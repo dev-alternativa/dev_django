@@ -1,0 +1,14 @@
+{% load static %}
+        <div class="card-header">
+            Usuários cadastrados
+        </div>
+        {% comment %} <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+            <a href="{% url 'add_usuario' %}" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Novo Usuário
+            </a>
+        </div> {% endcomment %}
+        <div class="space_from_margin">       
+            {% include "lista_usuarios.html" %}
+        </div>
+        

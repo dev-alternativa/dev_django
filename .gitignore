@@ -1,0 +1,61 @@
+# Virtual env
+venv/
+env/
+ENV/
+.venv/
+.pyvenv/
+.idea/
+
+
+# Arquivos Python
+_pycache_/
+*.pyo
+*.py[cod]
+*.so
+
+# Configurações do Django
+*.log
+local_settings.py
+
+# Media e arquivos estáticos
+media/
+staticfiles/
+static/
+
+# Arquivos de migrations
+*/migrations/*
+!*/migrations/__init__.py
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de logs
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos gerados pelo sistema de compilação
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Arquivos temporários e de backup
+*.swp
+*.bak
+*.tmp
+*.old
+*.orig
+*.save
+*.~*
+*.out
+*.rej
+*~
+
+# Arquivos relacionados ao Docker
+docker-compose.override.yml
+.dockerignore

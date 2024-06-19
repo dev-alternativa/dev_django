@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Importar Estoque{% endblock %}
+
+{% block content %}
+  <div id="page-wrapper">
+    <div class="container">
+      {% comment %} <div class="row"> {% endcomment %}
+        <div class="col-lg-12">
+          <h1 class="text-body-secondary text-center mb-3">Estoque de produtos</h1>
+          <div class="card">
+            <div class="card-header">
+              Importar arquivo Excel da listagem de Jumbos
+            </div>
+            
+            {% comment %} Botões de ações {% endcomment %}
+            <div class="container card card-conteudo">
+              <div class="row  class="input-group mb-3"">
+                <form class="row g-3" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+              </div>
+              <div class="container-fluid ">
+                <div class="row">
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-danger" onclick="goBack()">
+                        <i class="bi bi-x-lg"></i>
+                        Cancelar
+                      </button>
+                    </div>
+                    <div class="col-auto ms-auto">
+                      <button type="submit" class="btn btn-primary"">
+                        <i class="bi bi-upload"></i>
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+
+              </div>
+              </form>
+            </div>
+            {% comment %} Fim Botões de ações {% endcomment %}
+            
+            {% comment %} Lista items estoque {% endcomment %}
+            
+            {% comment %} Fim Lista Itens estoque{% endcomment %}
+          </div>
+        </div>
+        
+      {% comment %} </div> {% endcomment %}
+  </div>
+</div>
+{% endblock content %}

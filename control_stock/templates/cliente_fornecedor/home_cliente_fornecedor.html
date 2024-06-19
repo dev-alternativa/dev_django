@@ -1,0 +1,14 @@
+{% load static %}
+        <div class="card-header">
+            Clientes / Fornecedores cadastrados
+        </div>
+        <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+            <a href="{% url 'add_cliente_fornecedor' %}" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Novo Cliente/Fornecedor
+            </a>
+        </div>
+        <div class="space_from_margin">       
+            {% include "cliente_fornecedor/lista_cliente_fornecedor.html" %}
+        </div>
+        

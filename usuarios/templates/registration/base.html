@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Renato Pasklan">
+    <meta name="description" content="Página de Login do Sistema Alternativa Flexo">
+    {% comment %} Custom CSS {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <title>ALTERNATIVA FLEXO-DEV</title>
+    <style>
+      {% if ENVIRONMENT_DEV %}
+        .environment_banner {
+          background-color: seagreen;
+          height: 0.7rem;
+        }
+        {% elif ENVIRONMENT_HML  %}
+        .environment_banner {
+          background-color: goldenrod;
+          height: 0.7rem;
+        }
+        {% elif ENVIRONMENT_PRD  %}
+        .environment_banner {
+          background-color: white;
+          height: 0.7rem;
+      }
+      {% endif %}
+    </style>
+  </head>
+    <body>
+      <div class="login-container">
+        <div class='environment_banner'>&nbsp</div>
+          {% if ENVIRONMENT_DEV  %}
+            <H2>Desenvolvimento </H2>
+          {% elif ENVIRONMENT_HML %}
+            <H2>Homologação</H2>
+          {% elif ENVIRONMENT_PRD %}
+            <H2>Produção</H2>
+          {% else %}
+            <H2>Ambiente Desconhecido ou com erros</H2>
+          {% endif %}
+        
+
+        <div class="logo">
+          <img src="{% static 'img/logo-vertical.png' %}" id="logomarca" alt="Logo Alternativa Flexo" class="img-logo">
+        </div>
+        {% block content %}
+        {% endblock content %}
+      </div>
+  </body>
+</html>

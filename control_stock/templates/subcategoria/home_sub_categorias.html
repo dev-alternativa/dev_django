@@ -1,0 +1,14 @@
+{% load static %}
+        <div class="card-header">
+            Sub-Categorias cadastradas
+        </div>
+        <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+            <a href="{% url 'add_sub_categoria' %}" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Nova Sub-Categoria
+            </a>
+        </div>
+        <div class="space_from_margin">       
+            {% include "subcategoria/lista_sub_categoria.html" %}
+        </div>
+        

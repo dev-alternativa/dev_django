@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+   
+{% block title %}Sub-Categorias{% endblock %}
+
+{% block content %}
+  <div id="page-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="text-body-secondary text-center mb-3">Sub-Categorias</h1>
+                <!-- Exibir mensagens de inclusão ou erro -->
+                {% if messages %}
+                  <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <div class="card">
+                  {% include "subcategoria/home_sub_categorias.html" %}
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% endblock content %}
