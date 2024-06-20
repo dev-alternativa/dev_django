@@ -1,0 +1,71 @@
+/*
+    #Background
+*/
+
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('/static/img/bg-login.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+ }
+
+.login-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center; /* Alinhar o conteúdo centralizado */
+}
+
+/*
+    # Formulario
+*/
+
+.login-form input[type="text"],
+.login-form input[type="password"],
+.login-form input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.login-form input[type="submit"] {
+    background-color: #bf383f;
+    color: #fff;
+    cursor: pointer;
+}
+
+.login-form input[type="submit"]:hover {
+    background-color: #c9696e;
+}
+/*
+    # Image
+*/
+.logo {
+    height: 13rem;
+} 
+
+.img-logo  {
+    height: 15rem;
+}
+
+.error {
+    color: #d53438;
+    font-weight: bold;
+    border-style: solid;    
+    padding: 0.4rem;
+    border-width: thin
+}

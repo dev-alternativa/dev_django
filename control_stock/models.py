@@ -172,7 +172,7 @@ class ClienteFornecedor(Base):
     estado = models.CharField('Estado', choices=ESTADOS_BRASIL, max_length=50)
     contato = models.CharField('Contato', max_length=50)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100)
-    taxa_frete = models.CharField('Taxa de frete', max_length=100)
+    taxa_frete = models.DecimalField('Taxa de frete', max_digits=8, decimal_places=2)
     cliente_transportadora = models.ForeignKey('control_stock.Transportadora', verbose_name='Transportadora', on_delete=models.CASCADE)
     prazo = models.ForeignKey('control_stock.Prazo', verbose_name='Prazo', on_delete=models.CASCADE)
     categoria = models.ManyToManyField(Categoria, related_name='clientes')

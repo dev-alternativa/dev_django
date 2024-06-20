@@ -23,7 +23,7 @@ local_settings.py
 # Media e arquivos estáticos
 media/
 staticfiles/
-static/
+
 
 # Arquivos de migrations
 */migrations/*

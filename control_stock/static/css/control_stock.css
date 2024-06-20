@@ -1,0 +1,80 @@
+/* Globais */
+
+.space_from_margin {
+    padding: 1rem;
+}
+
+.space_padding_botton {
+    padding-bottom: 1rem;
+}
+
+.center_content {
+    display: flex;
+    justify-content: center;
+    padding-top: 1.2rem; 
+    padding-top: .3rem;
+    padding-left: .7rem;
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.action_size_column {
+    width: 25%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Select Categoria */
+.select2-search__field {
+    width: 100% !important;
+}
+
+/* Estoque */
+.btn-actions {
+    margin: 0.5rem;
+}
+
+input.btn-actions{
+    margin-top: 1.5rem;
+}
+
+.card_externo {
+    padding: 1rem;
+}
+
+.grupo-botoes {
+    padding-top:2rem
+}
+
+.filter-spaces {
+    padding-top: 1rem;
+}
+
+.table {
+    margin-top: 1rem;
+}
+
+th {
+    align-content: center;
+    text-align: center;
+    padding: 1rem;
+}
+
+.top-buttons {
+    padding-top: 1rem;
+    
+}
+
+.card-conteudo {
+    padding: 1rem;
+}
+
+/* Card Excluir Item */
+.delete-box {
+    text-align: center;
+}
+

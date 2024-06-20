@@ -3,8 +3,9 @@ from django.forms import ModelForm
 from .models import Categoria, ClienteFornecedor,ConfCoordenada, Prazo,SubCategoria, Transportadora, Unidade
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML
-from crispy_forms.bootstrap import TabHolder, Tab
+from crispy_forms.bootstrap import TabHolder, Tab, PrependedText 
 from crispy_bootstrap5.bootstrap5 import Switch
+from django_select2.forms import Select2MultipleWidget
 
 class UploadXLSXForm(forms.Form):
   file = forms.FileField(
@@ -53,63 +54,75 @@ class ClienteFornecedorForm(ModelForm):
   class Meta:
     model = ClienteFornecedor
     fields = '__all__'
+    widgets = {
+      'categoria': Select2MultipleWidget,
+    }
     
   def __init__(self, *args, **kwargs):
     super(ClienteFornecedorForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
+    self.fields['cnpj'].label = "CPF/CNPJ do Cliente/Fornecedor"
     # self.fields['descricao'].required = False
     self.helper.form_method = 'post'
     self.helper.layout = Layout(
       
-        TabHolder(
-            Tab(
-              'Dados Básicos',
-              Row(
-                Column(
-                  Field('nome', css_class='form-control col-md-6 mb-0'),
-                  Field('cnpj', css_class='form-control col-md-6 mb-0'),
-                  Field('cidade', css_class='form-control col-md-6 mb-0'),
-                  Field('estado', css_class='form-control col-md-6 mb-0'),
-                ),
-                Column(
-                  Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
-                  Field('taxa_frete', css_class='form-control col-md-6 mb-0'),
-                  Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
-                  Field('prazo', css_class='form-control col-md-6 mb-0'),
-                ),
-              )
+      TabHolder(
+        Tab(
+          'Dados Básicos',
+          Row(
+            Column(
+              Field('nome', css_class='form-control col-md-6 mb-0'),
+              Field('cnpj', css_class='form-control col-md-6 mb-0'),
+              Field('cidade', css_class='form-control col-md-6 mb-0'),
+              Field('estado', css_class='form-control col-md-6 mb-0'),
             ),
-            Tab(
-              'Dados Avançados',
-              Row(
-                Column(
-                  Field('categoria', css_class='form-control col-md-6 mb-0'), 
-                  #Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
-                  Field('inscricao_estadual', css_class='form-control col-md-6 mb-0'),
-                  Field('limite_credito', css_class='form-control col-md-6 mb-0'),
-                ),
-                Column(
-                  Switch('status', css_class='form-control col-md-6 mb-0'),
-                  Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
-                  Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
-                  Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),  
-                ),
-              )  
+            Column(
+              Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
+              PrependedText('taxa_frete','R$' ,css_class='form-control col-md-6 mb-0'),
+              Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
+              Field('prazo', css_class='form-control col-md-6 mb-0'),
             ),
-        ),        
-      Row(
-        Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          )
         ),
-        Column(
-          HTML(
-            '<button type="submit" class="btn btn-primary btn-lg">'
-            '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-          ),
+        Tab(
+          'Dados Avançados',
+          Row(
+            Column(
+              Field('categoria', css_class='form-control col-md-6 mb-0'), 
+              #Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
+              Field('inscricao_estadual', css_class='form-control col-md-6 mb-0'),
+              Field('limite_credito', css_class='form-control col-md-6 mb-0'),
+            ),
+            Column(
+              Switch('status', css_class='form-control col-md-6 mb-0'),
+              Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
+              Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
+              Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),  
+            ),
+          )  
         ),
-        css_class='form-group col-12 text-center'
-      )
+      ),        
+    Row(
+      Column(
+        HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+      ),
+      Column(
+        HTML(
+          '<button type="submit" class="btn btn-primary btn-lg">'
+          '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+        ),
+      ),
+      css_class='form-group col-12 text-center'
     )
+    )
+    
+    self.fields['cnpj'].widget.attrs.update({ 'maxlength': 18 })
+    self.fields['taxa_frete'].widget.attrs.update({ 'maxlength': 4 })
+    self.fields['inscricao_estadual'].widget.attrs.update({ 'maxlength': 14 })
+    
+    def clean_cnpj(self):
+      cnpj = self.cleaned_data.get('cnpj')
+      return cnpj.replace('.', '').replace('-', '').replace('/', '') if cnpj else ''
 
 
 # class ClienteFornecedorForm(ModelForm):
