@@ -54,8 +54,8 @@
                         </a>
                     </li> 
                    
-                    <li class="sidebar-item">
-                        <a href="{% url 'categoria' %}" class="sidebar-link sub-item">
+                    <li class="sidebar-item ">
+                        <a href="{% url 'categoria' %}" class="sidebar-link sub-item disable_click">
                             <i class="bi bi-basket2"></i>
                             Produto
                         </a>
@@ -128,7 +128,7 @@
                     <i class="bi bi-bar-chart-line"></i>
                     Dashboard
                 </a>
-                <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                <ul id="dashboard" class="sidebar-dropdown list-unstyled collapse hide_elements" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link">Dashboard Analytics</a>
                     </li>
@@ -167,7 +167,7 @@
             <li class="sidebar-header">
                 Multi Level Nav
             </li>
-            <li class="sidebar-item">
+            <li class="sidebar-item hide_elements">
                 <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#multi"
                     aria-expanded="false" aria-controls="multi">
                     <i class="fa-solid fa-share-nodes pe-2"></i>

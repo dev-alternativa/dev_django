@@ -8,7 +8,17 @@
     <meta name="description" content="Página de Login do Sistema Alternativa Flexo">
     {% comment %} Custom CSS {% endcomment %}
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <title>ALTERNATIVA FLEXO-DEV</title>
+    <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
+    
+    {% if ENVIRONMENT_DEV %}
+      <title>ALTERNATIVA FLEXO-DEV</title>
+    {% elif ENVIRONMENT_HML %}
+      <title>ALTERNATIVA FLEXO-HML</title>
+    {% else %}
+    <title>ALTERNATIVA FLEXO</title>    
+    {% endif %}
+    
+    
     <style>
       {% if ENVIRONMENT_DEV %}
         .environment_banner {

@@ -5,28 +5,28 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
  
-# # Cria usuario, usado apenas no admin
+# Cria usuario, usado apenas no admin
 class CustomUsuarioCreateForm(UserCreationForm):
   class Meta:
     model = CustomUsuario
     fields = ('email', 'first_name', 'last_name', 'contato', 'departamento', 'unidade')
     labels = {
-        'email': 'Username/E-mail'
+        'username': 'Username/E-mail'
     }
 
   def save(self, commit=True):
     user = super().save(commit=False)
     user.set_password(self.cleaned_data['password1'])
-    user.email = self.cleaned_data['email']
+    user.email = self.cleaned_data['username']
     if commit:
         user.save()
     return user
 
-  
+ # Atualiza usuario, usado apenas no admin
 class CustomUsuarioChangeForm(UserChangeForm):
   class Meta:
     model = CustomUsuario
-    fields = ('email', 'first_name', 'last_name', 'contato', 'departamento', 'unidade')
+    fields = ('first_name', 'last_name', 'contato', 'departamento', 'unidade')
 
 
 class LoginForm(AuthenticationForm):

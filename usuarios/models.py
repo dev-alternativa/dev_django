@@ -34,7 +34,7 @@ class UsuarioManager(BaseUserManager):
     extra_fields.setdefault('is_superuser', True)
     
     if extra_fields.get('is_staff') is not True:
-      raise ValueError('Superusuário precisa ser primeiro Staff, "Is_staff=True".')
+      raise ValueError('Superusuário precisa ser primeiro Staff, "is_staff=True".')
     if extra_fields.get('is_superuser') is not True:
       raise ValueError('Superusuário precisa ter propriedade "is_superuser=True"')
     
@@ -42,11 +42,7 @@ class UsuarioManager(BaseUserManager):
   
 # Model que define os campos que existirão na tabela de user
 class CustomUsuario(AbstractUser):
-  
-  class Meta:
-    verbose_name = 'Usuário'
-    verbose_name_plural = 'Usuários'
-  
+    
   DEPARTAMENTO_CHOICES = (
     ('FINANCEIRO', 'Financeiro'),
     ('GERENCIA', 'Gerência'),
@@ -65,7 +61,7 @@ class CustomUsuario(AbstractUser):
   departamento = models.CharField('Departamento', max_length=20, choices=DEPARTAMENTO_CHOICES)
   unidade = models.CharField('Unidade', max_length=40, choices=UNIDADE_CHOICES)
   
-  is_staff = models.BooleanField('Membro da equipe', default=False)
+  is_staff = models.BooleanField('Membro da equipe', default=True)
   
   USERNAME_FIELD = 'email'
   REQUIRED_FIELDS = ['first_name', 'last_name', 'contato']

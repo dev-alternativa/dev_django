@@ -8,7 +8,7 @@
                     <th>Contato</th>
                     <th>Departamento</th>
                     <th>Unidade</th>
-                    <th>Ações</th>
+                    {% comment %} <th>Ações</th> {% endcomment %}
                 </tr>
             </thead>
 
@@ -20,7 +20,7 @@
                     <td>{{ usuario.contato }}</td>
                     <td>{{ usuario.departamento }}</td>
                     <td>{{ usuario.unidade }}</td>
-                    <td class="action_size_column">
+                    <td class="action_size_column hide_elements">
                       <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                         <button type="button" class="btn btn-warning btn-edit"  data-categoria-id="{{ cat.id }}">
                           <i class="bi bi-pencil-square"></i>

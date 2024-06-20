@@ -1,0 +1,9 @@
+/* Desabilita o clique  */
+.disable_click {
+  pointer-events: none;
+}
+
+/* Ocultar Elementos */
+.hide_elements {
+  display: none;
+}
