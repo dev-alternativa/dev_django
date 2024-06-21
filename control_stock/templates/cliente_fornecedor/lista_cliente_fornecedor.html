@@ -8,23 +8,31 @@
               <th>CNPJ</th>
               <th>Contato</th>
               <th>Categoria</th>
-              <th>Tipo de Produto</th>
+              <th>Inscrição Estadual</th>
               <th>Limite de Crédito</th>
               <th class="action_size_column">Ações</th>
           </tr>
       </thead>
       <tbody class="table-group-divider">
-        {% for cat in itens_categoria %}
+        {% for cliente in itens_cliente_fornecedor %}
           <tr>
-            <td>{{ cat.nome }}</td>
-            <td>{{ cat.descricao }}</td>
+            <td>{{ cliente.nome }}</td>
+            <td>{{ cliente.cnpj }}</td>
+            <td>{{ cliente.contato }}</td>
+            <td>
+              {% for categoria in cliente.categoria.all  %}
+                {{ categoria.nome }}{% if not forloop.last %} / {% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ cliente.inscricao_estadual }}</td>
+            <td>{{ cliente.limite_credito }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
-                <button type="button" class="btn btn-warning btn-edit"  data-categoria-id="{{ cat.id }}">
+                <button type="button" class="btn btn-warning btn-edit"  data-categoria-id="{{ cliente.id }}">
                   <i class="bi bi-pencil-square"></i>
                   Editar
                 </button>
-                <button type="button" class="btn btn-danger btn-delete" data-categoria-id="{{ cat.id }}">
+                <button type="button" class="btn btn-danger btn-delete" data-categoria-id="{{ cliente.id }}">
                   <i class="bi bi-trash3"></i>
                   Apagar
                 </button>

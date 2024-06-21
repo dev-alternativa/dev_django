@@ -6,7 +6,12 @@
           <tr>
               <th>Nome</th>
               <th>CNPJ</th>
-              <th>OBS</th>
+              <th>Cód. OMIE COM</th>
+              <th>Cód. OMIE IND</th>
+              <th>Cód. OMIE PRE</th>
+              <th>Cód. OMIE MRX</th>
+              <th>Cód. OMIE SRV</th>
+              <th>Cód. OMIE FLX</th>
               <th class="action_size_column">Ações</th>
           </tr>
       </thead>
@@ -15,7 +20,12 @@
           <tr>
             <td>{{ transportadora.nome }}</td>
             <td>{{ transportadora.cnpj }}</td>
-            <td>{{ transportadora.obs }}</td>
+            <td>{{ transportadora.cod_omie_COM|default_if_none:"" }}</td>
+            <td>{{ transportadora.cod_omie_IND|default_if_none:"" }}</td>
+            <td>{{ transportadora.cod_omie_PRE|default_if_none:"" }}</td>
+            <td>{{ transportadora.cod_omie_MRX|default_if_none:"" }}</td>
+            <td>{{ transportadora.cod_omie_SRV|default_if_none:"" }}</td>
+            <td>{{ transportadora.cod_omie_FLX|default_if_none:"" }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <button type="button" class="btn btn-warning btn-edit"  data-transportadora-id="{{ transportadora.id }}">

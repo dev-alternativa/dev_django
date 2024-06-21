@@ -4,16 +4,18 @@
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
           <tr>
-              <th>Cenário</th>
-              <th>Obs.</th>
+              <th>Descrição</th>
+              <th>Parcelas</th>
+              <th>Código</th>
               <th class="action_size_column">Ações</th>
           </tr>
       </thead>
       <tbody class="table-group-divider">
         {% for prazo in itens_prazo %}
           <tr>
-            <td>{{ prazo.cenario }}</td>
-            <td>{{ prazo.obs }}</td>
+            <td>{{ prazo.descricao }}</td>
+            <td>{{ prazo.parcelas }}</td>
+            <td>{{ prazo.codigo }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <button type="button" class="btn btn-warning btn-edit"  data-prazo-id="{{ prazo.id }}">

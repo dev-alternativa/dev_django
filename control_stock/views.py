@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, ListView, DeleteView
 from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, SubCategoriaForm, TransportadoraForm, UnidadeForm, PrazoForm, UploadXLSXForm
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Prazo, SubCategoria, Transportadora, Unidade
+from django import forms
 
 import openpyxl
 
@@ -97,26 +98,27 @@ class ClienteFornecedorNovoView(CreateView):
   template_name = "cliente_fornecedor/adicionar_cliente_fornecedor.html"
   success_url = reverse_lazy('cliente_fornecedor')
   
-  # Veririfa se o form é válido
-  def form_valid(self, form):
-    respose = super().formvalid(form)
-    messages.success(self.request, 'Cliente/Fornecedor cadastrado com sucesso!')
-    return super().form_valid(form)
-  
-  def cliente_novo(request):
-    if request.method == 'POST':
-      form = ClienteFornecedorForm(request.POST)
-      if form.is_valid():
-        form.save()
-        return redirect('cliente_fornecedor')
-      else:
-        form = ClienteFornecedorForm()
-        
-      context = {
-        'form': form,
-      }
-      return render(request, 'adicionar_cliente_fornecedor.html', context)
+  def form_invalid(self, form):
+      cnpj = form.cleaned_data.get('cnpj', '')
+      digits = ''.join(filter(str.isdigit, cnpj))
+      if len(digits) < 11:
+          messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
+      
+        # Adicionar os erros do formulário nas mensagens
+      for field, errors in form.errors.items():
+          for error in errors:
+              messages.error(self.request, f"{form.fields[field].label}: {error}")
+      
+      
+      return self.render_to_response(self.get_context_data(form=form))
 
+  def form_valid(self, form):
+      response = super().form_valid(form)
+      messages.success(self.request, 'Cliente/Fornecedor cadastrado com sucesso!')
+      return response 
+ 
+  
+ 
 
 class CoordenadaNovaView(CreateView):
   model = ConfCoordenada
@@ -235,25 +237,35 @@ class TransportadoraNovaView(CreateView):
     template_name = 'transportadora/adicionar_transportadora.html'
     success_url = reverse_lazy('transportadora')
     
+    
+    # Verifica se form é invalido
+    def form_invalid(self, form):
+      cnpj = form.cleaned_data.get('cnpj', '')
+      digits = ''.join(filter(str.isdigit, cnpj))
+      if len(digits) < 11:
+        messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
+        return super().form_invalid(form)
+      return super().form_invalid(form)
+    
     # Verificaa se form é válido
     def form_valid(self, form):
       response = super().form_valid(form)
       messages.success(self.request, 'Transportadora cadastrada com sucesso!')
       return response
     
-    def transportadora_nova(request):
-      if request.method == 'POST':
-        form = TransportadoraForm(request.POST)
-        if form.is_valid():
-          form.save()
-          return redirect('transportadora')
-      else:
-        form = TransportadoraForm()
+    # def transportadora_nova(request):
+    #   if request.method == 'POST':
+    #     form = TransportadoraForm(request.POST)
+    #     if form.is_valid():
+    #       form.save()
+    #       return redirect('transportadora')
+    #   else:
+    #     form = TransportadoraForm()
         
-      context = {
-        'form': form,
-      }
-      return render(request, 'adicionar_transportadora.html', context)
+    #   context = {
+    #     'form': form,
+    #   }
+    #   return render(request, 'adicionar_transportadora.html', context)
   
   
 class UnidadeNovaView(CreateView):

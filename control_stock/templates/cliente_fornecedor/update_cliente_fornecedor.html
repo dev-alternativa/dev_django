@@ -14,7 +14,7 @@
                     Atualizar Categoria
                 </div>
                 <div class='btn-group top-buttons space_from_margin center_content' role="group" aria-label="Grupo de botões">
-                    <form method="POST">
+                    <form method="POST" id="form_cliente_fornecedor" autocomplete="off">
                       {% csrf_token %}
                       {% crispy form %}
                     </form>

@@ -7,3 +7,9 @@
 .hide_elements {
   display: none;
 }
+
+/* Divisor vertical */
+.dividor-vertical {
+  border-left: 1px solid #ccc;
+  height: auto;
+}
