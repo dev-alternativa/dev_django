@@ -306,6 +306,16 @@ class CategoriaUpdateView(UpdateView):
     messages.success(self.request, 'Categoria atualizada com sucesso!')
     return super().form_valid(form)  
   
+class ClienteFornecedorUpdateView(UpdateView):
+  model = ClienteFornecedor
+  form_class = ClienteFornecedorForm
+  template_name = 'cliente_fornecedor/update_cliente_fornecedor.html'
+  success_url = reverse_lazy('cliente_fornecedor')
+  
+  def form_valid(self, form):
+    messages.success(self.request, 'Cliente / Fornecedor atualizado com sucesso!')
+    return super().form_valid(form)
+  
   
 class CoordenadaUpdateView(UpdateView):
   model = ConfCoordenada

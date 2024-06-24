@@ -177,7 +177,7 @@ class ClienteFornecedor(Base):
     cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30)
     cidade = models.CharField('Cidade', max_length=100)
     estado = models.CharField('Estado', choices=ESTADOS_BRASIL, max_length=50)
-    contato = models.CharField('Contato', max_length=10)
+    contato = models.CharField('Contato(Tel/E-mail)', max_length=30)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100)
     taxa_frete = models.CharField('Taxa de frete', max_length=10)
     cliente_transportadora = models.ForeignKey('control_stock.Transportadora', verbose_name='Transportadora', on_delete=models.CASCADE)
