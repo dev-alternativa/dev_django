@@ -81,7 +81,15 @@ document.querySelectorAll('.btn-edit').forEach(function(button) {
       const unidadeId = this.getAttribute(`data-unidade-id`);
       const editUrl = `/unidade/${unidadeId}/update/`;
       window.location.href = editUrl;
+
+      /* CLIENTE/FORNECEDOR */
+    }else if(/\/cliente_fornecedor\//.test(currentURL)){
+      const clienteId = this.getAttribute(`data-itens_cliente-id`);
+      const editUrl = `/cliente_fornecedor/${clienteId}/update/`;
+      window.location.href = editUrl;
     }
+
+
   });
 });
 

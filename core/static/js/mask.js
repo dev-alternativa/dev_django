@@ -1,4 +1,4 @@
-/* Funções para aplicar máscara em campos do tipo texto */
+/* FUNÇÕES PARA APLICAR MÁSCARA EM CAMPOS DO TIPO TEXTO */
 
 
 // Lida com diferentes tipos de campos numéricos: Apenas númerico, números e a vírgula
@@ -16,6 +16,7 @@ const removeNaoNumerico = (input) => {
 };
 
 
+/** FORMATACAO DE VALORES MONETÁRIOS EM CAMPOS INPUT **/
 /*****************************************************************************************/
 
 // Chamada quando campo monetario perder o foco
@@ -33,8 +34,12 @@ const formataValorMonetario = (input) => {
 
       // Verifica quantas casas decimais existem
       if (parteDecimal.length === 0) {
-        // Acrescenta 2 '0' caso não existam valores após a vírgula
-        input.value = `${partInteira},00`;
+        if(partInteira.length === 0 || !partInteira){
+          input.value = `0,00`;
+        }else{
+          // Acrescenta 2 '0' caso não existam valores após a vírgula
+          input.value = `${partInteira},00`;
+        }
         
       } else if(parteDecimal.length === 1){
         
@@ -47,28 +52,20 @@ const formataValorMonetario = (input) => {
       }
     } else {
       //  não existindo vírgula, acrescenta 2 casas decimais com 2 '0'
-      input.value = `${valor},00`;
+      if (!valor) {
+        input.value = `0,00`;
+      } else {
+        input.value = `${valor},00`;
+      }
     }
   };
   // evento de perder o foco e execução da função
   input.addEventListener('blur', formatValue);
 };
 
+
+/** RESTRIÇÃO DE VALORES NUMÉRICOS EM CAMPOS INPUT **/
 /*****************************************************************************************/
-
-
-// Qualquer campo com a classe 'money' poderá utilizar essa função
-// const inputMonetario = document.querySelector(".money");
-// if(inputMonetario){
-//   removeNaoNumerico(inputMonetario);
-//   formataValorMonetario(inputMonetario);
-// }
-
-// // Qualquer campo com a classe não permitira a digitação de valores não numéricos
-// const inputNaoNumerico = document.querySelector('.numericValorOnly');
-// if(inputNaoNumerico){
-//   removeNaoNumerico(inputNaoNumerico);
-// }
 
 // Verifica todos os campos dos formulários que possam ser numericos e/ou monetários
 document.addEventListener('DOMContentLoaded', () => {
@@ -84,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+/** MASCARÁ PARA CNPJ e CPF **/
 /*****************************************************************************************/
 
 // Listener do input de CPF/CNPJ, verifica se o valor digitado é um CPF ou CNPJ
