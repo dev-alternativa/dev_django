@@ -81,7 +81,6 @@ class ClienteFornecedorForm(ModelForm):
     self.fields['tag_cadastro_omie_srv'].required = False
     self.fields['obs'].required = False
     # self.fields['sub_categoria'].required = False
-   
     
     self.helper.layout = Layout(
       TabHolder(
@@ -92,13 +91,14 @@ class ClienteFornecedorForm(ModelForm):
               Field('nome', css_class='form-control col-md-6 mb-0'),
               Field('cnpj', css_class='form-control col-md-6 mb-0'),
               Field('cidade', css_class='form-control col-md-6 mb-0'),
-              Field('estado', css_class='form-control col-md-6 mb-0'),
-              Field('contato', css_class='form-control col-md-6 mb-0'),
+              Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
+              Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
             ),
             Column(
-              Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
-              PrependedText('taxa_frete','R$', css_class='form-control col-md-6 mb-0 numericValorOnly'),
-              Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
+              Field('contato', css_class='form-control col-md-6 mb-0'),
+              Field('inscricao_estadual', css_class='form-control col-md-6 mb-0 numericValorOnly'),
+              Field('estado', css_class='form-control col-md-6 mb-0'),
+              PrependedText('taxa_frete','R$', css_class='form-control col-md-6 mb-0 numericValorOnly money'),
               Field('prazo', css_class='form-control col-md-6 mb-0'),
             ),
           )
@@ -109,8 +109,8 @@ class ClienteFornecedorForm(ModelForm):
             Column(
               Field('categoria', css_class='form-control col-md-6 mb-0'), 
               #Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
-              Field('inscricao_estadual', css_class='form-control col-md-6 mb-0'),
-              PrependedText('limite_credito', 'R$', css_class='form-control col-md-6 mb-0 numericValorOnly'),
+              
+              PrependedText('limite_credito', 'R$', css_class='form-control col-md-6 mb-0 numericValorOnly money'),
             ),
             Column(
               Switch('ativo', css_class='form-control col-md-6 mb-0'),

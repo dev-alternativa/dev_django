@@ -1,47 +1,95 @@
 /* Funções para aplicar máscara em campos do tipo texto */
 
 
-// Para input de valor monetários
-// Acrescenta vírgula e dois 0 caso não exista vírgula
-// Acrescemta um 0 caso exista apenas 1 casa decimal
-const formataValorMonetario = (input) => {
-  let valor = input.value.trim();
-
-
-  if (valor.includes(',')){
-    let partes = valor.split(',');
-    let parteInteira = partes[0];
-    let parteDecimal = partes[1];
-
-
-    if(parteDecimal.length === 1){
-      input.value = `${parteInteira},${parteDecimal}0`;
-    }else{
+// Lida com diferentes tipos de campos numéricos: Apenas númerico, números e a vírgula
+const removeNaoNumerico = (input) => {
+  input.addEventListener('input', () => {
+    let valor = input.value.trim();
+    if (input.classList.contains('money')) {
+      valor = valor.replace(/[^0-9,]/g, ''); // Permitir apenas números e vírgula
+      input.value = valor;
+    } else {
+      valor = valor.replace(/\D/g, ''); // Remover caracteres não numéricos
       input.value = valor;
     }
-  }else{
-    input.value = `${valor},00`;
-  }
-}
+  });
+};
 
-const numericOnlyInput = document.querySelector('.numericValorOnly');
-if(numericOnlyInput != undefined){
 
-  const removeNonNumericChar = (input) => {
-    input.addEventListener('input', () => {
-      let valor = input.value.replace(/D/, '');
-      return valor;
-    });
-  }
+/*****************************************************************************************/
 
-  removeNonNumericChar(numericOnlyInput);
-}
+// Chamada quando campo monetario perder o foco
+const formataValorMonetario = (input) => {
+  const formatValue = () => {
+    // remove espaços
+    let valor = input.value.trim();
+    
+    // verifica se existe ','
+    if (valor.includes(',')) {
+      // se existir, separa as partes decimal e inteira
+      let partes = valor.split(',');
+      let partInteira = partes[0];
+      let parteDecimal = partes[1] || '';
 
+      // Verifica quantas casas decimais existem
+      if (parteDecimal.length === 0) {
+        // Acrescenta 2 '0' caso não existam valores após a vírgula
+        input.value = `${partInteira},00`;
+        
+      } else if(parteDecimal.length === 1){
+        
+        // acrescenta 1 '0' caso só exista 1 casa decimal
+        input.value = `${partInteira},${parteDecimal}0`;
+      }else{
+
+        // garante a existencia de apenas 2 casas decimais, sempre removerá o última caractere digitado além das 2 casas, inclusive uma segunda ','
+        input.value = `${partInteira},${parteDecimal.slice(0, 2)}`;
+      }
+    } else {
+      //  não existindo vírgula, acrescenta 2 casas decimais com 2 '0'
+      input.value = `${valor},00`;
+    }
+  };
+  // evento de perder o foco e execução da função
+  input.addEventListener('blur', formatValue);
+};
+
+/*****************************************************************************************/
+
+
+// Qualquer campo com a classe 'money' poderá utilizar essa função
+// const inputMonetario = document.querySelector(".money");
+// if(inputMonetario){
+//   removeNaoNumerico(inputMonetario);
+//   formataValorMonetario(inputMonetario);
+// }
+
+// // Qualquer campo com a classe não permitira a digitação de valores não numéricos
+// const inputNaoNumerico = document.querySelector('.numericValorOnly');
+// if(inputNaoNumerico){
+//   removeNaoNumerico(inputNaoNumerico);
+// }
+
+// Verifica todos os campos dos formulários que possam ser numericos e/ou monetários
+document.addEventListener('DOMContentLoaded', () => {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach(input => {
+    if (input.classList.contains('numericValorOnly')) {
+      removeNaoNumerico(input); // Garante que apenas números e vírgula sejam permitidos
+    }
+    if (input.classList.contains('money')) {
+      removeNaoNumerico(input);
+      formataValorMonetario(input); // Formata o valor ao perder o foco
+    }
+  });
+});
+
+/*****************************************************************************************/
 
 // Listener do input de CPF/CNPJ, verifica se o valor digitado é um CPF ou CNPJ
 // Verifica quantidade de caracteres entrados e aplica a máscara conforme o tamanho
 const input_cnpj_cpf = document.querySelector('input[name="cnpj"]');
-if (input_cnpj_cpf != undefined){
+if (input_cnpj_cpf){
 
   const applyMask = (input) => {
     input.addEventListener('input', () => {
