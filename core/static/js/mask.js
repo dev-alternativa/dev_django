@@ -1,6 +1,32 @@
 /* FUNÇÕES PARA APLICAR MÁSCARA EM CAMPOS DO TIPO TEXTO */
 
 
+// substitui `.` por `,` nos inputs
+document.addEventListener('DOMContentLoaded', function () {
+
+  // só é disparada na rota de update
+  if (window.location.pathname.includes('update')) {
+    // Função para substituir ponto por vírgula
+    function formatDecimal(value) {
+        return value.replace(/\./g, ',');
+    }
+  
+    // Seleciona os inputs que precisam de formatação
+    const decimalInputs = document.querySelectorAll('input');
+    if(decimalInputs){
+      // Aplica a formatação aos valores dos inputs que tenham a classe money
+      decimalInputs.forEach(input => {
+          if (input.classList.contains("money")) {
+            if(input.value.includes('.')){
+              input.value = formatDecimal(input.value);
+            }
+          }
+      });
+    }
+  }
+});
+
+
 // Lida com diferentes tipos de campos numéricos: Apenas númerico, números e a vírgula
 const removeNaoNumerico = (input) => {
   input.addEventListener('input', () => {
