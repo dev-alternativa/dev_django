@@ -189,14 +189,14 @@ class ClienteFornecedor(Base):
     limite_credito = models.CharField('Limite de Crédito', max_length=20)
     # status = models.BooleanField('Ativo', default=True) # Verificar quis são os status
     contribuinte = models.BooleanField('Contribuinte', default=True)
-    tag_cliente = models.BooleanField('Cliente?', default=False)
-    tag_fornecedor = models.BooleanField('Fornecedor?', default=False)
-    tag_cadastro_omie_com = models.CharField('OMIE COM?',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_ind = models.CharField('OMIE IND?',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_pre = models.CharField('OMIE PRE?',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_mrx = models.CharField('OMIE MRX?',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_flx = models.CharField('OMIE FLX?',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_srv = models.CharField('OMIE SRV?',  max_length=20, null=True, blank=True)
+    tag_cliente = models.BooleanField('Cliente', default=False)
+    tag_fornecedor = models.BooleanField('Fornecedor', default=False)
+    tag_cadastro_omie_com = models.CharField('OMIE COM',  max_length=20, null=True, blank=True)
+    tag_cadastro_omie_ind = models.CharField('OMIE IND',  max_length=20, null=True, blank=True)
+    tag_cadastro_omie_pre = models.CharField('OMIE PRE',  max_length=20, null=True, blank=True)
+    tag_cadastro_omie_mrx = models.CharField('OMIE MRX',  max_length=20, null=True, blank=True)
+    tag_cadastro_omie_flx = models.CharField('OMIE FLX',  max_length=20, null=True, blank=True)
+    tag_cadastro_omie_srv = models.CharField('OMIE SRV',  max_length=20, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
 
     class Meta:

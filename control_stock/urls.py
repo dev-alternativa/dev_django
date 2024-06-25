@@ -18,6 +18,7 @@ urlpatterns = [
     path("cliente_fornecedor/", ClienteFornecedorListView.as_view(), name="cliente_fornecedor"),
     path("cliente_fornecedor/adicionar/", ClienteFornecedorNovoView.as_view(), name= "add_cliente_fornecedor"),
     path("cliente_fornecedor/<int:pk>/update/", ClienteFornecedorUpdateView.as_view(), name="update_cliente_fornecedor"),
+    path("cliente_fornecedor/<int:pk>/delete", ClienteFornecedorDeleteView.as_view(), name="delete_cliente_fornecedor"),
     
     # Coordenadas
     path("coordenada/", ConfCoordListView.as_view(), name="coordenada"),

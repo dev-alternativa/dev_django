@@ -1,5 +1,5 @@
 
-// TEMPORIZADOR DE MENSAGENS DE AVISO NAS PÁGINAS
+// TEMPORIZADOR DE ALERTS DE AVISO NAS PÁGINAS
 document.addEventListener('DOMContentLoaded', function() {
   // Selecione todos os alertas na página
   const alerts = document.querySelectorAll('.alert');
@@ -33,9 +33,11 @@ document.addEventListener('DOMContentLoaded', function() {
 // }
 
 
-// **** ACIONAR BOTÕES DE EDIÇÃO DE ITENS DA LISTA ****
-// Qualquer um dos botões de edição clicados 
-// redirecionará para a página de edição de dados com o ID correspondente
+// ************************ ACIONAR BOTÕES DE EDIÇÃO DE ITENS DA LISTA ************************
+/* 
+  Qualquer um dos botões de edição clicados 
+  redirecionará para a página de edição de dados com o ID correspondente
+*/
 document.querySelectorAll('.btn-edit').forEach(function(button) {
   button.addEventListener('click', function() {
     const currentURL = window.location.pathname;
@@ -93,10 +95,11 @@ document.querySelectorAll('.btn-edit').forEach(function(button) {
   });
 });
 
-// **** ACIONAR BOTÕES PARA DELETAR RESPECTIVO ITEM DA LISTA ****
-// Qualquer um dos botões 'Apagar'da lista clicados
-// perguntará se realmente deseja apagar e removerá o item atualizando 
-// a lista
+// ************************ ACIONAR BOTÕES PARA DELETAR RESPECTIVO ITEM DA LISTA ************************
+/*  
+  Qualquer um dos botões 'Apagar'da lista clicados perguntará se realmente deseja apagar 
+  e removerá o item, atualizando a lista 
+*/
 document.querySelectorAll('.btn-delete').forEach(function(button) {
   button.addEventListener('click', function() {
     const currentURL = window.location.pathname;
@@ -143,6 +146,11 @@ document.querySelectorAll('.btn-delete').forEach(function(button) {
       const deleteUrl = `/unidade/${unidadeId}/delete`;
       window.location.href = deleteUrl;
 
+      /* CLIENTE / FORNECEDOR */
+    }else if(/\/cliente_fornecedor\//.test(currentURL)){
+      const clienteId = this.getAttribute(`data-itens_cliente-id`);
+      const deleteUrl = `/cliente_fornecedor/${clienteId}/delete`;
+      window.location.href = deleteUrl;
     }
   });
 });

@@ -253,20 +253,6 @@ class TransportadoraNovaView(CreateView):
       messages.success(self.request, 'Transportadora cadastrada com sucesso!')
       return response
     
-    # def transportadora_nova(request):
-    #   if request.method == 'POST':
-    #     form = TransportadoraForm(request.POST)
-    #     if form.is_valid():
-    #       form.save()
-    #       return redirect('transportadora')
-    #   else:
-    #     form = TransportadoraForm()
-        
-    #   context = {
-    #     'form': form,
-    #   }
-    #   return render(request, 'adicionar_transportadora.html', context)
-  
   
 class UnidadeNovaView(CreateView):
     model = Unidade
@@ -395,12 +381,23 @@ class CategoriaDeleteView(DeleteView):
       return response
 
 
+class ClienteFornecedorDeleteView(DeleteView):
+  model = ClienteFornecedor
+  template_name = 'cliente_fornecedor/delete_cliente_fornecedor.html'
+  success_url = reverse_lazy('cliente_fornecedor')
+  
+  def delete_success(self, request, *args, **kwargs):
+    response = super().delete(request, *args, **kwargs)
+    messages.success(self.request, 'Cliente/Fornecedor excluído com sucesso!')
+    return response
+
+
 class CoordenadaDeleteView(DeleteView):
   model = ConfCoordenada
   template_name = "conf_coordenada/delete_coordenada.html"
   success_url = reverse_lazy('coordenada')
     
-  def delete_sucess(self, request, *args, **kwargs):
+  def delete_success(self, request, *args, **kwargs):
     response = super().delete(request, *args, **kwargs)
     messages.success(self.request, 'Coordenada excluída com sucesso!')
     return response
