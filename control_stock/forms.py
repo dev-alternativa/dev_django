@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, ValidationError 
 from .models import Categoria, ClienteFornecedor,ConfCoordenada, Prazo,SubCategoria, Transportadora, Unidade
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML, Fieldset, MultiField
+from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText 
 from crispy_bootstrap5.bootstrap5 import Switch
 from django_select2.forms import Select2MultipleWidget
@@ -58,13 +58,13 @@ class ClienteFornecedorForm(ModelForm):
       'categoria': Select2MultipleWidget,
     }
     
-    
-  # def clean_cnpj(self):
-  #   cnpj = self.cleaned_data.get('cnpj')
-  #   digits = ''.join(filter(str.isdigit, cnpj))
-  #   if len(digits) < 11 and len(digits > 0):
-  #       raise forms.ValidationError('CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
-  #   return cnpj
+  # Valida numeração de CPF / CNPJ
+  def clean_cnpj(self):
+    cnpj = self.cleaned_data.get('cnpj')
+    digits = ''.join(filter(str.isdigit, cnpj))
+    if len(digits) < 12:
+        raise forms.ValidationError('CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
+    return cnpj
     
   def __init__(self, *args, **kwargs):
     super(ClienteFornecedorForm, self).__init__(*args, **kwargs)
@@ -148,6 +148,7 @@ class ClienteFornecedorForm(ModelForm):
     # Especifica atributos específicos em alguns campos
     self.fields['taxa_frete'].widget.attrs['onchange'] = 'formataValorMonetario(this)'
     self.fields['limite_credito'].widget.attrs['onchange'] = 'formataValorMonetario(this)'
+    self.fields['cnpj'].widget.attrs['onchange'] = 'validaCampoCPFCNPJ(this)'
     
     # Especifica quantidade máxima de alguns campos do formulário
     self.fields['cnpj'].widget.attrs.update({ 'maxlength': 18 })
