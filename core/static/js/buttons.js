@@ -1,5 +1,5 @@
 
-/* Retorna para página de listagem */
+/* Retorna para página de listagem do cadastro correspondente */
 function goBack() {
   const urlPath = window.location.pathname;
   const dominio = window.location.origin

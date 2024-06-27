@@ -45,8 +45,43 @@ const removeNaoNumerico = (input) => {
 /** FORMATACAO DE VALORES MONETÁRIOS EM CAMPOS INPUT **/
 /*****************************************************************************************/
 const formataPeso = (input) => {
-  
-}
+  const formatValue = () => {
+    // remove espaços
+    let peso = input.value.trim();
+    // verifica se existe vírgula
+    if(peso.includes(',')){
+      // se existir, separa as partes decimal e inteira
+      let parts = peso.split(',');
+      let parteInteira = parts[0];
+      let parteDecimal = parts[1];
+
+      // verifica quantas cadas decimais foram informadas
+      if(parteDecimal.length === 0){
+        // se não ouver parte inteira ou decimal, aplica zero
+        if(parteInteira.length === 0 || !parteInteira){
+          input.value = `0,00`;
+        }else{
+          // acrescenta dois `0` caso exista vírgula mas não valor
+          input.value = `${parteInteira},00`
+        }
+      }else if(parteDecimal.length === 1){
+        // se foi informado apenas 1 valor decimal acrescenta mais um `0`
+        input.value = `${parteInteira},${parteDecimal}0`;
+      }else{
+        // se foi informado valor decimal com mais de duas casas, remove as outras
+        input.value = `${parteInteira},${parteDecimal.slice(0,2)}`;
+      }
+    }else{
+      // se o campo foi deixado em branco ou não foi informado vírgula
+      if(!peso){
+        input.value = `0,00`;
+      }else{
+        input.value = `${peso},00`;
+      }
+    }
+  };
+  input.addEventListener('blur', formatValue);
+};
 
 
 

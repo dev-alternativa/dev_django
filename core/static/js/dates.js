@@ -29,16 +29,17 @@ const validaData = (value) => {
 
 };
 
-
+// Verifica se foi informado uma data correta, é chamada quando o input perde o foco
 const validaCampoData = (input) => {
   const inputData = document.getElementById('id_data_recebimento');
   const errorElement = document.getElementById(`${input.id}-error`);
   let dataValida = false;
 
-
+  
   if (inputData) {
     dataValida = validaData(inputData.value);
   }
+
   if (!dataValida) {
     input.classList.add('is-invalid');
     if (!errorElement) {
