@@ -26,6 +26,12 @@ urlpatterns = [
     path("coordenada/<int:pk>/update/", CoordenadaUpdateView.as_view(), name="update_coordenada"),
     path("coordenada/<int:pk>/delete/", CoordenadaDeleteView.as_view(), name="delete_coordenada"),
     
+    # Lote
+    path("lote/", LoteListView.as_view(), name="lote"),
+    path("lote/adicionar/", LoteNovoView.as_view(), name="add_lote"),
+    path("lote/<int:pk>/update/", LoteUpdateView.as_view(), name="update_lote"),
+    path("lote/<int:pk>/delete/", LoteDeleteView.as_view(), name="delete_lote"),
+    
     # Prazo
     path("prazo/", PrazoListView.as_view(), name="prazo"),
     path("prazo/adicionar/", PrazoNovoView.as_view(), name="add_prazo"),
@@ -38,11 +44,11 @@ urlpatterns = [
     # path("produto/<int:pk>/update/", ProdutoUpdateView.as_view(), name="update_produto"),
     # path("produto/<int:pk>/delete/", ProdutoDeleteView.as_view(), name="delete_produto"),
     
-    # Sub Categoria
-    path("sub_categoria/", SubCategoriaListView.as_view(), name="sub_categoria"),
-    path("sub_categoria/adicionar", SubCategoriaNovaView.as_view(), name="add_sub_categoria"),
-    path("sub_categoria/<int:pk>/update/", SubCategoriaUpdateView.as_view(), name="update_sub_categoria"),
-    path("sub_categoria/<int:pk>/delete/", SubCategoriaDeleteView.as_view(), name="delete_sub_categoria"),
+    # # Sub Categoria
+    # path("sub_categoria/", SubCategoriaListView.as_view(), name="sub_categoria"),
+    # path("sub_categoria/adicionar", SubCategoriaNovaView.as_view(), name="add_sub_categoria"),
+    # path("sub_categoria/<int:pk>/update/", SubCategoriaUpdateView.as_view(), name="update_sub_categoria"),
+    # path("sub_categoria/<int:pk>/delete/", SubCategoriaDeleteView.as_view(), name="delete_sub_categoria"),
     
     # Transportadora
     path("transportadora/", TransportadoraView.as_view(), name="transportadora"),

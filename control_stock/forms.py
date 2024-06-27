@@ -1,11 +1,12 @@
 from django import forms
 from django.forms import ModelForm, ValidationError 
-from .models import Categoria, ClienteFornecedor,ConfCoordenada, Prazo,SubCategoria, Transportadora, Unidade
+from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote,Prazo, Transportadora, Unidade
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText 
 from crispy_bootstrap5.bootstrap5 import Switch
 from django_select2.forms import Select2MultipleWidget
+from datetime import datetime
 
 class UploadXLSXForm(forms.Form):
   file = forms.FileField(
@@ -16,7 +17,6 @@ class UploadXLSXForm(forms.Form):
   )    
   
 
-# Classe do formulário de Novas Categorias
 class CategoriaForm(ModelForm):
   
   class Meta:
@@ -48,7 +48,6 @@ class CategoriaForm(ModelForm):
     )
     
     
-# Classe do formulário de Novas Categorias
 class ClienteFornecedorForm(ModelForm):
    
   class Meta:
@@ -157,67 +156,6 @@ class ClienteFornecedorForm(ModelForm):
     self.fields['inscricao_estadual'].widget.attrs.update({ 'inscricao_estadual': 10 })
 
 
-# class ClienteFornecedorForm(ModelForm):
-  
-#   class Meta:
-#     model = ClienteFornecedor
-#     fields = '__all__'
-    
-#   def __init__(self, *args, **kwargs):
-#     super(ClienteFornecedorForm, self).__init__(*args, **kwargs)
-#     self.helper = FormHelper()
-#     # self.fields['descricao'].required = False
-#     self.helper.form_method = 'post'
-#     self.helper.layout = Layout(
-#       Row(
-#         Column(
-#           Field('nome', css_class='form-control col-md-6 mb-0'),
-#           Field('cnpj', css_class='form-control col-md-6 mb-0'),
-#           Field('cidade', css_class='form-control col-md-6 mb-0'),
-#           Field('estado', css_class='form-control col-md-6 mb-0'),
-#           Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
-#           Field('taxa_frete', css_class='form-control col-md-6 mb-0'),
-#           Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
-#           Field('prazo', css_class='form-control col-md-6 mb-0'),
-#         ),
-#         Column(
-#           Field('categoria', css_class='form-control col-md-6 mb-0'),
-#           #Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
-#           Field('inscricao_estadual', css_class='form-control col-md-6 mb-0'),
-#           # Field('tipo_produto', css_class='form-control col-md-6 mb-0'),
-#           Field('limite_credito', css_class='form-control col-md-6 mb-0'),
-#           Switch('status', css_class='form-control col-md-6 mb-0'),
-#           Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
-#           Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
-#           Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),
-#         ),
-#         Column(
-          
-#           Field('tag_cadastro_omie_com', css_class='form-control col-md-6 mb-0'),
-#           Field('tag_cadastro_omie_ind', css_class='form-control col-md-6 mb-0'),
-#           Field('tag_cadastro_omie_pre', css_class='form-control col-md-6 mb-0'),
-#           Field('tag_cadastro_omie_mrx', css_class='form-control col-md-6 mb-0'),
-#           Field('tag_cadastro_omie_flx', css_class='form-control col-md-6 mb-0'),
-#           Field('tag_cadastro_omie_srv', css_class='form-control col-md-6 mb-0'),
-#           Field('obs', css_class='form-control col-md-6 mb-0'),
-          
-#         ),
-#       ),
-#       Row(
-#         Column(
-#           HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
-#         ),
-#         Column(
-#           HTML(
-#             '<button type="submit" class="btn btn-primary btn-lg">'
-#             '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-#           ),
-#         ),
-#         css_class='form-group col-12 text-center'
-#       )
-#     )
-    
-# Classe do formulário de Novas Coordenadas
 class CoordenadaForm(ModelForm):
   
   class Meta:
@@ -247,7 +185,80 @@ class CoordenadaForm(ModelForm):
         css_class='form-row text-center'
       )
     )
+    
+
+# class DateInput(forms.DateInput):
+#   input_type = 'date',
+#   format_key = '%d/%m/%Y'
+#   # input_format = ('%d-%m-%Y'),
   
+#   def format_value(self, value):
+#       if isinstance(value, str):
+#           return value
+#       elif isinstance(value, datetime.date):
+#           return value.strftime(self.format_key)
+#       elif isinstance(value, datetime.datetime):
+#           return value.strftime(self.format_key)
+#       return value
+
+class LoteForm(ModelForm):
+  
+  class Meta:
+    model = Lote
+    fields = '__all__'
+    # widgets = {
+    #   'data_cadastro': DateInput(attrs={
+    #     'class': 'form-control',
+    #   }),
+    # }
+    widgets = {
+      'data_recebimento': forms.DateInput(
+        format=('%Y-%m-%d'),
+        attrs={
+        'class': 'form-control col-md-6 mb-0',
+        'placeholder': 'Selecione uma data',
+        'type': 'date',
+      }),
+    }
+    
+  def __init__(self, *args, **kwargs):
+    super(LoteForm, self).__init__(*args, **kwargs)
+    self.helper = FormHelper()
+    self.fields['obs'].required = False
+    self.helper.form_method = 'post'
+    self.helper.layout = Layout(
+      Row(
+        Column(
+          Field('codigo', css_class='form-control col-md-6 mb-0'),
+          Field('pedido', css_class='form-control col-md-6 mb-0'),
+          Field('cliente', css_class='form-control col-md-6 mb-0'),
+          Field('data_recebimento', css_class='form-control col-md-6 mb-0'),
+          Field('tipo', css_class='form-control col-md-6 mb-0'),
+          Field('container', css_class='form-control col-md-6 mb-0'),
+        ),
+        Column(
+          Field('volume', css_class='form-control col-md-6 mb-0'),
+          Field('pallet', css_class='form-control col-md-6 mb-0'),
+          Field('peso', css_class='form-control col-md-6 mb-0'),
+          Field('nf', css_class='form-control col-md-6 mb-0'),
+          Field('obs', css_class='form-control col-md-6 mb-0'),
+        ),
+      ),
+      Row(
+        Column(
+          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+        ),
+        Column(
+          HTML(
+            '<button type="submit" class="btn btn-primary btn-lg">'
+            '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+          ),
+        ),
+        css_class='form-group col-12 text-center'
+      )
+    )
+    
+    self.fields['data_recebimento'].widget.attrs['onchange'] = 'validaCampoData(this)'  
 #  Classe do formulário de Prazos
 class PrazoForm(ModelForm):
   
@@ -339,35 +350,35 @@ class PrazoForm(ModelForm):
 #     )
 
 # Classe do formulário de Novas Sub-Categorias
-class SubCategoriaForm(ModelForm):
+# class SubCategoriaForm(ModelForm):
   
-  class Meta:
-    model = SubCategoria
-    fields = ['nome', 'descricao']
+#   class Meta:
+#     model = SubCategoria
+#     fields = ['nome', 'descricao']
     
-  def __init__(self, *args, **kwargs):
-    super(SubCategoriaForm, self).__init__(*args, **kwargs)
-    self.helper = FormHelper()
-    self.fields['descricao'].required = False
-    self.helper.form_method = 'post'
-    self.helper.layout = Layout(
-      Row(
-        Field('nome', css_class='form-control col-md-6 mb-0'),
-        Field('descricao', css_class='form-control col-md-6 mb-0'),
-      ),
-      Row(
-        Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
-        ),
-        Column(
-          HTML(
-            '<button type="submit" class="btn btn-primary btn-lg">'
-            '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-          ),
-        ),
-        css_class='form-group col-12 text-center'
-      )
-    )
+#   def __init__(self, *args, **kwargs):
+#     super(SubCategoriaForm, self).__init__(*args, **kwargs)
+#     self.helper = FormHelper()
+#     self.fields['descricao'].required = False
+#     self.helper.form_method = 'post'
+#     self.helper.layout = Layout(
+#       Row(
+#         Field('nome', css_class='form-control col-md-6 mb-0'),
+#         Field('descricao', css_class='form-control col-md-6 mb-0'),
+#       ),
+#       Row(
+#         Column(
+#           HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+#         ),
+#         Column(
+#           HTML(
+#             '<button type="submit" class="btn btn-primary btn-lg">'
+#             '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+#           ),
+#         ),
+#         css_class='form-group col-12 text-center'
+#       )
+#     )
     
 class TransportadoraForm(ModelForm):
   

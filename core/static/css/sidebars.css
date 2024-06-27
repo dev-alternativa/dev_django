@@ -131,3 +131,11 @@ a.sidebar-link.sub-item:hover {
 .boas_vindas {
     padding-top: 0.7rem;
 }
+
+/* Icones em imagens */
+.icon-class {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    /* margin-right: 4px; */
+}

@@ -44,6 +44,11 @@ const removeNaoNumerico = (input) => {
 
 /** FORMATACAO DE VALORES MONETÁRIOS EM CAMPOS INPUT **/
 /*****************************************************************************************/
+const formataPeso = (input) => {
+  
+}
+
+
 
 // Chamada quando campo monetario perder o foco
 const formataValorMonetario = (input) => {

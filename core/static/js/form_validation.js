@@ -1,4 +1,4 @@
-/************************  VALIDAÇÕES DO FORMULÁRIO DE CLIENTE/FORNECEDOR  ************************/
+/************************  VALIDAÇÕES DO FORMULÁRIO   ************************/
 
 
 const validaCPF = (cpf) => {
@@ -92,7 +92,7 @@ const validaCNPJ = (cnpj) => {
 
 
 /* Valida CNPJ/CPF */
-const validaCampoCPFCNPJ =  (input) => {
+const validaCampoCPFCNPJ = (input) => {
   const inputCPFCNPJ = input.value.trim().replace(/[.]|[-]|[\/]/g,'');
   const errorElement = document.getElementById(`${input.id}-error`);
   let inputValido = false;
@@ -100,10 +100,8 @@ const validaCampoCPFCNPJ =  (input) => {
   // Verifica retorno de CPF ou CNPJ válido
   if (inputCPFCNPJ.length === 11) {
     inputValido = validaCPF(inputCPFCNPJ);
-    console.log(inputValido)
   }else if(inputCPFCNPJ.length === 14) {
     inputValido = validaCNPJ(inputCPFCNPJ);
-    console.log(inputValido)
   }
   // Se CPF ou CNPJ for invalido, aplica o aviso
   if(!inputValido){

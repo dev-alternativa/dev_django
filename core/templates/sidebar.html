@@ -53,7 +53,14 @@
                             Conf. Coordenadas
                         </a>
                     </li> 
-                   
+
+                    <li class="sidebar-item">
+                        <a href="{% url 'lote' %}" class="sidebar-link sub-item">
+                            <img src="{% static 'img/pallet.png' %}" alt="Pallet Icon" class="icon-class"></img>
+                            Lote
+                        </a>
+                    </li>
+
                     <li class="sidebar-item ">
                         <a href="{% url 'categoria' %}" class="sidebar-link sub-item disable_click">
                             <i class="bi bi-basket2"></i>
@@ -65,13 +72,6 @@
                         <a href="{% url 'prazo' %}" class="sidebar-link sub-item">
                             <i class="bi bi-calendar-range"></i>
                             Prazo
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a href="{% url 'sub_categoria' %}" class="sidebar-link sub-item">
-                            <i class="bi bi-tags"></i>
-                            Sub-Categoria
                         </a>
                     </li>
 

@@ -251,25 +251,25 @@ class ClienteFornecedor(Base):
       
      
 
-# class Lote(Base):
-#     codigo = models.IntegerField('Código')
-#     pedido =models.IntegerField('Número do Pedido')
-#     cliente = models.IntegerField('ID do Cliente')
-#     data_recebimento = models.DateField('Data de Recebimento')
-#     tipo = models.IntegerField('Tipo', null=True)
-#     container = models.IntegerField('Número do Container ')
-#     volume = models.IntegerField('Volume')
-#     pallet = models.IntegerField('Número do Pallet')
-#     peso = models.DecimalField('Peso', max_digits=10, decimal_places=2)
-#     nf = models.CharField('Nota Fiscal', max_length=50)
-#     obs = models.CharField('Observações', max_length=200)
+class Lote(Base):
+    codigo = models.IntegerField('Código')
+    pedido = models.CharField('Número do Pedido', max_length=20)
+    cliente = models.CharField('ID do Cliente', max_length=20)
+    data_recebimento = models.DateField('Data de Recebimento')
+    tipo = models.CharField('Tipo', max_length=20, null=True)
+    container = models.CharField('Número do Container', max_length=20)
+    volume = models.CharField('Volume', max_length=20)
+    pallet = models.IntegerField('Número do Pallet')
+    peso = models.CharField('Peso', max_length=10)
+    nf = models.CharField('Nota Fiscal', max_length=50)
+    obs = models.CharField('Observações', max_length=200)
     
-#     class Meta:
-#         verbose_name = 'Lote'
-#         verbose_name_plural = 'Lotes'
+    class Meta:
+        verbose_name = 'Lote'
+        verbose_name_plural = 'Lotes'
         
-#     def __str__(self):
-#         return self.codigo
+    def __str__(self):
+        return self.codigo
     
 
 # class Estoque(Base):

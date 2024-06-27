@@ -89,6 +89,13 @@ document.querySelectorAll('.btn-edit').forEach(function(button) {
       const clienteId = this.getAttribute(`data-itens_cliente-id`);
       const editUrl = `/cliente_fornecedor/${clienteId}/update/`;
       window.location.href = editUrl;
+
+      /* LOTE */
+    }else if(/\/lote\//.test(currentURL)){
+      const loteId = this.getAttribute(`data-lote-id`);
+      const editUrl = `/lote/${loteId}/update/`;
+      window.location.href = editUrl;
+      console.log(editUrl);
     }
 
 
@@ -150,6 +157,12 @@ document.querySelectorAll('.btn-delete').forEach(function(button) {
     }else if(/\/cliente_fornecedor\//.test(currentURL)){
       const clienteId = this.getAttribute(`data-itens_cliente-id`);
       const deleteUrl = `/cliente_fornecedor/${clienteId}/delete`;
+      window.location.href = deleteUrl;
+
+      /* LOTE */
+    }else if(/\/lote\//.test(currentURL)){
+      const loteId = this.getAttribute(`data-lote-id`);
+      const deleteUrl = `/lote/${loteId}/delete`;
       window.location.href = deleteUrl;
     }
   });

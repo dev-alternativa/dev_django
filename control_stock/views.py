@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, ListView, DeleteView
-from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, SubCategoriaForm, TransportadoraForm, UnidadeForm, PrazoForm, UploadXLSXForm
-from .models import Categoria, ClienteFornecedor, ConfCoordenada, Prazo, SubCategoria, Transportadora, Unidade
+from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm, UploadXLSXForm
+from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote,Prazo, Transportadora, Unidade
 from django import forms
 
 import openpyxl
@@ -29,6 +29,12 @@ class ConfCoordListView(ListView):
   context_object_name = 'itens_coordenada'
 
 
+class LoteListView(ListView):
+  model = Lote
+  template_name = 'lote/lote.html'
+  context_object_name = 'itens_lote'
+
+
 class PrazoListView(ListView):
   model = Prazo
   template_name = 'prazo/prazo.html'
@@ -45,10 +51,10 @@ class StockView(TemplateView):
   template_name = 'estoque.html' 
 
 
-class SubCategoriaListView(ListView):
-  model = SubCategoria
-  template_name = 'subcategoria/sub_categoria.html'
-  context_object_name = 'itens_sub_categoria'
+# class SubCategoriaListView(ListView):
+#   model = SubCategoria
+#   template_name = 'subcategoria/sub_categoria.html'
+#   context_object_name = 'itens_sub_categoria'
   
   
 class TransportadoraView(ListView):
@@ -77,19 +83,6 @@ class CategoriaNovaView(CreateView):
     messages.success(self.request, 'Categoria cadastrada com sucesso!')
     return response
 
-  def categoria_nova(request):
-    if request.method == 'POST':
-      form = CategoriaForm(request.POST)
-      if form.is_valid():
-        form.save()
-        return redirect('categoria')
-    else:
-      form = CategoriaForm()
-      
-    context = {
-      'form': form,
-    }
-    return render(request, 'adicionar_categoria.html', context)
   
   
 class ClienteFornecedorNovoView(CreateView):
@@ -116,9 +109,7 @@ class ClienteFornecedorNovoView(CreateView):
       response = super().form_valid(form)
       messages.success(self.request, 'Cliente/Fornecedor cadastrado com sucesso!')
       return response 
- 
   
- 
 
 class CoordenadaNovaView(CreateView):
   model = ConfCoordenada
@@ -132,19 +123,18 @@ class CoordenadaNovaView(CreateView):
     messages.success(self.request, 'Categoria cadastrada com sucesso!')
     return response
 
-  def categoria_nova(request):
-    if request.method == 'POST':
-      form = CoordenadaForm(request.POST)
-      if form.is_valid():
-        form.save()
-        return redirect('coordenada')
-    else:
-      form = CoordenadaForm()
-      
-    context = {
-      'form': form,
-    }
-    return render(request, 'adicionar_coordenada.html', context)
+
+
+class LoteNovoView(CreateView):
+  model = Lote
+  form_class = LoteForm
+  template_name = 'lote/adicionar_lote.html'
+  success_url = reverse_lazy('lote')
+  
+  def form_valid(self, form):
+    response = super().form_valid(form)
+    messages.success(self.request, 'Lote cadastrado com sucesso!')
+    return response
 
 
 class PrazoNovoView(CreateView):
@@ -158,20 +148,6 @@ class PrazoNovoView(CreateView):
     response = super().form_valid(form)
     messages.success(self.request, 'Prazo cadastrado com sucesso!')
     return response
-
-  def prazo_novo(request):
-    if request.method == 'POST':
-      form = PrazoForm(request.POST)
-      if form.is_valid():
-        form.save()
-        return redirect('prazo')
-    else:
-      form = PrazoForm()
-      
-    context = {
-      'form': form,
-    }
-    return render(request, 'adicionar_prazo.html', context)
 
 # class ProdutoNovoView(CreateView):
 #   model = Produto
@@ -204,31 +180,31 @@ class PrazoNovoView(CreateView):
 #     return render(request, 'adicionar_produto.html', context)
 
 
-class SubCategoriaNovaView(CreateView):
-  model = SubCategoria
-  form_class = SubCategoriaForm
-  template_name = "subcategoria/adicionar_sub_categoria.html"
-  success_url = reverse_lazy('sub_categoria')
+# class SubCategoriaNovaView(CreateView):
+#   model = SubCategoria
+#   form_class = SubCategoriaForm
+#   template_name = "subcategoria/adicionar_sub_categoria.html"
+#   success_url = reverse_lazy('sub_categoria')
   
   # Verifica se form é válido
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    messages.success(self.request, 'Sub-Categoria cadastrada com sucesso!')
-    return response
+  # def form_valid(self, form):
+  #   response = super().form_valid(form)
+  #   messages.success(self.request, 'Sub-Categoria cadastrada com sucesso!')
+  #   return response
 
-  def sub_categoria_nova(request):
-    if request.method == 'POST':
-      form = SubCategoriaForm(request.POST)
-      if form.is_valid():
-        form.save()
-        return redirect('sub_categoria')
-    else:
-      form = SubCategoriaForm()
+  # def sub_categoria_nova(request):
+  #   if request.method == 'POST':
+  #     form = SubCategoriaForm(request.POST)
+  #     if form.is_valid():
+  #       form.save()
+  #       return redirect('sub_categoria')
+  #   else:
+  #     form = SubCategoriaForm()
       
-    context = {
-      'form': form,
-    }
-    return render(request, 'adicionar_sub_categoria.html', context)
+  #   context = {
+  #     'form': form,
+  #   }
+  #   return render(request, 'adicionar_sub_categoria.html', context)
 
 
 class TransportadoraNovaView(CreateView):
@@ -265,20 +241,6 @@ class UnidadeNovaView(CreateView):
       response = super().form_valid(form)
       messages.success(self.request, 'Unidade cadastrada com sucesso!')
       return response
-    
-    def unidade_nova(request):
-      if request.method == 'POST':
-        form = UnidadeForm(request.POST)
-        if form.is_valid():
-          form.save()
-          return redirect('unidade')
-      else:
-        form = UnidadeForm()
-        
-      context = {
-        'form': form,
-      }
-      return render(request, 'adicionar_unidade.html', context)
   
   
 # *********** ATUALIZAÇÃO ***********
@@ -313,6 +275,17 @@ class CoordenadaUpdateView(UpdateView):
     messages.success(self.request, 'Coordenada atualizada com sucesso!')
     return super().form_valid(form)
 
+
+class LoteUpdateView(UpdateView):
+  model = Lote
+  form_class = LoteForm
+  template_name = 'lote/update_lote.html'
+  success_url = reverse_lazy('lote')
+  
+  def form_valid(self, form):
+    messages.success(self.request, 'Lote atualizado com sucesso!')
+    return super().form_valid(form)
+
 # class ProdutoUpdateView(UpdateView):
 #   model = Produto
 #   form_class = ProductForm
@@ -331,17 +304,6 @@ class PrazoUpdateView(UpdateView):
   
   def form_valid(self, form):
     messages.success(self.request, 'Prazo atualizado com sucesso!')
-    return super().form_valid(form)
-  
-  
-class SubCategoriaUpdateView(UpdateView):
-  model = SubCategoria
-  form_class = SubCategoriaForm
-  template_name = 'subcategoria/update_sub_categoria.html'
-  success_url = reverse_lazy('sub_categoria')
-  
-  def form_valid(self, form):
-    messages.success(self.request, 'Sub-Categoria atualizada com sucesso!')
     return super().form_valid(form)
   
   
@@ -401,6 +363,17 @@ class CoordenadaDeleteView(DeleteView):
     response = super().delete(request, *args, **kwargs)
     messages.success(self.request, 'Coordenada excluída com sucesso!')
     return response
+  
+
+class LoteDeleteView(DeleteView):
+  model = Lote
+  template_name = "lote/delete_lote.html"
+  success_url = reverse_lazy("lote")
+  
+  def delete_success(self, request, *args, **kwargs):
+    response = super().delete(request, *args, **kwargs)
+    messages.success(self.request, 'Lote excluído com sucesso!')
+    return response
 
 
 class PrazoDeleteView(DeleteView):
@@ -425,15 +398,15 @@ class PrazoDeleteView(DeleteView):
 #     return response
 
 
-class SubCategoriaDeleteView(DeleteView):
-  model = SubCategoria
-  template_name = 'subcategoria/delete_sub_categoria.html'
-  success_url = reverse_lazy('sub_categoria')
+# class SubCategoriaDeleteView(DeleteView):
+#   model = SubCategoria
+#   template_name = 'subcategoria/delete_sub_categoria.html'
+#   success_url = reverse_lazy('sub_categoria')
   
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Categoria excluída com sucesso!')
-    return response
+#   def delete_success(self, request, *args, **kwargs):
+#     response = super().delete(request, *args, **kwargs)
+#     messages.success(self.request, 'Categoria excluída com sucesso!')
+#     return response
 
 
 class TransportadoraDeleteView(DeleteView):
