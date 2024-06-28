@@ -7,7 +7,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.querySelector("#sidebar");
     let  sidebarState = localStorage.getItem("sidebarState");
-    console.log(sidebarState);
 
     if (!sidebarState) {
         sidebarState = "expanded";
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebar.classList.add("collapsed");
     }
     // localStorage.setItem("sidebarState", "expanded");    
-    // console.log(localStorage);
 });
     
 /* Oculta / Mostra Menu lateral */
