@@ -24,11 +24,11 @@ class SubCategoriaAdmin(admin.ModelAdmin):
 @admin.register(ClienteFornecedor)
 class ClienteFornecedorAdmin(admin.ModelAdmin):
   list_display = (
-    'nome', 
+    'nome_fantasia', 
     'cnpj', 
     'cidade', 
     'estado', 
-    'contato', 
+    'nome_contato', 
     'tipo_frete',
     'categorias_list',
     'taxa_frete', 
@@ -47,6 +47,6 @@ class ClienteFornecedorAdmin(admin.ModelAdmin):
     'tag_cadastro_omie_srv'
   )
   
-  search_fields = ('nome', 'cnpj', 'cidade', 'estado', 'contato')
+  search_fields = ('nome_fantasia', 'cnpj', 'cidade', 'estado', 'nome_contato')
   class Meta:
     model = ClienteFornecedor

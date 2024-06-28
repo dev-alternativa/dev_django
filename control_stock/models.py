@@ -1,5 +1,7 @@
 from django.db import models
 from core.models import Base
+import re
+from django.core.exceptions import ValidationError
 
 
 ESTADOS_BRASIL = (
@@ -173,20 +175,29 @@ class ClienteFornecedor(Base):
         ('9', '9 - Sem Ocorrência de Transporte'),
     )
     
-    nome = models.CharField('Nome do Cliente/Fornecedor', max_length=100)
+    nome_fantasia = models.CharField('Nome do Cliente/Fornecedor', max_length=100)
+    razao_social = models.CharField('Razão Social', max_length=100)
     cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30)
     cidade = models.CharField('Cidade', max_length=100)
     estado = models.CharField('Estado', choices=ESTADOS_BRASIL, max_length=50)
-    contato = models.CharField('Contato(Tel/E-mail)', max_length=30)
+    endereco = models.CharField('Endereço', max_length=50)
+    bairro = models.CharField('Bairro', max_length=50)
+    complemento = models.CharField('Complemento', max_length=50)
+    numero = models.IntegerField('Número')
+    telefone = models.CharField('Telefone', max_length=10)
+    ddd = models.CharField('DDD', max_length=4)
+    cep = models.CharField('CEP', max_length=12)
+    email = models.EmailField('E-mail', max_length=50)
+    nome_contato = models.CharField('Nome Contato', max_length=30)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100)
     taxa_frete = models.CharField('Taxa de frete', max_length=10)
     cliente_transportadora = models.ForeignKey('control_stock.Transportadora', verbose_name='Transportadora', on_delete=models.CASCADE)
     prazo = models.ForeignKey('control_stock.Prazo', verbose_name='Prazo', on_delete=models.CASCADE)
     categoria = models.ManyToManyField(Categoria, related_name='clientes')
-    # sub_categoria = models.ManyToManyField(SubCategoria, related_name='clientes')
     inscricao_estadual = models.CharField('Inscrição Estadual',max_length=20, null=True)
-    # tipo_produto = models.CharField('Tipo de Produto', max_length=50)
     limite_credito = models.CharField('Limite de Crédito', max_length=20)
+    # sub_categoria = models.ManyToManyField(SubCategoria, related_name='clientes')
+    # tipo_produto = models.CharField('Tipo de Produto', max_length=50)
     # status = models.BooleanField('Ativo', default=True) # Verificar quis são os status
     contribuinte = models.BooleanField('Contribuinte', default=True)
     tag_cliente = models.BooleanField('Cliente', default=False)
@@ -203,7 +214,26 @@ class ClienteFornecedor(Base):
         verbose_name = 'Cliente / Fornecedor'
         verbose_name_plural = 'Clientes / Fornecedores'
         
+    # Elimina valores não numéricos antes de salvar os dados
+    def clean(self):
+        super().clean()
+        # Remove caracteres não numéricos
+        self.cnpj = re.sub(r'\D', '', self.cnpj)
+        self.telefone = re.sub(r'\D', '', self.telefone)
+        self.ddd = re.sub(r'\D', '', self.ddd)
+        
+        # Validação de dados
+        if len(self.telefone) < 8:
+            raise ValidationError('Número de telefone deve conter pelo menos 8 dígitos.')
+        
+        if len(self.ddd) < 2:
+            raise ValidationError('DDD deve conter 2 dígitos.')
+        
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(ClienteFornecedor, self).save(*args, **kwargs)
     
+    # Decorator para salvar corretamente as categorias (campo MxM)
     @property
     def categorias_list(self):
         return ", ".join([c.nome for c in self.categoria.all()])    

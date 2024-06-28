@@ -5,7 +5,6 @@ from .views import *
 urlpatterns = [
     # Estoque
     path("estoque/", StockView.as_view(), name="estoque"),
-    path("estoque/importar/", UploadXLSXView.as_view(), name="importar"),
     path("estoque/success/", SuccessView.as_view(), name="success"),
     
     # Categoria

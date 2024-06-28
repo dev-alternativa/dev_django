@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, ListView, DeleteView
-from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm, UploadXLSXForm
+from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote,Prazo, Transportadora, Unidade
-from django import forms
+
 
 import openpyxl
 
@@ -48,7 +48,7 @@ class PrazoListView(ListView):
   
   
 class StockView(TemplateView):
-  template_name = 'estoque.html' 
+  template_name = 'estoque/estoque.html' 
 
 
 # class SubCategoriaListView(ListView):
@@ -431,41 +431,33 @@ class UnidadeDeleteView(DeleteView):
     return response
 
 
-
-
-
-
-
-
-
-
 # Outras
 
   
   
-class UploadXLSXView(FormView):
-  form_class = UploadXLSXForm
-  template_name = 'importar.html'
+# class UploadXLSXView(FormView):
+#   form_class = UploadXLSXForm
+#   template_name = 'importar.html'
   
     
-  def form_valid(self, form):
-      file = form.cleaned_data['file']
-      if file.name.endswith('.xlsx'):
-          wb = openpyxl.load_workbook(file)
-          sheet = wb.active
-          data = [row for row in sheet.iter_rows(values_only=True)]
+#   def form_valid(self, form):
+#       file = form.cleaned_data['file']
+#       if file.name.endswith('.xlsx'):
+#           wb = openpyxl.load_workbook(file)
+#           sheet = wb.active
+#           data = [row for row in sheet.iter_rows(values_only=True)]
           
-          # Salvando os dados no contexto para usar na próxima view
-          self.request.session['uploaded_data'] = data
+#           # Salvando os dados no contexto para usar na próxima view
+#           self.request.session['uploaded_data'] = data
           
-          messages.success(self.request, 'Arquivo XLSX importado com sucesso!')
-          return redirect(self.get_success_url())
-      else:
-          messages.error(self.request, 'O formato do arquivo deve ser XLSX.')
-          return self.form_invalid(form)
+#           messages.success(self.request, 'Arquivo XLSX importado com sucesso!')
+#           return redirect(self.get_success_url())
+#       else:
+#           messages.error(self.request, 'O formato do arquivo deve ser XLSX.')
+#           return self.form_invalid(form)
 
-  def get_success_url(self):
-      return reverse('success')
+#   def get_success_url(self):
+#       return reverse('success')
         
     
 class SuccessView(TemplateView):
