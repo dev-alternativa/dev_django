@@ -14,10 +14,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv() # Carrega variáveis de ambiente do arquivo .env
 ENVIRONMENT_DEV = os.getenv('ENVIRONMENT_DEV') == 'True'
 ENVIRONMENT_HML = os.getenv('ENVIRONMENT_HML') == 'True'
 ENVIRONMENT_PRD = os.getenv('ENVIRONMENT_PRD') == 'True'
+CNPJ_API_ENDPOINT = os.getenv('CNPJ_API_ENDPOINT', 'https://publica.cnpj.ws/cnpj/')
+CEP_API_ENDPOINT = os.getenv('CEP_API_ENDPOINT', 'https://brasilapi.com.br/api/cep/v2/')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'import_export',
     'django_select2',
+    'api',
 ]
 
 MIDDLEWARE = [

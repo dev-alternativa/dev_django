@@ -88,7 +88,12 @@ class ClienteFornecedorForm(ModelForm):
           Row(
             Column(
               Field('nome_fantasia', css_class='form-control col-md-6 mb-0'),
-              Field('cnpj', css_class='form-control col-md-6 mb-0'),
+                Column(
+                  FieldWithButtons(
+                    Field('cnpj', css_class='form-control col-md-6 mb-0'),
+                    StrictButton("Consultar CNPJ", css_class="btn btn-primary", css_id="btn_consulta_cnpj", onclick="consultarCNPJ()"),
+                  ),
+                ),  
               Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
               Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
             ),
@@ -107,7 +112,7 @@ class ClienteFornecedorForm(ModelForm):
             Column(
               FieldWithButtons(
                 Field('cep', css_class='form-control col-md-6 mb-0 mask-cep'),
-                StrictButton("Buscar CEP", css_class='btn btn-warning'),
+                StrictButton("Buscar CEP", css_class='btn btn-warning', css_id="btn_consulta_cep", onclick="consultarCEP()"),
               ),
               Field('endereco', css_class='form-control col-md-6 mb-0'),
               Field('cidade', css_class='form-control col-md-6 mb-0'),

@@ -62,3 +62,6 @@ dist/
 # Arquivos relacionados ao Docker
 docker-compose.override.yml
 .dockerignore
+
+# Outros arquivos
+exemplo*

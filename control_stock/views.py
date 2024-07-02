@@ -99,9 +99,12 @@ class ClienteFornecedorNovoView(CreateView):
       
         # Adicionar os erros do formulário nas mensagens
       for field, errors in form.errors.items():
+        if field != '__all__':
           for error in errors:
-              messages.error(self.request, f"{form.fields[field].label}: {error}")
-      
+            messages.error(self.request, f"{form.fields[field].label}: {error}")
+        else:
+          for error in errors:
+            messages.error(self.request, error)
       
       return self.render_to_response(self.get_context_data(form=form))
 

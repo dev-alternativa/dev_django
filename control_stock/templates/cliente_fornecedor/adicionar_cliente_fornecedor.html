@@ -31,6 +31,7 @@
                       {% endif %}
                     </form>
                 </div>
+                {% include "modalAlertBox.html" %}
             </div>
           </div>
         </div>
@@ -41,4 +42,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
 <script src="{% static 'js/mask.js' %}"></script>
 <script src="{% static 'js/form_validation.js' %}"></script>
+<script src="{% static 'js/api_requests.js' %}"></script>
 {% endblock %}
