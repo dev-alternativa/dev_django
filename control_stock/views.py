@@ -109,9 +109,15 @@ class ClienteFornecedorNovoView(CreateView):
       return self.render_to_response(self.get_context_data(form=form))
 
   def form_valid(self, form):
-      response = super().form_valid(form)
-      messages.success(self.request, 'Cliente/Fornecedor cadastrado com sucesso!')
-      return response 
+    cnpj = form.cleaned_data.get('cnpj', '')
+    digits = ''.join(filter(str.isdigit, cnpj))
+    if ClienteFornecedor.objects.filter(cnpj=digits).exists():
+      messages.error(self.request, 'Já existe um cliente/Fornecedor cadastrado com o CNPJ/CPF informado')
+      return self.render_to_response(self.get_context_data(form=form))
+    
+    response = super().form_valid(form)
+    messages.success(self.request, 'Cliente/Fornecedor cadastrado com sucesso!')
+    return response 
   
 
 class CoordenadaNovaView(CreateView):

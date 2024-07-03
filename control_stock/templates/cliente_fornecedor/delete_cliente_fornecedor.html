@@ -14,7 +14,7 @@
                 </div>
                 <div class="card-body delete-box">
                     <form method="POST">
-                      <p>Tem certeza de que deseja excluir "{{ object.nome }}"?</p>
+                      <p>Tem certeza de que deseja excluir "{{ object.nome_fantasia }}"?</p>
                       {% csrf_token %}
                       <button type="submit" class="btn btn-danger">Excluir</button>
                       <a href="{% url 'cliente_fornecedor' %}" class="btn btn-secondary">Cancelar</a>
