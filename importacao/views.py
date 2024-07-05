@@ -6,8 +6,6 @@ import pandas as pd
 from control_stock.models import Prazo
 
 
-import openpyxl
-
 # Create your views here.
 class ImportarPrazoView(FormView):
   form_class = UploadPrazoForm

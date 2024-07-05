@@ -4,10 +4,10 @@
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
           <tr>
-              <th>Descrição</th>
-              <th>Parcelas</th>
-              <th>Código</th>
-              <th class="action_size_column">Ações</th>
+              <th scope="col">Descrição</th>
+              <th scope="col">Parcelas</th>
+              <th scope="col">Código</th>
+              <th scope="col" class="action_size_column">Ações</th>
           </tr>
       </thead>
       <tbody class="table-group-divider">
@@ -32,4 +32,7 @@
         {% endfor %}
       </tbody>
   </table>
+
+  {% include 'paginacao_copy.html' %}
+  
 </div>
