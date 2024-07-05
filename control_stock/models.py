@@ -140,13 +140,14 @@ class Transportadora(Base):
 #         return self.descricao
       
 class Prazo(Base):
-    descricao = models.CharField('Descrição', max_length=100)
-    parcelas = models.CharField('Parcelas', max_length=100, null=True)
-    codigo = models.IntegerField('Código')
+    descricao = models.CharField('Descrição', max_length=120)
+    parcelas = models.CharField('Parcelas', max_length=60, null=True)
+    codigo = models.CharField('Código', max_length=60)
 
     class Meta:
         verbose_name = 'Prazo'
         verbose_name_plural = 'Prazos'
+        unique_together = ('parcelas', 'codigo')
         
     def __str__(self):
         return self.descricao

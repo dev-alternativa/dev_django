@@ -7,9 +7,6 @@ from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteFor
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote,Prazo, Transportadora, Unidade
 
 
-import openpyxl
-
-
 # *********** LISTAGENS  ***********
 class CategoriaListView(ListView):
   model = Categoria
@@ -39,6 +36,8 @@ class PrazoListView(ListView):
   model = Prazo
   template_name = 'prazo/prazo.html'
   context_object_name = 'itens_prazo'
+  paginate_by = 50
+  ordering = 'id'
   
   
 # class ProductListView(ListView):
@@ -444,29 +443,7 @@ class UnidadeDeleteView(DeleteView):
 
   
   
-# class UploadXLSXView(FormView):
-#   form_class = UploadXLSXForm
-#   template_name = 'importar.html'
-  
-    
-#   def form_valid(self, form):
-#       file = form.cleaned_data['file']
-#       if file.name.endswith('.xlsx'):
-#           wb = openpyxl.load_workbook(file)
-#           sheet = wb.active
-#           data = [row for row in sheet.iter_rows(values_only=True)]
-          
-#           # Salvando os dados no contexto para usar na próxima view
-#           self.request.session['uploaded_data'] = data
-          
-#           messages.success(self.request, 'Arquivo XLSX importado com sucesso!')
-#           return redirect(self.get_success_url())
-#       else:
-#           messages.error(self.request, 'O formato do arquivo deve ser XLSX.')
-#           return self.form_invalid(form)
 
-#   def get_success_url(self):
-#       return reverse('success')
         
     
 class SuccessView(TemplateView):

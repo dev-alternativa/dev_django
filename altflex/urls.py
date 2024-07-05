@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('control_stock.urls')),
     path('', include('usuarios.urls')),
     path('api/', include('api.urls')),
+    path('importacao/', include('importacao.urls')),
 ]
 
 admin.AdminSite.site_header = 'Administração Sistema Alternativa Flexo'

@@ -47,3 +47,10 @@ function goBack() {
 // }
 
 }
+
+/* BARRA DE PROGRESSO */
+$(document).ready(function() {
+  $('#upload-form').on('submit', function(event) {
+    $('#loading').show();
+  });
+});

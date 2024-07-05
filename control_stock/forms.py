@@ -7,14 +7,6 @@ from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, 
 from crispy_bootstrap5.bootstrap5 import Switch
 from django_select2.forms import Select2MultipleWidget
 
-# class UploadXLSXForm(forms.Form):
-#   file = forms.FileField(
-#     label="Importar Listagem",
-#       widget=forms.ClearableFileInput(attrs={
-#         'class': 'form-control'  # Classe Bootstrap para inputs de arquivos
-#       })
-#   )    
-  
 
 class CategoriaForm(ModelForm):
   

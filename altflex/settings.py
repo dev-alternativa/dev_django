@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'import_export',
     'django_select2',
     'api',
+    'importacao',
 ]
 
 MIDDLEWARE = [
