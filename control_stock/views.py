@@ -37,7 +37,7 @@ class PrazoListView(ListView):
   template_name = 'prazo/prazo.html'
   context_object_name = 'itens_prazo'
   paginate_by = 50
-  ordering = 'id'
+  ordering = '-dt_criacao'
   
   
 # class ProductListView(ListView):

@@ -1,30 +1,37 @@
- {% if is_paginated %}
+{% if is_paginated %}
     <nav aria-label="navegacao-paginacao">
-        <ul class="pagination">
+        <ul class="pagination justify-content-center">
 
-            {% if page_obj.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
-            {% else %}
-                <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
-            {% endif %}
+            <!-- Lógica para exibir apenas 10 páginas, começa exibindo apenas 5 e a partir da página 11 sempre fica com 10 páginas -->
+            {% with start_page=page_obj.number|add:'-5' %}
+                {% with end_page=page_obj.number|add:'4' %}
+                
+                    <!-- Verifica se está na primeira página -->
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                    {% endif %}
+                        <!-- Itera pelas páginas -->
+                        {% for num in paginator.page_range %}
+                            {% if num >= start_page and num <= end_page %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                    {% endwith %}
+            {% endwith %}
 
-            {% for num in paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
-                {% else %}
-                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                {% endif %}
-            {% endfor %}
-
+            <!-- Verifica se está na última página -->
             {% if page_obj.has_next %}
-
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a></li>
             {% else %}
-                <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
+                <li class="page-item disabled"><a class="page-link" href="#">»</a></li>
             {% endif %}
-
         </ul>
-
     </nav>
-
 {% endif %}

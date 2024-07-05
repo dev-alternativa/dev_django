@@ -15,6 +15,8 @@ class ImportarPrazoView(FormView):
   # Upload do arquivo do formulário
   def form_valid(self, form):
     file = form.cleaned_data['file']
+    nao_incluidos = 0
+    incluiddos = 0
     
     # Tenta carregar arquivo Excel
     try:
@@ -45,11 +47,13 @@ class ImportarPrazoView(FormView):
           codigo = row['nCodigo'],
           parcelas = row['nParcelas'],
         )
-      
-      if created:
-        messages.info(self.request, f'Novo prazo incluído: {obj}')
-      else:
-        messages.info(self.request, f'Item {obj} já está cadastrado')
+        if not created:
+          nao_incluidos += 1
+        else:
+          incluiddos += 1      
+          
+      if nao_incluidos != 0:
+        messages.info(self.request, f'{nao_incluidos} itens já estão cadastrados e não foram incluídos, {incluiddos} itens foram incluídos')
     
       messages.success(self.request, 'Arquivo importado e processado com sucesso!')
       print('OK!')

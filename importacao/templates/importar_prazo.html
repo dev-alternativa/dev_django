@@ -1,14 +1,13 @@
 {% extends "base.html" %}
-
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}Importar Planilha de Prazos{% endblock %}
 
 {% block content %}
   <div id="page-wrapper">
     <div class="container">
-      {% comment %} <div class="row"> {% endcomment %}
-        <div class="col-lg-12">
+      <div class="col-lg-12">
           <h1 class="text-body-secondary text-center mb-3">Importar Prazo</h1>
           {% if messages %}
             <div class="messages">
@@ -26,48 +25,39 @@
               Importar arquivo Excel da listagem de Prazos
             </div>
             
-            {% comment %} Botões de ações {% endcomment %}
             <div class="container card card-conteudo">
-              <div class="row  class="input-group mb-3"">
-                <form class="row g-3" method="post" enctype="multipart/form-data" id="upload-form">
+              <div class="row  top-buttons space_from_margin center_content">
+                <form method="post" enctype="multipart/form-data" id="upload-form">
                   {% csrf_token %}
-                  {{ form.as_p }}
-              </div>
-              <div id="loading">
-                <p>Aguarde... Arquivo sendo processado.</p>
-                <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                  <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-                </div>
-              </div>
-              </div>
-              <div class="container-fluid ">
-                <div class="row">
-                    <div class="col-auto">
-                      <button type="button" class="btn btn-danger" onclick="goBack()">
-                        <i class="bi bi-x-lg"></i>
-                        Cancelar
-                      </button>
+                  {% crispy form %}
+              
+                  {% comment %} <div class="container-fluid">
+                    <div class="row" >
+                      <div class="col-auto">
+                        <button type="button" class="btn btn-danger" onclick="goBack()">
+                          <i class="bi bi-x-lg"></i>
+                          Cancelar
+                        </button>
+                      </div>
+                      <div class="col-auto ms-auto">
+                        <button type="submit" class="btn btn-primary"">
+                          <i class="bi bi-upload"></i>
+                          Upload
+                        </button>
+                      </div>
+                  </div> <!-- fim container fluid--> {% endcomment %}
+                  {% comment %} <div id="loading">
+                    <p>Aguarde... Arquivo sendo processado.</p>
+                    <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
                     </div>
-                    <div class="col-auto ms-auto">
-                      <button type="submit" class="btn btn-primary"">
-                        <i class="bi bi-upload"></i>
-                        Upload
-                      </button>
-                    </div>
-                  </div>
-
-              </div>
-              </form>
-            </div>
-            {% comment %} Fim Botões de ações {% endcomment %}
-            
-            {% comment %} Lista items estoque {% endcomment %}
-            
-            {% comment %} Fim Lista Itens estoque{% endcomment %}
-          </div>
-        </div>
-        
-      {% comment %} </div> {% endcomment %}
-  </div>
-</div>
+                  </div> {% endcomment %}
+                  
+                </form>
+              </div> <!-- fim row input-group-->
+            </div> <!-- fim container card card-conteudo-->
+          </div> <!-- fim card-->
+      </div> <!-- fim col-lg-12-->
+    </div> <!-- fim container-->
+  </div> <!--fim page-wrapper-->
 {% endblock content %}
