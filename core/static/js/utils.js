@@ -1,3 +1,25 @@
+// TEMPORIZADOR DE ALERTS DE AVISO NAS PÁGINAS
+document.addEventListener('DOMContentLoaded', function() {
+  // Selecione todos os alertas na página
+  const alerts = document.querySelectorAll('.alert');
+
+  // Para cada alerta encontrado
+  alerts.forEach(alert => {
+      // Defina um tempo de espera de 3 segundos (3000 milissegundos)
+      setTimeout(() => {
+          // Adicione a classe 'fade' para iniciar a transição de desvanecimento
+          alert.classList.remove('show');
+          alert.classList.add('fade');
+
+          // Após a transição, remova o alerta do DOM
+          setTimeout(() => {
+              alert.remove();
+          }, 150);  // Tempo de transição para o fade (pode ajustar conforme a necessidade)
+      }, 3000);  // 3 segundos
+  });
+});
+
+
 /* MESSAGE BOX CUSTOMIZADA */
 const messageBox = (titulo, mensagem) => {
   return new Promise((resolve) => {
@@ -52,5 +74,6 @@ function goBack() {
 $(document).ready(function() {
   $('#upload-form').on('submit', function(event) {
     $('#loading').show();
+    $('#overlay').show();
   });
 });
