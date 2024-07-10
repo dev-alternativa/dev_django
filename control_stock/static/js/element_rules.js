@@ -1,5 +1,3 @@
-
-
 // *** Funcão para os botões 'close' fecharem os alerts ***
 // const handleClose = () => {
 //   const alertDiv = closeButton.parentNode; // Captura a div pai de `alert`

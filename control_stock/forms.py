@@ -5,7 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, FieldWithButtons, StrictButton 
 from crispy_bootstrap5.bootstrap5 import Switch
-from django_select2.forms import Select2MultipleWidget
+from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 
 class CategoriaForm(ModelForm):
@@ -45,8 +45,19 @@ class ClienteFornecedorForm(ModelForm):
     model = ClienteFornecedor
     fields = '__all__'
     widgets = {
-      'categoria': Select2MultipleWidget,
+      'categoria': Select2MultipleWidget(attrs={'data-placeholder': 'Selecione uma categoria'}),
+      'prazo': Select2Widget(
+        attrs={
+          'data-language': 'pt-br',
+          'data-placeholder': 'Começe digitando algo...',
+          'data-minimum-input-length': 3,
+          'data-width': '100%',
+          # 'data-height': '1rem',
+        }
+      )
     }
+    
+    
     
   # Valida numeração de CPF / CNPJ
   def clean_cnpj(self):
@@ -93,7 +104,7 @@ class ClienteFornecedorForm(ModelForm):
               Field('razao_social', css_class='form_controle col-md-6 mb-0'),
               Field('inscricao_estadual', css_class='form-control col-md-6 mb-0 numericValorOnly'),
               PrependedText('taxa_frete','R$', css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
-              Field('prazo', css_class='form-control col-md-6 mb-0'),
+              Field('prazo', css_class='form-control col-md-6 mb-0 '),
               
             ),
           )

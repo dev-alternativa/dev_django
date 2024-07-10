@@ -34,7 +34,7 @@ toggler.addEventListener("click",function(){
 
 
 
-/* Função para permitir manter o estado de expansão dos menus da barra lateral */
+/* Função para permitir manter o estado de expansed/collapsed nos menus da barra lateral */
 $(document).ready( () => {
 
   // Função para salvar o estado de expansão no localStorage
@@ -42,7 +42,7 @@ $(document).ready( () => {
     localStorage.setItem(id + "Expanded", isExpanded);
 }
 
-// Restaurar o estado de expansão ao carregar a página
+// Restaurar o estado de expansão para cada um dos itens do menu ao carregar a página
 $('a.sidebar-link[data-menu]').each(function() {
     var targetId = $(this).data('menu');
     var savedState = localStorage.getItem(targetId + "Expanded");
@@ -64,7 +64,7 @@ $('a.sidebar-link[data-menu]').each(function() {
         saveState(targetId, !isExpanded);
     });
 
-    // Adicionar evento de transição para garantir que o estado seja salvo corretamente
+    // Adicionar evento de transição (hide/show) para garantir que o estado seja salvo corretamente
     targetElement.on("shown.bs.collapse", function () {
         saveState(targetId, true);
     });

@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('usuarios.urls')),
     path('api/', include('api.urls')),
     path('importacao/', include('importacao.urls')),
+    path("select2/", include("django_select2.urls")),
 ]
 
 admin.AdminSite.site_header = 'Administração Sistema Alternativa Flexo'

@@ -170,3 +170,4 @@ LOGIN_REDIRECT_URL = 'index'   # A página para onde o usuário será redirecion
 LOGOUT_REDIRECT_URL = 'login'  # A página para onde o usuário será redirecionado após fazer logout
 
 LOGIN_URL = 'login'
+SELECT2_CSS = ['css/select2.css']
