@@ -132,8 +132,8 @@ const validaCampoCPFCNPJ = (input) => {
 /* Valida campos obrigatórios em abas inativas  */
 document.addEventListener('DOMContentLoaded', function () {
   // Captura o formulário
-  const form = document.getElementById('form_cliente_fornecedor');
-  if(form){
+  const form = document.getElementsByClassName('form_fill_content');
+  if(form[0]){
 
     // Captura todas as abas
     const tabs = document.querySelectorAll('.nav-link');
@@ -172,13 +172,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   
     // Valida o formulário na submissão
-    form.addEventListener('submit', function(event){
-      if(!form.checkValidity()){
+    form[0].addEventListener('submit', function(event){
+      if(!form[0].checkValidity()){
         event.preventDefault();
         event.stopPropagation();
   
         // Encontra o primeiro campo inválido
-        const firstinvalidField = form.querySelector(':invalid');
+        const firstinvalidField = form[0].querySelector(':invalid');
   
         if(firstinvalidField){
           // Econtra a aba que contém o campo inválido
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
           firstinvalidField.focus();
         }
       }
-      form.classList.add('was-validated');
+      form[0].classList.add('was-validated');
     }, false);
   }
 });

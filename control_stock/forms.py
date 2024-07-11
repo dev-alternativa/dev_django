@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm 
-from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote,Prazo, Transportadora, Unidade
+from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, Produto, Transportadora, Unidade
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, FieldWithButtons, StrictButton 
@@ -57,8 +57,7 @@ class ClienteFornecedorForm(ModelForm):
       )
     }
     
-    
-    
+        
   # Valida numeração de CPF / CNPJ
   def clean_cnpj(self):
     cnpj = self.cleaned_data.get('cnpj')
@@ -71,7 +70,7 @@ class ClienteFornecedorForm(ModelForm):
     super(ClienteFornecedorForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
     self.helper.form_method = 'post'
-    
+    # ************** Campos não obrigatórios **************
     self.fields['cnpj'].label = "CPF/CNPJ do Cliente/Fornecedor"
     self.fields['complemento'].required = False
     self.fields['taxa_frete'].required = False
@@ -348,61 +347,96 @@ class PrazoForm(ModelForm):
   
   
 # Classe do formulário de Produtos
-# class ProductForm(ModelForm):
+class ProdutoForm(ModelForm):
   
-#   class Meta:
-#      model = Produto
-#      fields = '__all__' # inclui todos os campos do model
+  class Meta:
+     model = Produto
+     fields = '__all__' # inclui todos os campos do model
   
-#   def __init__(self, *args, **kwargs):
-#     super(ProductForm, self).__init__(*args, **kwargs)
-#     self.helper = FormHelper()
-#     self.helper.form_method = 'post'
-#     self.helper.layout = Layout(
-#       Row(
-#         Column(
-#           Field('tipo_categoria', css_class='form-control col-md-6 mb-0'),
-#           Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
-#           Field('nome_produto', css_class='form-control col-md-6 mb-0'),
-#           Field('descricao', css_class='form-control col-md-6 mb-0'),
-#           Field('espessura', css_class='form-control col-md-6 mb-0 validate-number', placeholder=''),
-#           Field('tamanho', css_class='form-control col-md-6 mb-0 validate-number'),
-#           Field('largura', css_class='form-control col-md-6 mb-0 validate-number'),
-#           Field('comprimento', css_class='form-control col-md-6 mb-0 validate-number'),
-#         ),
-#         Column(
-#           Field('m_quadrado', css_class='form-control col-md-6 mb-0'),
-#           Field('qtd_por_caixa', css_class='form-control col-md-6 mb-0 validate-number'),
-#           Field('peso_unitario', css_class='form-control col-md-6 mb-0'),
-#           Field('peso_caixa', css_class='form-control col-md-6 mb-0'),
-#           Field('estado', css_class='form-control col-md-6 mb-0'),
-#         ),
-#         Column(
-#           Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_oculto_omie_com', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_oculto_omie_ind', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_oculto_omie_flx', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_oculto_omie_pre', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
-#           Field('cod_oculto_omie_mrx', css_class='form-control col-md-6 mb-0'),
-#         )
-#       ),
-#       Row(
-#         Column(
-#           HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
-#         ),
-#         Column(
-#           HTML(
-#             '<button type="submit" class="btn btn-primary btn-lg">'
-#             '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-#           ),
-#         ),
-#         css_class='form-row text-center'
-#       )
-#     )
+  def __init__(self, *args, **kwargs):
+    super(ProdutoForm, self).__init__(*args, **kwargs)
+    self.helper = FormHelper()
+    self.helper.form_method = 'post'
+    # ************** Campos não obrigatórios **************
+    self.fields['m_quadrado'].required = False
+    self.fields['peso_unitario'].required = False
+    self.fields['peso_unitario'].required = False
+    self.fields['peso_caixa'].required = False
+    self.fields['cod_omie_com'].required = False
+    self.fields['cod_oculto_omie_com'].required = False
+    self.fields['cod_omie_ind'].required = False
+    self.fields['cod_oculto_omie_ind'].required = False
+    self.fields['cod_omie_flx'].required = False
+    self.fields['cod_oculto_omie_flx'].required = False
+    self.fields['cod_omie_pre'].required = False
+    self.fields['cod_oculto_omie_pre'].required = False
+    self.fields['cod_omie_mrx'].required = False
+    self.fields['cod_oculto_omie_mrx'].required = False
+    self.fields['cod_omie_srv'].required = False
+    self.fields['cod_oculto_omie_srv'].required = False
+         
+    self.helper.layout = Layout(
+      TabHolder(
+        Tab(
+          'Dados Básicos',
+          Row(
+            Column(
+              Field('tipo_categoria', css_class='form-control col-md-6 mb-0'),
+              Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
+              Field('nome_produto', css_class='form-control col-md-6 mb-0'),
+              Field('largura', css_class='form-control col-md-6 mb-0 validate-number'),
+              Field('comprimento', css_class='form-control col-md-6 mb-0 validate-number'),
+            ),
+            Column(
+              Field('m_quadrado', css_class='form-control col-md-6 mb-0', readonly='readonly', placeholder='Informe "Largura", "Comprimento" e a "Categoria"'),
+              Field('qtd_por_caixa', css_class='form-control col-md-6 mb-0 validate-number'),
+              Field('peso_unitario', css_class='form-control col-md-6 mb-0'),
+              Field('peso_caixa', css_class='form-control col-md-6 mb-0'),
+              Field('situacao', css_class='form-control col-md-6 mb-0'),
+            ),
+          ),
+          Row(
+            Column(
+              Field('fornecedor', css_class='form-control col-md-6 mb-0'),  
+            ),  
+          ),  
+        ),  
+        Tab(
+          'Dados OMIE',
+          Row(
+            Column(
+              Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
+              Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
+              Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
+              Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
+              Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
+              Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
+            ),  
+            Column(
+            Field('cod_oculto_omie_com', css_class='form-control col-md-6 mb-0'),
+            Field('cod_oculto_omie_ind', css_class='form-control col-md-6 mb-0'),
+            Field('cod_oculto_omie_flx', css_class='form-control col-md-6 mb-0'),
+            Field('cod_oculto_omie_pre', css_class='form-control col-md-6 mb-0'),
+            Field('cod_oculto_omie_mrx', css_class='form-control col-md-6 mb-0'),
+            Field('cod_oculto_omie_srv', css_class='form-control col-md-6 mb-0'),
+            ),  
+          ),  
+        ),  
+        
+      ),
+      Row(
+        Column(
+          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+        ),
+        Column(
+          HTML(
+            '<button type="submit" class="btn btn-primary btn-lg">'
+            '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+          ),
+        ),
+        css_class='form-row text-center'
+      )
+    )
 
 # Classe do formulário de Novas Sub-Categorias
 # class SubCategoriaForm(ModelForm):

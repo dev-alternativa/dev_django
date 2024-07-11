@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, ListView, DeleteView
-from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm
-from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote,Prazo, Transportadora, Unidade
+from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm, ProdutoForm
+from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, Produto, Transportadora, Unidade
 
 
 # *********** LISTAGENS  ***********
@@ -40,10 +40,10 @@ class PrazoListView(ListView):
   ordering = '-dt_criacao'
   
   
-# class ProductListView(ListView):
-#   model = Produto
-#   template_name = 'produto/produto.html'
-#   context_object_name = 'itens_produto'
+class ProductListView(ListView):
+  model = Produto
+  template_name = 'produto/produto.html'
+  context_object_name = 'itens_produto'
   
   
 class StockView(TemplateView):
@@ -157,35 +157,24 @@ class PrazoNovoView(CreateView):
     messages.success(self.request, 'Prazo cadastrado com sucesso!')
     return response
 
-# class ProdutoNovoView(CreateView):
-#   model = Produto
-#   form_class = ProductForm
-#   template_name = "produto/adicionar_produto.html"
-#   sucess_url = reverse_lazy('produto' )
+class ProdutoNovoView(CreateView):
+  model = Produto
+  form_class = ProdutoForm
+  template_name = "produto/adicionar_produto.html"
+  success_url = reverse_lazy('produto')
   
-#    # Verifica se form é válido
-#   def form_valid(self, form):
-#     response = super().form_valid(form)
-#     messages.success(self.request, 'Produto cadastrado com sucesso!')
-#     return response
+   # Verifica se form é válido
+  def form_invalid(self, form):
+    messages.error(self.request, 'Erro ao cadastrar produto. Por favor, verifique os dados e tente novamente.')
+    return super().form_invalid(form)
+  
+  def form_valid(self, form):
+    response = super().form_valid(form)
+    messages.success(self.request, 'Produto cadastrado com sucesso!')
+    return response
 
-#   def form_invalid(self, form):
-#     messages.error(self.request, 'Erro ao cadastrar produto. Por favor, verifique os dados e tente novamente.')
-#     return super().form_invalid(form)
 
-#   def produto_novo(request):
-#     if request.method == 'POST':
-#       form = ProductForm(request.POST)
-#       if form.is_valid():
-#         form.save()
-#         return redirect('produto')
-#     else:
-#       form = ProductForm()
-      
-#     context = {
-#       'form': form,
-#     }
-#     return render(request, 'adicionar_produto.html', context)
+ 
 
 
 # class SubCategoriaNovaView(CreateView):
@@ -294,15 +283,15 @@ class LoteUpdateView(UpdateView):
     messages.success(self.request, 'Lote atualizado com sucesso!')
     return super().form_valid(form)
 
-# class ProdutoUpdateView(UpdateView):
-#   model = Produto
-#   form_class = ProductForm
-#   template_name = 'produto/update_produto.html'
-#   success_url = reverse_lazy('produto')
+class ProdutoUpdateView(UpdateView):
+  model = Produto
+  form_class = ProdutoForm
+  template_name = 'produto/update_produto.html'
+  success_url = reverse_lazy('produto')
   
-#   def form_valid(self, form):
-#     messages.success(self.request, 'Prazo atualizado com sucesso!')
-#     return super().form_valid(form)
+  def form_valid(self, form):
+    messages.success(self.request, 'Prazo atualizado com sucesso!')
+    return super().form_valid(form)
 
 class PrazoUpdateView(UpdateView):
   model = Prazo
@@ -395,15 +384,15 @@ class PrazoDeleteView(DeleteView):
     return response
   
   
-# class ProdutoDeleteView(DeleteView):
-#   model = Produto
-#   template_name = "produto/delete_produto.html"
-#   success_url = reverse_lazy('produto')
+class ProdutoDeleteView(DeleteView):
+  model = Produto
+  template_name = "produto/delete_produto.html"
+  success_url = reverse_lazy('produto')
   
-#   def delete_success(self, request, *args, **kwargs):
-#     response = super().delete(request, *args, **kwargs)
-#     messages.success(self.request, 'Produto excluído com sucesso!')
-#     return response
+  def delete_success(self, request, *args, **kwargs):
+    response = super().delete(request, *args, **kwargs)
+    messages.success(self.request, 'Produto excluído com sucesso!')
+    return response
 
 
 # class SubCategoriaDeleteView(DeleteView):

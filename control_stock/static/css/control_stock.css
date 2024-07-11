@@ -91,3 +91,8 @@ th {
 .delete-box {
     text-align: center;
 }
+
+/* Preencher todo o espaço disponível dentro de um form */
+.form_fill_content {
+    width: -webkit-fill-available;
+}

@@ -240,45 +240,45 @@ class ClienteFornecedor(Base):
         return ", ".join([c.nome for c in self.categoria.all()])    
     
     def __str__(self):
-        return self.nome
+        return self.nome_fantasia
   
   
-# class Produto(Base):
-#     ESTADO_PRODUTO = ( 
-#         ('CORTADA', 'Cortada'),
-#         ('INTEIRA', 'Inteira'),
-#     )
+class Produto(Base):
+    SITUACAO_PRODUTO = ( 
+        ('CORTADA', 'Cortada'),
+        ('INTEIRA', 'Inteira'),
+    )
     
-#     nome_produto = models.CharField('Nome Produto', max_length=100, null=True)
-#     tipo_categoria = models.ForeignKey('control_stock.Categoria', verbose_name='Tipo Categoria',max_length=100, on_delete=models.CASCADE) #FK
-#     sub_categoria = models.ForeignKey('control_stock.SubCategoria', verbose_name='Sub-Categoria', on_delete=models.CASCADE)  # FK
-#     largura = models.CharField('Largura', max_length=20, null=True)
-#     comprimento = models.CharField('Comprimento', max_length=100, null=True)
-#     m_quadrado = models.DecimalField('Metro Quadrado', max_digits=20, decimal_places=2, null=True) # campo calculado
-#     qtd_por_caixa = models.IntegerField('Quantidade por caixa', null=True)
-#     peso_unitario = models.DecimalField('Peso Unitário', max_digits=20, decimal_places=20, null=True)
-#     peso_caixa = models.DecimalField('Peso da Caixa', max_digits=20, decimal_places=5, null=True)
-#     estado = models.CharField('Estado', choices=ESTADO_PRODUTO, max_length=50, null=True)
-#     fornecedor = models.ForeignKey('control_stock.ClienteFornecedor', verbose_name='Fornecedor', max_length=100, on_delete=models.CASCADE)
-#     cod_omie_com = models.IntegerField('Código no OMIE do CNPJ COM', null=True)
-#     cod_oculto_omie_com = models.IntegerField('Código oculto no OMIE do CNPJ COM', null=True)
-#     cod_omie_ind = models.IntegerField('Código no OMIE do CNPJ IND', null=True)
-#     cod_oculto_omie_ind = models.IntegerField('Código oculto no OMIE do CNPJ IND', null=True)
-#     cod_omie_flx = models.IntegerField('Código no OMIE do CNPJ FLX', null=True)
-#     cod_oculto_omie_flx = models.IntegerField('Código oculto no OMIE do CNPJ FLX', null=True)
-#     cod_omie_pre = models.IntegerField('Código no OMIE do CNPJ PRE', null=True)
-#     cod_oculto_omie_pre = models.IntegerField('Código oculto no OMIE do CNPJ PRE', null=True)
-#     cod_omie_mrx = models.IntegerField('Código no OMIE do CNPJ MRX', null=True)
-#     cod_oculto_omie_mrx = models.IntegerField('Código oculto no OMIE do CNPJ MRX', null=True)
-#     cod_omie_srv = models.IntegerField('Código no OMIE do CNPJ SRV', null=True)
-#     cod_oculto_omie_srv = models.IntegerField('Código oculto no OMIE do CNPJ SRV', null=True)
+    tipo_categoria = models.ForeignKey('control_stock.Categoria', verbose_name='Tipo Categoria',max_length=100, on_delete=models.CASCADE) #FK
+    sub_categoria = models.CharField('Sub-Categoria', max_length=100)  
+    nome_produto = models.CharField('Nome Produto', max_length=100, null=True)
+    largura = models.CharField('Largura', max_length=20, null=True)
+    comprimento = models.CharField('Comprimento', max_length=10, null=True)
+    m_quadrado = models.CharField('Metro Quadrado', max_length=10, null=True) # campo calculado
+    qtd_por_caixa = models.IntegerField('Quantidade por caixa', null=True)
+    peso_unitario = models.CharField('Peso Unitário', max_length=10, null=True)
+    peso_caixa = models.CharField('Peso da Caixa', max_length=10, null=True)
+    situacao = models.CharField('Estado', choices=SITUACAO_PRODUTO, max_length=50, null=True)
+    fornecedor = models.ForeignKey('control_stock.ClienteFornecedor', verbose_name='Fornecedor', max_length=100, on_delete=models.CASCADE)
+    cod_omie_com = models.CharField('Cód. OMIE CNPJ COM', max_length=30, null=True)
+    cod_oculto_omie_com = models.CharField('Cód. oculto no OMIE CNPJ COM', max_length=30, null=True)
+    cod_omie_ind = models.CharField('Cód. OMIE CNPJ IND', max_length=30, null=True)
+    cod_oculto_omie_ind = models.CharField('Cód. oculto no OMIE CNPJ IND', max_length=30, null=True)
+    cod_omie_flx = models.CharField('Cód. OMIE CNPJ FLX', max_length=30, null=True)
+    cod_oculto_omie_flx = models.CharField('Cód. oculto no OMIE CNPJ FLX', max_length=30, null=True)
+    cod_omie_pre = models.CharField('Cód. OMIE CNPJ PRE', max_length=30, null=True)
+    cod_oculto_omie_pre = models.CharField('Cód. oculto no OMIE CNPJ PRE', max_length=30, null=True)
+    cod_omie_mrx = models.CharField('Cód. OMIE CNPJ MRX', max_length=30, null=True)
+    cod_oculto_omie_mrx = models.CharField('Cód. oculto no OMIE CNPJ MRX', max_length=30, null=True)
+    cod_omie_srv = models.CharField('Cód. OMIE CNPJ SRV', max_length=30, null=True)
+    cod_oculto_omie_srv = models.CharField('Cód. oculto no OMIE CNPJ SRV', max_length=30, null=True)
 
-#     class Meta:
-#         verbose_name = 'Produto'
-#         verbose_name_plural = 'Produtos'
+    class Meta:
+        verbose_name = 'Produto'
+        verbose_name_plural = 'Produtos'
     
-#     def __str__(self):
-#         return self.chapa_modelo
+    def __str__(self):
+        return self.nome_produto
       
      
 

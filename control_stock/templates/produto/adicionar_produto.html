@@ -8,13 +8,13 @@
     <div class="container">
         <div class="row">
           <div class="col-lg-12">
-            <h1 class="text-body-secondary text-center mb-3">Tipo de produtos</h1>
+            <h1 class="text-body-secondary text-center mb-3">Produto</h1>
             <div class="card">
                 <div class="card-header">
-                    Adicionar Tipo de Produto
+                    Adicionar Produto
                 </div>
                 <div class='btn-group top-buttons space_from_margin center_content' role="group" aria-label="Grupo de botões">
-                    <form method="POST" id="formAddProduto">
+                    <form method="POST" id="formAddProduto" class="form_fill_content" autocomplete="off">
                       {% csrf_token %}
                       {% crispy form %}
                     </form>
@@ -25,3 +25,7 @@
     </div>
 </div>
 {% endblock  %}
+{% block extra_scripts %}
+  <script src="{% static 'js/misc.js' %}"></script>
+  <script src="{% static 'js/form_validation.js' %}"></script>
+{% endblock %}
