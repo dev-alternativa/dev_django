@@ -7,6 +7,47 @@ from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteFor
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, Produto, Transportadora, Unidade
 
 
+# *********** Mixins  ***********
+
+class ValidaCNPJMixin:
+  def form_invalid(self, form):
+    cnpj = form.cleaned_data.get('cnpj', '')
+    digits = ''.join(filter(str.isdigit, cnpj))
+    if len(digits) < 11:
+        messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
+    return super().form_invalid(form)
+
+  def form_valid(self, form):
+    response = super().form_valid(form)
+    messages.success(self.request, 'Dados atualizados com sucesso!')
+    return response
+   
+#  Mensagens de formulários de inclusão / atualização de itens
+class FormMessageMixin:
+  success_message = ''
+  error_message = 'Não foi possível salvar, corrija os erros abaixo.'
+  
+  def form_valid(self, form):
+    response = super().form_valid(form)
+    if self.success_message:
+      messages.success(self.request, self.success_message)
+    return response
+
+  def form_invalid(self, form):
+    messages.error(self.request, self.error_message)
+    return super().form_invalid(form)
+   
+   
+# Mensagens de exclusão de itens
+class DeleteSuccessMessageMixin:
+  delete_success_message = 'Item excluído com sucesso!'
+  
+  def delete(self, request, *args, **kwargs):
+    response = super().delete(request, *args, **kwargs)
+    if self.delete_success_message:
+      messages.success(self.request, self.delete_success_message)
+      return response
+
 # *********** LISTAGENS  ***********
 class CategoriaListView(ListView):
   model = Categoria
@@ -60,6 +101,8 @@ class TransportadoraView(ListView):
   model = Transportadora
   template_name = 'transportadora/transportadora.html'
   context_object_name = 'itens_transportadora'
+  paginate_by = 30
+  ordering = '-dt_criacao'
   
   
 class UnidadeListView(ListView):
@@ -70,18 +113,13 @@ class UnidadeListView(ListView):
   
 
 # *********** INCLUSÃO  ***********
-class CategoriaNovaView(CreateView):
+class CategoriaNovaView(FormMessageMixin, CreateView):
   model = Categoria
   form_class = CategoriaForm
   template_name = "categoria/adicionar_categoria.html"
   success_url = reverse_lazy('categoria')
+  success_message = 'Categoria cadastrada com sucesso!' 
   
-  # Verifica se form é válido
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    messages.success(self.request, 'Categoria cadastrada com sucesso!')
-    return response
-
   
   
 class ClienteFornecedorNovoView(CreateView):
@@ -96,7 +134,7 @@ class ClienteFornecedorNovoView(CreateView):
       if len(digits) < 11:
           messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
       
-        # Adicionar os erros do formulário nas mensagens
+      # Adicionar os erros do formulário nas mensagens
       for field, errors in form.errors.items():
         if field != '__all__':
           for error in errors:
@@ -119,63 +157,28 @@ class ClienteFornecedorNovoView(CreateView):
     return response 
   
 
-class CoordenadaNovaView(CreateView):
+class CoordenadaNovaView(FormMessageMixin, CreateView):
   model = ConfCoordenada
   form_class = CoordenadaForm
   template_name = "conf_coordenada/adicionar_coordenada.html"
   success_url = reverse_lazy('coordenada')
+  success_message = 'Coordenada incluída com sucesso!'
   
-  # Verifica se form é válido
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    messages.success(self.request, 'Categoria cadastrada com sucesso!')
-    return response
 
-
-
-class LoteNovoView(CreateView):
+class LoteNovoView(FormMessageMixin, CreateView):
   model = Lote
   form_class = LoteForm
   template_name = 'lote/adicionar_lote.html'
   success_url = reverse_lazy('lote')
+  success_message = 'Lote incluído com sucesso!'
   
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    messages.success(self.request, 'Lote cadastrado com sucesso!')
-    return response
 
-
-class PrazoNovoView(CreateView):
-  model = Prazo
-  form_class = PrazoForm
-  template_name = 'prazo/adicionar_prazo.html'
-  success_url = reverse_lazy('prazo')
-
-   # Verifica se form é válido
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    messages.success(self.request, 'Prazo cadastrado com sucesso!')
-    return response
-
-class ProdutoNovoView(CreateView):
+class ProdutoNovoView(FormMessageMixin, CreateView):
   model = Produto
   form_class = ProdutoForm
   template_name = "produto/adicionar_produto.html"
   success_url = reverse_lazy('produto')
-  
-   # Verifica se form é válido
-  def form_invalid(self, form):
-    messages.error(self.request, 'Erro ao cadastrar produto. Por favor, verifique os dados e tente novamente.')
-    return super().form_invalid(form)
-  
-  def form_valid(self, form):
-    response = super().form_valid(form)
-    messages.success(self.request, 'Produto cadastrado com sucesso!')
-    return response
-
-
- 
-
+  success_message = 'Produto incluído com sucesso'
 
 # class SubCategoriaNovaView(CreateView):
 #   model = SubCategoria
@@ -183,262 +186,140 @@ class ProdutoNovoView(CreateView):
 #   template_name = "subcategoria/adicionar_sub_categoria.html"
 #   success_url = reverse_lazy('sub_categoria')
   
-  # Verifica se form é válido
-  # def form_valid(self, form):
-  #   response = super().form_valid(form)
-  #   messages.success(self.request, 'Sub-Categoria cadastrada com sucesso!')
-  #   return response
 
-  # def sub_categoria_nova(request):
-  #   if request.method == 'POST':
-  #     form = SubCategoriaForm(request.POST)
-  #     if form.is_valid():
-  #       form.save()
-  #       return redirect('sub_categoria')
-  #   else:
-  #     form = SubCategoriaForm()
-      
-  #   context = {
-  #     'form': form,
-  #   }
-  #   return render(request, 'adicionar_sub_categoria.html', context)
-
-
-class TransportadoraNovaView(CreateView):
+class TransportadoraNovaView(ValidaCNPJMixin, CreateView):
     model = Transportadora
     form_class = TransportadoraForm
     template_name = 'transportadora/adicionar_transportadora.html'
     success_url = reverse_lazy('transportadora')
+    success_message = 'Transportadora incluída com sucesso'
     
-    
-    # Verifica se form é invalido
-    def form_invalid(self, form):
-      cnpj = form.cleaned_data.get('cnpj', '')
-      digits = ''.join(filter(str.isdigit, cnpj))
-      if len(digits) < 11:
-        messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
-        return super().form_invalid(form)
-      return super().form_invalid(form)
-    
-    # Verificaa se form é válido
-    def form_valid(self, form):
-      response = super().form_valid(form)
-      messages.success(self.request, 'Transportadora cadastrada com sucesso!')
-      return response
-    
-  
-class UnidadeNovaView(CreateView):
+      
+class UnidadeNovaView(FormMessageMixin, CreateView):
     model = Unidade
     form_class = UnidadeForm
     template_name = 'unidade/adicionar_unidade.html'
     success_url = reverse_lazy('unidade')
+    success_message = 'Unidade incluída com sucesso'
     
-    # Verificaa se form é válido
-    def form_valid(self, form):
-      response = super().form_valid(form)
-      messages.success(self.request, 'Unidade cadastrada com sucesso!')
-      return response
-  
+ 
   
 # *********** ATUALIZAÇÃO ***********
-class CategoriaUpdateView(UpdateView):
+class CategoriaUpdateView(FormMessageMixin, UpdateView):
   model = Categoria
   form_class = CategoriaForm
   template_name = 'categoria/update_categoria.html'
   success_url = reverse_lazy('categoria')
+  success_message = 'Categoria atualizada com sucesso!'
   
-  def form_valid(self, form):
-    messages.success(self.request, 'Categoria atualizada com sucesso!')
-    return super().form_valid(form)  
   
-class ClienteFornecedorUpdateView(UpdateView):
+class ClienteFornecedorUpdateView(FormMessageMixin, UpdateView):
   model = ClienteFornecedor
   form_class = ClienteFornecedorForm
   template_name = 'cliente_fornecedor/update_cliente_fornecedor.html'
   success_url = reverse_lazy('cliente_fornecedor')
-  
-  def form_valid(self, form):
-    messages.success(self.request, 'Cliente / Fornecedor atualizado com sucesso!')
-    return super().form_valid(form)
+  success_message = 'Cliente / Fornecedor atualizado com sucesso!'
   
   
-class CoordenadaUpdateView(UpdateView):
+class CoordenadaUpdateView(FormMessageMixin, UpdateView):
   model = ConfCoordenada
   form_class = CoordenadaForm
   template_name = 'conf_coordenada/update_coordenada.html'
   success_url = reverse_lazy('coordenada')
+  success_message = 'Coordenada atualizada com sucesso!'
   
-  def form_valid(self, form):
-    messages.success(self.request, 'Coordenada atualizada com sucesso!')
-    return super().form_valid(form)
 
-
-class LoteUpdateView(UpdateView):
+class LoteUpdateView(FormMessageMixin, UpdateView):
   model = Lote
   form_class = LoteForm
   template_name = 'lote/update_lote.html'
   success_url = reverse_lazy('lote')
+  success_message = 'Lote atualizado com sucesso!'
   
-  def form_valid(self, form):
-    messages.success(self.request, 'Lote atualizado com sucesso!')
-    return super().form_valid(form)
 
-class ProdutoUpdateView(UpdateView):
+class ProdutoUpdateView(FormMessageMixin, UpdateView):
   model = Produto
   form_class = ProdutoForm
   template_name = 'produto/update_produto.html'
   success_url = reverse_lazy('produto')
+  success_message = 'Produto atualizado com sucesso!'
   
-  def form_valid(self, form):
-    messages.success(self.request, 'Prazo atualizado com sucesso!')
-    return super().form_valid(form)
 
-class PrazoUpdateView(UpdateView):
+class PrazoUpdateView(FormMessageMixin, UpdateView):
   model = Prazo
   form_class = PrazoForm
   template_name = 'prazo/update_prazo.html'
   success_url = reverse_lazy('prazo')
-  
-  def form_valid(self, form):
-    messages.success(self.request, 'Prazo atualizado com sucesso!')
-    return super().form_valid(form)
+  success_message = 'Prazo atualizado com sucesso!'
   
   
-class TransportadoraUpdateView(UpdateView):
+class TransportadoraUpdateView(ValidaCNPJMixin, UpdateView):
   model = Transportadora
   form_class = TransportadoraForm
   template_name = 'transportadora/update_transportadora.html'
   success_url = reverse_lazy('transportadora')
+    
   
-  def form_valid(self, form):
-      messages.success(self.request, 'Transportadora atualizada com sucesso!')
-      return super().form_valid(form)
-  
-  
-class UnidadeUpdateView(UpdateView):
+class UnidadeUpdateView(FormMessageMixin, UpdateView):
   model = Unidade
   form_class = UnidadeForm
   template_name = 'unidade/update_unidade.html'
   success_url = reverse_lazy('unidade')
-  
-  def form_valid(self, form):
-    messages.success(self.request, 'Unidade atualizada com sucesso!')
-    return super().form_valid(form)
-  
+  success_message = 'Unidade atualizada com sucesso!'
   
 
 
 # *********** EXCLUSÃO DE ITENS ***********
-class CategoriaDeleteView(DeleteView):
+class CategoriaDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Categoria
   template_name = 'categoria/delete_categoria.html'
   success_url = reverse_lazy('categoria')
 
-  def delete_success(self, request, *args, **kwargs):
-      response = super().delete(request, *args, **kwargs)
-      messages.success(self.request, 'Categoria excluída com sucesso!')
-      return response
 
-
-class ClienteFornecedorDeleteView(DeleteView):
+class ClienteFornecedorDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = ClienteFornecedor
   template_name = 'cliente_fornecedor/delete_cliente_fornecedor.html'
   success_url = reverse_lazy('cliente_fornecedor')
   
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Cliente/Fornecedor excluído com sucesso!')
-    return response
 
-
-class CoordenadaDeleteView(DeleteView):
+class CoordenadaDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = ConfCoordenada
   template_name = "conf_coordenada/delete_coordenada.html"
   success_url = reverse_lazy('coordenada')
-    
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Coordenada excluída com sucesso!')
-    return response
   
 
-class LoteDeleteView(DeleteView):
+class LoteDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Lote
   template_name = "lote/delete_lote.html"
   success_url = reverse_lazy("lote")
   
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Lote excluído com sucesso!')
-    return response
 
-
-class PrazoDeleteView(DeleteView):
+class PrazoDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Prazo
   template_name = "prazo/delete_prazo.html"
   success_url = reverse_lazy('prazo')
   
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Prazo excluído com sucesso!')
-    return response
   
-  
-class ProdutoDeleteView(DeleteView):
+class ProdutoDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Produto
   template_name = "produto/delete_produto.html"
   success_url = reverse_lazy('produto')
   
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Produto excluído com sucesso!')
-    return response
 
-
-# class SubCategoriaDeleteView(DeleteView):
+# class SubCategoriaDeleteView(DeleteSuccessMessageMixin, DeleteView):
 #   model = SubCategoria
 #   template_name = 'subcategoria/delete_sub_categoria.html'
 #   success_url = reverse_lazy('sub_categoria')
   
-#   def delete_success(self, request, *args, **kwargs):
-#     response = super().delete(request, *args, **kwargs)
-#     messages.success(self.request, 'Categoria excluída com sucesso!')
-#     return response
 
-
-class TransportadoraDeleteView(DeleteView):
+class TransportadoraDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Transportadora
   template_name = 'transportadora/delete_transportadora.html'
   success_url = reverse_lazy('transportadora')
   
-  def delete_success(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Transportadora excluída com sucesso!')
-    return response
   
-  
-class UnidadeDeleteView(DeleteView):
+class UnidadeDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Unidade
   template_name = 'unidade/delete_unidade.html'
   success_url = reverse_lazy("unidade")
   
-  def delete_sucess(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    messages.success(self.request, 'Unidade excluída com sucesso!')
-    return response
-
-
-# Outras
-
-  
-  
-
-        
-    
-class SuccessView(TemplateView):
-  template_name = "success.html"
-  
-  def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['data'] = self.request.session.get('uploaded_data', [])
-        return context

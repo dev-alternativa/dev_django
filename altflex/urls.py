@@ -8,7 +8,7 @@ urlpatterns = [
     path('', include('control_stock.urls')),
     path('', include('usuarios.urls')),
     path('api/', include('api.urls')),
-    path('importacao/', include('importacao.urls')),
+    path('', include('importacao.urls')),
     path("select2/", include("django_select2.urls")),
 ]
 

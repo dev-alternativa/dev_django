@@ -475,12 +475,13 @@ class TransportadoraForm(ModelForm):
     model = Transportadora
     fields = '__all__'
     
-  def clean_cnpj(self):
+  def save(self, commit=True):
+    instance = super().save(commit=False)
     cnpj = self.cleaned_data.get('cnpj', '')
-    digits = ''.join(filter(str.isdigit, cnpj))
-    if len(digits) < 11:
-        raise forms.ValidationError('CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
-    return cnpj
+    instance.cnpj = ''.join(filter(str.isdigit, cnpj))
+    if commit:
+      instance.save()
+    return instance
     
   def __init__(self, *args, **kwargs):
     super(TransportadoraForm, self).__init__(*args, **kwargs)
