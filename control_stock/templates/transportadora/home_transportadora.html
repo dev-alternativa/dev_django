@@ -7,6 +7,10 @@
                 <i class="bi bi-plus-lg"></i>
                 Adicionar Nova Transportadora
             </a>
+            <a href="{% url 'importar_transportadora' %}" class="btn btn-outline-success">
+                <i class="bi-box-arrow-in-left"></i>
+                Importar de Planilha Excel
+            </a>
         </div>
         <div class="space_from_margin">       
             {% include "transportadora/lista_transportadora.html" %}
