@@ -27,7 +27,7 @@
 
 /* Tamanho da coluna de 'Ações' na listagem de itens */
 .action_size_column {
-    width: 25%;
+    width: 10rem;
     text-align: center;
     vertical-align: middle;
 }

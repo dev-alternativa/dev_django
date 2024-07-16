@@ -9,6 +9,26 @@ from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, P
 
 # *********** Mixins  ***********
 
+class ExibirCNPJCPFFormatado:
+  context_object_name = ''
+  
+  # Formata o CNPJ ou CPF que serão apresentados nas listagens
+  def format_cnpj_cpf(self, cnpj):
+    if len(cnpj) == 14:
+        return f'{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}'
+    elif len(cnpj) == 11:
+        return f'{cnpj[:3]}.{cnpj[3:6]}.{cnpj[6:9]}-{cnpj[9:11]}'
+    return cnpj
+  
+  # Exibe no contexto CNPJ ou CPF formatados
+  def get_context_data(self, **kwargs):
+    context = super().get_context_data(**kwargs)
+    itens = context.get(self.context_object_name, [])
+    for item in itens:
+      item.cnpj_formatado = self.format_cnpj_cpf(item.cnpj)
+    return context
+
+
 class ValidaCNPJMixin:
   def form_invalid(self, form):
     cnpj = form.cleaned_data.get('cnpj', '')
@@ -55,10 +75,12 @@ class CategoriaListView(ListView):
   context_object_name = 'itens_categoria'
   
   
-class ClienteFornecedorListView(ListView):
+class ClienteFornecedorListView(ExibirCNPJCPFFormatado, ListView):
   model = ClienteFornecedor
   template_name = 'cliente_fornecedor/cliente_fornecedor.html'
   context_object_name = 'itens_cliente_fornecedor'
+  paginate_by = 30
+  ordering = '-dt_criacao'
   
   
 class ConfCoordListView(ListView):
@@ -97,7 +119,7 @@ class StockView(TemplateView):
 #   context_object_name = 'itens_sub_categoria'
   
   
-class TransportadoraView(ListView):
+class TransportadoraView(ExibirCNPJCPFFormatado, ListView):
   model = Transportadora
   template_name = 'transportadora/transportadora.html'
   context_object_name = 'itens_transportadora'
@@ -172,6 +194,14 @@ class LoteNovoView(FormMessageMixin, CreateView):
   success_url = reverse_lazy('lote')
   success_message = 'Lote incluído com sucesso!'
   
+
+class PrazoNovoView(FormMessageMixin, CreateView):
+  model = Prazo
+  form_class = PrazoForm
+  template_name = 'prazo/adicionar_prazo.html'
+  success_url = reverse_lazy('prazo')
+  success_message = 'Prazo incluído com sucesso!'
+
 
 class ProdutoNovoView(FormMessageMixin, CreateView):
   model = Produto
