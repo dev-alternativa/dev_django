@@ -181,22 +181,22 @@ class ClienteFornecedor(Base):
     cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30)
     cidade = models.CharField('Cidade', max_length=100)
     estado = models.CharField('Estado', choices=ESTADOS_BRASIL, max_length=50)
-    endereco = models.CharField('Endereço', max_length=50)
+    endereco = models.CharField('Endereço', max_length=100)
     bairro = models.CharField('Bairro', max_length=50)
     complemento = models.CharField('Complemento', max_length=50, null=True)
     numero = models.CharField('Número', max_length=15)
-    telefone = models.CharField('Telefone', max_length=10)
-    ddd = models.CharField('DDD', max_length=4)
+    telefone = models.CharField('Telefone', max_length=15, null=True)
+    ddd = models.CharField('DDD', max_length=4, null=True)
     cep = models.CharField('CEP', max_length=12)
     email = models.EmailField('E-mail', max_length=300)
-    nome_contato = models.CharField('Nome Contato', max_length=30, null=True)
+    nome_contato = models.CharField('Nome Contato', max_length=50, null=True)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100)
     taxa_frete = models.CharField('Taxa de frete', max_length=10, null=True)
     cliente_transportadora = models.ForeignKey('control_stock.Transportadora', verbose_name='Transportadora', on_delete=models.CASCADE)
     prazo = models.ForeignKey('control_stock.Prazo', verbose_name='Prazo', on_delete=models.CASCADE)
     categoria = models.ManyToManyField(Categoria, related_name='clientes')
     inscricao_estadual = models.CharField('Inscrição Estadual',max_length=20, null=True)
-    limite_credito = models.CharField('Limite de Crédito', max_length=20)
+    limite_credito = models.CharField('Limite de Crédito', max_length=20, null=True)
     # sub_categoria = models.ManyToManyField(SubCategoria, related_name='clientes')
     # tipo_produto = models.CharField('Tipo de Produto', max_length=50)
     # status = models.BooleanField('Ativo', default=True) # Verificar quis são os status
@@ -221,14 +221,17 @@ class ClienteFornecedor(Base):
         # Remove caracteres não numéricos
         self.cnpj = re.sub(r'\D', '', self.cnpj)
         self.telefone = re.sub(r'\D', '', self.telefone)
-        self.ddd = re.sub(r'\D', '', self.ddd)
+        self.ddd = re.sub(r'[^\d]|0', '', self.ddd) # remove caracteres não numéricos e o 0
         
-        # Validação de dados
-        if len(self.telefone) < 8:
-            raise ValidationError('Número de telefone deve conter pelo menos 8 dígitos.')
-        
-        if len(self.ddd) < 2:
-            raise ValidationError('DDD deve conter 2 dígitos.')
+        # Se telefone existir mas for menor que 8, é invalido
+        if self.telefone:
+            if len(self.telefone) < 8:
+                self.telefone != 'N/A'
+                                
+        # se DDD existir e for menor que 2, é invalido
+        if self.ddd:
+            if len(self.ddd) < 2:
+                self.ddd = 'N/A'
         
     def save(self, *args, **kwargs):
         self.clean()

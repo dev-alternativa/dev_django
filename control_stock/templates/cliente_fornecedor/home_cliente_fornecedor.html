@@ -7,6 +7,10 @@
                 <i class="bi bi-plus-lg"></i>
                 Adicionar Novo Cliente/Fornecedor
             </a>
+            <a href="{% url 'importar_cliente_fornecedor' %}" class="btn btn-outline-success">
+                <i class="bi-box-arrow-in-left"></i>
+                Importar de Planilha Excel
+            </a>
         </div>
         <div class="space_from_margin">       
             {% include "cliente_fornecedor/lista_cliente_fornecedor.html" %}

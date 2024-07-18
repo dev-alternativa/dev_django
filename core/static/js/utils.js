@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => {
               alert.remove();
           }, 150);  // Tempo de transição para o fade (pode ajustar conforme a necessidade)
-      }, 3000);  // 3 segundos
+      }, 6000);  // 3 segundos
   });
 });
 

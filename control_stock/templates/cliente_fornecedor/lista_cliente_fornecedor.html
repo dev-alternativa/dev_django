@@ -4,9 +4,9 @@
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
           <tr>
-              <th>Nome</th>
-              <th>CNPJ</th>
-              <th>Contato</th>
+              <th>Nome Fantasia</th>
+              <th>CNPJ/CPF</th>
+              <th>Telefone</th>
               <th>Categoria</th>
               <th>Inscrição Estadual</th>
               <th>Limite de Crédito</th>
@@ -16,9 +16,9 @@
       <tbody class="table-group-divider">
         {% for cliente in itens_cliente_fornecedor %}
           <tr>
-            <td>{{ cliente.nome }}</td>
+            <td>{{ cliente.nome_fantasia }}</td>
             <td>{{ cliente.cnpj_formatado }}</td>
-            <td>{{ cliente.contato }}</td>
+            <td>({{ cliente.ddd }})&nbsp{{ cliente.telefone }}</td>
             <td>
               <!-- Exibição de Categorias corretamente -->
               {% for categoria in cliente.categoria.all  %}
@@ -43,4 +43,5 @@
         {% endfor %}
       </tbody>
   </table>
+  {% include 'paginacao.html' %}
 </div>

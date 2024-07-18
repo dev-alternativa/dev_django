@@ -80,7 +80,7 @@ class ClienteFornecedorListView(ExibirCNPJCPFFormatado, ListView):
   template_name = 'cliente_fornecedor/cliente_fornecedor.html'
   context_object_name = 'itens_cliente_fornecedor'
   paginate_by = 30
-  ordering = '-dt_criacao'
+  ordering = 'nome_fantasia'
   
   
 class ConfCoordListView(ListView):
