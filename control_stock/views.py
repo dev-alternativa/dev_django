@@ -1,10 +1,12 @@
 from pyexpat.errors import messages
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, ListView, DeleteView
 from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm, ProdutoForm
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, Produto, Transportadora, Unidade
+
 
 
 # *********** Mixins  ***********
@@ -81,6 +83,17 @@ class ClienteFornecedorListView(ExibirCNPJCPFFormatado, ListView):
   context_object_name = 'itens_cliente_fornecedor'
   paginate_by = 30
   ordering = 'nome_fantasia'
+  
+  def get_queryset(self):
+    queryset = super().get_queryset()
+    search = self.request.GET.get('search')
+    if search:
+      search_terms = search.split()
+      query = Q()
+      for term in search_terms:
+        query |= Q(nome_fantasia__icontains=term) | Q(cnpj__icontains=term)
+      queryset = queryset.filter(query).distinct()
+    return queryset
   
   
 class ConfCoordListView(ListView):

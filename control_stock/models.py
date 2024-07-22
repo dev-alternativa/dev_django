@@ -250,11 +250,12 @@ class Produto(Base):
     SITUACAO_PRODUTO = ( 
         ('CORTADA', 'Cortada'),
         ('INTEIRA', 'Inteira'),
+        ('ESTOQUE', 'Estoque'),
     )
     
     tipo_categoria = models.ForeignKey('control_stock.Categoria', verbose_name='Tipo Categoria',max_length=100, on_delete=models.CASCADE) #FK
     sub_categoria = models.CharField('Sub-Categoria', max_length=100)  
-    nome_produto = models.CharField('Nome Produto', max_length=100, null=True)
+    nome_produto = models.CharField('Nome Produto', max_length=100)
     largura = models.CharField('Largura', max_length=20, null=True)
     comprimento = models.CharField('Comprimento', max_length=10, null=True)
     m_quadrado = models.CharField('Metro Quadrado', max_length=10, null=True) # campo calculado

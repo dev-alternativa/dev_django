@@ -1,5 +1,15 @@
 {% load static %}
 
+<form method="get" action="" class="row g-3 justify-content-center" autocomplete=off>
+  <div class="col-6">
+    <input type="text" class="form-control" name="search" placeholder="Buscar clientes..." value="{{ request.GET.search }}">
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-info" type="submit">Buscar</button>
+  </div>
+
+</form>
+
 <div class="table-responsive border-secondary">
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
@@ -31,11 +41,11 @@
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <button type="button" class="btn btn-warning btn-edit"  data-itens_cliente-id="{{ cliente.id }}">
                   <i class="bi bi-pencil-square"></i>
-                  Editar
+                  {% comment %} Editar {% endcomment %}
                 </button>
                 <button type="button" class="btn btn-danger btn-delete" data-itens_cliente-id="{{ cliente.id }}">
                   <i class="bi bi-trash3"></i>
-                  Apagar
+                  {% comment %} Apagar {% endcomment %}
                 </button>
               </div>
             </td>

@@ -352,6 +352,17 @@ class ProdutoForm(ModelForm):
   class Meta:
      model = Produto
      fields = '__all__' # inclui todos os campos do model
+     widgets = {
+       'fornecedor': Select2Widget(
+         attrs={
+           'data-placeholder': 'Selecione um fornecedor',
+           'data-placeholder': 'Começe digitando algo...',
+           'data-minimum-input-length': 3,
+           'data-width': '100%',
+           }
+        ),
+       
+     }
   
   def __init__(self, *args, **kwargs):
     super(ProdutoForm, self).__init__(*args, **kwargs)
