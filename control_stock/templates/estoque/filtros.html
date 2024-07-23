@@ -1,0 +1,13 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<div class="card-body card_externo">
+    <div class="card">
+        <div class="card-header p-2 text-primary-emphasis bg-primary-subtle border border-primary-subtle ">
+            Filtrar itens do estoque
+        </div>
+        <div class="card-body">
+            {% csrf_token %}
+            {% crispy form %}
+        </div>
+    </div>
+</div>

@@ -123,9 +123,6 @@ class ProductListView(ListView):
   context_object_name = 'itens_produto'
   
   
-class StockView(TemplateView):
-  template_name = 'estoque/estoque.html' 
-
 
 # class SubCategoriaListView(ListView):
 #   model = SubCategoria
