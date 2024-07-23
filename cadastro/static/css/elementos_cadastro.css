@@ -1,0 +1,98 @@
+/* Globais */
+/* Margem */
+.space_from_margin {
+    padding: 1rem;
+}
+
+/* Espaçamento de baixo */
+.space_padding_botton {
+    padding-bottom: 1rem;
+}
+
+/* Centralizar conteúdo */
+.center_content {
+    display: flex;
+    justify-content: center;
+    padding-top: 1.2rem; 
+    padding-top: .3rem;
+    padding-left: .7rem;
+}
+
+/* alinhar alertas */
+.alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Tamanho da coluna de 'Ações' na listagem de itens */
+.action_size_column {
+    width: 10rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Select Categoria */
+.select2-search__field {
+    width: 100% !important;
+}
+
+/* Tamanho da margem da coluna 'Ações' */
+.btn-actions {
+    margin: 0.5rem;
+}
+
+/* Tamaho dos botões da coluna 'Ações' */
+input.btn-actions{
+    margin-top: 1.5rem;
+}
+
+/* Espaçamento do cartão externo dos cadastros */
+.card_externo {
+    padding: 1rem;
+}
+
+/* Espaçamento grupo de botões */
+.grupo-botoes {
+    padding-top:2rem
+}
+
+/* Espaçamento entre os filtros */
+.filter-spaces {
+    padding-top: 1rem;
+}
+
+
+/* margem superior de tabelas */
+.table {
+    margin-top: 1rem;
+}
+
+/* Configuração cabeçalho de tabela*/
+th {
+    align-content: center;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.7rem;
+}
+
+/* Espaçamento superior de botões */
+.top-buttons {
+    padding-top: 1rem;
+    
+}
+
+/* Espaçamento do cartão de conteúdo */
+.card-conteudo {
+    padding: 1rem;
+}
+
+/* Card Excluir Item */
+.delete-box {
+    text-align: center;
+}
+
+/* Preencher todo o espaço disponível dentro de um form */
+.form_fill_content {
+    width: -webkit-fill-available;
+}

@@ -4,27 +4,25 @@
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
           <tr>
-              <th scope="col">Descrição</th>
-              <th scope="col">Parcelas</th>
-              <th scope="col">Código</th>
-              <th scope="col" class="action_size_column">Ações</th>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th class="action_size_column">Ações</th>
           </tr>
       </thead>
       <tbody class="table-group-divider">
-        {% for prazo in itens_prazo %}
+        {% for cat in itens_categoria %}
           <tr>
-            <td>{{ prazo.descricao }}</td>
-            <td>{{ prazo.parcelas }}</td>
-            <td>{{ prazo.codigo }}</td>
+            <td>{{ cat.nome }}</td>
+            <td>{{ cat.descricao }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
-                <button type="button" class="btn btn-warning btn-edit"  data-prazo-id="{{ prazo.id }}">
+                <button type="button" class="btn btn-warning btn-edit"  data-categoria-id="{{ cat.id }}">
                   <i class="bi bi-pencil-square"></i>
-                  Editar
+                  {% comment %} Editar {% endcomment %}
                 </button>
-                <button type="button" class="btn btn-danger btn-delete" data-prazo-id="{{ prazo.id }}">
+                <button type="button" class="btn btn-danger btn-delete" data-categoria-id="{{ cat.id }}">
                   <i class="bi bi-trash3"></i>
-                  Apagar
+                  {% comment %} Apagar {% endcomment %}
                 </button>
               </div>
             </td>
@@ -32,7 +30,4 @@
         {% endfor %}
       </tbody>
   </table>
-
-  {% include 'paginacao.html' %}
-  
 </div>

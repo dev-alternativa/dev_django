@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import UploadPrazoForm, UploadClienteFornecedorForm, UploadTransportadoraForm
 import pandas as pd
-from control_stock.models import Prazo, Categoria, ClienteFornecedor, Transportadora
+from cadastro.models import Prazo, Categoria, ClienteFornecedor, Transportadora
 import re
 
 class ImportarPrazoView(FormView):
@@ -304,7 +304,7 @@ class ImportarTransportadoraView(FormView):
           cod_omie_SRV = row['codigo_cliente_omie_SRV'],
           cod_omie_FLX = row['codigo_cliente_omie_FLX'],
         )
-       
+
         if created:
           incluidos += 1
         else:

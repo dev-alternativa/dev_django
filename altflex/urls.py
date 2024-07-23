@@ -6,6 +6,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('', include('control_stock.urls')),
+    path('', include('cadastro.urls')),
     path('', include('usuarios.urls')),
     path('api/', include('api.urls')),
     path('', include('importacao.urls')),

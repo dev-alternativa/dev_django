@@ -27,23 +27,23 @@
 <!-- Custom CSS  -->
     <link href="{% static '/css/utils.css' %}" rel="stylesheet">
     <link href="{% static '/css/sidebars.css' %}" rel="stylesheet">
-    <link href="{% static '/css/control_stock.css' %}" rel="stylesheet">
+    <link href="{% static '/css/elementos_cadastro.css' %}" rel="stylesheet">
 
     <style>
         {% if ENVIRONMENT_DEV %}
-          .environment_banner {
-            background-color: seagreen;
-          }
-          {% elif ENVIRONMENT_HML  %}
-          .environment_banner {
-            background-color: goldenrod;
-          }
+            .environment_banner {
+                background-color: seagreen;
+            }
+        {% elif ENVIRONMENT_HML  %}
+            .environment_banner {
+                background-color: goldenrod;
+            }
         {% elif ENVIRONMENT_PRD  %}
-        .environment_banner {
-          background-color: white;
-        }
+            .environment_banner {
+                background-color: white;
+            }
         {% endif %}
-      </style>
+    </style>
 
     <title>{% block title %}Alternativa Flexo{% endblock title %}</title>
 </head>

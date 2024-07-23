@@ -43,20 +43,23 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'usuarios',
-    'core',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'control_stock',
+    # libs
     'crispy_forms',
     'crispy_bootstrap5',
     'import_export',
     'django_select2',
+    # my apps
+    'core',
+    'control_stock',
     'api',
     'importacao',
+    'cadastro',
 ]
 
 MIDDLEWARE = [
