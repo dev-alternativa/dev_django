@@ -265,7 +265,7 @@ class Produto(Base):
 
 
 class Lote(Base):
-    codigo = models.IntegerField('Código')
+    codigo = models.BigIntegerField('Código')
     pedido = models.CharField('Número do Pedido', max_length=20)
     cliente = models.CharField('ID do Cliente', max_length=20)
     data_recebimento = models.DateField('Data de Recebimento')

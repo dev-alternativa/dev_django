@@ -46,7 +46,7 @@ class ValidaCNPJMixin:
 #  Mensagens de formulários de inclusão / atualização de itens
 class FormMessageMixin:
   success_message = ''
-  error_message = 'Não foi possível salvar, corrija os erros abaixo.'
+  # error_message = ''
 
   def form_valid(self, form):
     response = super().form_valid(form)
@@ -54,9 +54,10 @@ class FormMessageMixin:
       messages.success(self.request, self.success_message)
     return response
 
-  def form_invalid(self, form):
-    messages.error(self.request, self.error_message)
-    return super().form_invalid(form)
+  # def form_invalid(self, form):
+
+  #   messages.error(self.request, self.error_message)
+  #   return super().form_invalid(form)
 
 
 # Mensagens de exclusão de itens
@@ -417,3 +418,8 @@ class TransportadoraDetailView(DetailView):
 class ClienteFornecedorDetailView(DetailView):
   model = ClienteFornecedor
   template_name =  'cliente_fornecedor/visualizar_cliente.html'
+
+
+class LoteDetailView(DetailView):
+  model = Lote
+  template_name = 'lote/visualizar_lote.html'

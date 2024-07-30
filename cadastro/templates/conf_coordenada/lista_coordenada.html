@@ -19,9 +19,9 @@
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <!-- Visualizar -->
-                <a href="{% url 'detail_transportadora' transportadora.pk %}" class="btn btn-secondary btn-view">
+                {% comment %} <a href="{% url 'detail_transportadora' transportadora.pk %}" class="btn btn-secondary btn-view">
                   <i class="bi bi-eye"></i>
-                </a>
+                </a> {% endcomment %}
 
                 <!-- Editar -->
                 <button type="button" class="btn btn-warning btn-edit"  data-coordenada-id="{{ coordenada.id }}">

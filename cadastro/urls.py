@@ -27,6 +27,7 @@ urlpatterns = [
     path("lote/adicionar/", LoteNovoView.as_view(), name="add_lote"),
     path("lote/<int:pk>/update/", LoteUpdateView.as_view(), name="update_lote"),
     path("lote/<int:pk>/delete/", LoteDeleteView.as_view(), name="delete_lote"),
+    path("lote/<int:pk>/detail/", LoteDetailView.as_view(), name="detail_lote"),
 
     # Prazo
     path("prazo/", PrazoListView.as_view(), name="prazo"),
