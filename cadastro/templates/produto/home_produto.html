@@ -1,15 +1,17 @@
 {% load static %}
-        <div class="card-header">
-            Produtos cadastrados
-        </div>
-        <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
-            <a href="{% url 'add_produto' %}" class="btn btn-outline-primary">
-                <i class="bi bi-plus-lg"></i>
-                Adicionar Tipo de Produto
-            </a>
-        </div>
-        <div class="space_from_margin">       
-            {% include "produto/lista_produto.html" %}
-        </div>
-        
-                    
+    <div class="card-header">
+        Produtos cadastrados
+    </div>
+    <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+        <a href="{% url 'add_produto' %}" class="btn btn-outline-primary">
+            <i class="bi bi-plus-lg"></i>
+            Adicionar Produto
+        </a>
+        <a href="{% url 'importar_produto' %}" class="btn btn-outline-success">
+            <i class="bi-box-arrow-in-left"></i>
+            Importar de Planilha Excel
+        </a>
+    </div>
+    <div class="space_from_margin">       
+        {% include "produto/lista_produto.html" %}
+    </div>                   

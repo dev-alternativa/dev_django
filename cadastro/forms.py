@@ -1,19 +1,19 @@
 from django import forms
-from django.forms import ModelForm 
+from django.forms import ModelForm
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, Produto, Transportadora, Unidade
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, Submit, HTML
-from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, FieldWithButtons, StrictButton 
+from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, FieldWithButtons, StrictButton
 from crispy_bootstrap5.bootstrap5 import Switch
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 
 class CategoriaForm(ModelForm):
-  
+
   class Meta:
     model = Categoria
     fields = ['nome', 'descricao']
-    
+
   def __init__(self, *args, **kwargs):
     super(CategoriaForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -26,7 +26,7 @@ class CategoriaForm(ModelForm):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'categoria' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
@@ -37,8 +37,8 @@ class CategoriaForm(ModelForm):
         css_class='form-group col-12 text-center'
       )
     )
-    
-    
+
+
 class ClienteFornecedorForm(ModelForm):
 
   class Meta:
@@ -56,8 +56,8 @@ class ClienteFornecedorForm(ModelForm):
         }
       )
     }
-    
-        
+
+
   # Valida numeração de CPF / CNPJ
   def clean_cnpj(self):
     cnpj = self.cleaned_data.get('cnpj')
@@ -65,7 +65,7 @@ class ClienteFornecedorForm(ModelForm):
     if len(digits) < 11:
         raise forms.ValidationError('CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres. Teste')
     return cnpj
-    
+
   def __init__(self, *args, **kwargs):
     super(ClienteFornecedorForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -82,7 +82,7 @@ class ClienteFornecedorForm(ModelForm):
     self.fields['tag_cadastro_omie_srv'].required = False
     self.fields['obs'].required = False
     # self.fields['sub_categoria'].required = False
-    
+
     self.helper.layout = Layout(
       TabHolder(
         Tab(
@@ -95,7 +95,7 @@ class ClienteFornecedorForm(ModelForm):
                     Field('cnpj', css_class='form-control col-md-6 mb-0'),
                     StrictButton("Consultar CNPJ", css_class="btn btn-primary", css_id="btn_consulta_cnpj", onclick="consultarCNPJ()"),
                   ),
-                ),  
+                ),
               Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
               Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
             ),
@@ -104,7 +104,7 @@ class ClienteFornecedorForm(ModelForm):
               Field('inscricao_estadual', css_class='form-control col-md-6 mb-0 numericValorOnly'),
               PrependedText('taxa_frete','R$', css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
               Field('prazo', css_class='form-control col-md-6 mb-0 '),
-              
+
             ),
           )
         ),
@@ -132,7 +132,7 @@ class ClienteFornecedorForm(ModelForm):
                 css_class='form-row'
               ),
               Field('estado', css_class='form-control col-md-6 mb-0'),
-              
+
             ),
           ),
         ),
@@ -146,7 +146,7 @@ class ClienteFornecedorForm(ModelForm):
             Column(
               Field('email', css_class='form-control col-md-6 mb-0'),
               Field('telefone', css_class='form-control col-md-6 mb-0 mask-fone'),
-              
+
             ),
           ),
         ),
@@ -154,33 +154,33 @@ class ClienteFornecedorForm(ModelForm):
           'Dados Avançados',
           Row(
             Column(
-              Field('categoria', css_class='form-control col-md-6 mb-0'), 
+              Field('categoria', css_class='form-control col-md-6 mb-0'),
               #Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
-              
+
               PrependedText('limite_credito', 'R$', css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
             ),
             Column(
               Switch('ativo', css_class='form-control col-md-6 mb-0'),
               Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
               Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
-              Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),  
+              Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),
             ),
             Column(
-              Field('tag_cadastro_omie_com', css_class='form-control col-md-3 mb-0 numericValorOnly'),  
-              Field('tag_cadastro_omie_ind', css_class='form-control col-md-3 mb-0 numericValorOnly'),  
-              Field('tag_cadastro_omie_pre', css_class='form-control col-md-3 mb-0 numericValorOnly'),  
+              Field('tag_cadastro_omie_com', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+              Field('tag_cadastro_omie_ind', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+              Field('tag_cadastro_omie_pre', css_class='form-control col-md-3 mb-0 numericValorOnly'),
             ),
             Column(
-              Field('tag_cadastro_omie_mrx', css_class='form-control col-md-3 mb-0 numericValorOnly'),  
-              Field('tag_cadastro_omie_flx', css_class='form-control col-md-3 mb-0 numericValorOnly'),  
-              Field('tag_cadastro_omie_srv', css_class='form-control col-md-3 mb-0 numericValorOnly'),  
+              Field('tag_cadastro_omie_mrx', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+              Field('tag_cadastro_omie_flx', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+              Field('tag_cadastro_omie_srv', css_class='form-control col-md-3 mb-0 numericValorOnly'),
             ),
           ),
         ),
-      ),        
+      ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'cliente_fornecedor' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
@@ -191,15 +191,15 @@ class ClienteFornecedorForm(ModelForm):
         css_class='form-group col-12 text-center'
       )
     )
-    
+
     # máscaras dos campos
     # self.fields['bairro'].widget.attrs.update({ 'class': 'mask-cep' })
-    
+
     # Especifica atributos específicos em alguns campos
     # self.fields['taxa_frete'].widget.attrs['onchange'] = 'formataValorMonetario(this)'
     # self.fields['limite_credito'].widget.attrs['onchange'] = 'formataValorMonetario(this)'
     self.fields['cnpj'].widget.attrs['onchange'] = 'validaCampoCPFCNPJ(this)'
-    
+
     # Especifica quantidade máxima de alguns campos do formulário
     self.fields['cnpj'].widget.attrs.update({ 'maxlength': 18 })
     # self.fields['taxa_frete'].widget.attrs.update({ 'maxlength': 6 })
@@ -208,11 +208,11 @@ class ClienteFornecedorForm(ModelForm):
 
 
 class CoordenadaForm(ModelForm):
-  
+
   class Meta:
     model = ConfCoordenada
     fields = ['titulo', 'unidade', 'predio']
-    
+
   def __init__(self, *args, **kwargs):
     super(CoordenadaForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -225,7 +225,7 @@ class CoordenadaForm(ModelForm):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'coordenada' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
@@ -236,10 +236,10 @@ class CoordenadaForm(ModelForm):
         css_class='form-row text-center'
       )
     )
-    
+
 
 class LoteForm(ModelForm):
-  
+
   class Meta:
     model = Lote
     fields = '__all__'
@@ -257,7 +257,7 @@ class LoteForm(ModelForm):
         'type': 'date',
       }),
     }
-    
+
   def __init__(self, *args, **kwargs):
     super(LoteForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -283,7 +283,7 @@ class LoteForm(ModelForm):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'lote' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
@@ -294,18 +294,18 @@ class LoteForm(ModelForm):
         css_class='form-group col-12 text-center'
       )
     )
-    
-    self.fields['data_recebimento'].widget.attrs['onchange'] = 'validaCampoData(this)'  
-    self.fields['peso'].widget.attrs['onchange'] = 'formataPeso(this)'  
-    
-    
+
+    self.fields['data_recebimento'].widget.attrs['onchange'] = 'validaCampoData(this)'
+    self.fields['peso'].widget.attrs['onchange'] = 'formataPeso(this)'
+
+
 #  Classe do formulário de Prazos
 class PrazoForm(ModelForm):
-  
+
   class Meta:
     model = Prazo
     fields = ['descricao', 'parcelas', 'codigo']
-    
+
   def __init__(self, *args, **kwargs):
     super(PrazoForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -319,7 +319,7 @@ class PrazoForm(ModelForm):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'prazo' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
@@ -330,11 +330,11 @@ class PrazoForm(ModelForm):
         css_class='form-row text-center'
       )
     )
-  
-  
+
+
 # Classe do formulário de Produtos
 class ProdutoForm(ModelForm):
-  
+
   class Meta:
     model = Produto
     fields = '__all__' # inclui todos os campos do model
@@ -348,7 +348,7 @@ class ProdutoForm(ModelForm):
           }
         ),
     }
-  
+
   def __init__(self, *args, **kwargs):
     super(ProdutoForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -392,10 +392,10 @@ class ProdutoForm(ModelForm):
           ),
           Row(
             Column(
-              Field('fornecedor', css_class='form-control col-md-6 mb-0'),  
-            ),  
-          ),  
-        ),  
+              Field('fornecedor', css_class='form-control col-md-6 mb-0'),
+            ),
+          ),
+        ),
         Tab(
           'Dados OMIE',
           Row(
@@ -406,7 +406,7 @@ class ProdutoForm(ModelForm):
               Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
               Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
               Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
-            ),  
+            ),
             Column(
             Field('cod_oculto_omie_com', css_class='form-control col-md-6 mb-0'),
             Field('cod_oculto_omie_ind', css_class='form-control col-md-6 mb-0'),
@@ -414,14 +414,14 @@ class ProdutoForm(ModelForm):
             Field('cod_oculto_omie_pre', css_class='form-control col-md-6 mb-0'),
             Field('cod_oculto_omie_mrx', css_class='form-control col-md-6 mb-0'),
             Field('cod_oculto_omie_srv', css_class='form-control col-md-6 mb-0'),
-            ),  
-          ),  
-        ),  
-        
+            ),
+          ),
+        ),
+
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'produto' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
@@ -435,11 +435,11 @@ class ProdutoForm(ModelForm):
 
 # Classe do formulário de Novas Sub-Categorias
 # class SubCategoriaForm(ModelForm):
-  
+
 #   class Meta:
 #     model = SubCategoria
 #     fields = ['nome', 'descricao']
-    
+
 #   def __init__(self, *args, **kwargs):
 #     super(SubCategoriaForm, self).__init__(*args, **kwargs)
 #     self.helper = FormHelper()
@@ -463,13 +463,13 @@ class ProdutoForm(ModelForm):
 #         css_class='form-group col-12 text-center'
 #       )
 #     )
-    
+
 class TransportadoraForm(ModelForm):
-  
+
   class Meta:
     model = Transportadora
     fields = '__all__'
-    
+
   def save(self, commit=True):
     instance = super().save(commit=False)
     cnpj = self.cleaned_data.get('cnpj', '')
@@ -477,7 +477,7 @@ class TransportadoraForm(ModelForm):
     if commit:
       instance.save()
     return instance
-    
+
   def __init__(self, *args, **kwargs):
     super(TransportadoraForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -497,34 +497,37 @@ class TransportadoraForm(ModelForm):
           Field('obs', css_class='form-control col-md-6 mb-0'),
         ),
         Column(
-          Field('cod_omie_COM', css_class='form-control col-md-6 mb-0'),  
-          Field('cod_omie_IND', css_class='form-control col-md-6 mb-0'),  
-          Field('cod_omie_PRE', css_class='form-control col-md-6 mb-0'),  
-          Field('cod_omie_MRX', css_class='form-control col-md-6 mb-0'),  
-          Field('cod_omie_SRV', css_class='form-control col-md-6 mb-0'),  
-          Field('cod_omie_FLX', css_class='form-control col-md-6 mb-0'),  
+          Field('cod_omie_COM', css_class='form-control col-md-6 mb-0'),
+          Field('cod_omie_IND', css_class='form-control col-md-6 mb-0'),
+          Field('cod_omie_PRE', css_class='form-control col-md-6 mb-0'),
+          Field('cod_omie_MRX', css_class='form-control col-md-6 mb-0'),
+          Field('cod_omie_SRV', css_class='form-control col-md-6 mb-0'),
+          Field('cod_omie_FLX', css_class='form-control col-md-6 mb-0'),
         ),
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg "></i>Cancelar</button>'),
+          HTML("<a href='{% url 'transportadora' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
-          Submit('submit', 'Salvar', css_class='btn btn-primary btn-lg'),
+          HTML(
+            '<button type="submit" class="btn btn-primary btn-lg">'
+            '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+          )
         ),
         css_class='form-group col-12 text-center'
       )
     )
-    
+
     self.fields['cnpj'].widget.attrs.update({ 'maxlength': 18 })
-    
-    
+
+
 class UnidadeForm(ModelForm):
-  
+
   class Meta:
     model = Unidade
     fields = ['nome']
-    
+
   def __init__(self, *args, **kwargs):
     super(UnidadeForm, self).__init__(*args, **kwargs)
     self.helper = FormHelper()
@@ -535,11 +538,11 @@ class UnidadeForm(ModelForm):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger " onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'unidade' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML(
-            '<button type="submit" class="btn btn-primary ">'
+            '<button type="submit" class="btn btn-primary btn-lg">'
             '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
           ),
           # Submit('submit', 'Salvar', css_class='btn btn-primary btn-lg save-button'),
@@ -547,13 +550,13 @@ class UnidadeForm(ModelForm):
         css_class='form-group col-12 text-center'
       )
     )
-    
+
 # class TipoFreteForm(ModelForm):
-  
+
 #   class Meta:
 #     model = TipoFrete
 #     fields = ['nome', 'descricao']
-    
+
 #   def __init__(self, *args, **kwargs):
 #     super(TipoFreteForm, self).__init__(*args, **kwargs)
 #     self.helper = FormHelper()

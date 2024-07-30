@@ -23,4 +23,10 @@ $(document).ready( () => {
   }
   $('#id_largura, #id_comprimento').on('input', calculaArea);
   $('#id_tipo_categoria').on('change', calculaArea);
+
+});
+
+// Ativa tooltip
+$(document).ready(function(){
+  $('[data-toggle="tooltip"]').tooltip();
 });

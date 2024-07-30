@@ -6,6 +6,7 @@
           <tr>
               <th>Nome</th>
               <th>Unidade</th>
+              <th>Prédio</th>
               <th class="action_size_column">Ações</th>
           </tr>
       </thead>
@@ -17,13 +18,18 @@
             <td>{{ coordenada.predio }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                <!-- Visualizar -->
+                <a href="{% url 'detail_transportadora' transportadora.pk %}" class="btn btn-secondary btn-view">
+                  <i class="bi bi-eye"></i>
+                </a>
+
+                <!-- Editar -->
                 <button type="button" class="btn btn-warning btn-edit"  data-coordenada-id="{{ coordenada.id }}">
                   <i class="bi bi-pencil-square"></i>
-                  {% comment %} Editar {% endcomment %}
                 </button>
+                <!-- Apagar -->
                 <button type="button" class="btn btn-danger btn-delete" data-coordenada-id="{{ coordenada.id }}">
                   <i class="bi bi-trash3"></i>
-                  {% comment %} Apagar {% endcomment %}
                 </button>
               </div>
             </td>

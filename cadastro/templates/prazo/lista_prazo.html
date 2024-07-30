@@ -1,5 +1,20 @@
 {% load static %}
 
+<form method="get" action="" class="row g-3 justify-content-center" autocomplete=off>
+  <div class="col-6">
+    <input type="text" class="form-control"
+      data-toggle="tooltip" data-placement="top"
+      data-bs-title="Para m² digite apenas números"
+      name="search"
+      placeholder="Buscar por descrição ou parcela..."
+      value="{{ request.GET.search }}"
+    >
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-info" type="submit">Buscar</button>
+  </div>
+</form>
+
 <div class="table-responsive border-secondary">
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
@@ -34,5 +49,5 @@
   </table>
 
   {% include 'paginacao.html' %}
-  
+
 </div>

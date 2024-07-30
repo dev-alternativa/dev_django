@@ -1,5 +1,22 @@
 {% load static %}
 
+<form method="get" action="" class="row g-3 justify-content-center" autocomplete=off>
+  <div class="col-6">
+    <input type="text" class="form-control"
+      id="busca"
+      name="search"
+      data-toggle="tooltip" data-placement="top"
+      data-bs-title="Para CNPJ digite apenas números"
+      placeholder="Pelo Nome ou CNPJ..."
+      value="{{ request.GET.search }}">
+
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-info" type="submit">Buscar</button>
+  </div>
+
+</form>
+
 <div class="table-responsive border-secondary">
   <table class="table table-hover table-bordered border-secondary-subtle">
       <thead>
@@ -28,13 +45,18 @@
             <td>{{ transportadora.cod_omie_FLX|default_if_none:"" }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                <!-- Visualizar -->
+                <a href="{% url 'detail_transportadora' transportadora.pk %}" class="btn btn-secondary btn-view">
+                  <i class="bi bi-eye"></i>
+                </a>
+
+                <!-- Editar -->
                 <button type="button" class="btn btn-warning btn-edit"  data-transportadora-id="{{ transportadora.id }}">
                   <i class="bi bi-pencil-square"></i>
-                  <!-- Editar -->
                 </button>
+                <!-- Apagar -->
                 <button type="button" class="btn btn-danger btn-delete" data-transportadora-id="{{ transportadora.id }}">
                   <i class="bi bi-trash3"></i>
-                  <!-- Apagar -->
                 </button>
               </div>
             </td>
@@ -44,3 +66,6 @@
   </table>
   {% include 'paginacao.html' %}
 </div>
+{% block extra_scripts %}
+<script src="{% static 'js/cadastro_misc.js' %}"></script>
+{% endblock %}
