@@ -1,10 +1,10 @@
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .forms import UploadPrazoForm, UploadClienteFornecedorForm, UploadTransportadoraForm
+from .forms import UploadPrazoForm, UploadClienteFornecedorForm, UploadTransportadoraForm, UploadProdutoForm
 import pandas as pd
-from cadastro.models import Prazo, Categoria, ClienteFornecedor, Transportadora
-import re
+from cadastro.models import Prazo, Categoria, ClienteFornecedor, Transportadora, Produto
+import re, sys
 
 class ImportarPrazoView(FormView):
   form_class = UploadPrazoForm
@@ -321,3 +321,144 @@ class ImportarTransportadoraView(FormView):
       print(f'Erro: {e}')
       messages.error(self.request, f"Erro ao processar o arquivo: {e}, um ou mais itens não foram importados.")
       return self.form_invalid(form)
+
+
+class ImportarProdutoView(FormView):
+    form_class = UploadProdutoForm
+    template_name = 'importar_produto.html'
+    success_url = reverse_lazy('produto')
+
+    def form_valid(self, form):
+      file = form.cleaned_data['file']
+      nao_incluidos = 0
+      incluidos = 0
+      sheet_name = 'Planilha1'
+
+      try:
+        # limpesa do DF
+        df = pd.read_excel(file, sheet_name, engine='openpyxl')
+        df = df.drop(columns=['Tamanho', 'M2'])
+        
+        df['Peso Unitario'] = df['Peso Unitario'].fillna('0')
+        df['Peso/Caixa'] = df['Peso/Caixa'].fillna('0')
+        df['Cod_COM'] = df['Cod_COM'].fillna('0').astype(str)
+        df['Cod_IND'] = df['Cod_IND'].fillna('0').astype(str)
+        df['Cod_FLX'] = df['Cod_FLX'].fillna('0').astype(str)
+        df['Cod_PRE'] = df['Cod_PRE'].fillna('0').astype(str)
+        df['Cod_MRX'] = df['Cod_MRX'].fillna('0').astype(str)
+        df['Cod_SRV'] = df['Cod_SRV'].fillna('0').astype(str)
+        df['Cod_Prod_COM'] = df['Cod_Prod_COM'].fillna('0').astype(str)
+        df['Cod_IND2'] = df['Cod_IND2'].fillna('0').astype(str)
+        df['Cod_Prod_FLX'] = df['Cod_Prod_FLX'].fillna('0').astype(str)
+        df['Cod_PRE2'] = df['Cod_PRE2'].fillna('0').astype(str)
+        df['Cod_Prod_MRX'] = df['Cod_Prod_MRX'].fillna('0').astype(str)
+        df['Cod_Prod_SRV'] = df['Cod_Prod_SRV'].fillna('0').astype(str)
+        
+        df = df.fillna('N/A')
+          
+      except Exception as e:
+          messages.error(self.request, f'Erro ao ler o arquivo Excel: {e}')
+          return self.form_invalid(form)
+
+      if df.empty:
+          messages.error(self.request, 'A planilha está vazia...')
+          return self.form_invalid(form)
+
+      colunas_esperadas = ['Categoria', 'Subcategoria', 'Produto', 'Fornecedor']
+      
+      colunas_ausentes = [column for column in colunas_esperadas if column not in df.columns]
+
+      # Se houver colunas ausentes informa quais estão faltando
+      if colunas_ausentes:
+        colunas_ausentes_str = ', '.join(colunas_ausentes)
+        messages.error(self.request, f"As seguintes colunas estão faltando: {colunas_ausentes_str}")
+        print(f'As seguintes colunas estão faltando: {colunas_ausentes_str}')
+        return self.form_invalid(form)
+
+      try:
+        for index, row in df.iterrows():
+          try:
+            row = row.where(pd.notnull(row), None)
+            # DEBUG da linha em processamento
+            print(f"Processando linha {index + 1}: {row.to_dict()}")
+            # Buscar ou criar a categoria
+            categoria_nome = row.get('Categoria', '')
+            categoria_obj, created = Categoria.objects.get_or_create(nome=categoria_nome)
+            
+            # Buscar ou criar o fornecedor
+            fornecedor_nome = row.get('Fornecedor', '')
+            fornecedor_obj, created = ClienteFornecedor.objects.get_or_create(nome_fantasia=fornecedor_nome)
+            
+            for column in [
+                'Categoria', 'Subcategoria', 'Produto', 'Larg.', 'Compr.', 
+                'Metragem (m²)', 'Qtd/Caixa2', 'Peso Unitario', 'Peso/Caixa', 
+                'Situação', 'Fornecedor', 'Cod_COM', 'Cod_Prod_COM', 'Cod_FLX', 
+                'Cod_Prod_FLX', 'Cod_IND', 'Cod_IND2', 'Cod_PRE', 'Cod_PRE2', 
+                'Cod_MRX', 'Cod_Prod_MRX', 'Cod_SRV', 'Cod_Prod_SRV'
+              ]:
+              if row[column] is None:
+                print(f"Coluna {column} contém None na linha {index + 1}")
+              else:
+                print(f"Coluna {column} na linha {index + 1}: {row[column]} (Tipo: {type(row[column])})")
+                    
+              
+
+            obs, created = Produto.objects.update_or_create(
+              nome_produto=row.get('Produto', ''),
+              defaults={
+                'tipo_categoria': categoria_obj,  # Associar a categoria obtida/criada
+                'subcategoria': row.get('Subcategoria', ''),
+                'largura': str(row.get('Larg.', '')) if row.get('Larg.') else '',
+                'comprimento': str(row.get('Compr.', '')) if row.get('Compr.') else '',
+                'm_quadrado': str(row.get('Metragem (m²)', '')) if row.get('Metragem (m²)') else '',
+                'qtd_por_caixa': str(row.get('Qtd/Caixa2', '')) if row.get('Qtd/Caixa2') else '',
+                'peso_unitario': str(row.get('Peso Unitario', '')) if row.get('Peso Unitario') else '',
+                'peso_caixa': str(row.get('Peso/Caixa', '')) if row.get('Peso/Caixa') else '',
+                'situacao': row.get('Situação', '') if row.get('Situação') else '',
+                'fornecedor': fornecedor_obj,  # Associar o fornecedor obtido/criado
+                'cod_omie_com': str(row.get('Cod_COM', '')) if row.get('Cod_COM') else '',
+                'cod_oculto_omie_com': str(row.get('Cod_Prod_COM', '')) if row.get('Cod_Prod_COM') else '',
+                'cod_omie_ind': str(row.get('Cod_IND', '')) if row.get('Cod_IND') else '',
+                'cod_oculto_omie_ind': str(row.get('Cod_IND2', '')) if row.get('Cod_IND2') else '',
+                'cod_omie_flx': str(row.get('Cod_FLX', '')) if row.get('Cod_FLX') else '',
+                'cod_oculto_omie_flx': str(row.get('Cod_Prod_FLX', '')) if row.get('Cod_Prod_FLX') else '',
+                'cod_omie_pre': str(row.get('Cod_PRE', '')) if row.get('Cod_PRE') else '',
+                'cod_oculto_omie_pre': str(row.get('Cod_PRE2', '')) if row.get('Cod_PRE2') else '',
+                'cod_omie_mrx': str(row.get('Cod_MRX', '')) if row.get('Cod_MRX') else '',
+                'cod_oculto_omie_mrx': str(row.get('Cod_Prod_MRX', '')) if row.get('Cod_Prod_MRX') else '',
+                'cod_omie_srv': str(row.get('Cod_SRV', '')) if row.get('Cod_SRV') else '',
+                'cod_oculto_omie_srv': str(row.get('Cod_Prod_SRV', '')) if row.get('Cod_Prod_SRV') else '',
+              } 
+            )
+
+            if created:
+              incluidos += 1
+            else:
+              nao_incluidos += 1
+
+          except Exception as e:
+            
+            
+                        
+            print(f'Erro ao processar linha {index + 1}: {e}')
+            # print(f"Item {row.to_dict()}")
+            print(f'\n')
+            messages.error(self.request, f"Erro ao processar a linha {index + 1}: {e}")
+            nao_incluidos += 1
+            return self.form_invalid(form)
+
+          if nao_incluidos != 0:
+            messages.info(self.request, f'{nao_incluidos} itens já estão cadastrados e não foram incluídos, {incluidos} itens foram incluídos')
+          
+          if nao_incluidos == 0:
+            messages.error(self.request, f"Nenhum arquivo incluido: {e}")
+
+          messages.success(self.request, f'Arquivo importado e processado com sucesso!')
+
+          return super().form_valid(form)
+
+      except Exception as e:
+        messages.error(self.request, f"Erro ao processar o arquivo: {e}, um ou mais itens não foram importados.")
+        print(f'Erro: {e}')
+        return self.form_invalid(form)
+

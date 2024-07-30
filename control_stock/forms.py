@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm 
 from cadastro.models import ConfCoordenada, Lote,Produto
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, Submit, Div
+from crispy_forms.layout import Layout, Field, Row, Column, HTML, Div
 # from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, FieldWithButtons, StrictButton 
 # from django_select2.forms import Select2MultipleWidget, Select2Widget
 
@@ -101,9 +101,14 @@ class BuscaEstoqueForm(forms.Form):
               Column('est_coordenada', css_class='col-lg-2'),
               Column('est_lotes_origem', css_class='col-lg-2'),
               Column(
-                Submit('submit', 'Aplicar Filtro', css_class='btn btn-success disable_click'),
+                HTML('<button type="submit" class="btn btn-success disable_click"><i class="bi bi-funnel"></i> Aplicar Filtro</button>'),
                 css_class='col-lg-2 form-group grupo-botoes d-grid gap-2'
               ),
+              Column(
+                HTML('<button type="button" class="btn btn-warning" id="limpafiltro"><i class="bi bi-eraser"></i> Limpar Filtro</button>'),
+                css_class='col-lg-2 form-group grupo-botoes d-grid gap-2'
+              ),
+              css_class='filter filter-spaces',
             )
           )
         )

@@ -40,11 +40,11 @@ class Unidade(Base):
     class Meta:
         verbose_name = 'Unidade'
         verbose_name_plural = 'Unidades'
-        
+
     def __str__(self):
         return self.nome
-      
-      
+
+
 class Categoria(Base):
     nome = models.CharField('Nome', max_length=100)
     descricao = models.TextField('Descrição', null=True)
@@ -52,30 +52,30 @@ class Categoria(Base):
     class Meta:
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
-    
+
     def __str__(self):
         return self.nome
-    
+
 
 class SubCategoria(Base):
     nome = models.CharField('Nome', max_length=100)
     descricao = models.TextField('Descricao', null=True)
-    
+
     class Meta:
         verbose_name = 'Sub-Categoria'
         verbose_name_plural = 'Sub-Categorias'
-    
+
     def __str__(self):
         return self.nome
-      
-      
+
+
 class ConfCoordenada(Base):
     PREDIO = (
         ('LOGISTICA', 'Logística'),
         ('SUPERLAM', 'Super Laminação'),
         ('GRAVACAO', 'Gravação'),
     )
-    
+
     titulo = models.CharField('Configuração de Coordenada', max_length=100)
     unidade = models.ForeignKey('cadastro.Unidade', verbose_name='Unidade', on_delete=models.CASCADE)
     predio = models.CharField('Prédio', choices=PREDIO, max_length=50, null=True)
@@ -83,11 +83,11 @@ class ConfCoordenada(Base):
     class Meta:
         verbose_name = 'Configuração de Coordenada'
         verbose_name_plural = 'Configurações de Coordenadas'
-        
+
     def __str__(self):
         return self.titulo
-      
-      
+
+
 class Transportadora(Base):
     nome = models.CharField('Nome Fantasia', max_length=100)
     cnpj = models.CharField('CNPJ / CPF', max_length=20)
@@ -98,46 +98,36 @@ class Transportadora(Base):
     cod_omie_SRV = models.CharField('Cód. OMIE SRV', max_length=15, null=True)
     cod_omie_FLX = models.CharField('Cód. OMIE FLX', max_length=15, null=True)
     obs = models.TextField('Observações', null=True, max_length=200)
-    
+
     class Meta:
         verbose_name = 'Transportadora'
         verbose_name_plural = 'Transportadoras'
-        
+
     def __str__(self):
         return self.nome
-      
-      
-# class StatusEstoque(Base):
-#     valor = models.CharField('Valor', max_length=50)
-    
-#     class Meta:
-#         verbose_name = 'Estado do Estoque'
-#         verbose_name_plural = 'Estados do Estoque'
-        
-#     def __str__(self):
-#         return self.valor
-      
+
+
 # class TipoPerda(Base):
 #     descricao = models.CharField('Descrição', max_length=50)
-    
+
 #     class Meta:
 #         verbose_name = 'Tipo de Perda'
 #         verbose_name_plural = 'Tipos de Perda'
-        
+
 #     def __str__(self):
 #         return self.descricao
-    
+
 
 # class TipoAlteracao(Base):
 #     descricao = models.CharField('Descrição', max_length=100)
-    
+
 #     class Meta:
 #         verbose_name = 'Tipo de Alteração'
 #         verbose_name_plural = 'Tipos de Alteração'
-        
+
 #     def __str__(self):
 #         return self.descricao
-      
+
 class Prazo(Base):
     descricao = models.CharField('Descrição', max_length=120)
     parcelas = models.CharField('Parcelas', max_length=60, null=True)
@@ -147,25 +137,13 @@ class Prazo(Base):
         verbose_name = 'Prazo'
         verbose_name_plural = 'Prazos'
         unique_together = ('parcelas', 'codigo')
-        
+
     def __str__(self):
         return self.descricao
-      
-      
-# class Contato(Base):
-#     telefone = models.CharField('Telefone', max_length=50, null=True)
-#     email = models.CharField('E-mail', max_length=50)
-#     obs = models.TextField('Observações', null=True)
-    
-#     class Meta:
-#         verbose_name = 'Contato'
-#         verbose_name_plural = 'Contatos'
-        
-#     def __str__(self):
-#         return self.telefone
-  
+
+
 class ClienteFornecedor(Base):
-    
+
     TIPO_FRETE = (
         ('0', '0 - (CIF)'),
         ('1', '1 - (FOB)'),
@@ -174,7 +152,7 @@ class ClienteFornecedor(Base):
         ('4', '4 - Transporte Próprio por conta do Destinatário'),
         ('9', '9 - Sem Ocorrência de Transporte'),
     )
-    
+
     nome_fantasia = models.CharField('Nome do Cliente/Fornecedor', max_length=100)
     razao_social = models.CharField('Razão Social', max_length=100)
     cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30)
@@ -187,7 +165,7 @@ class ClienteFornecedor(Base):
     telefone = models.CharField('Telefone', max_length=15, null=True)
     ddd = models.CharField('DDD', max_length=4, null=True)
     cep = models.CharField('CEP', max_length=12)
-    email = models.EmailField('E-mail', max_length=300)
+    email = models.CharField('E-mail', max_length=300)
     nome_contato = models.CharField('Nome Contato', max_length=50, null=True)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100)
     taxa_frete = models.CharField('Taxa de frete', max_length=10, null=True)
@@ -213,7 +191,7 @@ class ClienteFornecedor(Base):
     class Meta:
         verbose_name = 'Cliente / Fornecedor'
         verbose_name_plural = 'Clientes / Fornecedores'
-        
+
     # Elimina valores não numéricos antes de salvar os dados
     def clean(self):
         super().clean()
@@ -221,39 +199,40 @@ class ClienteFornecedor(Base):
         self.cnpj = re.sub(r'\D', '', self.cnpj)
         self.telefone = re.sub(r'\D', '', self.telefone)
         self.ddd = re.sub(r'[^\d]|0', '', self.ddd) # remove caracteres não numéricos e o 0
-        
+        self.cep = re.sub(r'\D', '', self.cep)
+
         # Se telefone existir mas for menor que 8, é invalido
         if self.telefone:
             if len(self.telefone) < 8:
                 self.telefone != 'N/A'
-                                
+
         # se DDD existir e for menor que 2, é invalido
         if self.ddd:
             if len(self.ddd) < 2:
                 self.ddd = 'N/A'
-        
+
     def save(self, *args, **kwargs):
         self.clean()
         super(ClienteFornecedor, self).save(*args, **kwargs)
-    
+
     # Decorator para salvar corretamente as categorias (campo MxM)
     @property
     def categorias_list(self):
-        return ", ".join([c.nome for c in self.categoria.all()])    
-    
+        return ", ".join([c.nome for c in self.categoria.all()])
+
     def __str__(self):
         return self.nome_fantasia
-  
-  
+
+
 class Produto(Base):
-    SITUACAO_PRODUTO = ( 
+    SITUACAO_PRODUTO = (
         ('CORTADA', 'Cortada'),
         ('INTEIRA', 'Inteira'),
         ('ESTOQUE', 'Estoque'),
     )
-    
+
     tipo_categoria = models.ForeignKey('cadastro.Categoria', verbose_name='Tipo Categoria',max_length=100, on_delete=models.CASCADE) #FK
-    sub_categoria = models.CharField('Sub-Categoria', max_length=100)  
+    sub_categoria = models.CharField('Sub-Categoria', max_length=100)
     nome_produto = models.CharField('Nome Produto', max_length=100)
     largura = models.CharField('Largura', max_length=20, null=True)
     comprimento = models.CharField('Comprimento', max_length=10, null=True)
@@ -279,10 +258,10 @@ class Produto(Base):
     class Meta:
         verbose_name = 'Produto'
         verbose_name_plural = 'Produtos'
-    
+
     def __str__(self):
         return self.nome_produto
-      
+
 
 
 class Lote(Base):
@@ -297,11 +276,11 @@ class Lote(Base):
     peso = models.CharField('Peso', max_length=10)
     nf = models.CharField('Nota Fiscal', max_length=50)
     obs = models.CharField('Observações', max_length=200)
-    
+
     class Meta:
         verbose_name = 'Lote'
         verbose_name_plural = 'Lotes'
-        
+
     def __str__(self):
         return self.codigo
-    
+

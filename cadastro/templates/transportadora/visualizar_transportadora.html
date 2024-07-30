@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Visualizar Transportadora{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <h1 class="text-body-secondary text-center mb-3">Visualização de Dados</h1>
+    <div class="card">
+        <div class="card-header">
+            Dados da Transportadora
+        </div>
+        <div class="card-body text-center">
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>Nome:</strong></div>
+                <div class="col-sm-7">{{ object.nome }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>CNPJ:</strong></div>
+                <div class="col-sm-7">{{ object.cnpj }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>cod_omie_COM:</strong></div>
+                <div class="col-sm-7"> {{ object.cod_omie_COM }} </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>cod_omie_IND:</strong></div>
+                <div class="col-sm-7">{{ object.cod_omie_IND }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>cod_omie_PRE:</strong></div>
+                <div class="col-sm-7">{{ object.cod_omie_PRE }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>cod_omie_MRX:</strong></div>
+                <div class="col-sm-7">{{ object.cod_omie_MRX }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>cod_omie_SRV:</strong></div>
+                <div class="col-sm-7">{{ object.cod_omie_SRV }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-sm-5"><strong>cod_omie_FLX:</strong></div>
+                <div class="col-sm-7">{{ object.cod_omie_FLX }}</div>
+            </div>
+            <a href="{% url 'transportadora' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+</div>
+
+{% endblock content %}
