@@ -10,7 +10,7 @@ from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, P
 
 # ********************************* Mixins  ********************************************
 
-class ExibirCNPJCPFFormatado:
+class FormataDadosMixin:
   context_object_name = ''
 
   # Formata o CNPJ ou CPF que serão apresentados nas listagens
@@ -21,13 +21,28 @@ class ExibirCNPJCPFFormatado:
         return f'{cnpj[:3]}.{cnpj[3:6]}.{cnpj[6:9]}-{cnpj[9:11]}'
     return cnpj
 
-  # Exibe no contexto CNPJ ou CPF formatados
+  # formata para real `BRL`
+  def format_BRL(self, value):
+      value_str = str(value).replace('.', ',')
+      if ',' not in value_str:
+          value_str += ',00'
+      elif len(value_str.split(',')[1]) == 1:
+          value_str += '0'
+      return f'R$ {value_str}'
+
+  # Formata o contexto para exibição
   def get_context_data(self, **kwargs):
     context = super().get_context_data(**kwargs)
     itens = context.get(self.context_object_name, [])
     for item in itens:
       item.cnpj_formatado = self.format_cnpj_cpf(item.cnpj)
+      if hasattr(item, 'limite_credito'):
+        item.limite_credito = self.format_BRL(item.limite_credito)
     return context
+
+  def format_cep(self, cep):
+      # formata CEP para exibição como 12345-678
+      return f'{cep[:5]}-{cep[5:]}'
 
 
 class ValidaCNPJMixin:
@@ -89,7 +104,7 @@ class CategoriaListView(ListView):
     return queryset
 
 
-class ClienteFornecedorListView(ExibirCNPJCPFFormatado, ListView):
+class ClienteFornecedorListView(FormataDadosMixin, ListView):
   model = ClienteFornecedor
   template_name = 'cliente_fornecedor/cliente_fornecedor.html'
   context_object_name = 'itens_cliente_fornecedor'
@@ -134,7 +149,7 @@ class PrazoListView(ListView):
         search_terms = search.split()
         query = Q()
         for term in search_terms:
-          query |= Q(descricao__icontains=term) | Q(parcelas__icontains=term)
+          query |= Q(descricao__icontains=term) | Q(codigo__icontains=term)
         queryset = queryset.filter(query).distinct()
       return queryset
 
@@ -160,12 +175,12 @@ class ProductListView(ListView):
 #   context_object_name = 'itens_sub_categoria'
 
 
-class TransportadoraListView(ExibirCNPJCPFFormatado, ListView):
+class TransportadoraListView(FormataDadosMixin, ListView):
   model = Transportadora
   template_name = 'transportadora/transportadora.html'
   context_object_name = 'itens_transportadora'
   paginate_by = 30
-  ordering = '-dt_criacao'
+  ordering = 'nome'
 
   def get_queryset(self):
       queryset = super().get_queryset()
@@ -415,9 +430,25 @@ class TransportadoraDetailView(DetailView):
   template_name = 'transportadora/visualizar_transportadora.html'
 
 
-class ClienteFornecedorDetailView(DetailView):
+class ClienteFornecedorDetailView(DetailView, FormatadoDadosMixin):
   model = ClienteFornecedor
   template_name =  'cliente_fornecedor/visualizar_cliente.html'
+  context_object_name = 'cliente_fornecedor'
+
+
+  def get_context_data(self, **kwargs):
+      context = super().get_context_data(**kwargs)
+
+      item = context.get(self.context_object_name)
+      if item:
+        item.cnpj_formatado = self.format_cnpj_cpf(item.cnpj)
+        item.limite_credito = self.format_BRL(item.limite_credito)
+        item.cep = self.format_cep(item.cep)
+        item.taxa_frete = self.format_BRL(item.taxa_frete)
+
+      return context
+
+
 
 
 class LoteDetailView(DetailView):

@@ -37,7 +37,7 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>CNPJ:</strong></div>
-                                <div class="col-sm-7">{{ object.cnpj }}</div>
+                                <div class="col-sm-7">{{ object.cnpj_formatado }}</div>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,12 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Categoria:</strong></div>
-                                <div class="col-sm-7">{{ object.categoria }}</div>
+                                <!-- Exibição de Categorias corretamente -->
+                                <div class="col-sm-7">
+                                    {% for categoria in object.categoria.all  %}
+                                        {{ categoria.nome }}{% if not forloop.last %} / {% endif %}
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -169,15 +174,15 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Contribuinte:</strong></div>
-                                <div class="col-sm-7">{{ object.contribuinte }}</div>
+                                <div class="col-sm-7">{{ object.contribuinte|yesno:'Sim,Não' }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cliente:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cliente }}</div>
+                                <div class="col-sm-7">{{ object.tag_cliente|yesno:'Sim,Não' }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Fornecedor:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_fornecedor }}</div>
+                                <div class="col-sm-7">{{ object.tag_fornecedor|yesno:'Sim,Não' }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie COM:</strong></div>
