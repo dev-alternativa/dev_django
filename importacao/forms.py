@@ -35,7 +35,7 @@ class UploadPrazoForm(forms.Form):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'prazo' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML('<button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-floppy space_from_margin"></i>Salvar</button>'),
@@ -77,7 +77,7 @@ class UploadClienteFornecedorForm(forms.Form):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'cliente_fornecedor' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML('<button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-floppy space_from_margin"></i>Salvar</button>'),
@@ -120,7 +120,7 @@ class UploadTransportadoraForm(forms.Form):
       ),
       Row(
         Column(
-          HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg space_from_margin"></i>Cancelar</button>'),
+          HTML("<a href='{% url 'transportadora' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML('<button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-floppy space_from_margin"></i>Salvar</button>'),
@@ -162,7 +162,7 @@ class UploadProdutoForm(forms.Form):
       ),
       Row(
         Column(
-          HTML("<a href='{% url 'unidade' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
+          HTML("<a href='{% url 'produto' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
         ),
         Column(
           HTML('<button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-floppy space_from_margin"></i>Salvar</button>'),
