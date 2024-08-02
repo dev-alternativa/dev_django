@@ -107,7 +107,7 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Nome do Contato:</strong></div>
-                                <div class="col-sm-7">{{ object.nome_contato }}</div>
+                                <div class="col-sm-7">{{ object.nome_contato|default_if_none:"N/A" }}</div>
                             </div>
                         </div>
                     </div>
@@ -126,7 +126,20 @@
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tipo de Frete:</strong></div>
-                                <div class="col-sm-7">{{ object.tipo_frete }}</div>
+                                {% if object.tipo_frete == '0' %}
+                                    <div class="col-sm-7">(CIF)</div>
+                                {% elif object.tipo_frete == '1' %}
+                                    <div class="col-sm-7">(FOB)</div>
+                                {% elif object.tipo_frete == '2' %}
+                                    <div class="col-sm-7">Frete por conta de Terceiros</div>
+                                {% elif object.tipo_frete == '3' %}
+                                    <div class="col-sm-7">Transporte Próprio por conta do Remetente</div>
+                                {% elif object.tipo_frete == '4' %}
+                                    <div class="col-sm-7">Transporte Próprio por conta do Destinatário</div>
+                                {% elif object.tipo_frete == '9' %}
+                                    <div class="col-sm-7">Sem Ocorrência de Transporte</div>
+                                {% endif %}
+
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Taxa de Frete:</strong></div>
@@ -134,11 +147,11 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Cliente Transportadora:</strong></div>
-                                <div class="col-sm-7">{{ object.cliente_transportadora }}</div>
+                                <div class="col-sm-7">{{ object.cliente_transportadora|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Prazo:</strong></div>
-                                <div class="col-sm-7">{{ object.prazo }}</div>
+                                <div class="col-sm-7">{{ object.prazo|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Categoria:</strong></div>
@@ -170,7 +183,7 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Limite de Crédito:</strong></div>
-                                <div class="col-sm-7">{{ object.limite_credito }}</div>
+                                <div class="col-sm-7">{{ object.limite_credito|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Contribuinte:</strong></div>
@@ -186,27 +199,27 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie COM:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cadastro_omie_com }}</div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_com|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie IND:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cadastro_omie_ind }}</div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_ind|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie PRE:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cadastro_omie_pre }}</div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_pre|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie MRX:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cadastro_omie_mrx }}</div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_mrx|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie FLX:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cadastro_omie_flx }}</div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_flx|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Tag Cadastro Omie SRV:</strong></div>
-                                <div class="col-sm-7">{{ object.tag_cadastro_omie_srv }}</div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_srv|default_if_none:"" }}</div>
                             </div>
                         </div>
                     </div>

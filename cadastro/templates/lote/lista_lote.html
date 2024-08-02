@@ -30,13 +30,13 @@
                 </a>
 
                 <!-- Editar -->
-                <button type="button" class="btn btn-warning btn-edit"  data-lote-id="{{ lote.id }}">
+                <a class="btn btn-warning btn-edit" href="{% url 'update_lote' lote.pk %}" role="button">
                   <i class="bi bi-pencil-square"></i>
-                </button>
+                </a>
                 <!-- Apagar -->
-                <button type="button" class="btn btn-danger btn-delete" data-lote-id="{{ lote.id }}">
+                <a class="btn btn-danger btn-delete" href="{% url 'delete_lote' lote.pk %}" role="button">
                   <i class="bi bi-trash3"></i>
-                </button>
+                </a>
               </div>
             </td>
           </tr>

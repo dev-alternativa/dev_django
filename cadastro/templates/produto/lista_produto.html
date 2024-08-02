@@ -30,12 +30,6 @@
             <th>Peso Caixa</th>
             <th>Situação</th>
             <th>Fornecedor</th>
-            <th>Cód. OMIE 'COM'</th>
-            <th>Cód. OMIE 'IND'</th>
-            <th>Cód. OMIE 'FLX'</th>
-            <th>Cód. OMIE 'PRE'</th>
-            <th>Cód. OMIE 'MRX'</th>
-            <th>Cód. OMIE 'SRV'</th>
             <th class="action_size_column">Ações</th>
           </tr>
       </thead>
@@ -52,12 +46,6 @@
             <td>{{ produto.peso_caixa }}</td>
             <td>{{ produto.situacao }}</td>
             <td>{{ produto.fornecedor }}</td>
-            <td>{{ produto.cod_omie_com | default_if_none:"" }}</td>
-            <td>{{ produto.cod_omie_ind | default_if_none:"" }}</td>
-            <td>{{ produto.cod_omie_flx | default_if_none:"" }}</td>
-            <td>{{ produto.cod_omie_pre | default_if_none:"" }}</td>
-            <td>{{ produto.cod_omie_mrx | default_if_none:"" }}</td>
-            <td>{{ produto.cod_omie_srv | default_if_none:"" }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <button type="button" class="btn btn-warning btn-edit"  data-produto-id="{{ produto.id }}">
@@ -75,6 +63,6 @@
       </tbody>
   </table>
 </div>
-{% block extra_scripts %}
+{% comment %} {% block extra_scripts %}
   <script src="{% static 'js/cadastro_misc.js' %}"></script>
-{% endblock %}
+{% endblock %} {% endcomment %}

@@ -24,13 +24,13 @@
                 </a> {% endcomment %}
 
                 <!-- Editar -->
-                <button type="button" class="btn btn-warning btn-edit"  data-coordenada-id="{{ coordenada.id }}">
+                <a class="btn btn-warning btn-edit" href="{% url 'update_coordenada' coordenada.pk %}" role="button">
                   <i class="bi bi-pencil-square"></i>
-                </button>
+                </a>
                 <!-- Apagar -->
-                <button type="button" class="btn btn-danger btn-delete" data-coordenada-id="{{ coordenada.id }}">
+                <a class="btn btn-danger btn-delete" href="{% url 'delete_coordenada' coordenada.pk %}" role="button">
                   <i class="bi bi-trash3"></i>
-                </button>
+                </a>
               </div>
             </td>
           </tr>

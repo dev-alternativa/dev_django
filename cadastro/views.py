@@ -24,10 +24,14 @@ class FormataDadosMixin:
   # formata para real `BRL`
   def format_BRL(self, value):
       value_str = str(value).replace('.', ',')
+      if value_str == 'None':
+        print('ok')
+        return 'R$ 0,00'
+
       if ',' not in value_str:
-          value_str += ',00'
+        value_str += ',00'
       elif len(value_str.split(',')[1]) == 1:
-          value_str += '0'
+        value_str += '0'
       return f'R$ {value_str}'
 
   # Formata o contexto para exibição
@@ -430,7 +434,7 @@ class TransportadoraDetailView(DetailView):
   template_name = 'transportadora/visualizar_transportadora.html'
 
 
-class ClienteFornecedorDetailView(DetailView, FormatadoDadosMixin):
+class ClienteFornecedorDetailView(DetailView, FormataDadosMixin):
   model = ClienteFornecedor
   template_name =  'cliente_fornecedor/visualizar_cliente.html'
   context_object_name = 'cliente_fornecedor'
@@ -445,7 +449,7 @@ class ClienteFornecedorDetailView(DetailView, FormatadoDadosMixin):
         item.limite_credito = self.format_BRL(item.limite_credito)
         item.cep = self.format_cep(item.cep)
         item.taxa_frete = self.format_BRL(item.taxa_frete)
-
+      print(f'TESTE CREDITO: {item.limite_credito}')
       return context
 
 

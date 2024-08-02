@@ -157,7 +157,7 @@ class ClienteFornecedor(Base):
 
     nome_fantasia = models.CharField('Nome do Cliente/Fornecedor', max_length=100)
     razao_social = models.CharField('Razão Social', max_length=100)
-    cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30)
+    cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30, unique=True)
     cidade = models.CharField('Cidade', max_length=100)
     estado = models.CharField('Estado', choices=ESTADOS_BRASIL, max_length=50)
     endereco = models.CharField('Endereço', max_length=100)
@@ -242,7 +242,7 @@ class Produto(Base):
     qtd_por_caixa = models.PositiveIntegerField('Quantidade por caixa', null=True, blank=True)
     peso_unitario = models.CharField('Peso Unitário', max_length=10, null=True, blank=True)
     peso_caixa = models.CharField('Peso da Caixa', max_length=10, null=True, blank=True)
-    situacao = models.CharField('Estado', choices=SITUACAO_PRODUTO, max_length=50, null=True, blank=True)
+    situacao = models.CharField('Estado do Produto', choices=SITUACAO_PRODUTO, max_length=50, null=True, blank=True)
     fornecedor = models.ForeignKey('cadastro.ClienteFornecedor', verbose_name='Fornecedor', max_length=100, on_delete=models.PROTECT)
     cod_omie_com = models.CharField('Cód. OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_oculto_omie_com = models.CharField('Cód. oculto no OMIE CNPJ COM', max_length=30, null=True, blank=True)

@@ -133,7 +133,7 @@ const validaCampoCPFCNPJ = (input) => {
 document.addEventListener('DOMContentLoaded', function () {
   // Captura o formulário
   const form = document.getElementsByClassName('form_fill_content');
-  console.log("teste")
+
   if(form[0]){
 
     // Captura todas as abas
