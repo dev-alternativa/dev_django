@@ -157,7 +157,7 @@ class ClienteFornecedor(Base):
 
     nome_fantasia = models.CharField('Nome do Cliente/Fornecedor', max_length=100)
     razao_social = models.CharField('Razão Social', max_length=100)
-    cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30, unique=True)
+    cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30, unique=True, null=True, blank=True)
     cidade = models.CharField('Cidade', max_length=100)
     estado = models.CharField('Estado', choices=ESTADOS_BRASIL, max_length=50)
     endereco = models.CharField('Endereço', max_length=100)
@@ -189,6 +189,7 @@ class ClienteFornecedor(Base):
     tag_cadastro_omie_flx = models.CharField('OMIE FLX',  max_length=20, null=True, blank=True)
     tag_cadastro_omie_srv = models.CharField('OMIE SRV',  max_length=20, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
+    is_international = models.BooleanField('Fornecedor Estrangeiro', default=False)
 
     class Meta:
         verbose_name = 'Cliente / Fornecedor'

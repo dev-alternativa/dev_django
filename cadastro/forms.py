@@ -164,6 +164,7 @@ class ClienteFornecedorForm(ModelForm):
               Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
               Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
               Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),
+              Switch('is_international', css_class='form-control col-md-6 mb-0'),
             ),
             Column(
               Field('tag_cadastro_omie_com', css_class='form-control col-md-3 mb-0 numericValorOnly'),
