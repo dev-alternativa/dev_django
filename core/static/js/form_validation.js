@@ -96,12 +96,16 @@ const validaCampoCPFCNPJ = (input) => {
   const inputCPFCNPJ = input.value.trim().replace(/[.]|[-]|[\/]/g,'');
   const errorElement = document.getElementById(`${input.id}-error`);
   let inputValido = false;
+  const inputFieldCNPJ = $('#id_cnpj');
 
   // Verifica retorno de CPF ou CNPJ válido
   if (inputCPFCNPJ.length === 11) {
     inputValido = validaCPF(inputCPFCNPJ);
   }else if(inputCPFCNPJ.length === 14) {
-    inputValido = validaCNPJ(inputCPFCNPJ);
+    if (!inputFieldCNPJ.prop(':disabled')){
+      inputValido = validaCNPJ(inputCPFCNPJ);
+    }
+
   }
   // Se CPF ou CNPJ for invalido, aplica o aviso
   if(!inputValido){

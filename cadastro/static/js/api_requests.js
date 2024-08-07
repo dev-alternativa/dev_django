@@ -36,13 +36,13 @@ const consultarCNPJ = () => {
     // desativa o botão de consultar até que a requisição termine
     btnConsultaCNPJ.html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> <span role="status">Aguarde...</span>');
     btnConsultaCNPJ.attr('disabled', true);
-    
+
     $.ajax({
       url: url,
       method: 'GET',
       success: (data, jqXHR, textStatus) => {
         const dataResponse = data;
-        
+
         btnConsultaCNPJ.html('Consultar CNPJ');
         btnConsultaCNPJ.attr('disabled', false);
         $('#id_cnpj').removeClass('is-invalid');
@@ -102,7 +102,7 @@ const consultarCEP = () => {
     // Trava o botão de consulta com mensagem e muda texto do mesmo para 'Aguardando'
     btnConsultaCEP.html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> <span role="status">Aguarde...</span>')
     btnConsultaCEP.attr('disabled', true);
-    
+
     $.ajax({
       url: url,
       method: 'GET',
@@ -121,7 +121,7 @@ const consultarCEP = () => {
           $('#id_cep').removeClass('is-invalid');
           erroDivCEP.text('')
           $('#id_cep').addClass('is-valid');
-                  
+
         }
       },
       error: (errorThrown,  jqXHR, textStatus) => {
@@ -139,7 +139,7 @@ const consultarCEP = () => {
 
 
 const tratarJSONCNPJ = (jsonData) => {
- 
+
   // Parse do JSON com os dados que serão utilizados para preencher o formulário
   const razao_social = (jsonData.razao_social) ? jsonData.razao_social : "";
   const nome_fantasia = (jsonData.estabelecimento.nome_fantasia) ? jsonData.estabelecimento.nome_fantasia : "";

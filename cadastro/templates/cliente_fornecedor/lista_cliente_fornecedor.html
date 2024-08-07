@@ -33,15 +33,15 @@
         {% for cliente in itens_cliente_fornecedor %}
           <tr>
             <td>{{ cliente.nome_fantasia }}</td>
-            <td>{{ cliente.cnpj_formatado }}</td>
-            <td>({{ cliente.ddd }})&nbsp{{ cliente.telefone }}</td>
+            <td>{{ cliente.cnpj_formatado|default_if_none:"" }}</td>
+            <td>({{ cliente.ddd|default_if_none:"N/A" }})&nbsp{{ cliente.telefone|default_if_none:"" }}</td>
             <td>
               <!-- Exibição de Categorias corretamente -->
               {% for categoria in cliente.categoria.all  %}
                 {{ categoria.nome }}{% if not forloop.last %} / {% endif %}
               {% endfor %}
             </td>
-            <td>{{ cliente.inscricao_estadual }}</td>
+            <td>{{ cliente.inscricao_estadual|default_if_none:"" }}</td>
             <td>{{ cliente.limite_credito }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">

@@ -15,10 +15,11 @@ class FormataDadosMixin:
 
   # Formata o CNPJ ou CPF que serão apresentados nas listagens
   def format_cnpj_cpf(self, cnpj):
-    if len(cnpj) == 14:
-        return f'{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}'
-    elif len(cnpj) == 11:
-        return f'{cnpj[:3]}.{cnpj[3:6]}.{cnpj[6:9]}-{cnpj[9:11]}'
+    if cnpj:
+      if len(cnpj) == 14:
+          return f'{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}'
+      elif len(cnpj) == 11:
+          return f'{cnpj[:3]}.{cnpj[3:6]}.{cnpj[6:9]}-{cnpj[9:11]}'
     return cnpj
 
   # formata para real `BRL`
@@ -46,7 +47,8 @@ class FormataDadosMixin:
 
   def format_cep(self, cep):
       # formata CEP para exibição como 12345-678
-      return f'{cep[:5]}-{cep[5:]}'
+      if cep:
+        return f'{cep[:5]}-{cep[5:]}'
 
 
 class ValidaCNPJMixin:
@@ -161,6 +163,7 @@ class ProductListView(ListView):
   model = Produto
   template_name = 'produto/produto.html'
   context_object_name = 'itens_produto'
+  paginate_by = 30
 
   def get_queryset(self):
     queryset = super().get_queryset()
@@ -169,7 +172,7 @@ class ProductListView(ListView):
       search_terms = search.split()
       query = Q()
       for term in search_terms:
-        query |= Q(tipo_categoria__icontains=term) | Q(nome_produto__icontains=term) | Q(m_quadrado__icontains=term)
+        query |= Q(tipo_categoria__nome__icontains=term) | Q(nome_produto__icontains=term) | Q(m_quadrado__icontains=term)
       queryset = queryset.filter(query).distinct()
     return queryset
 
@@ -226,27 +229,30 @@ class ClienteFornecedorNovoView(CreateView):
 
   def form_invalid(self, form):
       cnpj = form.cleaned_data.get('cnpj', '')
-      digits = ''.join(filter(str.isdigit, cnpj))
-      if len(digits) < 11:
-          messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
+      if cnpj:
+        digits = ''.join(filter(str.isdigit, cnpj))
+        if len(digits) < 11:
+            messages.error(self.request, 'CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres.')
 
-      # Adicionar os erros do formulário nas mensagens
-      for field, errors in form.errors.items():
-        if field != '__all__':
-          for error in errors:
-            messages.error(self.request, f"{form.fields[field].label}: {error}")
-        else:
-          for error in errors:
-            messages.error(self.request, error)
+        # Adicionar os erros do formulário nas mensagens
+        for field, errors in form.errors.items():
+          if field != '__all__':
+            for error in errors:
+              messages.error(self.request, f"{form.fields[field].label}: {error}")
+          else:
+            for error in errors:
+              messages.error(self.request, error)
 
-      return self.render_to_response(self.get_context_data(form=form))
+        return self.render_to_response(self.get_context_data(form=form))
 
   def form_valid(self, form):
     cnpj = form.cleaned_data.get('cnpj', '')
-    digits = ''.join(filter(str.isdigit, cnpj))
-    if ClienteFornecedor.objects.filter(cnpj=digits).exists():
-      messages.error(self.request, 'Já existe um cliente/Fornecedor cadastrado com o CNPJ/CPF informado')
-      return self.render_to_response(self.get_context_data(form=form))
+    is_international = form.cleaned_data.get('is_international', '')
+    if cnpj and not is_international:
+      digits = ''.join(filter(str.isdigit, cnpj))
+      if ClienteFornecedor.objects.filter(cnpj=digits).exists():
+        messages.error(self.request, 'Já existe um cliente/Fornecedor cadastrado com o CNPJ/CPF informado')
+        return self.render_to_response(self.get_context_data(form=form))
 
     response = super().form_valid(form)
     messages.success(self.request, 'Cliente/Fornecedor cadastrado com sucesso!')
@@ -453,8 +459,11 @@ class ClienteFornecedorDetailView(DetailView, FormataDadosMixin):
       return context
 
 
-
-
 class LoteDetailView(DetailView):
   model = Lote
   template_name = 'lote/visualizar_lote.html'
+
+
+class ProdutoDetailView(DetailView):
+  model = Produto
+  template_name= 'produto/visualizar_produto.html'

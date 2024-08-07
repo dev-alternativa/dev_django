@@ -21,12 +21,28 @@ $(document).ready( () => {
       $('#id_m_quadrado').val('Informe "Largura", "Comprimento" e a "Categoria"');
     }
   }
+
   $('#id_largura, #id_comprimento').on('input', calculaArea);
   $('#id_tipo_categoria').on('change', calculaArea);
 
-});
+  /* Bloqueia o campo CNPJ quando o fornecedor for estrangeiro */
+  const bloqueiaInputCNPJ = () => {
+    const switchInternacional = $('#id_is_international');
+    const cnpjInput = $('#id_cnpj');
+    const btn_consulta_cnpj = $('#btn_consulta_cnpj');
 
-// Ativa tooltip
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
+    if (switchInternacional.is(':checked')) {
+      cnpjInput.val('');
+      cnpjInput.prop('disabled', true);
+      btn_consulta_cnpj.prop('disabled', true);
+    }
+  }
+
+  $('#id_is_international').on('change', bloqueiaInputCNPJ);
+
+  // Ativa tooltip
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
 });
