@@ -10,14 +10,14 @@ class Estoque(Base):
     )
 
     TRANSACAO = (
-        ('e', 'entrada'),
-        ('s', 'saida'),
+        ('e', 'Entrada'),
+        ('s', 'Saida'),
     )
 
     TIPO_STATUS = (
         ('AJUSTE', 'Ajuste'),
     )
-    estoque = models.IntegerField('Qtd Estoque')
+    saldoTotal = models.IntegerField('Saldo do Estoque')
     produto = models.ForeignKey('cadastro.Produto', verbose_name='Produto', on_delete=models.CASCADE)
     lote = models.ForeignKey('cadastro.Lote', verbose_name='Lote', on_delete=models.CASCADE)
     origem = models.CharField('Origem', max_length=100)

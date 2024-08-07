@@ -29,3 +29,10 @@
   z-index: 9999;
 }
 
+/* Estiliza mensagem de ausência de itens nas listagens */
+.no-results {
+  padding: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 1rem;
+}

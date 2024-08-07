@@ -1,33 +1,51 @@
 {% load static %}
 
 <div class="table-responsive border-secondary">
+    {% if itens_estoque %}
     <table class="table table-hover table-bordered border-secondary-subtle">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Qtde.</th>
                 <th>Produto</th>
-                <th>Larg.</th>
-                <th>Comp.</th>
-                <th>Emenda</th>
+                <th>Transação</th>
                 <th>Lote</th>
-                <th>Data/Hora</th>
                 <th>Origem</th>
-                <th>Lote Origem</th>
-                <th>Situação</th>
+                <th>Pedido</th>
                 <th>Status</th>
-                <th>Tipo Perda</th>
+                <th>Tipo Saída</th>
                 <th>m<sup>2</sup></th>
                 <th>Coordenada</th>
-                <th>Baixa</th>
-                <th>Faturamento</th>
+                <th>Dt. Baixa</th>
                 <th>NF</th>
-                <th>Pedido</th>
-                <th>Container</th>
+                <th>Data Faturamento</th>
                 <th>Obs.</th>
-                <th>Última Alt.</th>
-                <th>Data/Hora</th>
                 <th>Ações</th>
             </tr>
         </thead>
-    </table>
+        <tbody class="table-group-divider">
+
+                {% for item in itens_estoque %}
+                    <tr>
+                        <td>{{ itens_estoque.saldoTotal }}</td>
+                        <td>{{ itens_estoque.produto }}</td>
+                        <td>{{ itens_estoque.lote }}</td>
+                        <td>{{ itens_estoque.origem }}</td>
+                        <td>{{ itens_estoque.pedido }}</td>
+                        <td>{{ itens_estoque.status }}</td>
+                        <td>{{ itens_estoque.tipo_saida }}</td>
+                        <td>{{ itens_estoque.nf }}</td>
+                        <td>{{ itens_estoque.transacao }}</td>
+                        <td>{{ itens_estoque.obs }}</td>
+                        <td>{{ itens_estoque.data_baixa }}</td>
+                        <td>{{ itens_estoque.coordenada }}</td>
+                        <td>{{ itens_estoque.unidade }}</td>
+                        <td>{{ itens_estoque.data_fatura }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+            <p class="no-results">Nenhum item encontrado...</p> 
+        {% endif %}
 </div>

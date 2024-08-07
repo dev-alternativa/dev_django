@@ -26,24 +26,31 @@
           </tr>
       </thead>
       <tbody class="table-group-divider">
+        {% if itens_categoria %}
+        
         {% for cat in itens_categoria %}
-          <tr>
-            <td>{{ cat.nome }}</td>
-            <td>{{ cat.descricao }}</td>
-            <td class="action_size_column">
-              <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
-                <!-- Editar -->
-                <a class="btn btn-warning btn-edit" href="{% url 'update_categoria' cat.pk %}" role="button">
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-                <!-- Apagar -->
-                <a class="btn btn-danger btn-delete" href="{% url 'delete_categoria' cat.pk %}" role="button">
-                  <i class="bi bi-trash3"></i>
-                </a>
-              </div>
-            </td>
-          </tr>
-        {% endfor %}
+            <tr>
+              <td>{{ cat.nome }}</td>
+              <td>{{ cat.descricao }}</td>
+              <td class="action_size_column">
+                <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                  <!-- Editar -->
+                  <a class="btn btn-warning btn-edit" href="{% url 'update_categoria' cat.pk %}" role="button">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <!-- Apagar -->
+                  <a class="btn btn-danger btn-delete" href="{% url 'delete_categoria' cat.pk %}" role="button">
+                    <i class="bi bi-trash3"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        
+        {% else %}
+            <p class="no-results">Nenhum item contrado...</p> 
+        {% endif %}
+
       </tbody>
   </table>
 </div>
