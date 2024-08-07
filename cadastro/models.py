@@ -287,5 +287,5 @@ class Lote(Base):
         verbose_name_plural = 'Lotes'
 
     def __str__(self):
-        return self.codigo
+        return str(self.codigo)
 

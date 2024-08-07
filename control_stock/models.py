@@ -4,16 +4,16 @@ from core.models import Base
 from cadastro.models import Produto, ClienteFornecedor
 
 class Estoque(Base):
-    TIPO_SAIDA = ( 
+    TIPO_SAIDA = (
         ('PERDA', 'Perda'),
         ('INTEIRA', 'Inteira'),
     )
-    
+
     TRANSACAO = (
         ('e', 'entrada'),
         ('s', 'saida'),
     )
-    
+
     TIPO_STATUS = (
         ('AJUSTE', 'Ajuste'),
     )
@@ -31,15 +31,15 @@ class Estoque(Base):
     coordenada = models.ForeignKey('cadastro.ConfCoordenada', verbose_name='Configuração de Coordenada', max_length=50, on_delete=models.CASCADE)
     unidade = models.ForeignKey('cadastro.Unidade', verbose_name='Unidade', max_length=40, on_delete=models.CASCADE)
     data_fatura = models.DateField('Data da Fatura', null=True)
-    
-    
+
+
     class Meta:
         verbose_name = 'Estoque'
         verbose_name_plural = 'Estoques'
-        
+
     def __str__(self):
-        return self.estoque 
-    
+        return  str(self.estoque)
+
 
 class EstoqueEntrada(models.Model):
     estoque = models.ForeignKey(Estoque, on_delete=models.CASCADE)
@@ -49,9 +49,10 @@ class EstoqueEntrada(models.Model):
     data_entrada = models.DateTimeField(default=timezone.now)
     responsavel = models.ForeignKey('usuarios.CustomUsuario', on_delete=models.CASCADE)
     saldo = models.IntegerField()
-    
+
     class Meta:
         ordering = ('pk',)
-        
+        verbose_name = 'Entrada de Estoque'
+
     def __str__(self):
-        return '{} - {} - {}'.fornat(self.pk, self.estoque, self.produto)
+        return '{} - {} - {}'.format(self.pk, self.estoque, self.produto)
