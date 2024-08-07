@@ -4,6 +4,7 @@ import re
 
 
 ESTADOS_BRASIL = (
+        ('EX', '<ESTRANGEIRO>'),
         ('AC', 'Acre'),
         ('AL', 'Alagoas'),
         ('AP', 'Amapá'),
@@ -166,7 +167,7 @@ class ClienteFornecedor(Base):
     numero = models.CharField('Número', max_length=15)
     telefone = models.CharField('Telefone', max_length=15, null=True, blank=True)
     ddd = models.CharField('DDD', max_length=4, null=True, blank=True)
-    cep = models.CharField('CEP', max_length=12)
+    cep = models.CharField('CEP', max_length=12, null=True, blank=True)
     email = models.CharField('E-mail', max_length=300)
     nome_contato = models.CharField('Nome Contato', max_length=50, null=True, blank=True)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100)
@@ -189,7 +190,7 @@ class ClienteFornecedor(Base):
     tag_cadastro_omie_flx = models.CharField('OMIE FLX',  max_length=20, null=True, blank=True)
     tag_cadastro_omie_srv = models.CharField('OMIE SRV',  max_length=20, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
-    is_international = models.BooleanField('Fornecedor Estrangeiro', default=False)
+    is_international = models.BooleanField('Estrangeiro', default=False)
 
     class Meta:
         verbose_name = 'Cliente / Fornecedor'
@@ -199,10 +200,11 @@ class ClienteFornecedor(Base):
     def clean(self):
         super().clean()
         # Remove caracteres não numéricos
-        self.cnpj = re.sub(r'\D', '', self.cnpj)
-        self.telefone = re.sub(r'\D', '', self.telefone)
-        self.ddd = re.sub(r'[^\d]|0', '', self.ddd) # remove caracteres não numéricos e o 0
-        self.cep = re.sub(r'\D', '', self.cep)
+        if self.cnpj:
+            self.cnpj = re.sub(r'\D', '', self.cnpj)
+            self.telefone = re.sub(r'\D', '', self.telefone)
+            self.ddd = re.sub(r'[^\d]|0', '', self.ddd) # remove caracteres não numéricos e o 0
+            self.cep = re.sub(r'\D', '', self.cep)
 
         # Se telefone existir mas for menor que 8, é invalido
         if self.telefone:

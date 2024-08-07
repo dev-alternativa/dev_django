@@ -54,6 +54,14 @@ class ClienteFornecedorForm(ModelForm):
           'data-width': '100%',
           # 'data-height': '1rem',
         }
+      ),
+      'cliente_transportadora': Select2Widget(
+        attrs={
+          'data-language': 'pt-br',
+          'data-placeholder': 'Começe digitando algo...',
+          'data-minimum-input-length': 3,
+          'data-width': '100%',
+        }
       )
     }
 
@@ -61,10 +69,11 @@ class ClienteFornecedorForm(ModelForm):
   # Valida numeração de CPF / CNPJ
   def clean_cnpj(self):
     cnpj = self.cleaned_data.get('cnpj')
-    digits = ''.join(filter(str.isdigit, cnpj))
-    if len(digits) < 11:
-        raise forms.ValidationError('CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres. Teste')
-    return cnpj
+    if cnpj:
+      digits = ''.join(filter(str.isdigit, cnpj))
+      if len(digits) < 11:
+          raise forms.ValidationError('CPF/CNPJ inválido, precisa ter no mínimo 11 caracteres. Teste')
+      return cnpj
 
   def __init__(self, *args, **kwargs):
     super(ClienteFornecedorForm, self).__init__(*args, **kwargs)
