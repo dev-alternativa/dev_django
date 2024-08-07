@@ -22,12 +22,11 @@
           <tr>
             <th>Categoria</th>
             <th>Sub-Categoria</th>
-            <th>Largura</th>
+            <th>Nome Produto</th>
             <th>Comprimento</th>
-            <th>m2</th>
-            <th>Qtde. por caixa</th>
-            <th>Peso Unitário</th>
-            <th>Peso Caixa</th>
+            <th>Largura</th>
+            <th>M²</th>
+            <th>Qtde por Caixa</th>
             <th>Situação</th>
             <th>Fornecedor</th>
             <th class="action_size_column">Ações</th>
@@ -38,30 +37,34 @@
           <tr>
             <td>{{ produto.tipo_categoria }}</td>
             <td>{{ produto.sub_categoria }}</td>
-            <td>{{ produto.largura }}</td>
+            <td>{{ produto.nome_produto }}</td>
             <td>{{ produto.comprimento }}</td>
+            <td>{{ produto.largura }}</td>
             <td>{{ produto.m_quadrado }}</td>
             <td>{{ produto.qtd_por_caixa }}</td>
-            <td>{{ produto.peso_unitario }}</td>
-            <td>{{ produto.peso_caixa }}</td>
             <td>{{ produto.situacao }}</td>
             <td>{{ produto.fornecedor }}</td>
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
-                <button type="button" class="btn btn-warning btn-edit"  data-produto-id="{{ produto.id }}">
+                <!-- Visualizar -->
+                <a href="{% url 'detail_produto' produto.pk %}" class="btn btn-secondary btn-view">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <!-- Editar -->
+                <a class="btn btn-warning btn-edit" href="{% url 'update_produto' produto.pk %}" role="button">
                   <i class="bi bi-pencil-square"></i>
-                  {% comment %} Editar {% endcomment %}
-                </button>
-                <button type="button" class="btn btn-danger btn-delete" data-produto-id="{{ produto.id }}">
+                </a>
+                <!-- Apagar -->
+                <a class="btn btn-danger btn-delete" href="{% url 'delete_produto' produto.pk %}" role="button">
                   <i class="bi bi-trash3"></i>
-                  {% comment %} Apagar {% endcomment %}
-                </button>
+                </a>
               </div>
             </td>
           </tr>
         {% endfor %}
       </tbody>
   </table>
+  {% include 'paginacao.html' %}
 </div>
 {% comment %} {% block extra_scripts %}
   <script src="{% static 'js/cadastro_misc.js' %}"></script>

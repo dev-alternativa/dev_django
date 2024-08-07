@@ -37,7 +37,7 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>CNPJ:</strong></div>
-                                <div class="col-sm-7">{{ object.cnpj_formatado }}</div>
+                                <div class="col-sm-7">{{ object.cnpj_formatado|default_if_none:"" }}</div>
                             </div>
                         </div>
                     </div>
@@ -72,15 +72,15 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Complemento:</strong></div>
-                                <div class="col-sm-7">{{ object.complemento }}</div>
+                                <div class="col-sm-7">{{ object.complemento|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Número:</strong></div>
-                                <div class="col-sm-7">{{ object.numero }}</div>
+                                <div class="col-sm-7">{{ object.numero|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>CEP:</strong></div>
-                                <div class="col-sm-7">{{ object.cep }}</div>
+                                <div class="col-sm-7">{{ object.cep|default_if_none:"" }}</div>
                             </div>
                         </div>
                     </div>
@@ -99,7 +99,7 @@
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Telefone:</strong></div>
-                                <div class="col-sm-7">({{ object.ddd }}) {{ object.telefone }}</div>
+                                <div class="col-sm-7">({{ object.ddd|default_if_none:"N/A" }}) {{ object.telefone|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Email:</strong></div>
@@ -179,7 +179,7 @@
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Inscrição Estadual:</strong></div>
-                                <div class="col-sm-7">{{ object.inscricao_estadual }}</div>
+                                <div class="col-sm-7">{{ object.inscricao_estadual|default_if_none:"" }}</div>
                             </div>
                             <div class="row mb-2">
                                 <div class="col-sm-5"><strong>Limite de Crédito:</strong></div>

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Visualizar Produto{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <h1 class="text-body-secondary text-center mb-3">Visualização de Dados</h1>
+    <div class="card">
+        <div class="card-header">
+            Dados do Produto
+        </div>
+        <div class="card-body text-center">
+            <h1>Detalhes do Produto</h1>
+
+            <div class="accordion" id="accordionClientData">
+                <!-- Informações Básicas -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                Informações Básicas
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tipo Categoria:</strong></div>
+                                <div class="col-sm-7">{{ object.tipo_categoria }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Sub Categoria:</strong></div>
+                                <div class="col-sm-7">{{ object.sub_categoria }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Largura:</strong></div>
+                                <div class="col-sm-7">{{ object.largura }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Comprimento:</strong></div>
+                                <div class="col-sm-7">{{ object.comprimento }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>M²:</strong></div>
+                                <div class="col-sm-7">{{ object.m_quadrado }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Quantidade por Caixa:</strong></div>
+                                <div class="col-sm-7">{{ object.qtd_por_caixa }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Peso Unitário:</strong></div>
+                                <div class="col-sm-7">{{ object.peso_unitario }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Peso Caixa:</strong></div>
+                                <div class="col-sm-7">{{ object.peso_caixa }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Situação:</strong></div>
+                                <div class="col-sm-7">{{ object.situacao }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Situação:</strong></div>
+                                <div class="col-sm-7">{{ object.fornecedor }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- OMIE -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingFive">
+                        <h2 class="mb-0">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFive" aria-expanded="false" aria-controls="panelsStayOpen-collapseFive">
+                                OMIE
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE COM:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_omie_com|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE Oculto COM :</strong></div>
+                                <div class="col-sm-7">{{ object.cod_oculto_omie_com|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE IND:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_omie_ind|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE Oculto IND:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_oculto_omie_ind|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE FLX:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_omie_flx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE Oculto FLX:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_oculto_omie_flx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE PRE:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_omie_pre|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE Oculto PRE:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_oculto_omie_pre|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE MRX:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_omie_mrx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE Oculto MRX:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_oculto_omie_mrx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE SRV:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_omie_srv|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cód. OMIE Oculto SRV:</strong></div>
+                                <div class="col-sm-7">{{ object.cod_oculto_omie_srv|default_if_none:"" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2 text-center">
+            <div class='col-md-6'>
+                <a href="{% url 'produto' %}" class="btn btn-danger btn-lg">Cancelar</a>
+            </div>
+            <div class='col-md-6'>
+                <a href="{% url 'update_produto' object.pk %}" class="btn btn-warning btn-lg btn-view">Editar</a>
+            </div>
+        </div>
+</div>
+
+{% endblock content %}

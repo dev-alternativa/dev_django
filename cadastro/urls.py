@@ -40,6 +40,7 @@ urlpatterns = [
     path("produto/adicionar/", ProdutoNovoView.as_view(), name="add_produto"),
     path("produto/<int:pk>/update/", ProdutoUpdateView.as_view(), name="update_produto"),
     path("produto/<int:pk>/delete/", ProdutoDeleteView.as_view(), name="delete_produto"),
+    path("produto/<int:pk>/detail/", ProdutoDetailView.as_view(), name="detail_produto"),
 
     # # Sub Categoria
     # path("sub_categoria/", SubCategoriaListView.as_view(), name="sub_categoria"),
