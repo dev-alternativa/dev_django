@@ -199,11 +199,11 @@ class ClienteFornecedor(Base):
     # Elimina valores não numéricos antes de salvar os dados
     def clean(self):
         super().clean()
-        # Remove caracteres não numéricos
+
         if self.cnpj:
             self.cnpj = re.sub(r'\D', '', self.cnpj)
             self.telefone = re.sub(r'\D', '', self.telefone)
-            self.ddd = re.sub(r'[^\d]|0', '', self.ddd) # remove caracteres não numéricos e o 0
+            self.ddd = re.sub(r'[^\d]|0', '', self.ddd)
             self.cep = re.sub(r'\D', '', self.cep)
 
         # Se telefone existir mas for menor que 8, é invalido
@@ -263,6 +263,7 @@ class Produto(Base):
     class Meta:
         verbose_name = 'Produto'
         verbose_name_plural = 'Produtos'
+        ordering = ['nome_produto']
 
     def __str__(self):
         return self.nome_produto

@@ -5,5 +5,5 @@ from .views import *
 urlpatterns = [
     # Estoque
     path("estoque/", EstoqueListView.as_view(), name="estoque"),
-    # path("estoque/success/", SuccessView.as_view(), name="success"),
+    path("estoque/adicionar/", EstoqueCreateView.as_view(), name="adicionar_estoque"),
 ]

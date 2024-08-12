@@ -1,11 +1,11 @@
 from django import forms
-from django.forms import ModelForm 
-from cadastro.models import ConfCoordenada, Lote,Produto
+from django.forms import ModelForm
+from cadastro.models import ConfCoordenada, Lote, Produto
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, HTML, Div
-# from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, AppendedText, FieldWithButtons, StrictButton 
-# from django_select2.forms import Select2MultipleWidget, Select2Widget
-
+from .models import EstoqueAdicao
+from cadastro.models import ClienteFornecedor
+from django_select2.forms import Select2Widget
 
 class BuscaEstoqueForm(forms.Form):
     est_produto = forms.ModelChoiceField(
@@ -18,9 +18,9 @@ class BuscaEstoqueForm(forms.Form):
     est_largura = forms.CharField(label = 'Por Largura', required=False, widget=forms.TextInput(attrs={'class': 'form-control filtros'}))
     est_comprimento = forms.CharField(label = 'Por Comprimento', required=False, widget=forms.TextInput(attrs={'class': 'form-control filtros'}))
     est_lote = forms.ModelChoiceField(
-      label = 'Por Lote', 
+      label = 'Por Lote',
       queryset = Lote.objects.all(),
-      required = False, 
+      required = False,
       widget = forms.Select(attrs = {'class': 'form-select filtros', 'aria-label': 'Default select example'})
     )
     est_datatime = forms.CharField(label = 'Por Data', required=False, widget=forms.TextInput(attrs={'class': 'form-control filtros data'}))
@@ -111,4 +111,60 @@ class BuscaEstoqueForm(forms.Form):
               css_class='filter filter-spaces',
             )
           )
+        )
+
+class AdicionarEstoqueForm(forms.ModelForm):
+
+    class Meta:
+        model = EstoqueAdicao
+        fields = ['produto', 'fornecedor', 'quantidade', 'responsavel']
+        widgets = {
+            'fornecedor': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Selecione um fornecedor',
+                    'data-placeholder': 'Começe digitando algo...',
+                    'data-minimum-input-length': 3,
+                    'data-width': '100%',
+                    }
+                ),
+            'produto': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Selecione um produto',
+                    'data-placeholder': 'Começe digitando algo...',
+                    'data-minimum-input-length': 3,
+                    'data-width': '100%',
+                    }
+                ),
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(AdicionarEstoqueForm, self).__init__(*args, **kwargs)
+        self.fields['fornecedor'].queryset = ClienteFornecedor.objects.filter(tag_fornecedor=True)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('produto', css_class='form-control col-md-2 mb-0'),
+                    Field('fornecedor', css_class='form-control col-md-2 mb-0'),
+                ),
+                Column(
+                    Field('quantidade', css_class='form-control col-md-2 mb-0'),
+                    Field('responsavel', css_class='form-control col-md-2 mb-0'),
+                ),
+
+            ),
+            Row(
+                Column(
+                    HTML("<a href='{% url 'estoque' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
+                ),
+                Column(
+                    HTML(
+                        '<button type="submit" class="btn btn-primary btn-lg">'
+                        '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+                    ),
+                ),
+                css_class='form-group col-12 text-center'
+            )
         )

@@ -1,58 +1,60 @@
 from django.db import models
-from django.utils import timezone
 from core.models import Base
 from cadastro.models import Produto, ClienteFornecedor
 
-class Estoque(Base):
-    TIPO_SAIDA = (
-        ('PERDA', 'Perda'),
-        ('INTEIRA', 'Inteira'),
-    )
 
-    TRANSACAO = (
-        ('e', 'Entrada'),
-        ('s', 'Saida'),
-    )
+TIPO_SAIDA = (
+    ('PERDA', 'Perda'),
+    ('INTEIRA', 'Inteira'),
+)
 
-    TIPO_STATUS = (
-        ('AJUSTE', 'Ajuste'),
-    )
-    saldoTotal = models.IntegerField('Saldo do Estoque')
-    produto = models.ForeignKey('cadastro.Produto', verbose_name='Produto', on_delete=models.CASCADE)
-    lote = models.ForeignKey('cadastro.Lote', verbose_name='Lote', on_delete=models.CASCADE)
-    origem = models.CharField('Origem', max_length=100)
-    pedido = models.CharField('Número do Pedido', max_length=50)
-    status = models.CharField('Status', choices=TIPO_STATUS, max_length=20, null=True) # Verficar opções
-    tipo_saida = models.CharField('Tipo de Saída', max_length=20)
+TRANSACAO = (
+    ('E', 'Entrada'),
+    ('S', 'Saida'),
+)
+
+TIPO_STATUS = (
+    ('AJUSTE', 'Ajuste'),
+)
+
+
+class EstoqueInventario(Base):
+    saldo = models.IntegerField('Saldo Atual', default=0)
+    produto = models.OneToOneField('cadastro.Produto', on_delete=models.PROTECT, related_name='produto')
+    lote = models.ForeignKey('cadastro.Lote', on_delete=models.PROTECT, related_name='lote', null=True, blank=True)
+    pedido = models.CharField('Número do Pedido', max_length=50, null=True, blank=True)
+    status = models.CharField('Status', choices=TIPO_STATUS, max_length=20, null=True, blank=True)
     nf = models.PositiveIntegerField('Nota Fiscal', null=True, blank=True)
-    transacao = models.CharField(choices=TRANSACAO, max_length=1)
-    obs = models.TextField('Observações', max_length=200, null=True)
-    data_baixa = models.DateField('Data de Baixa', null=True)
-    coordenada = models.ForeignKey('cadastro.ConfCoordenada', verbose_name='Configuração de Coordenada', max_length=50, on_delete=models.CASCADE)
-    unidade = models.ForeignKey('cadastro.Unidade', verbose_name='Unidade', max_length=40, on_delete=models.CASCADE)
-    data_fatura = models.DateField('Data da Fatura', null=True)
-
+    tipo_transacao = models.TextField('TRANSACAO', max_length=200, null=True)
+    coordenada = models.ForeignKey(
+        'cadastro.ConfCoordenada',
+        verbose_name='Configuração de Coordenada',
+        max_length=50,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True)
+    unidade = models.ForeignKey('cadastro.Unidade', max_length=40, on_delete=models.PROTECT, related_name='unidade', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Estoque'
         verbose_name_plural = 'Estoques'
 
     def __str__(self):
-        return  str(self.estoque)
+        return  str(self.saldo)
 
 
-class EstoqueEntrada(models.Model):
-    estoque = models.ForeignKey(Estoque, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    fornecedor = models.ForeignKey(ClienteFornecedor, on_delete=models.CASCADE)
+class EstoqueAdicao(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+    fornecedor = models.ForeignKey(ClienteFornecedor, on_delete=models.PROTECT)
     quantidade = models.PositiveIntegerField()
-    data_entrada = models.DateTimeField(default=timezone.now)
-    responsavel = models.ForeignKey('usuarios.CustomUsuario', on_delete=models.CASCADE)
-    saldo = models.IntegerField()
+    data_movimentacao = models.DateTimeField(auto_now_add=True)
+    responsavel = models.ForeignKey('usuarios.CustomUsuario', on_delete=models.PROTECT )
+    # tipo_transacao = models.CharField(choices=TRANSACAO, max_length=1)
+    # saldo = models.IntegerField()
 
     class Meta:
         ordering = ('pk',)
-        verbose_name = 'Entrada de Estoque'
+        verbose_name = 'AJuste de Estoque'
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.pk, self.estoque, self.produto)
+        return '{} - {} - {}'.format(self.pk, self.quantidade, self.produto)

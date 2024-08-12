@@ -560,29 +560,3 @@ class UnidadeForm(ModelForm):
         css_class='form-group col-12 text-center'
       )
     )
-
-# class TipoFreteForm(ModelForm):
-
-#   class Meta:
-#     model = TipoFrete
-#     fields = ['nome', 'descricao']
-
-#   def __init__(self, *args, **kwargs):
-#     super(TipoFreteForm, self).__init__(*args, **kwargs)
-#     self.helper = FormHelper()
-#     self.helper.form_method = 'post'
-#     self.helper.layout = Layout(
-#       Row(
-#         Field('nome', css_class='form-control col-md-6 mb-0'),
-#         Field('descricao', css_class='form-control col-md-6 mb-0'),
-#       ),
-#       Row(
-#         Column(
-#           HTML('<button type="button" class="btn btn-danger btn-lg" onclick="goBack()"><i class="bi bi-x-lg"></i>Cancelar</button>'),
-#         ),
-#         Column(
-#           Submit('submit', 'Salvar', css_class='btn btn-primary btn-lg'),
-#         ),
-#         css_class='form-group col-12 text-center'
-#       )
-#     )

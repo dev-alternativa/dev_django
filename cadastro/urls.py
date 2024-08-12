@@ -42,21 +42,13 @@ urlpatterns = [
     path("produto/<int:pk>/delete/", ProdutoDeleteView.as_view(), name="delete_produto"),
     path("produto/<int:pk>/detail/", ProdutoDetailView.as_view(), name="detail_produto"),
 
-    # # Sub Categoria
-    # path("sub_categoria/", SubCategoriaListView.as_view(), name="sub_categoria"),
-    # path("sub_categoria/adicionar", SubCategoriaNovaView.as_view(), name="add_sub_categoria"),
-    # path("sub_categoria/<int:pk>/update/", SubCategoriaUpdateView.as_view(), name="update_sub_categoria"),
-    # path("sub_categoria/<int:pk>/delete/", SubCategoriaDeleteView.as_view(), name="delete_sub_categoria"),
-
     # Transportadora
     path("transportadora/", TransportadoraListView.as_view(), name="transportadora"),
     path("transportadora/adicionar/", TransportadoraNovaView.as_view(), name="add_transportadora"),
     path("transportadora/<int:pk>/update/", TransportadoraUpdateView.as_view(), name="update_transportadora"),
     path("transportadora/<int:pk>/delete/", TransportadoraDeleteView.as_view(), name="delete_transportadora"),
     path("transportadora/<int:pk>/detail/", TransportadoraDetailView.as_view(), name="detail_transportadora"),
-    # Tipo Frete
-    # path("tipo_frete/", TipoFreteView.as_view(), name="tipo_frete"),
-    # path("tipo_frete/adicionar", TipoFreteNovoView.as_view(), name="add_tipo_frete"),
+
 
     # Unidade
     path("unidade/", UnidadeListView.as_view(), name="unidade"),

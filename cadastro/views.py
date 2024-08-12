@@ -2,7 +2,7 @@ from pyexpat.errors import messages
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from django.views.generic import TemplateView, CreateView, UpdateView, ListView, DeleteView, DetailView
+from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView
 from .forms import CategoriaForm, ClienteFornecedorForm, CoordenadaForm, LoteForm, TransportadoraForm, UnidadeForm, PrazoForm, ProdutoForm
 from .models import Categoria, ClienteFornecedor, ConfCoordenada, Lote, Prazo, Produto, Transportadora, Unidade
 
@@ -52,6 +52,7 @@ class FormataDadosMixin:
 
 
 class ValidaCNPJMixin:
+
   def form_invalid(self, form):
     cnpj = form.cleaned_data.get('cnpj', '')
     digits = ''.join(filter(str.isdigit, cnpj))
@@ -176,11 +177,6 @@ class ProductListView(ListView):
       queryset = queryset.filter(query).distinct()
     return queryset
 
-# class SubCategoriaListView(ListView):
-#   model = SubCategoria
-#   template_name = 'subcategoria/sub_categoria.html'
-#   context_object_name = 'itens_sub_categoria'
-
 
 class TransportadoraListView(FormataDadosMixin, ListView):
   model = Transportadora
@@ -201,7 +197,6 @@ class TransportadoraListView(FormataDadosMixin, ListView):
       return queryset
 
 
-
 class UnidadeListView(ListView):
   model = Unidade
   template_name = 'unidade/unidade.html'
@@ -218,7 +213,6 @@ class CategoriaNovaView(FormMessageMixin, CreateView):
   template_name = "categoria/adicionar_categoria.html"
   success_url = reverse_lazy('categoria')
   success_message = 'Categoria cadastrada com sucesso!'
-
 
 
 class ClienteFornecedorNovoView(CreateView):
@@ -289,12 +283,6 @@ class ProdutoNovoView(FormMessageMixin, CreateView):
   template_name = "produto/adicionar_produto.html"
   success_url = reverse_lazy('produto')
   success_message = 'Produto incluído com sucesso'
-
-# class SubCategoriaNovaView(CreateView):
-#   model = SubCategoria
-#   form_class = SubCategoriaForm
-#   template_name = "subcategoria/adicionar_sub_categoria.html"
-#   success_url = reverse_lazy('sub_categoria')
 
 
 class TransportadoraNovaView(ValidaCNPJMixin, CreateView):
@@ -416,12 +404,6 @@ class ProdutoDeleteView(DeleteSuccessMessageMixin, DeleteView):
   success_url = reverse_lazy('produto')
 
 
-# class SubCategoriaDeleteView(DeleteSuccessMessageMixin, DeleteView):
-#   model = SubCategoria
-#   template_name = 'subcategoria/delete_sub_categoria.html'
-#   success_url = reverse_lazy('sub_categoria')
-
-
 class TransportadoraDeleteView(DeleteSuccessMessageMixin, DeleteView):
   model = Transportadora
   template_name = 'transportadora/delete_transportadora.html'
@@ -434,7 +416,8 @@ class UnidadeDeleteView(DeleteSuccessMessageMixin, DeleteView):
   success_url = reverse_lazy("unidade")
 
 
-# *********** VISUALIZAÇÃO DE ITENS ***********
+# ********************** VISUALIZAÇÃO DE ITENS **********************
+
 class TransportadoraDetailView(DetailView):
   model = Transportadora
   template_name = 'transportadora/visualizar_transportadora.html'
@@ -444,7 +427,6 @@ class ClienteFornecedorDetailView(DetailView, FormataDadosMixin):
   model = ClienteFornecedor
   template_name =  'cliente_fornecedor/visualizar_cliente.html'
   context_object_name = 'cliente_fornecedor'
-
 
   def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)

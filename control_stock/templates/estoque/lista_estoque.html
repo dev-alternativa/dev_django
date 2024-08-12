@@ -5,47 +5,31 @@
     <table class="table table-hover table-bordered border-secondary-subtle">
         <thead>
             <tr>
+                <th>Id</th>
                 <th>Qtde.</th>
                 <th>Produto</th>
-                <th>Transação</th>
-                <th>Lote</th>
-                <th>Origem</th>
-                <th>Pedido</th>
+                {% comment %} <th>Transação</th> {% endcomment %}
                 <th>Status</th>
-                <th>Tipo Saída</th>
-                <th>m<sup>2</sup></th>
-                <th>Coordenada</th>
-                <th>Dt. Baixa</th>
-                <th>NF</th>
-                <th>Data Faturamento</th>
-                <th>Obs.</th>
-                <th>Ações</th>
+                {% comment %} <th>Tipo Saída</th> {% endcomment %}
+                {% comment %} <th>m<sup>2</sup></th> {% endcomment %}
+                <th>Data Alteração</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
 
                 {% for item in itens_estoque %}
                     <tr>
-                        <td>{{ itens_estoque.saldoTotal }}</td>
-                        <td>{{ itens_estoque.produto }}</td>
-                        <td>{{ itens_estoque.lote }}</td>
-                        <td>{{ itens_estoque.origem }}</td>
-                        <td>{{ itens_estoque.pedido }}</td>
-                        <td>{{ itens_estoque.status }}</td>
-                        <td>{{ itens_estoque.tipo_saida }}</td>
-                        <td>{{ itens_estoque.nf }}</td>
-                        <td>{{ itens_estoque.transacao }}</td>
-                        <td>{{ itens_estoque.obs }}</td>
-                        <td>{{ itens_estoque.data_baixa }}</td>
-                        <td>{{ itens_estoque.coordenada }}</td>
-                        <td>{{ itens_estoque.unidade }}</td>
-                        <td>{{ itens_estoque.data_fatura }}</td>
+                        <td>{{ item.produto_id }}</td>
+                        <td>{{ item.saldo }}</td>
+                        <td>{{ item.produto.nome_produto }}</td>
+                        <td>{{ item.ativo|yesno:"Ativo,Inativo" }}</td>
+                        <td>{{ item.dt_modificado }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
 
         {% else %}
-            <p class="no-results">Nenhum item encontrado...</p> 
+            <p class="no-results">Nenhum item encontrado...</p>
         {% endif %}
 </div>
