@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Visualizar Cliente / Fornecedor{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <h1 class="text-body-secondary text-center mb-3">Visualização de Dados</h1>
+    <div class="card">
+        <div class="card-header">
+            Dados do Cliente / Fornecedor
+        </div>
+        <div class="card-body text-center">
+            <h1>Detalhes do Cliente</h1>
+
+            <div class="accordion" id="accordionClientData">
+                <!-- Informações Básicas -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                Informações Básicas
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Nome Fantasia:</strong></div>
+                                <div class="col-sm-7">{{ object.nome_fantasia }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Razão Social:</strong></div>
+                                <div class="col-sm-7">{{ object.razao_social }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>CNPJ:</strong></div>
+                                <div class="col-sm-7">{{ object.cnpj_formatado|default_if_none:"" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endereço -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingTwo">
+                        <h2 class="mb-0">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                Endereço
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cidade:</strong></div>
+                                <div class="col-sm-7">{{ object.cidade }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Estado:</strong></div>
+                                <div class="col-sm-7">{{ object.estado }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Endereço:</strong></div>
+                                <div class="col-sm-7">{{ object.endereco }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Bairro:</strong></div>
+                                <div class="col-sm-7">{{ object.bairro }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Complemento:</strong></div>
+                                <div class="col-sm-7">{{ object.complemento|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Número:</strong></div>
+                                <div class="col-sm-7">{{ object.numero|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>CEP:</strong></div>
+                                <div class="col-sm-7">{{ object.cep|default_if_none:"" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contato -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingThree">
+                        <h2 class="mb-0">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                                Contato
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Telefone:</strong></div>
+                                <div class="col-sm-7">({{ object.ddd|default_if_none:"N/A" }}) {{ object.telefone|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Email:</strong></div>
+                                <div class="col-sm-7">{{ object.email }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Nome do Contato:</strong></div>
+                                <div class="col-sm-7">{{ object.nome_contato|default_if_none:"N/A" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações de Transporte e Categoria -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingFour">
+                        <h2 class="mb-0">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                                Informações de Transporte e Categoria
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tipo de Frete:</strong></div>
+                                {% if object.tipo_frete == '0' %}
+                                    <div class="col-sm-7">(CIF)</div>
+                                {% elif object.tipo_frete == '1' %}
+                                    <div class="col-sm-7">(FOB)</div>
+                                {% elif object.tipo_frete == '2' %}
+                                    <div class="col-sm-7">Frete por conta de Terceiros</div>
+                                {% elif object.tipo_frete == '3' %}
+                                    <div class="col-sm-7">Transporte Próprio por conta do Remetente</div>
+                                {% elif object.tipo_frete == '4' %}
+                                    <div class="col-sm-7">Transporte Próprio por conta do Destinatário</div>
+                                {% elif object.tipo_frete == '9' %}
+                                    <div class="col-sm-7">Sem Ocorrência de Transporte</div>
+                                {% endif %}
+
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Taxa de Frete:</strong></div>
+                                <div class="col-sm-7">{{ object.taxa_frete }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Cliente Transportadora:</strong></div>
+                                <div class="col-sm-7">{{ object.cliente_transportadora|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Prazo:</strong></div>
+                                <div class="col-sm-7">{{ object.prazo|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Categoria:</strong></div>
+                                <!-- Exibição de Categorias corretamente -->
+                                <div class="col-sm-7">
+                                    {% for categoria in object.categoria.all  %}
+                                        {{ categoria.nome }}{% if not forloop.last %} / {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Outros -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingFive">
+                        <h2 class="mb-0">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFive" aria-expanded="false" aria-controls="panelsStayOpen-collapseFive">
+                                Outros
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Inscrição Estadual:</strong></div>
+                                <div class="col-sm-7">{{ object.inscricao_estadual|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Limite de Crédito:</strong></div>
+                                <div class="col-sm-7">{{ object.limite_credito|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Contribuinte:</strong></div>
+                                <div class="col-sm-7">{{ object.contribuinte|yesno:'Sim,Não' }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cliente:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cliente|yesno:'Sim,Não' }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Fornecedor:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_fornecedor|yesno:'Sim,Não' }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cadastro Omie COM:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_com|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cadastro Omie IND:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_ind|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cadastro Omie PRE:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_pre|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cadastro Omie MRX:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_mrx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cadastro Omie FLX:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_flx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Tag Cadastro Omie SRV:</strong></div>
+                                <div class="col-sm-7">{{ object.tag_cadastro_omie_srv|default_if_none:"" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2 text-center">
+            <div class='col-md-6'>
+                <a href="{% url 'customer_supplier' %}" class="btn btn-danger btn-lg">Cancelar</a>
+            </div>
+            <div class='col-md-6'>
+                <a href="{% url 'update_customer_supplier' object.pk %}" class="btn btn-warning btn-lg btn-view">Editar</a>
+            </div>
+        </div>
+</div>
+
+{% endblock content %}

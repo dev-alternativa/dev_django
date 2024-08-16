@@ -1,0 +1,17 @@
+{% load static %}
+        <div class="card-header">
+            Prazos cadastrados
+        </div>
+        <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+            <a href="{% url 'add_lead_time' %}" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Prazo
+            </a>
+            <a href="{% url 'import_lead_time' %}" class="btn btn-outline-success">
+                <i class="bi-box-arrow-in-left"></i>
+                Importar de Planilha Excel
+            </a>
+        </div>
+        <div class="space_from_margin">
+            {% include "prazo/lista_prazo.html" %}
+        </div>

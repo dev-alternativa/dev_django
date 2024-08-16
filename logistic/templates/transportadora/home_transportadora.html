@@ -1,0 +1,17 @@
+{% load static %}
+        <div class="card-header">
+            Transportadoras cadastradas
+        </div>
+        <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+            <a href="{% url 'add_carrier' %}" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Nova Transportadora
+            </a>
+            <a href="{% url 'import_carrier' %}" class="btn btn-outline-success">
+                <i class="bi-box-arrow-in-left"></i>
+                Importar de Planilha Excel
+            </a>
+        </div>
+        <div class="space_from_margin">
+            {% include "transportadora/lista_transportadora.html" %}
+        </div>

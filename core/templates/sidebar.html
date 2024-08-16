@@ -3,7 +3,7 @@
     <div class="h-100">
         <div class="sidebar-logo">
             <a href="{% url 'index' %}">
-                 <img src="{% static 'img/logo.png' %}" id="sidebar-logo" class="img-fluid" alt="">
+                <img src="{% static 'img/logo.png' %}" id="sidebar-logo" class="img-fluid" alt="">
             </a>
         </div>
         <!-- Sidebar Navigation -->
@@ -27,7 +27,7 @@
                 <ul id="cadastros" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
 
                     <li class="sidebar-item">
-                        <a href="{% url 'categoria' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'category' %}" class="sidebar-link sub-item">
                             <i class="bi bi-tag"></i>
                             Categoria
                         </a>
@@ -40,36 +40,36 @@
                         </a>
                     </li>
 
-                     <li class="sidebar-item">
-                        <a href="{% url 'cliente_fornecedor' %}" class="sidebar-link sub-item">
+                    <li class="sidebar-item">
+                        <a href="{% url 'customer_supplier' %}" class="sidebar-link sub-item">
                             <i class="bi bi-people"></i>
                             Cliente/Fornecedor
                         </a>
                     </li>
 
                     <li class="sidebar-item">
-                        <a href="{% url 'coordenada' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'coordinate' %}" class="sidebar-link sub-item">
                             <i class="bi bi-bookshelf"></i>
                             Conf. Coordenadas
                         </a>
-                    </li> 
+                    </li>
 
-                    <li class="sidebar-item">
+                    {% comment %} <li class="sidebar-item">
                         <a href="{% url 'lote' %}" class="sidebar-link sub-item">
                             <img src="{% static 'img/pallet.png' %}" alt="Pallet Icon" class="icon-class"></img>
                             Lote
                         </a>
-                    </li>
+                    </li> {% endcomment %}
 
                     <li class="sidebar-item ">
-                        <a href="{% url 'produto' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'product' %}" class="sidebar-link sub-item">
                             <i class="bi bi-basket2"></i>
                             Produto
                         </a>
                     </li>
 
                     <li class="sidebar-item">
-                        <a href="{% url 'prazo' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'lead_time' %}" class="sidebar-link sub-item">
                             <i class="bi bi-calendar-range"></i>
                             Prazo
                         </a>
@@ -82,14 +82,14 @@
                         </a>
                     </li> {% endcomment %}
                     <li class="sidebar-item">
-                        <a href="{% url 'transportadora' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'carrier' %}" class="sidebar-link sub-item">
                             <i class="bi bi-truck"></i>
                             Transportadora
                         </a>
                     </li>
 
                     <li class="sidebar-item">
-                        <a href="{% url 'unidade' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'location' %}" class="sidebar-link sub-item">
                             <i class="bi bi-buildings"></i>
                             Unidade
                         </a>
@@ -106,12 +106,12 @@
                 <ul id="estoque" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#estoque">
 
                     <li class="sidebar-item">
-                        <a href="{% url 'estoque' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'inventory' %}" class="sidebar-link sub-item">
                             <i class="bi bi-boxes"></i>
                             Listar Estoque
                         </a>
                     </li>
-                    
+
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link sub-item">
                             <i class="bi bi-bookshelf"></i>
@@ -122,6 +122,30 @@
                 </ul>
             </li>
 
+            <!--*************** Vendas ***************-->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#vendas"
+                    aria-expanded="false" aria-controls="vendas" id="vendasLink" data-menu="vendas">
+                    <i class="bi bi-person-vcard"></i>
+                    Vendedores
+                </a>
+                <ul id="vendas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                    <li class="sidebar-item">
+                        <a href="{% url 'seller' %}" class="sidebar-link sub-item">
+                            <i class="bi bi-list-task"></i>
+                            Listar
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link sub-item">
+                            <i class="bi bi-cart3"></i>
+                            Nova
+                        </a>
+                    </li>
+                </ul>
+
+
+            <!--*************** Dashboard ***************-->
             <li class="sidebar-item">
                 <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard"
                     aria-expanded="false" aria-controls="dashboard" id="dashboardLink" data-menu="dashboard">
@@ -145,13 +169,13 @@
                 </a>
                 <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
-                        <a href="{% url 'usuarios' %}" class="sidebar-link sub-item">
+                        <a href="{% url 'users' %}" class="sidebar-link sub-item">
                             <i class="bi bi-person-lines-fill"></i>
                             Listar
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a href="{% url 'admin:usuarios_customusuario_changelist' %}" class="sidebar-link sub-item" target="_blank">
+                        <a href="{% url 'admin:accounts_customusuario_changelist' %}" class="sidebar-link sub-item" target="_blank">
                             <i class="bi bi-person-add"></i>
                             Novo...
                         </a>

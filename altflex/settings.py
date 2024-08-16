@@ -42,7 +42,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'usuarios',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,11 +54,14 @@ INSTALLED_APPS = [
     'import_export',
     'django_select2',
     # my apps
-    'core',
-    'control_stock',
+    'accounts',
     'api',
-    'importacao',
-    'cadastro',
+    'core',
+    'common',
+    'imports',
+    'logistic',
+    'products',
+    'transactions',
 ]
 
 MIDDLEWARE = [
@@ -167,7 +169,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'usuarios.CustomUsuario'
+AUTH_USER_MODEL = 'accounts.CustomUsuario'
 
 LOGIN_REDIRECT_URL = 'index'   # A página para onde o usuário será redirecionado após fazer login
 LOGOUT_REDIRECT_URL = 'login'  # A página para onde o usuário será redirecionado após fazer logout

@@ -4,13 +4,16 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('accounts.urls')),
+    path('', include('common.urls')),
     path('', include('core.urls')),
-    path('', include('control_stock.urls')),
-    path('', include('cadastro.urls')),
-    path('', include('usuarios.urls')),
-    path('api/', include('api.urls')),
-    path('', include('importacao.urls')),
+    path('', include('logistic.urls')),
+    path('', include('products.urls')),
+    path('', include('transactions.urls')),
+    path('', include('imports.urls')),
     path("select2/", include("django_select2.urls")),
+
+    path('api/', include('api.urls')),
 ]
 
 admin.AdminSite.site_header = 'Administração Sistema Alternativa Flexo'

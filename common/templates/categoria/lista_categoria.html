@@ -1,0 +1,55 @@
+{% load static %}
+
+<form method="get" action="" class="row g-3 justify-content-center" autocomplete=off>
+  <div class="col-6">
+    <input type="text" class="form-control"
+      data-toggle="tooltip" data-placement="top"
+      data-bs-title="Para CNPJ digite apenas números"
+      name="search"
+      placeholder="Buscar por nome..."
+      value="{{ request.GET.search }}"
+    >
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-info" type="submit">Buscar</button>
+  </div>
+
+</form>
+
+<div class="table-responsive border-secondary">
+  <table class="table table-hover table-bordered border-secondary-subtle">
+    {% if itens_categoria %}
+      <thead>
+          <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th class="action_size_column">Ações</th>
+          </tr>
+      </thead>
+      <tbody class="table-group-divider">
+
+        {% for cat in itens_categoria %}
+          <tr>
+            <td>{{ cat.nome }}</td>
+            <td>{{ cat.descricao }}</td>
+            <td class="action_size_column">
+              <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                <!-- Editar -->
+                <a class="btn btn-warning btn-edit" href="{% url 'update_category' cat.pk %}" role="button">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <!-- Apagar -->
+                <a class="btn btn-danger btn-delete" href="{% url 'delete_category' cat.pk %}" role="button">
+                  <i class="bi bi-trash3"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+
+      </tbody>
+    {% else %}
+        <p class="no-results">Nenhum item encontrado...</p>
+    {% endif %}
+  </table>
+</div>

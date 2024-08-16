@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Importação bem sucedida</title>
+</head>
+<body>
+  <div class="container" mt-5>
+
+    <h1>DADOS IMPORTADOS:</h1>
+    <a href="{% url 'inventory' %}" class="btn btn-dark" role="button">Voltar</a>
+
+    {% if data %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          {% for header in data.0 %}
+            <th>{{ header }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% comment %} {% for row, values in enumerate(data) %}
+          {% if row != 0 %%}
+            <tr>
+
+              {% for cell in values %}
+                <td>{{ cell }}</td>
+              {% endfor %}
+
+            </tr>
+          {% endif %}
+        {% endfor %} {% endcomment %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>No data found.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

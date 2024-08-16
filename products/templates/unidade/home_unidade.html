@@ -1,0 +1,13 @@
+{% load static %}
+        <div class="card-header">
+            Unidades cadastradas
+        </div>
+        <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+            <a href="{% url 'add_location' %}" class="btn btn-outline-primary">
+                <i class="bi bi-plus-lg"></i>
+                Adicionar Nova Unidade
+            </a>
+        </div>
+        <div class="space_from_margin">
+            {% include "unidade/lista_unidade.html" %}
+        </div>
