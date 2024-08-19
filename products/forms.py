@@ -244,32 +244,32 @@ class ProductForm(ModelForm):
         self.helper.layout = Layout(
             TabHolder(
                 Tab(
-                'Dados Básicos',
-                Row(
-                    Column(
-                        Field('tipo_categoria', css_class='form-control col-md-6 mb-0'),
-                        Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
-                        Field('nome_produto', css_class='form-control col-md-6 mb-0'),
-                        Field('largura', css_class='form-control col-md-6 mb-0 validate-number'),
-                        Field('comprimento', css_class='form-control col-md-6 mb-0 validate-number'),
+                    'Dados Básicos',
+                    Row(
+                        Column(
+                            Field('tipo_categoria', css_class='form-control col-md-6 mb-0'),
+                            Field('sub_categoria', css_class='form-control col-md-6 mb-0'),
+                            Field('nome_produto', css_class='form-control col-md-6 mb-0'),
+                            Field('largura', css_class='form-control col-md-6 mb-0 validate-number'),
+                            Field('comprimento', css_class='form-control col-md-6 mb-0 validate-number'),
+                        ),
+                        Column(
+                            Field(
+                                'm_quadrado',
+                                css_class='form-control col-md-6 mb-0',
+                                readonly='readonly',
+                                placeholder='Informe "Largura", "Comprimento" e a "Categoria"'),
+                            Field('qtd_por_caixa', css_class='form-control col-md-6 mb-0 validate-number'),
+                            Field('peso_unitario', css_class='form-control col-md-6 mb-0'),
+                            Field('peso_caixa', css_class='form-control col-md-6 mb-0'),
+                            Field('situacao', css_class='form-control col-md-6 mb-0'),
+                        ),
                     ),
-                    Column(
-                        Field(
-                            'm_quadrado',
-                            css_class='form-control col-md-6 mb-0',
-                            readonly='readonly',
-                            placeholder='Informe "Largura", "Comprimento" e a "Categoria"'),
-                        Field('qtd_por_caixa', css_class='form-control col-md-6 mb-0 validate-number'),
-                        Field('peso_unitario', css_class='form-control col-md-6 mb-0'),
-                        Field('peso_caixa', css_class='form-control col-md-6 mb-0'),
-                        Field('situacao', css_class='form-control col-md-6 mb-0'),
-                    ),
-                ),
-                Row(
-                    Column(
-                        Field('fornecedor', css_class='form-control col-md-6 mb-0'),
-                    ),
-                ),
+                    # Row(
+                    #     Column(
+                    #         Field('fornecedor', css_class='form-control col-md-6 mb-0'),
+                    #     ),
+                    # ),
                 ),
                 Tab(
                 'Dados OMIE',

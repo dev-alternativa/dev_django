@@ -34,7 +34,7 @@ TIPO_STATUS = (
 
 class CoordinateSetting(Base):
     titulo = models.CharField('Configuração de Coordenada', max_length=100)
-    unidade = models.ForeignKey('products.Location', verbose_name='Unidade', on_delete=models.PROTECT)
+    unidade = models.ForeignKey('products.Location', verbose_name='Unidade', on_delete=models.PROTECT, related_name='coordenadas')
     predio = models.CharField('Prédio', choices=PREDIO, max_length=50, null=True, blank=True)
 
     class Meta:
@@ -61,12 +61,6 @@ class Product(Base):
     peso_unitario = models.CharField('Peso Unitário', max_length=10, null=True, blank=True)
     peso_caixa = models.CharField('Peso da Caixa', max_length=10, null=True, blank=True)
     situacao = models.CharField('Estado do Produto', choices=SITUACAO_PRODUTO, max_length=50, null=True, blank=True)
-    fornecedor = models.ForeignKey(
-        'common.CustomerSupplier',
-        verbose_name='Fornecedor',
-        max_length=100,
-        on_delete=models.PROTECT
-    )
     cod_omie_com = models.CharField('Cód. OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_oculto_omie_com = models.CharField('Cód. oculto no OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_omie_ind = models.CharField('Cód. OMIE CNPJ IND', max_length=30, null=True, blank=True)
@@ -90,7 +84,7 @@ class Product(Base):
 
 
 class Inventory(Base):
-    entrada_items = models.ForeignKey('transactions.InflowsItems', on_delete=models.PROTECT, related_name='inventory')
+    entrada_items_id = models.ForeignKey('transactions.InflowsItems', on_delete=models.PROTECT, related_name='inventory')
     saida_items = models.ForeignKey('transactions.OutflowsItems', on_delete=models.PROTECT, related_name='inventory')
     coordenada = models.ForeignKey(
         'products.CoordinateSetting',
@@ -109,12 +103,13 @@ class Inventory(Base):
     tipo_perda = models.CharField('Tipo de Perda', choices=TIPO_PERDA, max_length=100, null=True, blank=True)
     tipo_alteracao = models.CharField('Tipo de Alteração', choices=TIPO_ALTERACAO, max_length=100, null=True, blank=True)
 
+
     class Meta:
         verbose_name = 'Estoque'
         verbose_name_plural = 'Estoques'
 
     def __str__(self):
-        return  str(self.saldo)
+        return  '{} - {} - {}'.format(self.entrada_items_id, self.comprimento, self.largura)
 
 
 class Location(Base):

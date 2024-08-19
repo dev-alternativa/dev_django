@@ -209,17 +209,17 @@ class ImportCustomerSupplierView(FormView):
                         transportadora.nome = row.get('nome', 'Nome a definir')
                         transportadora.save()
 
-                    print("Verificando prazo...")
-                    prazo_descricao = row.get('Número de Parcelas', '')
+                    # print("Verificando prazo...")
+                    # prazo_descricao = row.get('Número de Parcelas', '')
 
-                    if pd.notna(prazo_descricao):
-                        prazo_queryset = LeadTime.objects.filter(descricao=prazo_descricao)
-                        if prazo_queryset.exists():
-                            prazo_obj = prazo_queryset.first()  # Pega o primeiro objeto encontrado
-                        else:
-                            prazo_obj = None
-                    else:
-                        prazo_obj = None
+                    # if pd.notna(prazo_descricao):
+                    #     prazo_queryset = LeadTime.objects.filter(descricao=prazo_descricao)
+                    #     if prazo_queryset.exists():
+                    #         prazo_obj = prazo_queryset.first()  # Pega o primeiro objeto encontrado
+                    #     else:
+                    #         prazo_obj = None
+                    # else:
+                    #     prazo_obj = None
 
                     print("Salvando dados no banco...")
                     obj, created = CustomerSupplier.objects.update_or_create(
@@ -242,7 +242,6 @@ class ImportCustomerSupplierView(FormView):
                             'tipo_frete': row.get('Modalidade do Frete', ''),
                             'taxa_frete': row.get('Frete') if int(row.get('Modalidade do Frete')) == 3 else '0,00', # Regra: taxa só existe se a modalidade de frete for do tipo 3
                             'cliente_transportadora': transportadora,
-                            'prazo': prazo_obj,
                             'inscricao_estadual': self.remover_nao_numericos(row.get('inscricao_estadual', '')),
                             'limite_credito': row.get('valor_limite_credito_total', '0'),
                             'contribuinte':  1 if row.get('contribuinte') == 'S' else 0,
@@ -407,11 +406,11 @@ class ImportProductView(FormView):
                 categoria_obj, created = Category.objects.get_or_create(nome=categoria_nome)
 
                 # Verifica se o fornecedor existe
-                try:
-                    fornecedor_obj = CustomerSupplier.objects.get(nome_fantasia=fornecedor_nome)
-                except CustomerSupplier.DoesNotExist:
-                    messages.error(self.request, f"Erro na linha {index + 1}: Fornecedor '{fornecedor_nome}' não encontrado. Cadastre o fornecedor primeiro.")
-                    return self.form_invalid(form)
+                # try:
+                #     fornecedor_obj = CustomerSupplier.objects.get(nome_fantasia=fornecedor_nome)
+                # except CustomerSupplier.DoesNotExist:
+                #     messages.error(self.request, f"Erro na linha {index + 1}: Fornecedor '{fornecedor_nome}' não encontrado. Cadastre o fornecedor primeiro.")
+                #     return self.form_invalid(form)
 
 
                 # Cria ou atualiza o produto
@@ -427,7 +426,7 @@ class ImportProductView(FormView):
                         'peso_unitario': row['Peso Unitario'],
                         'peso_caixa': row['Peso/Caixa'],
                         'situacao': row['Situação'],
-                        'fornecedor': fornecedor_obj,
+                        # 'fornecedor': fornecedor_obj,
                         'cod_omie_com': row['Cod_COM'],
                         'cod_oculto_omie_com': row['Cod_Prod_COM'],
                         'cod_omie_flx': row['Cod_FLX'],

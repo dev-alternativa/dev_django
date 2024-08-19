@@ -83,7 +83,6 @@ class CustomerSupplier(Base):
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100, default=TIPO_FRETE[5])
     taxa_frete = models.CharField('Taxa de frete', max_length=10, null=True, blank=True)
     cliente_transportadora = models.ForeignKey('logistic.Carrier', verbose_name='Transportadora', on_delete=models.PROTECT, null=True, blank=True)
-    prazo = models.ForeignKey('logistic.LeadTime', verbose_name='Prazo', on_delete=models.PROTECT, null=True, blank=True)
     categoria = models.ManyToManyField(Category, related_name='clientes')
     inscricao_estadual = models.CharField('Inscrição Estadual',max_length=20, null=True, blank=True)
     limite_credito = models.CharField('Limite de Crédito', max_length=20, null=True, blank=True)
@@ -139,10 +138,11 @@ class CustomerSupplier(Base):
 class Price(Base):
     produto = models.ForeignKey('products.Product', verbose_name='Produto', on_delete=models.PROTECT, related_name='precos')
     cliente = models.ForeignKey(CustomerSupplier, verbose_name='Cliente', on_delete=models.PROTECT, related_name='precos')
-    preco = models.DecimalField('Preço', max_digits=10, decimal_places=2)
+    valor = models.DecimalField('Valor', max_digits=10, decimal_places=2)
     is_dolar = models.BooleanField('Dolar', default=False)
+    prazo = models.ForeignKey('logistic.LeadTime', verbose_name='Prazo', on_delete=models.PROTECT, null=True, blank=True, related_name='precos')
     cnpj_faturamento = models.CharField('CNPJ do Faturamento', choices=CNPJ_FATURAMENTO, max_length=30, null=True, blank=True)
-    criterio = models.CharField('Critério de Cálculo', max_length=100, null=True, blank=True)
+    condicao = models.CharField('Condição de Cálculo', max_length=100, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
 
     class Meta:
@@ -150,7 +150,7 @@ class Price(Base):
         verbose_name_plural = 'Preços'
 
     def __str__(self):
-        return str(self.preco)
+        return str(self.valor)
 
 
 class Seller(Base):
