@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Visualizar Vendedor{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <h1 class="text-body-secondary text-center mb-3">Visualização de Dados</h1>
+    <div class="card">
+        <div class="card-header">
+            Dados do Vendedor
+        </div>
+        <div class="card-body text-center">
+            <h1>Detalhes do Vendedor</h1>
+
+            <div class="accordion" id="accordionClientData">
+                <!-- Informações Básicas -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                Informações Básicas
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Nome:</strong></div>
+                                <div class="col-sm-7">{{ seller.nome }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>E-mail:</strong></div>
+                                <div class="col-sm-7">{{ seller.email|default_if_none:"N/A" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Ativo:</strong></div>
+                                <div class="col-sm-7">{{ seller.ativo|yesno:"Sim,Não" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Representante:</strong></div>
+                                <div class="col-sm-7">{{ seller.representante|yesno:"Sim,Não" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OMIE -->
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingTwo">
+                        <h2 class="mb-0">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                OMIE
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-parent="#accordionClientData">
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Código OMIE COM:</strong></div>
+                                <div class="col-sm-7">{{ seller.cod_omie_com }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Código OMIE IND:</strong></div>
+                                <div class="col-sm-7">{{ seller.cod_omie_ind }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Código OMIE PRE:</strong></div>
+                                <div class="col-sm-7">{{ seller.cod_omie_pre }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Código OMIE MRX:</strong></div>
+                                <div class="col-sm-7">{{ seller.cod_omie_mrx }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Código OMIE FLX:</strong></div>
+                                <div class="col-sm-7">{{ seller.cod_omie_flx|default_if_none:"" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-5"><strong>Código OMIE SRV:</strong></div>
+                                <div class="col-sm-7">{{ seller.cod_omie_srv|default_if_none:"" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row mb-2 text-center">
+            <div class='col-md-6'>
+                <a href="{% url 'seller' %}" class="btn btn-danger btn-lg">Cancelar</a>
+            </div>
+            <div class='col-md-6'>
+                <a href="{% url 'update_seller' object.pk %}" class="btn btn-warning btn-lg btn-view">Editar</a>
+            </div>
+        </div>
+</div>
+
+{% endblock content %}

@@ -1,7 +1,7 @@
 from pyexpat.errors import messages
 from django.urls import reverse_lazy
 from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView
-from common.forms import CategoryForm, CustomerSupplierForm
+from common.forms import CategoryForm, CustomerSupplierForm, SellerForm
 from common.models import Category, CustomerSupplier, Seller
 from django.db.models import Q
 from core.views import FormataDadosMixin,  FormMessageMixin, DeleteSuccessMessageMixin
@@ -141,7 +141,7 @@ class CustomerSupplierDetailView(DetailView, FormataDadosMixin):
 class SellerListView(ListView):
     model = Seller
     template_name = 'vendedores/vendedor.html'
-    context_object_name = 'items_vendedores'
+    context_object_name = 'sellers'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -155,23 +155,29 @@ class SellerListView(ListView):
         return queryset
 
 
-# class SellerNewView(FormMessageMixin, CreateView):
-#     model = Seller
-#     form_class = SellerForm
-#     template_name = "categoria/adicionar_categoria.html"
-#     success_url = reverse_lazy('category')
-#     success_message = 'Categoria cadastrada com sucesso!'
+class SellerNewView(FormMessageMixin, CreateView):
+    model = Seller
+    form_class = SellerForm
+    template_name = "vendedores/adicionar_vendedor.html"
+    success_url = reverse_lazy('seller')
+    success_message = 'Vendedor cadastrado com sucesso!'
 
 
-# class SellerUpdateView(FormMessageMixin, UpdateView):
-#     model = Seller
-#     form_class = SellerForm
-#     template_name = 'categoria/update_categoria.html'
-#     success_url = reverse_lazy('category')
-#     success_message = 'Categoria atualizada com sucesso!'
+class SellerUpdateView(FormMessageMixin, UpdateView):
+    model = Seller
+    form_class = SellerForm
+    template_name = 'vendedores/update_vendedor.html'
+    success_url = reverse_lazy('seller')
+    success_message = 'Vendedor atualizado com sucesso!'
 
 
 class SellerDeleteView(DeleteSuccessMessageMixin, DeleteView):
     model = Seller
-    template_name = 'categoria/delete_categoria.html'
+    template_name = 'vendedores/delete_vendedor.html'
     success_url = reverse_lazy('seller')
+
+
+class SellerDetailView(DetailView, FormataDadosMixin):
+    model = Seller
+    template_name =  'vendedores/visualizar_vendedor.html'
+    context_object_name = 'seller'

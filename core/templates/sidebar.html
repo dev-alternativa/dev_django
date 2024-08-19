@@ -122,14 +122,14 @@
                 </ul>
             </li>
 
-            <!--*************** Vendas ***************-->
+            <!--*************** Vendedores ***************-->
             <li class="sidebar-item">
-                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#vendas"
-                    aria-expanded="false" aria-controls="vendas" id="vendasLink" data-menu="vendas">
+                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#vendedores"
+                    aria-expanded="false" aria-controls="vendedores" id="vendedoresLink" data-menu="vendedores">
                     <i class="bi bi-person-vcard"></i>
                     Vendedores
                 </a>
-                <ul id="vendas" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                <ul id="vendedores" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
                         <a href="{% url 'seller' %}" class="sidebar-link sub-item">
                             <i class="bi bi-list-task"></i>
@@ -138,8 +138,8 @@
                     </li>
                     <li class="sidebar-item">
                         <a href="#" class="sidebar-link sub-item">
-                            <i class="bi bi-cart3"></i>
-                            Nova
+                            <i class="bi bi-person-plus"></i>
+                            Novo
                         </a>
                     </li>
                 </ul>
@@ -162,12 +162,12 @@
                 </ul>
             </li>
             <li class="sidebar-item">
-                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#auth"
-                    aria-expanded="false" aria-controls="auth" id="usuarioLink" data-menu="auth">
+                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#user"
+                    aria-expanded="false" aria-controls="user" id="usuarioLink" data-menu="user">
                     <i class="bi bi-person"></i>
                     Usuários
                 </a>
-                <ul id="auth" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                <ul id="user" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                     <li class="sidebar-item">
                         <a href="{% url 'users' %}" class="sidebar-link sub-item">
                             <i class="bi bi-person-lines-fill"></i>

@@ -16,5 +16,8 @@ urlpatterns = [
     path("cliente_fornecedor/<int:pk>/detail/", views.CustomerSupplierDetailView.as_view(), name="detail_customer_supplier"),
 
     path("vendedor/", views.SellerListView.as_view(), name="seller"),
+    path("vendedor/adicionar/", views.SellerNewView.as_view(), name="add_seller"),
+    path("vendedor/<int:pk>/update/", views.SellerUpdateView.as_view(), name="update_seller"),
     path("vendedor/<int:pk>/delete/", views.SellerDeleteView.as_view(), name="delete_seller"),
+    path("vendedor/<int:pk>/detail/", views.SellerDetailView.as_view(), name="detail_seller"),
 ]

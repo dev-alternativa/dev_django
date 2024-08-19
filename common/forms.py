@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, HTML
-from common.models import Category, CustomerSupplier
+from common.models import Category, CustomerSupplier, Seller
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, FieldWithButtons, StrictButton
 from crispy_bootstrap5.bootstrap5 import Switch
@@ -96,19 +96,19 @@ class CustomerSupplierForm(ModelForm):
                     'Dados Básicos',
                     Row(
                         Column(
-                        Field('nome_fantasia', css_class='form-control col-md-6 mb-0'),
-                            Column(
-                            FieldWithButtons(
-                                Field('cnpj', css_class='form-control col-md-6 mb-0'),
-                                StrictButton(
-                                    "Consultar CNPJ",
-                                    css_class="btn btn-primary",
-                                    css_id="btn_consulta_cnpj",
-                                    onclick="consultarCNPJ()"),
-                            ),
-                            ),
-                        Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
-                        Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
+                            Field('nome_fantasia', css_class='form-control col-md-6 mb-0'),
+                                Column(
+                                    FieldWithButtons(
+                                        Field('cnpj', css_class='form-control col-md-6 mb-0'),
+                                        StrictButton(
+                                            "Consultar CNPJ",
+                                            css_class="btn btn-primary",
+                                            css_id="btn_consulta_cnpj",
+                                            onclick="consultarCNPJ()"),
+                                    ),
+                                ),
+                            Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
+                            Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
                         ),
                         Column(
                             Field('razao_social', css_class='form_controle col-md-6 mb-0'),
@@ -219,3 +219,67 @@ class CustomerSupplierForm(ModelForm):
         # self.fields['taxa_frete'].widget.attrs.update({ 'maxlength': 6 })
         self.fields['limite_credito'].widget.attrs.update({ 'maxlength': 8 })
         self.fields['inscricao_estadual'].widget.attrs.update({ 'inscricao_estadual': 10 })
+
+
+class SellerForm(ModelForm):
+    class Meta:
+        model = Seller
+        fields = [
+            'nome',
+            'cod_omie_com',
+            'cod_omie_ind',
+            'cod_omie_pre',
+            'cod_omie_mrx',
+            'cod_omie_flx',
+            'cod_omie_srv',
+            'representante',
+            'email',
+            'ativo',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(SellerForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.fields['cod_omie_com'].required = False
+        self.fields['cod_omie_ind'].required = False
+        self.fields['cod_omie_pre'].required = False
+        self.fields['cod_omie_mrx'].required = False
+        self.fields['cod_omie_flx'].required = False
+        self.fields['cod_omie_srv'].required = False
+        self.fields['email'].required = False
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('nome', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
+
+                ),
+                Column(
+                    Field('email', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
+
+                ),
+                Column(
+                    Switch('ativo', css_class='form-control col-md-6 mb-0 '),
+                    Switch('representante', css_class='form-control col-md-6 mb-0'),
+                ),
+                # css_class='form-group col-12 text-center'
+            ),
+            Row(
+                Column(
+                    HTML("<a href='{% url 'seller' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
+                ),
+                Column(
+                    HTML(
+                        '<button type="submit" class="btn btn-primary btn-lg">'
+                        '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+                    ),
+                ),
+                css_class='form-group col-12 text-center'
+            )
+        )

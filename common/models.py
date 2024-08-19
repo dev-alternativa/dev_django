@@ -155,8 +155,14 @@ class Price(Base):
 
 class Seller(Base):
     nome = models.CharField('Nome', max_length=100)
-    cod_omie = models.PositiveIntegerField('Código OMIE', unique=True)
-    email = models.EmailField('E-mail', max_length=300)
+    cod_omie_com = models.PositiveBigIntegerField('Código OMIE COM', unique=True)
+    cod_omie_ind = models.PositiveBigIntegerField('Código OMIE IND', unique=True)
+    cod_omie_pre = models.PositiveBigIntegerField('Código OMIE PRE', unique=True)
+    cod_omie_mrx = models.PositiveBigIntegerField('Código OMIE MRX', unique=True)
+    cod_omie_flx = models.PositiveBigIntegerField('Código OMIE FLX', unique=True)
+    cod_omie_srv = models.PositiveBigIntegerField('Código OMIE SRV', unique=True)
+    representante = models.BooleanField('Representante', default=False)
+    email = models.EmailField('E-mail', max_length=300, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Vendedor'
@@ -164,4 +170,4 @@ class Seller(Base):
         ordering = ['nome']
 
     def __str__(self):
-        return '{} - {}'.format(self.nome, self.cod_omie)
+        return self.nome
