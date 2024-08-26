@@ -13,7 +13,7 @@
 .center_content {
     display: flex;
     justify-content: center;
-    padding-top: 1.2rem; 
+    padding-top: 1.2rem;
     padding-top: .3rem;
     padding-left: .7rem;
 }
@@ -79,7 +79,7 @@ th {
 /* Espaçamento superior de botões */
 .top-buttons {
     padding-top: 1rem;
-    
+
 }
 
 /* Espaçamento do cartão de conteúdo */

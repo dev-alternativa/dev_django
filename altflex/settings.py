@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'import_export',
     'django_select2',
+    'crispy_formset_modal',
     # my apps
     'accounts',
     'api',

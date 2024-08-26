@@ -3,13 +3,13 @@ from core.models import Base
 
 
 TIPO_SAIDA = (
-    ('VENDA', 'Venda'),
-    ('AJUSTE', 'Ajuste'),
+    ('V', 'Venda'),
+    ('A', 'Ajuste'),
 )
 
 TIPO_ENTRADA = (
-    ('COMPRA', 'Compra'),
-    ('AJUSTE', 'Ajuste'),
+    ('C', 'Compra'),
+    ('A', 'Ajuste'),
 )
 
 

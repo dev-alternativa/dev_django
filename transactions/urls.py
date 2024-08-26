@@ -3,7 +3,6 @@ from transactions import views
 
 
 urlpatterns = [
-    # Estoque
-
-    # path("estoque/adicionar/", EstoqueCreateView.as_view(), name="adicionar_estoque"),
+    path('inflows/', views.InflowsListView.as_view(), name='inflow_list'),
+    path('inflows/adicionar/', views.InflowsNewView.as_view(), name='inflow_new'),
 ]
