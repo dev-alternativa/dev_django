@@ -14,10 +14,12 @@ TIPO_ENTRADA = (
 
 
 class Inflows(Base):
-    fornecedor = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='inflows')
-    valor_total = models.DecimalField(max_digits=10, decimal_places=2)
-    tipo_entrada = models.CharField(choices=TIPO_ENTRADA, max_length=50)
-    dt_recebimento = models.DateTimeField()
+    fornecedor = models.ForeignKey('common.CustomerSupplier', verbose_name='Fornecedor', on_delete=models.PROTECT, related_name='inflows')
+    valor_total = models.DecimalField('Valor Total', max_digits=10, decimal_places=2)
+    tipo_entrada = models.CharField('Tipo de Entrada', choices=TIPO_ENTRADA, max_length=50)
+    nf_entrada = models.PositiveIntegerField('Nota Fiscal')
+    obs = models.TextField(max_length=500, blank=True, null=True)
+    dt_recebimento = models.DateTimeField('Data de Recebimento')
 
     class Meta:
         ordering = ('pk',)
@@ -28,19 +30,18 @@ class Inflows(Base):
 
 
 class InflowsItems(Base):
-    entrada_id = models.ForeignKey(Inflows, on_delete=models.PROTECT, related_name='inflows_items')
+    entrada = models.ForeignKey(Inflows, verbose_name='Entrada Items', on_delete=models.PROTECT, related_name='inflows_items')
     produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='inflows_items')
-    quantidade = models.PositiveIntegerField()
-    nf_entrada = models.PositiveIntegerField()
-    valor_unitario_custo = models.DecimalField(max_digits=10, decimal_places=2)
-    lote = models.CharField(max_length=50, blank=True, null=True)
+    quantidade = models.PositiveIntegerField('Quantidade')
+    valor_unitario = models.DecimalField('Valor Unitário', max_digits=10, decimal_places=2)
+    lote = models.CharField('Lote', max_length=50, blank=True, null=True)
 
     class Meta:
         ordering = ('pk',)
         verbose_name = 'Items de Entrada de Estoque'
 
     def __str__(self):
-        return    '{} - {}'.format(self.pk, self.entrada)
+        return    '{} - {}'.format(self.pk, self.entrada.pk, self.entrada)
 
 
 class Outflows(Base):
@@ -65,7 +66,7 @@ class Outflows(Base):
 
 
 class OutflowsItems(Base):
-    saida_id = models.ForeignKey(Outflows, on_delete=models.PROTECT, related_name='saida_items')
+    saida = models.ForeignKey(Outflows, on_delete=models.PROTECT, related_name='saida_items')
     produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='saida_items')
     quantidade = models.PositiveIntegerField()
     valor_unitario = models.ForeignKey('common.Price', on_delete=models.PROTECT, related_name='saida_items')
@@ -81,7 +82,7 @@ class OutflowsItems(Base):
         verbose_name = 'Items de Saída de Estoque'
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.pk, self.quantidade, self.produto)
+        return '{} - {} - {}'.format(self.pk, self.saida.pk, self.produto)
 
 
 class TaxScenario(Base):

@@ -1,8 +1,8 @@
 from django.urls import path
-from transactions import views
+from .views import InflowsListView, InflowsNewView
 
 
 urlpatterns = [
-    path('inflows/', views.InflowsListView.as_view(), name='inflow_list'),
-    path('inflows/adicionar/', views.InflowsNewView.as_view(), name='inflow_new'),
+    path('inflows/', InflowsListView.as_view(), name='inflow_list'),
+    path('inflows/new/', InflowsNewView.as_view(), name='inflow_new'),
 ]

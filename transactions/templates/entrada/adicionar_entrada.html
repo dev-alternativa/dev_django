@@ -1,55 +1,134 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load django_bootstrap5 %}
 
 {% block title %}Registrar Entrada{% endblock %}
 {% block content %}
-  <div id="page-wrapper">
-      <div class="container">
-          <div class="row">
-            <div class="col-lg-12">
-              <h1 class="text-body-secondary text-center mb-3">Entradas</h1>
-              <div class="card">
-                  <div class="card-header">
-                      Registrar Nova Entrada
-                  </div>
-                  <div class="row mb-3 card-conteudo">
-                    <div class='col-md-6'>
-                      <a href="{% url 'inventory' %}" class='btn btn-danger btn-lg'>
-                        <i class='bi bi-x-lg space_from_margin'></i>
-                        Voltar para lista de entradas
-                      </a>
-                    </div>
-                  </div>
-                  <div class='row card-conteudo' >
-                    <form method="POST" autocomplete="off">
-                      {% csrf_token %}
-                      {% crispy form %}
-                      {{ formset.management_form }}
+  <div class="row card-conteudo">
+    <div class='col-md-6'>
+      <a href="{% url 'inventory' %}" class='btn btn-danger btn-lg'>
+        {% comment %} <i class='bi bi-x-lg space_from_margin'></i> {% endcomment %}
+        <i class="bi bi-backspace space_from_margin"></i>
+        Voltar
+      </a>
+    </div>
+  </div>
 
-                        <!-- Layout do Formulário Principal -->
-                        <div class="mt-4">
-                          <h4>Itens da Entrada</h4>
-                          {% for form in formset %}
-                              {% crispy form %}
+    <div class="row">
+      <div class="cols">
+        <h1 class="text-body-secondary text-center mb-3">Registrar Entradas</h1>
 
-                              <!-- Exibir o checkbox de remoção, se aplicável -->
-                              {% if form.DELETE %}
-                                  <div class="form-group">
-                                      {{ form.DELETE }} Remover
-                                  </div>
-                              {% endif %}
-                          {% endfor %}
-                        </div>
+        <form method="POST" autocomplete="off">
+          {% csrf_token %}
+          {% crispy form %}
+          {{ formset.management_form }}
+      </div>
+    </div>
 
-                        <!-- Layout do Formulário de Itens -->
 
-                    </form>
+    <div class="row">
+      <div class="col-sm-12">
+        <legend style="border-bottom: 1px solid #e5e5e5;">Produtos</legend>
+        <div id="entradas" class="row g-3">
+          {% for item_estoque_form in formset %}
+            <div id="item-{{ forloop.counter0 }}" class="col-sm-3">
+              {{ item_estoque_form|crispy }}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
-                  </div>
-              </div>
+        <a class="btn btn-secondary btn-lg" id="add-item">
+          <i class="bi bi-plus-lg"></i>
+          Adicionar Item
+        </a>
+
+        <div class="row float-end">
+          <div class="col-sm-12" style="margin-top: 10px;">
+            <div class="form-inline buttons">
+              <button class="btn btn-primary" value="Save">
+                <i class="bi bi-floppy-o"></i>
+                Salvar
+              </button>
             </div>
           </div>
-      </div>
+        </div>
+
+      </form>
+
+    </div>
   </div>
+
+
+  <script type="text/html" id="item-entrada">
+    <div id="item-__prefix__" class="row g-3">
+      {{ formset.empty_form|crispy }}
+    </div>
+  </script>
 {% endblock content %}
+
+{% block extra_scripts %}
+
+  <script>
+
+/********** 1- Verifica quantos formulários foram renderizados **********/
+/********** 2- Adiciona um novo formulário ******************************/
+/********** 3- Atualiza o total de formulários de items *****************/
+
+  $(document).ready( () => {
+    $('#add-item').click( (ev) => {
+      ev.preventDefault();
+      let count = $('#entradas').children().length;
+      let templateMarkup = $('#item-entrada').html();
+      let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
+      $("div#entradas").append(compiledTemplate);
+
+      // update form count
+      $('#id_inflows_items-TOTAL_FORMS').attr('value', count + 1);
+
+      // scroll animate to view our new form
+      $('html, body').animate({
+        scrollTop: $('#add-item').position().top-200
+      }, 800);
+
+      // Reaply Select2 to the new field added
+      $('#id_inflows_items-' + count + '-produto').select2();
+
+    });
+  });
+
+  $(document).on('click', '.remove-form-btn', function(e) {
+    e.preventDefault();
+
+    // Remove o formulário
+    $(this).closest('.form-group').remove();
+
+    // Atualiza a contagem total dos formulários
+    let count = $('#entradas').children().length;
+    $('#id_inflows_items-TOTAL_FORMS').val(count);
+
+    // Reorganiza os índices dos formulários restantes
+    $('#entradas .form-group').each(function(index) {
+        $(this).find('input, select, textarea').each(function() {
+            let name = $(this).attr('name');
+            let id = $(this).attr('id');
+            if (name) {
+                let newName = name.replace(/\d+/, index);
+                $(this).attr('name', newName);
+            }
+            if (id) {
+                let newId = id.replace(/\d+/, index);
+                $(this).attr('id', newId);
+            }
+        });
+    });
+  });
+
+
+  </script>
+{% endblock %}
+
+
+

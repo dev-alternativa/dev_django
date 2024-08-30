@@ -1,4 +1,5 @@
 from django.views.generic import ListView, CreateView
+from django.contrib import messages
 from transactions.models import Inflows
 from transactions.forms import InflowsForm, InflowsItemsFormSet
 from core.views import FormMessageMixin
@@ -33,9 +34,23 @@ class InflowsNewView(FormMessageMixin, CreateView):
         context = self.get_context_data()
         formset = context['formset']
         if formset.is_valid():
+            # Salva form principal
             self.object = form.save()
+
+            # Associa formset à instância do form principal
             formset.instance = self.object
+
+            # Salva os itens do formset
             formset.save()
+
             return redirect(self.success_url)
         else:
+            messages.error(self.request, 'Erro ao salvar os dados!')
             return super().form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Erro ao registrar a entrada!')
+        return super().form_invalid(form)
+
+
+

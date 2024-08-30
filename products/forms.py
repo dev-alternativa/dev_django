@@ -143,7 +143,7 @@ class SearchInventoryForm(forms.Form):
                     Column('est_id', css_class='col-lg-2'),
                     Column('est_largura', css_class='col-lg-2'),
                     Column('est_comprimento', css_class='col-lg-2'),
-                    Column('est_lote', css_class='col-lg-2'),
+                    # Column('est_lote', css_class='col-lg-2'),
                     Column('est_datatime', css_class='col-lg-2'),
                     css_class='row'
                 ),

@@ -1,7 +1,7 @@
 from django import forms
-from django.forms import inlineformset_factory
+from django.forms import Textarea, inlineformset_factory
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, HTML, Button
+from crispy_forms.layout import Layout, Field, Row, Column, HTML
 from transactions.models import Inflows, InflowsItems
 from products.models import Product
 from common.models import CustomerSupplier
@@ -12,7 +12,7 @@ class InflowsForm(forms.ModelForm):
 
     class Meta:
         model = Inflows
-        fields = ['fornecedor', 'valor_total', 'tipo_entrada', 'dt_recebimento']
+        exclude = [ 'dt_criacao', 'dt_modificado']
         widgets = {
             'fornecedor': Select2Widget(
                 attrs={
@@ -21,12 +21,7 @@ class InflowsForm(forms.ModelForm):
                     'data-width': '100%',
                     }
                 ),
-        }
-        labels = {
-            'fornecedor': 'Fornecedor',
-            'valor_total': 'Valor Total',
-            'tipo_entrada': 'Tipo Entrada',
-            'dt_recebimento': 'Data Recebimento',
+            'obs': Textarea(attrs={'rows': 3}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -40,83 +35,66 @@ class InflowsForm(forms.ModelForm):
                 Column(
                     Field('fornecedor', css_class='form-control col-md-2 mb-0'),
                     Field('valor_total', css_class='form-control col-md-2 mb-0'),
+                    Field('nf_entrada', css_class='form-control col-md-2 mb-0'),
                 ),
                 Column(
                     Field('tipo_entrada', css_class='form-control col-md-2 mb-0'),
                     Field('dt_recebimento', css_class='form-control col-md-2 mb-0'),
-
+                    Field('obs', css_class='form-control col-md-2 mb-0'),
                 ),
 
             ),
-            # Row(
-            #     Column(
-            #         HTML("<a href='{% url 'inventory' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
-            #     ),
-            #     Column(
-            #         HTML(
-            #             '<button type="submit" class="btn btn-primary btn-lg">'
-            #             '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-            #         ),
-            #     ),
-            #     css_class='form-group col-12 text-center'
-            # )
         )
 
 class InflowsItemsForm(forms.ModelForm):
 
     class Meta:
         model = InflowsItems
-        fields = ['produto', 'quantidade', 'nf_entrada', 'valor_unitario_custo', 'lote']
+        exclude = [ 'dt_criacao', 'dt_modificado', 'ativo']
         widgets = {
             'produto': Select2Widget(
                 attrs={
                     'data-placeholder': 'Selecione um produto',
                     'data-placeholder': 'Começe digitando algo...',
                     'data-minimum-input-length': 3,
-                    'data-width': '100%',
                 }
             ),
         }
 
-    def __init__(self, *args, **kwargs):
-        super(InflowsItemsForm, self).__init__(*args, **kwargs)
-        nome_produto = kwargs.pop('nome_produto', None)  # Pega o valor de 'nome_produto' se estiver nos kwargs
-        if nome_produto:
-            self.fields['produto'].queryset = Product.objects.filter(nome__icontains=nome_produto)
-        else:
-            self.fields['produto'].queryset = Product.objects.all()
-        # self.fields['produto'].queryset = Product.objects.filter(nome_produto=True)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    Field('produto', css_class='form-control col-md-2 mb-0'),
-                ),
-                Column(
-                    Field('quantidade', css_class='form-control col-md-2 mb-0'),
-                ),
-                Column(
-                    Field('valor_unitario_custo', css_class='form-control col-md-2 mb-0'),
-                ),
-                Column(
-                    Field('nf_entrada', css_class='form-control col-md-2 mb-0'),
-                ),
-                Column(
-                    Field('lote', css_class='form-control col-md-2 mb-0'),
-                ),
-                Column(
-                    HTML("<a href='#' class='btn btn-danger btn-lg btn-plus'><i class='bi bi-trash '></i></a>"),
-                ),
-                css_class='form-group col-12 '
-            ),
-            # Row(
-            #     Column(
-            #         Button('Adicionar Item', css_class='btn btn-success btn-lg btn-plus'),
-            #     ),
-            #     # css_class='form-group col-12 text-center'
-            # ),
-        )
+    # def __init__(self, *args, **kwargs):
+    #     super(InflowsItemsForm, self).__init__(*args, **kwargs)
+    #     nome_produto = kwargs.pop('nome_produto', None)  # Pega o valor de 'nome_produto' se estiver nos kwargs
+    #     if nome_produto:
+    #         self.fields['produto'].queryset = Product.objects.filter(nome__icontains=nome_produto)
+    #     else:
+    #         self.fields['produto'].queryset = Product.objects.all()
+    #     self.helper = FormHelper()
+    #     self.helper.form_method = 'post'
+        # self.helper.layout = Layout(
+        #     Row(
+        #         Column(
+        #             Field('produto', css_class='form-control col-6 '),
+        #             css_class="form-group col-md-5"
+        #         ),
+        #         Column(
+        #             Field('quantidade', css_class='form-control col-2 '),
+        #             css_class="form-group col-md-2"
+        #         ),
+        #         Column(
+        #             Field('valor_unitario', css_class='form-control col-2 '),
+        #             css_class="form-group col-md-2"
+        #         ),
+        #         Column(
+        #             Field('lote', css_class='form-control col-2 '),
+        #             css_class="form-group col-md-2"
+        #         ),
+        #         Column(
+        #             HTML("<a href='#' class='btn btn-danger btn-lg btn-plus remove-form-btn'><i class='bi bi-trash '></i></a>"),
+        #             css_class="form-group col-md-1 justify-content-center align-items-center"
+        #         ),
+        #         css_class='form-row'
+        #     ),
+        # )
 
 
 InflowsItemsFormSet = inlineformset_factory(
@@ -124,7 +102,7 @@ InflowsItemsFormSet = inlineformset_factory(
     InflowsItems,
     form=InflowsItemsForm,
     extra=1,
-    can_delete=True
+    can_delete=False
 )
 
 
