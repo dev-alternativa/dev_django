@@ -1,10 +1,8 @@
 from django import forms
 from django.forms import Textarea, inlineformset_factory
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, HTML
+from crispy_forms.layout import Layout, Field, Row, Column
 from transactions.models import Inflows, InflowsItems
-from products.models import Product
-from common.models import CustomerSupplier
 from django_select2.forms import Select2Widget
 
 
@@ -16,17 +14,24 @@ class InflowsForm(forms.ModelForm):
         widgets = {
             'fornecedor': Select2Widget(
                 attrs={
-                    'data-placeholder': 'Começe digitando algo...',
-                    'data-minimum-input-length': 3,
-                    'data-width': '100%',
+                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    # 'data-minimum-input-length': 3,
+                    # 'data-width': '100%',
                     }
                 ),
             'obs': Textarea(attrs={'rows': 3}),
+            'dt_recebimento': forms.DateTimeInput(
+                attrs={
+                    'type': 'date',
+                    'class': 'form-control',
+                    'placeholder': 'Selecione uma data'
+                    }
+                ),
         }
 
     def __init__(self, *args, **kwargs):
         super(InflowsForm, self).__init__(*args, **kwargs)
-        self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)
+        # self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -54,11 +59,21 @@ class InflowsItemsForm(forms.ModelForm):
         widgets = {
             'produto': Select2Widget(
                 attrs={
-                    'data-placeholder': 'Selecione um produto',
-                    'data-placeholder': 'Começe digitando algo...',
-                    'data-minimum-input-length': 3,
+                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    # 'data-placeholder': 'Começe digitando algo...',
+                    # 'data-minimum-input-length': 3,
                 }
             ),
+            'quantidade': forms.NumberInput(attrs={'class': 'form-control'}),
+            'valor_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
+            'lote': forms.TextInput(attrs={'class': 'form-control'}),
+
+        }
+        label = {
+            'produto': 'Produto',
+            'quantidade': 'Quantidade',
+            'valor_unitario': 'Valor Unitário',
+            'lote': 'Lote',
         }
 
     # def __init__(self, *args, **kwargs):
@@ -70,31 +85,31 @@ class InflowsItemsForm(forms.ModelForm):
     #         self.fields['produto'].queryset = Product.objects.all()
     #     self.helper = FormHelper()
     #     self.helper.form_method = 'post'
-        # self.helper.layout = Layout(
-        #     Row(
-        #         Column(
-        #             Field('produto', css_class='form-control col-6 '),
-        #             css_class="form-group col-md-5"
-        #         ),
-        #         Column(
-        #             Field('quantidade', css_class='form-control col-2 '),
-        #             css_class="form-group col-md-2"
-        #         ),
-        #         Column(
-        #             Field('valor_unitario', css_class='form-control col-2 '),
-        #             css_class="form-group col-md-2"
-        #         ),
-        #         Column(
-        #             Field('lote', css_class='form-control col-2 '),
-        #             css_class="form-group col-md-2"
-        #         ),
-        #         Column(
-        #             HTML("<a href='#' class='btn btn-danger btn-lg btn-plus remove-form-btn'><i class='bi bi-trash '></i></a>"),
-        #             css_class="form-group col-md-1 justify-content-center align-items-center"
-        #         ),
-        #         css_class='form-row'
-        #     ),
-        # )
+    #     self.helper.layout = Layout(
+    #         Row(
+    #             Column(
+    #                 Field('produto', css_class='form-control col-6 '),
+    #                 css_class="form-group col-md-5"
+    #             ),
+    #             Column(
+    #                 Field('quantidade', css_class='form-control col-2 '),
+    #                 css_class="form-group col-md-2"
+    #             ),
+    #             Column(
+    #                 Field('valor_unitario', css_class='form-control col-2 '),
+    #                 css_class="form-group col-md-2"
+    #             ),
+    #             Column(
+    #                 Field('lote', css_class='form-control col-2 '),
+    #                 css_class="form-group col-md-2"
+    #             ),
+    #             Column(
+    #                 HTML("<a href='#' class='btn btn-danger btn-lg btn-plus remove-form-btn'><i class='bi bi-trash '></i></a>"),
+    #                 css_class="form-group col-md-1 justify-content-center align-items-center"
+    #             ),
+    #             css_class='form-row'
+    #         ),
+    #     )
 
 
 InflowsItemsFormSet = inlineformset_factory(

@@ -1,11 +1,92 @@
-<table class="table table-hover table-bordered border-secondary-subtle">
-    <thead>
-        <tr>
-            <th>Produto</th>
-            <th>Fornecedor</th>
-            <th>Valor</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody class="table-group-divider">
-</tbody></table>
+{% extends "base.html" %}
+
+{% block title %} Entradas {% endblock %}
+
+{% block content %}
+    <div id="page-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class = "text-body-secondary text-center mb-3">Entradas</h1>
+
+                    {% if messages %}
+                        <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class='col-md-6'>
+                            <form method='get' action='{% url "inflow_list" %}'>
+                                {% csrf_token %}
+                                <div class='input-group'>
+                                    <input type='text' name='product' class='form-control' placeholder='Produto' value='{{ request.GET.product }}'>
+                                    <button type='submit' class='btn btn-primary'>
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class='col-md-6'>
+                            <a href="{% url 'inflow_new' %}" class='btn btn-success float-end'>
+                                <i class="bi bi-plus-lg"></i>
+                                Adicionar Entrada
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="space_from_margin">
+                            <table class="table table-hover table-bordered border-secondary-subtle">
+                                {% if inflows %}
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fornecedor</th>
+                                            <th>Valor</th>
+                                            <th>Tipo de Entrada</th>
+                                            <th>Dt. de Recebimento</th>
+                                            <th>NF</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table table-hover table-bordered border-secondary-subtle">
+                                        {% for inflow in inflows %}
+                                            <tr>
+                                                <td>{{ inflow.id }}</td>
+                                                <td>{{ inflow.fornecedor }}</td>
+                                                <td>R$ {{ inflow.valor_total }}</td>
+                                                <td>{{ inflow.get_tipo_entrada_display  }}</td>
+                                                <td>{{ inflow.dt_recebimento }}</td>
+                                                <td>{{ inflow.nf_entrada }}</td>
+                                                <td class="action_size_column">
+                                                    <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                                                        <!-- Visualizar detalhes -->
+                                                        <a class="btn btn-secondary btn-view" href="{% url 'inflow_detail' inflow.pk %}" role="button">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    {% else %}
+                                        <p class="no-results">Nenhum item encontrado...</p>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

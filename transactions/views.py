@@ -1,18 +1,23 @@
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, DetailView
 from django.contrib import messages
-from transactions.models import Inflows
+from transactions.models import Inflows, InflowsItems
 from transactions.forms import InflowsForm, InflowsItemsFormSet
 from core.views import FormMessageMixin
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from products.models import Inventory
 
 # ********************************* INFLOWS *********************************
 class InflowsListView(ListView):
     model = Inflows
-    template_name = 'entrada/entrada.html'
+    template_name = 'entrada/lista_entrada.html'
     context_object_name = 'inflows'
     paginate_by = 30
     ordering = '-dt_recebimento'
+
+class InventoryListView(ListView):
+    model = Inventory
+    template_name = 'inventario/inventario.html'
 
 
 class InflowsNewView(FormMessageMixin, CreateView):
@@ -52,5 +57,13 @@ class InflowsNewView(FormMessageMixin, CreateView):
         messages.error(self.request, 'Erro ao registrar a entrada!')
         return super().form_invalid(form)
 
+class InflowsDetailView(DetailView):
+    model = Inflows
+    template_name = 'entrada/detalhes_entrada.html'
+    context_object_name = 'inflow'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["inflow_items"] = InflowsItems.objects.filter(entrada=self.object)
+        return context
 
