@@ -13,7 +13,7 @@ class InflowsListView(ListView):
     template_name = 'entrada/lista_entrada.html'
     context_object_name = 'inflows'
     paginate_by = 30
-    ordering = '-dt_recebimento'
+    ordering = '-id'
 
 class InventoryListView(ListView):
     model = Inventory
@@ -38,8 +38,19 @@ class InflowsNewView(FormMessageMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         formset = context['formset']
-        if formset.is_valid():
-            # Salva form principal
+
+        # Verifica se ao menos um formulário do formset está preenchido
+        valid_form_found = any(
+            form.is_valid() and
+            not form.cleaned_data.get('DELETE', False)
+            and all(form.cleaned_data.values())
+            for form in formset
+        )
+        print(valid_form_found)
+
+        if valid_form_found and formset.is_valid():
+
+            # Salva formulário principal
             self.object = form.save()
 
             # Associa formset à instância do form principal
@@ -56,6 +67,7 @@ class InflowsNewView(FormMessageMixin, CreateView):
     def form_invalid(self, form):
         messages.error(self.request, 'Erro ao registrar a entrada!')
         return super().form_invalid(form)
+
 
 class InflowsDetailView(DetailView):
     model = Inflows

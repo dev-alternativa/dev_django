@@ -11,12 +11,12 @@
 
                     {% if messages %}
                         <div class="messages">
-                        {% for message in messages %}
-                            <div class="alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
                         </div>
                     {% endif %}
 
@@ -33,7 +33,14 @@
                             </form>
                         </div>
 
-                        <div class='col-md-6'>
+                        <div class='col-md-3'>
+                            <a href="{% url 'inventory' %}" class='btn btn-danger float-end'>
+                                <i class="bi bi-backspace"></i>
+                                Voltar para o Inventário
+                            </a>
+                        </div>
+
+                        <div class='col-md-3'>
                             <a href="{% url 'inflow_new' %}" class='btn btn-success float-end'>
                                 <i class="bi bi-plus-lg"></i>
                                 Adicionar Entrada
@@ -53,6 +60,7 @@
                                             <th>Tipo de Entrada</th>
                                             <th>Dt. de Recebimento</th>
                                             <th>NF</th>
+                                            <th>Data de Criação</th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -63,8 +71,9 @@
                                                 <td>{{ inflow.fornecedor }}</td>
                                                 <td>R$ {{ inflow.valor_total }}</td>
                                                 <td>{{ inflow.get_tipo_entrada_display  }}</td>
-                                                <td>{{ inflow.dt_recebimento }}</td>
+                                                <td>{{ inflow.dt_recebimento|date:'d/m/Y' }}</td>
                                                 <td>{{ inflow.nf_entrada }}</td>
+                                                <td>{{ inflow.dt_criacao|date:'d/m/Y' }}</td>
                                                 <td class="action_size_column">
                                                     <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                                                         <!-- Visualizar detalhes -->

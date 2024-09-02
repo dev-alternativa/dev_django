@@ -3,77 +3,47 @@
 {% block title %} Detalhes da Entrada {{ inflow.id }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h1 class="text-body-secondary text-center mb-3">Detalhes da Entrada {{ inflow.id }}</h1>
-  <div class="row" style="margin-bottom: 1rem;">
-    <div class='col-md-6'>
-      <a href="{% url 'inflow_list' %}" class='btn btn-danger btn-lg'>
-        <i class="bi bi-backspace space_from_margin"></i>
-        Voltar
-      </a>
+  <div class="container mt-5">
+    <h1 class="text-body-secondary text-center mb-3">Detalhes da Entrada {{ inflow.id }}</h1>
+    <div class="row" style="margin-bottom: 1rem;">
+      <div class='col-md-6'>
+        <a href="{% url 'inflow_list' %}" class='btn btn-danger btn-lg'>
+          <i class="bi bi-backspace space_from_margin"></i>
+          Voltar
+        </a>
+      </div>
     </div>
-  </div>
 
-
-  <div class="card">
-    <div class="card-header">
-      Itens da Entrada: <strong>{{ inflow.id }}</strong> Nota Fiscal: <strong>{{ inflow.nf_entrada }}</strong>
-  </div>
-    <div class="card-body text-center">
-      <table class="table table-hover  border-secondary-subtle">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Produto</th>
-            <th>Quantidade</th>
-            <th>Valor Unitário</th>
-            <th>Lote</th>
-            <th>Data de Criação</th>
-          </tr>
-        </thead>
-        <tbody class="table-group-divider">
-          {% for item in inflow_items %}
+    <div class="card">
+      <div class="card-header">
+        Itens da Entrada: <strong>{{ inflow.id }}</strong> Nota Fiscal: <strong>{{ inflow.nf_entrada }}</strong>
+    </div>
+      <div class="card-body text-center">
+        <table class="table table-hover  border-secondary-subtle">
+          <thead>
             <tr>
-              <td>{{ item.id }}</td>
-              <td>{{ item.produto.nome_produto }}</td>
-              <td>{{ item.quantidade }}</td>
-              <td>R${{ item.valor_unitario }}</td>
-              <td>{{ item.lote|default_if_none:"" }}</td>
-              <td>{{ item.dt_criacao }}</td>
+              <th>Item</th>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Valor Unitário</th>
+              <th>Lote</th>
+              <th>Data de Criação</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% comment %} {% for item in inflow_items %}
-        <div class="row mb-2">
-          <div class="col-sm-5"><strong>Item:</strong></div>
-          <div class="col-sm-7">{{ item.id }}</div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-sm-5"><strong>Produto:</strong></div>
-          <div class="col-sm-7">{{ item.produto.nome_produto }}</div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-sm-5"><strong>Quantidade:</strong></div>
-          <div class="col-sm-7">{{ item.quantidade }}</div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-sm-5"><strong>Valor Unitário:</strong></div>
-          <div class="col-sm-7">R${{ item.valor_unitario }}</div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-sm-5"><strong>Lote:</strong></div>
-          <div class="col-sm-7">{{ item.lote|default_if_none:"" }}</div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-sm-5"><strong>Data de Criação:</strong></div>
-          <div class="col-sm-7">{{ item.dt_criacao }}</div>
-        </div>
-
-      {% endfor %} {% endcomment %}
-    </div>
-</div>
-
-
+          </thead>
+          <tbody class="table-group-divider">
+            {% for item in inflow_items %}
+              <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.produto.nome_produto }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>R${{ item.valor_unitario }}</td>
+                <td>{{ item.lote|default_if_none:"" }}</td>
+                <td>{{ item.dt_criacao }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+  </div>
 
 {% endblock content %}

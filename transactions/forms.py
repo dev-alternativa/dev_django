@@ -38,9 +38,9 @@ class InflowsForm(forms.ModelForm):
 
             Row(
                 Column(
-                    Field('fornecedor', css_class='form-control col-md-2 mb-0'),
-                    Field('valor_total', css_class='form-control col-md-2 mb-0'),
-                    Field('nf_entrada', css_class='form-control col-md-2 mb-0'),
+                    Field('fornecedor', css_class='form-control col-md-2 mb-3'),
+                    Field('valor_total', css_class='form-control col-md-2 mb-3'),
+                    Field('nf_entrada', css_class='form-control col-md-2 mb-3'),
                 ),
                 Column(
                     Field('tipo_entrada', css_class='form-control col-md-2 mb-0'),
