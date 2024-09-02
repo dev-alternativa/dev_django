@@ -7,6 +7,18 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from products.models import Inventory
 
+
+# Utility
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
+
+def is_form_empty(form):
+    """Retorna True se todos os campos do formulário forem vazios"""
+    return all(field is None or field == '' for field in form.cleaned_data.values())
+
+
 # ********************************* INFLOWS *********************************
 class InflowsListView(ListView):
     model = Inflows
@@ -42,8 +54,8 @@ class InflowsNewView(FormMessageMixin, CreateView):
         # Verifica se ao menos um formulário do formset está preenchido
         valid_form_found = any(
             form.is_valid() and
-            not form.cleaned_data.get('DELETE', False)
-            and all(form.cleaned_data.values())
+            not form.cleaned_data.get('DELETE', False) and
+            not is_form_empty(form)
             for form in formset
         )
         print(valid_form_found)
@@ -59,9 +71,9 @@ class InflowsNewView(FormMessageMixin, CreateView):
             # Salva os itens do formset
             formset.save()
 
-            return redirect(self.success_url)
+            return super().form_valid(form)
         else:
-            messages.error(self.request, 'Erro ao salvar os dados!')
+            messages.error(self.request, 'É necessário incluir pelo menos 1 produto!')
             return super().form_invalid(form)
 
     def form_invalid(self, form):
