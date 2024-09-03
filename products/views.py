@@ -38,14 +38,16 @@ class CoordinateSettingDeleteView(DeleteSuccessMessageMixin, DeleteView):
 # ********************************* ESTOQUE  *********************************
 class InventoryListView(ListView):
     model = Inventory
-    form_class = SearchInventoryForm
     template_name = 'estoque/estoque.html'
-    context_object_name = 'itens_estoque'
+    form_class = SearchInventoryForm
+    paginate_by = 30
+    ordering = '-id'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = self.form_class(self.request.GET or None)
+        context['form'] = self.form_class()
         return context
+
 
 
 # ********************************* UNIDADE  *********************************

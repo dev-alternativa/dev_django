@@ -2,7 +2,7 @@ from django import forms
 from django.forms import Textarea, inlineformset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column
-from transactions.models import Inflows, InflowsItems
+from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
 
 
@@ -76,41 +76,6 @@ class InflowsItemsForm(forms.ModelForm):
             'lote': 'Lote',
         }
 
-    # def __init__(self, *args, **kwargs):
-    #     super(InflowsItemsForm, self).__init__(*args, **kwargs)
-    #     nome_produto = kwargs.pop('nome_produto', None)  # Pega o valor de 'nome_produto' se estiver nos kwargs
-    #     if nome_produto:
-    #         self.fields['produto'].queryset = Product.objects.filter(nome__icontains=nome_produto)
-    #     else:
-    #         self.fields['produto'].queryset = Product.objects.all()
-    #     self.helper = FormHelper()
-    #     self.helper.form_method = 'post'
-    #     self.helper.layout = Layout(
-    #         Row(
-    #             Column(
-    #                 Field('produto', css_class='form-control col-6 '),
-    #                 css_class="form-group col-md-5"
-    #             ),
-    #             Column(
-    #                 Field('quantidade', css_class='form-control col-2 '),
-    #                 css_class="form-group col-md-2"
-    #             ),
-    #             Column(
-    #                 Field('valor_unitario', css_class='form-control col-2 '),
-    #                 css_class="form-group col-md-2"
-    #             ),
-    #             Column(
-    #                 Field('lote', css_class='form-control col-2 '),
-    #                 css_class="form-group col-md-2"
-    #             ),
-    #             Column(
-    #                 HTML("<a href='#' class='btn btn-danger btn-lg btn-plus remove-form-btn'><i class='bi bi-trash '></i></a>"),
-    #                 css_class="form-group col-md-1 justify-content-center align-items-center"
-    #             ),
-    #             css_class='form-row'
-    #         ),
-    #     )
-
 
 InflowsItemsFormSet = inlineformset_factory(
     Inflows,
@@ -121,51 +86,82 @@ InflowsItemsFormSet = inlineformset_factory(
 )
 
 
+class OutflowsForm(forms.ModelForm):
 
-# class InflowsItemsForm(forms.ModelForm):
+    class Meta:
+        model = Outflows
+        exclude = ['dt_criacao', 'dt_modificado']
+        widgets = {
+            'cliente': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    }
+                ),
+            'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
+            'dt_faturamento': forms.DateTimeInput(
+                attrs={
+                    'type': 'date',
+                    'class': 'form-control',
+                    'placeholder': 'Selecione uma data'
+                    }
+                ),
+        }
 
-#     class Meta:
-#         model = InflowsItems
-#         fields = '__all__'
-#         widgets = {
-#             'produto': Select2Widget(
-#                 attrs={
-#                     'data-placeholder': 'Selecione um produto',
-#                     'data-placeholder': 'Começe digitando algo...',
-#                     'data-minimum-input-length': 3,
-#                     'data-width': '100%',
-#                     }
-#                 ),
-#         }
+    def __init__(self, *args, **kwargs):
+        super(OutflowsForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('numero_pedido_cliente', css_class='form-control col-md-2 mb-3'),
+                    Field('tipo_saida', css_class='form-control col-md-2 mb-3'),
+                    Field('pedido_interno_cliente', css_class='form-control col-md-2 mb-3'),
+                ),
+                Column(
+                    Field('cliente', css_class='form-control col-md-2 mb-3'),
+                    Field('nf_saida', css_class='form-control col-md-2 mb-3'),
+                    Field('transportadora', css_class='form-control col-md-2 mb-3'),
+                ),
+                Column(
+                    Field('dolar_ptax', css_class='form-control col-md-2 mb-3'),
+                    Field('dados_adicionais_nf', css_class='form-control col-md-2 mb-3'),
+                    Field('cod_cenario_fiscal', css_class='form-control col-md-2 mb-3'),
+                ),
+                Column(
+                    Field('desconto', css_class='form-control col-md-2 mb-3'),
+                    Field('dt_faturamento', css_class='form-control col-md-2 mb-3'),
+                ),
+            ),
+        )
 
 
-#     def __init__(self, *args, **kwargs):
-#         super(InflowsItemsForm, self).__init__(*args, **kwargs)
-#         self.fields['produto'].queryset = Product.objects.filter(tag_produto=True)
-#         self.helper = FormHelper()
-#         self.helper.form_method = 'post'
-#         self.helper.layout = Layout(
-#             Row(
-#                 Column(
-#                     Field('produto', css_class='form-control col-md-2 mb-0'),
-#                     Field('entrada', css_class='form-control col-md-2 mb-0'),
-#                 ),
-#                 Column(
-#                     Field('quantidade', css_class='form-control col-md-2 mb-0'),
-#                     Field('valor_unitario_custo', css_class='form-control col-md-2 mb-0'),
-#                 ),
+class OutflowsItemsForm(forms.ModelForm):
 
-#             ),
-#             Row(
-#                 Column(
-#                     HTML("<a href='{% url 'inflows' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
-#                 ),
-#                 Column(
-#                     HTML(
-#                         '<button type="submit" class="btn btn-primary btn-lg">'
-#                         '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-#                     ),
-#                 ),
-#                 css_class='form-group col-12 text-center'
-#             )
-#         )
+    class Meta:
+        model = OutflowsItems
+        exclude = ['dt_criacao', 'dt_modificado', 'ativo']
+        widget = {
+            'produto': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    }
+                ),
+            'quantidade': forms.NumberInput(attrs={'class': 'form-control'}),
+            'valor_unitario': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'max_length': '4',
+                }
+            ),
+            'dados_adicionais_item': Textarea(attrs={'rows': 3}),
+        }
+
+
+OutflowsItemsFormSet = inlineformset_factory(
+    Outflows,
+    OutflowsItems,
+    form=OutflowsItemsForm,
+    extra=1,
+    can_delete=False
+)

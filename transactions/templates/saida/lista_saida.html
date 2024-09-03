@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %} Entradas {% endblock %}
+{% block title %} Saídas {% endblock %}
 
 {% block content %}
     <div id="page-wrapper">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class = "text-body-secondary text-center mb-3">Entradas</h1>
+                    <h1 class = "text-body-secondary text-center mb-3">Saídas</h1>
 
                     {% if messages %}
                         <div class="messages">
@@ -34,7 +34,7 @@
                                 <div class='input-group'>
                                     <input type='text' name='search'
                                         class='form-control'
-                                        placeholder='Fornecedor ou Nota Fiscal'
+                                        placeholder='Pedido ou Nota Fiscal'
                                         value='{{ request.GET.search }}'
                                     >
                                     <button type='submit' class='btn btn-primary'>
@@ -46,9 +46,9 @@
 
 
                         <div class='col-md-4'>
-                            <a href="{% url 'inflow_new' %}" class='btn btn-success float-end'>
+                            <a href="{% url 'outflow_new' %}" class='btn btn-success float-end'>
                                 <i class="bi bi-plus-lg"></i>
-                                Adicionar Entrada
+                                Adicionar Saída
                             </a>
                         </div>
                     </div>
@@ -56,29 +56,32 @@
                     <div class="card">
                         <div class="space_from_margin">
                             <table class="table table-hover table-bordered border-secondary-subtle">
-                                {% if inflows %}
+                                {% if outflows %}
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Fornecedor</th>
-                                            <th>Valor</th>
-                                            <th>Tipo de Entrada</th>
-                                            <th>Dt. de Recebimento</th>
-                                            <th>NF</th>
-                                            <th>Data de Criação</th>
+                                            <th>No Pedido</th>
+                                            <th>Tipo de Saída</th>
+                                            <th>Tipo de Entrada </th>
+                                            <th>Pedido Interno</th>
+                                            <th>Nome Cliente</th>
+                                            <th>NF Saída</th>
+                                            <th>Transportadora</th>
+                                            <th>Data Faturamento</th>
+                                            <th>Data Criação</th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody class="table table-hover table-bordered border-secondary-subtle">
-                                        {% for inflow in inflows %}
+                                        {% for outflow in outflows %}
                                             <tr>
-                                                <td>{{ inflow.id }}</td>
-                                                <td>{{ inflow.fornecedor }}</td>
-                                                <td>R$ {{ inflow.valor_total }}</td>
-                                                <td>{{ inflow.get_tipo_entrada_display  }}</td>
-                                                <td>{{ inflow.dt_recebimento|date:'d/m/Y' }}</td>
-                                                <td>{{ inflow.nf_entrada }}</td>
-                                                <td>{{ inflow.dt_criacao|date:'d/m/Y' }}</td>
+                                                <td>{{ outflow.id }}</td>
+                                                <td>{{ outflow.fornecedor }}</td>
+                                                <td>R$ {{ outflow.valor_total }}</td>
+                                                <td>{{ outflow.get_tipo_entrada_display  }}</td>
+                                                <td>{{ outflow.dt_recebimento|date:'d/m/Y' }}</td>
+                                                <td>{{ outflow.nf_entrada }}</td>
+                                                <td>{{ outflow.dt_criacao|date:'d/m/Y' }}</td>
                                                 <td class="action_size_column">
                                                     <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                                                         <!-- Visualizar detalhes -->

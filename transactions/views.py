@@ -1,25 +1,21 @@
 from django.views.generic import ListView, CreateView, DetailView
 from django.contrib import messages
-from transactions.models import Inflows, InflowsItems
-from transactions.forms import InflowsForm, InflowsItemsFormSet
+from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
+from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm,OutflowsItemsFormSet
 from core.views import FormMessageMixin
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
-from products.models import Inventory
+from django.db.models import Q
+
 
 
 # Utility
-
-MESSAGE_TAGS = {
-    messages.ERROR: 'danger'
-}
 
 def is_form_empty(form):
     """Retorna True se todos os campos do formulário forem vazios"""
     return all(field is None or field == '' for field in form.cleaned_data.values())
 
 
-# ********************************* INFLOWS *********************************
+# ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
     model = Inflows
     template_name = 'entrada/lista_entrada.html'
@@ -27,9 +23,17 @@ class InflowsListView(ListView):
     paginate_by = 30
     ordering = '-id'
 
-class InventoryListView(ListView):
-    model = Inventory
-    template_name = 'inventario/inventario.html'
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.GET.get('search')
+        if search:
+            search_terms = search.split()
+            query = Q()
+
+            for term in search_terms:
+                query |= Q(fornecedor__nome_fantasia__icontains=term) | Q(nf_entrada__icontains=term)
+            queryset = queryset.filter(query).distinct()
+        return queryset
 
 
 class InflowsNewView(FormMessageMixin, CreateView):
@@ -91,3 +95,39 @@ class InflowsDetailView(DetailView):
         context["inflow_items"] = InflowsItems.objects.filter(entrada=self.object)
         return context
 
+
+# ********************************* SAÍDAS *********************************
+class OutflowsListView(ListView):
+    model = Outflows
+    template_name = 'saida/lista_saida.html'
+    context_object_name = 'outflows'
+    paginate_by = 30
+    ordering = '-id'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.GET.get('search')
+        if search:
+            search_terms = search.split()
+            query = Q()
+
+            for term in search_terms:
+                query |= Q(cliente__nome_fantasia__icontains=term) | Q(nf_saida__icontains=term)
+            queryset = queryset.filter(query).distinct()
+        return queryset
+
+
+class OutflowsNewView(FormMessageMixin, CreateView):
+    model = Outflows
+    form_class = OutflowsForm
+    template_name = 'saida/adicionar_saida.html'
+    success_url = reverse_lazy('outflows_list')
+    success_message = 'Saída registrada com sucesso!'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = OutflowsItemsFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = OutflowsItemsFormSet()
+        return context

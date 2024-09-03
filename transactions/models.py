@@ -46,7 +46,7 @@ class InflowsItems(Base):
 
 class Outflows(Base):
     numero_pedido_cliente = models.PositiveIntegerField()
-    tipo_saida = models.CharField(max_length=50, blank=True, null=True)
+    tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True)
     pedido_interno_cliente = models.PositiveIntegerField()
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
     nf_saida = models.PositiveIntegerField()
@@ -55,7 +55,7 @@ class Outflows(Base):
     dados_adicionais_nf = models.TextField(max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    dt_faturamento = models.DateTimeField(auto_now=True)
+    dt_faturamento = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ('pk',)
@@ -70,7 +70,7 @@ class OutflowsItems(Base):
     produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='saida_items')
     quantidade = models.PositiveIntegerField()
     valor_unitario = models.ForeignKey('common.Price', on_delete=models.PROTECT, related_name='saida_items')
-    dados_adicionais_item = models.TextField(max_length=500, blank=True, null=True)
+    dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(max_length=50, blank=True, null=True)
     item_pedido = models.IntegerField()
     obs = models.TextField(max_length=500, blank=True, null=True)

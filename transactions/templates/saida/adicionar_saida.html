@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registrar Entrada{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/select2.css' %}">
+
+<div class="row">
+  <div class="cols">
+    <h1 class="text-body-secondary text-center mb-3">Registrar Entradas</h1>
+  <div class="row" style="margin-bottom: 1rem;">
+    <div class='col-md-6'>
+      <a href="{% url 'outflow_list' %}" class='btn btn-danger btn-lg'>
+        <i class="bi bi-backspace space_from_margin"></i>
+        Voltar
+      </a>
+    </div>
+  </div>
+  {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+
+      <!-- O FORMULÁRIO COMEÇA AQUI -->
+      <form method="POST" autocomplete="off" novalidate>
+        {% csrf_token %}
+
+        <!-- Formulário Superior -->
+        <div class="row justify-content-center">
+
+          <div class="col-md-4 ">
+            <div class="form-group">
+              {{ form.numero_pedido_cliente|as_crispy_field }}
+            </div>
+            <div class="form-group">
+              {{ form.pedido_interno_cliente|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.transportadora|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.nf_saida|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.desconto|as_crispy_field }}
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+                {{ form.cliente|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.tipo_saida|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.dolar_ptax|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.dt_faturamento|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.cod_cenario_fiscal|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.dados_adicionais_nf|as_crispy_field }}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Formulários Formset -->
+        <legend style="border-bottom: 1px solid #e5e5e5;">Produtos</legend>
+        <div class="row">
+          <div class="row mb-3">
+            <div id="entradas" class="row g-2" data-form-count="1">
+              {{ formset.management_form }}
+              {% for item_saida_form in formset %}
+                <div id="item-{{ forloop.counter0 }}" class="row line-to-remove">
+                  <div class="col-md-3 col-sm-6">
+                    {{ item_saida_form.produto|as_crispy_field }}
+                  </div>
+                  <div class="col-md-1 col-sm-6">
+                    {{ item_saida_form.quantidade|as_crispy_field }}
+                  </div>
+                  <div class="col-md-2 col-sm-6">
+                    {{ item_saida_form.valor_unitario|as_crispy_field }}
+                  </div>
+                  <div class="col-md-2 col-sm-6">
+                    {{ item_saida_form.dados_adicionais_item|as_crispy_field }}
+                  </div>
+                  <div class="col-md-2 col-sm-6">
+                    {{ item_saida_form.numero_pedido|as_crispy_field }}
+                  </div>
+                  <div class="col-md-1 col-sm-6">
+                    {{ item_saida_form.cfop|as_crispy_field }}
+                  </div>
+                  <div class="col-md-1 col-sm-1 d-flex align-items-center">
+                    <a href="#" class="btn btn-danger btn-lg  remove-form-btn float-end">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão de adicionar item -->
+        <a class="btn btn-secondary btn-lg" id="add-item">
+          <i class="bi bi-plus-lg"></i>
+          Adicionar Item
+        </a>
+
+        <!-- Botão de salvar -->
+        <div class="row float-end">
+          <div class="col-sm-12" style="margin-top: 10px;">
+            <div class="form-inline buttons">
+              <button class="btn btn-primary" value="Save">
+                <i class="bi bi-floppy-o"></i>
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+      <!-- O FORMULÁRIO TERMINA AQUI -->
+
+    </div>
+  </div>
+
+  <!-- Script que gera novos formulários -->
+  <script type="text/html" id="item-entrada">
+    <div id="item-__prefix__" class="row line-to-remove">
+      <div class="col-md-3 col-sm-6">
+        {{ formset.empty_form.produto|as_crispy_field }}
+      </div>
+      <div class="col-md-1 col-sm-6">
+        {{ formset.empty_form.quantidade|as_crispy_field }}
+      </div>
+      <div class="col-md-2 col-sm-6">
+        {{ formset.empty_form.valor_unitario|as_crispy_field }}
+      </div>
+      <div class="col-md-2 col-sm-6">
+        {{ formset.empty_form.dados_adicionais_item|as_crispy_field }}
+      </div>
+      <div class="col-md-2 col-sm-6">
+        {{ formset.empty_form.numero_pedido|as_crispy_field }}
+      </div>
+      <div class="col-md-1 col-sm-6">
+        {{ formset.empty_form.cfop|as_crispy_field }}
+      </div>
+      <div class="col-md-1 col-sm-6 d-flex align-items-center">
+        <a href="#" class="btn btn-danger btn-lg btn-plus remove-form-btn float-end">
+          <i class="bi bi-trash"></i>
+        </a>
+      </div>
+    </div>
+  </script>
+
+{% endblock content %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/select2.min.js' %}"></script>
+
+
+<script>
+  /********** 1- Verifica quantos formulários foram renderizados **********/
+  /********** 2- Adiciona um novo formulário ******************************/
+  /********** 3- Atualiza o total de formulários de items *****************/
+
+  $(document).ready( () => {
+    // Função de // Função de correspondência personalizada
+    function matchCustom(params, data) {
+      // If there are no search terms, return all of the data
+      if ($.trim(params.term) === '') {
+        return data;
+      }
+
+      // Do not display the item if there is no 'text' property
+      if (typeof data.text === 'undefined') {
+        return null;
+      }
+
+      var searchTerm = $.trim(params.term).toUpperCase();
+      var dataText = data.text.toUpperCase();
+      // `params.term` should be the term that is used for searching
+      // `data.text` is the text that is displayed for the data object
+      if (data.text.indexOf(params.term) > -1) {
+        var modifiedData = $.extend({}, data, true);
+
+        // You can return modified objects from here
+        // This includes matching the `children` how you want in nested data sets
+        return modifiedData;
+      }
+
+      // Return `null` if the term should not be displayed
+      return null;
+    }
+
+    // Inicializa o Select2 com a função de correspondência personalizada
+    $("#id_cliente").select2({
+      matcher: matchCustom
+    });
+
+    $('#id_inflows_items-0-produto').select2({
+      matcher: matchCustom
+    });
+
+    $('textarea').attr('rows', 3);
+
+    /************* Adicionar um item ao formset *************/
+    $('#add-item').click( (ev) => {
+      // Reseta o tamanho da área de texto do novo form
+
+      ev.preventDefault();
+
+      // Obtém número atual de formulários usando atributo data
+      let count = parseInt($('#entradas').attr('data-form-count')) ;
+
+      // Se não houver nenhum formulário, coloca o atributo como 1
+      if(count == 0) {
+        console.log(count)
+        count = 1;
+        console.log(count)
+      }
+
+      let templateMarkup = $('#item-entrada').html();
+      let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
+
+      // Adiciona o novo formulário ao contêiner
+      $("div#entradas").append(compiledTemplate);
+
+      // Atualiza o atributo data como novo número de formulários
+      $('#entradas').attr('data-form-count', count);
+
+      // Atualiza o campo com o total de formulários
+      $('#id_inflows_items-TOTAL_FORMS').attr('value', count);
+
+      // Scroll automático para ver o novo formulário adicionado
+      $('html, body').animate({
+        scrollTop: $('#add-item').position().top-200
+      }, 800);
+
+      // Reaply Select2 to the new field added
+      $('select').select2();
+
+      // Atualiza textarea com 3 linhas
+      $('textarea').attr('rows', 3);
+
+    });
+  });
+
+  /************* Remove um item do formset *************/
+  $(document).on('click', '.remove-form-btn', function(e) {
+    e.preventDefault();
+
+    // Remove o formulário
+    $(this).closest('.line-to-remove').remove();
+
+    // Atualiza a contagem total dos formulários
+    let count = parseInt($('#entradas').attr('data-form-count')) - 1;
+
+    $('#id_inflows_items-TOTAL_FORMS').attr('value', count);
+    $('#entradas').attr('data-form-count', count);
+
+
+    // Reorganiza os índices dos formulários restantes
+    $('#entradas .form-group').each(function(index) {
+        $(this).find('input, select, textarea').each(function() {
+            let name = $(this).attr('name');
+            let id = $(this).attr('id');
+            if (name) {
+                let newName = name.replace(/\d+/, index);
+                $(this).attr('name', newName);
+            }
+            if (id) {
+                let newId = id.replace(/\d+/, index);
+                $(this).attr('id', newId);
+            }
+        });
+    });
+  });
+</script>
+{% endblock %}
