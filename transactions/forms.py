@@ -15,8 +15,6 @@ class InflowsForm(forms.ModelForm):
             'fornecedor': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    # 'data-minimum-input-length': 3,
-                    # 'data-width': '100%',
                     }
                 ),
             'obs': Textarea(attrs={'rows': 3}),
@@ -93,6 +91,11 @@ class OutflowsForm(forms.ModelForm):
         exclude = ['dt_criacao', 'dt_modificado']
         widgets = {
             'cliente': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    }
+                ),
+            'transportadora': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
                     }

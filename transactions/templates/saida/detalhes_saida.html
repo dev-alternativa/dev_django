@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %} Detalhes da Entrada {{ inflow.id }}{% endblock %}
+{% block title %} Detalhes da Saída {{ outflow.numero_pedido_cliente }}{% endblock %}
 
 {% block content %}
   <div class="container mt-5">
-    <h1 class="text-body-secondary text-center mb-3">Detalhes da Entrada {{ inflow.id }}</h1>
+    <h1 class="text-body-secondary text-center mb-3">Detalhes da Saída <strong>{{ outflow.numero_pedido_cliente }}</strong></h1>
     <div class="row" style="margin-bottom: 1rem;">
       <div class='col-md-6'>
-        <a href="{% url 'inflow_list' %}" class='btn btn-danger btn-lg'>
+        <a href="{% url 'outflow_list' %}" class='btn btn-danger btn-lg'>
           <i class="bi bi-backspace space_from_margin"></i>
           Voltar
         </a>
@@ -16,28 +16,35 @@
 
     <div class="card">
       <div class="card-header">
-        Itens da Entrada: <strong>{{ inflow.id }}</strong> Nota Fiscal: <strong>{{ inflow.nf_entrada }}</strong>
+        Itens da Entrada #<strong>{{ outflow.id }}</strong> de Nota Fiscal: <strong>{{ outflow.nf_saida }}</strong>
     </div>
       <div class="card-body text-center">
         <table class="table table-hover  border-secondary-subtle">
           <thead>
             <tr>
               <th>Item</th>
+              <th>N. Pedido</th>
               <th>Produto</th>
               <th>Quantidade</th>
               <th>Valor Unitário</th>
-              <th>Lote</th>
+              <th>Item Pedido</th>
+              <th>Cfop</th>
+              <th>Obs</th>
               <th>Data de Criação</th>
             </tr>
           </thead>
           <tbody class="table-group-divider">
-            {% for item in inflow_items %}
+            {% for item in outflow_items %}
               <tr>
                 <td>{{ item.id }}</td>
+                <td>{{ item.numero_pedido }}</td>
                 <td>{{ item.produto.nome_produto }}</td>
                 <td>{{ item.quantidade }}</td>
                 <td>R${{ item.valor_unitario }}</td>
-                <td>{{ item.lote|default_if_none:"" }}</td>
+                <td>{{ item.item_pedido }}</td>
+                <td>{{ item.obs }}</td>
+                <td>{{ item.cod_vendedor }}</td>
+                <td>{{ item.cfop }}</td>
                 <td>{{ item.dt_criacao }}</td>
               </tr>
             {% endfor %}

@@ -51,7 +51,7 @@ class Outflows(Base):
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
     nf_saida = models.PositiveIntegerField()
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas')
-    dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2)
+    dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_nf = models.TextField(max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -72,9 +72,9 @@ class OutflowsItems(Base):
     valor_unitario = models.ForeignKey('common.Price', on_delete=models.PROTECT, related_name='saida_items')
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(max_length=50, blank=True, null=True)
-    item_pedido = models.IntegerField()
+    item_pedido = models.IntegerField(verbose_name='Item Pedido')
     obs = models.TextField(max_length=500, blank=True, null=True)
-    cod_vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, null=True, blank=True, related_name='saida_items')
+    vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
     cfop = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
@@ -87,16 +87,16 @@ class OutflowsItems(Base):
 
 class TaxScenario(Base):
     cenario = models.CharField('Cenário Fiscal', max_length=100)
-    cod_ind_utilizado = models.PositiveBigIntegerField()
-    cod_com_utilizado = models.PositiveBigIntegerField()
-    cod_pre_utilizado = models.PositiveBigIntegerField()
-    cod_srv_utilizado = models.PositiveBigIntegerField()
-    cod_mrx_utilizado = models.PositiveBigIntegerField()
-    cod_flx_utilizado = models.PositiveBigIntegerField()
+    cod_ind_utilizado = models.PositiveBigIntegerField('Cód. IND')
+    cod_com_utilizado = models.PositiveBigIntegerField('Cód. COM')
+    cod_pre_utilizado = models.PositiveBigIntegerField('Cód. PRE')
+    cod_srv_utilizado = models.PositiveBigIntegerField('Cód. SRV')
+    cod_mrx_utilizado = models.PositiveBigIntegerField('Cód. MRX')
+    cod_flx_utilizado = models.PositiveBigIntegerField('Cód. FLX')
 
     class Meta:
         verbose_name = 'Cenário Fiscal'
         verbose_name_plural = 'Cenários Fiscais'
 
     def __str__(self):
-        return self.cenario_fiscal
+        return self.cenario

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from common.models import Category, CustomerSupplier, Seller
+from common.models import Category, CustomerSupplier, Seller, Price
 
 
 @admin.register(Category)
@@ -22,3 +22,8 @@ class SellerAdmin(admin.ModelAdmin):
     list_filter = ('representante', 'email')
 
 
+@admin.register(Price)
+class PriceAdmin(admin.ModelAdmin):
+    list_display = ('produto', 'cliente', 'valor', 'is_dolar', 'prazo', 'cnpj_faturamento', 'condicao', 'obs')
+    search_fields = ('cliente', 'valor', 'cnpj_faturamento', 'condicao')
+    list_filter = ('is_dolar',  'cnpj_faturamento')

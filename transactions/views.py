@@ -121,7 +121,7 @@ class OutflowsNewView(FormMessageMixin, CreateView):
     model = Outflows
     form_class = OutflowsForm
     template_name = 'saida/adicionar_saida.html'
-    success_url = reverse_lazy('outflows_list')
+    success_url = reverse_lazy('outflow_list')
     success_message = 'Saída registrada com sucesso!'
 
     def get_context_data(self, **kwargs):
@@ -130,4 +130,47 @@ class OutflowsNewView(FormMessageMixin, CreateView):
             context['formset'] = OutflowsItemsFormSet(self.request.POST, instance=self.object)
         else:
             context['formset'] = OutflowsItemsFormSet()
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+
+        # Verifica se ao menos um formulário do formset está preenchido
+        valid_form_found = any(
+            form.is_valid() and
+            not form.cleaned_data.get('DELETE', False) and
+            not is_form_empty(form)
+            for form in formset
+        )
+
+        if valid_form_found and formset.is_valid():
+
+            # Salva formulário principal
+            self.object = form.save()
+
+            # Associa formset à instância do form principal
+            formset.instance = self.object
+
+            # Salva os itens do formset
+            formset.save()
+
+            return super().form_valid(form)
+        else:
+            messages.error(self.request, 'É necessário incluir pelo menos 1 produto!')
+            return super().form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Erro ao registrar a saida!')
+        return super().form_invalid(form)
+
+
+class OutflowsDetailView(DetailView):
+    model = Outflows
+    template_name = 'saida/detalhes_saida.html'
+    context_object_name = 'outflow'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["outflow_items"] = OutflowsItems.objects.filter(saida=self.object)
         return context

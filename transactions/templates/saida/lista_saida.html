@@ -62,7 +62,6 @@
                                             <th>ID</th>
                                             <th>No Pedido</th>
                                             <th>Tipo de Saída</th>
-                                            <th>Tipo de Entrada </th>
                                             <th>Pedido Interno</th>
                                             <th>Nome Cliente</th>
                                             <th>NF Saída</th>
@@ -76,16 +75,18 @@
                                         {% for outflow in outflows %}
                                             <tr>
                                                 <td>{{ outflow.id }}</td>
-                                                <td>{{ outflow.fornecedor }}</td>
-                                                <td>R$ {{ outflow.valor_total }}</td>
-                                                <td>{{ outflow.get_tipo_entrada_display  }}</td>
-                                                <td>{{ outflow.dt_recebimento|date:'d/m/Y' }}</td>
-                                                <td>{{ outflow.nf_entrada }}</td>
+                                                <td>{{ outflow.numero_pedido_cliente }}</td>
+                                                <td>{{ outflow.get_tipo_saida_display }}</td>
+                                                <td>{{ outflow.pedido_interno_cliente  }}</td>
+                                                <td>{{ outflow.cliente  }}</td>
+                                                <td>{{ outflow.nf_saida }}</td>
+                                                <td>{{ outflow.transportadora }}</td>
+                                                <td>{{ outflow.dt_faturamento|date:'d/m/Y' }}</td>
                                                 <td>{{ outflow.dt_criacao|date:'d/m/Y' }}</td>
                                                 <td class="action_size_column">
                                                     <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                                                         <!-- Visualizar detalhes -->
-                                                        <a class="btn btn-secondary btn-view" href="{% url 'inflow_detail' inflow.pk %}" role="button">
+                                                        <a class="btn btn-secondary btn-view" href="{% url 'outflow_detail' outflow.pk %}" role="button">
                                                             <i class="bi bi-eye"></i>
                                                         </a>
 

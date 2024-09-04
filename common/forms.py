@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column, HTML
-from common.models import Category, CustomerSupplier, Seller
+from common.models import Category, CustomerSupplier, Seller, Price
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, FieldWithButtons, StrictButton
 from crispy_bootstrap5.bootstrap5 import Switch

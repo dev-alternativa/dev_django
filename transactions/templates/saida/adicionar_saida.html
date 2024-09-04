@@ -81,7 +81,7 @@
         <legend style="border-bottom: 1px solid #e5e5e5;">Produtos</legend>
         <div class="row">
           <div class="row mb-3">
-            <div id="entradas" class="row g-2" data-form-count="1">
+            <div id="saidas" class="row g-2" data-form-count="1">
               {{ formset.management_form }}
               {% for item_saida_form in formset %}
                 <div id="item-{{ forloop.counter0 }}" class="row line-to-remove">
@@ -99,6 +99,15 @@
                   </div>
                   <div class="col-md-2 col-sm-6">
                     {{ item_saida_form.numero_pedido|as_crispy_field }}
+                  </div>
+                  <div class="col-md-2 col-sm-6">
+                    {{ item_saida_form.item_pedido|as_crispy_field }}
+                  </div>
+                  <div class="col-md-1 col-sm-6">
+                    {{ item_saida_form.vendedor|as_crispy_field }}
+                  </div>
+                  <div class="col-md-1 col-sm-6">
+                    {{ item_saida_form.obs|as_crispy_field }}
                   </div>
                   <div class="col-md-1 col-sm-6">
                     {{ item_saida_form.cfop|as_crispy_field }}
@@ -139,7 +148,7 @@
   </div>
 
   <!-- Script que gera novos formulários -->
-  <script type="text/html" id="item-entrada">
+  <script type="text/html" id="item-saida">
     <div id="item-__prefix__" class="row line-to-remove">
       <div class="col-md-3 col-sm-6">
         {{ formset.empty_form.produto|as_crispy_field }}
@@ -207,12 +216,16 @@
       return null;
     }
 
-    // Inicializa o Select2 com a função de correspondência personalizada
+    // Inicializa o Select2 nas Select com a função de correspondência personalizada
     $("#id_cliente").select2({
       matcher: matchCustom
     });
 
-    $('#id_inflows_items-0-produto').select2({
+    $("#id_transportadora").select2({
+      matcher: matchCustom
+    });
+
+    $('#id_saida_items-0-produto').select2({
       matcher: matchCustom
     });
 
@@ -225,26 +238,27 @@
       ev.preventDefault();
 
       // Obtém número atual de formulários usando atributo data
-      let count = parseInt($('#entradas').attr('data-form-count')) ;
+      let count = parseInt($('#saidas').attr('data-form-count')) ;
 
       // Se não houver nenhum formulário, coloca o atributo como 1
       if(count == 0) {
-        console.log(count)
         count = 1;
-        console.log(count)
+      }else{
+        count += 1;
       }
+      console.log(count)
 
-      let templateMarkup = $('#item-entrada').html();
+      let templateMarkup = $('#item-saida').html();
       let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
 
       // Adiciona o novo formulário ao contêiner
-      $("div#entradas").append(compiledTemplate);
+      $("div#saidas").append(compiledTemplate);
 
       // Atualiza o atributo data como novo número de formulários
-      $('#entradas').attr('data-form-count', count);
+      $('#saidas').attr('data-form-count', count);
 
       // Atualiza o campo com o total de formulários
-      $('#id_inflows_items-TOTAL_FORMS').attr('value', count);
+      $('#id_saida_items-TOTAL_FORMS').attr('value', count);
 
       // Scroll automático para ver o novo formulário adicionado
       $('html, body').animate({
@@ -268,14 +282,14 @@
     $(this).closest('.line-to-remove').remove();
 
     // Atualiza a contagem total dos formulários
-    let count = parseInt($('#entradas').attr('data-form-count')) - 1;
+    let count = parseInt($('#saidas').attr('data-form-count')) - 1;
 
-    $('#id_inflows_items-TOTAL_FORMS').attr('value', count);
-    $('#entradas').attr('data-form-count', count);
+    $('#id_saida_items-TOTAL_FORMS').attr('value', count);
+    $('#saidas').attr('data-form-count', count);
 
 
     // Reorganiza os índices dos formulários restantes
-    $('#entradas .form-group').each(function(index) {
+    $('#saidas .form-group').each(function(index) {
         $(this).find('input, select, textarea').each(function() {
             let name = $(this).attr('name');
             let id = $(this).attr('id');

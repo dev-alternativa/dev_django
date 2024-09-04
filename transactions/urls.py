@@ -1,11 +1,12 @@
 from django.urls import path
-from .views import InflowsListView, InflowsNewView,  InflowsDetailView, OutflowsListView, OutflowsNewView
+from transactions import views
 
 
 urlpatterns = [
-    path('inflows/', InflowsListView.as_view(), name='inflow_list'),
-    path('inflows/new/', InflowsNewView.as_view(), name='inflow_new'),
-    path('inflows/<int:pk>/detail/', InflowsDetailView.as_view(), name='inflow_detail'),
-    path('outflows/', OutflowsListView.as_view(), name='outflow_list'),
-    path('outflows/new/', OutflowsNewView.as_view(), name='outflow_new'),
+    path('inflows/', views.InflowsListView.as_view(), name='inflow_list'),
+    path('inflows/new/', views.InflowsNewView.as_view(), name='inflow_new'),
+    path('inflows/<int:pk>/detail/', views.InflowsDetailView.as_view(), name='inflow_detail'),
+    path('outflows/', views.OutflowsListView.as_view(), name='outflow_list'),
+    path('outflows/new/', views.OutflowsNewView.as_view(), name='outflow_new'),
+    path('outflows/<int:pk>/detail/', views.OutflowsDetailView.as_view(), name='outflow_detail'),
 ]
