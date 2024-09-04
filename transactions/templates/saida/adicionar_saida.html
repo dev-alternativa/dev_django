@@ -9,7 +9,7 @@
 
 <div class="row">
   <div class="cols">
-    <h1 class="text-body-secondary text-center mb-3">Registrar Entradas</h1>
+    <h1 class="text-body-secondary text-center mb-3">Registrar Saída</h1>
   <div class="row" style="margin-bottom: 1rem;">
     <div class='col-md-6'>
       <a href="{% url 'outflow_list' %}" class='btn btn-danger btn-lg'>
@@ -85,39 +85,51 @@
               {{ formset.management_form }}
               {% for item_saida_form in formset %}
                 <div id="item-{{ forloop.counter0 }}" class="row line-to-remove">
-                  <div class="col-md-3 col-sm-6">
-                    {{ item_saida_form.produto|as_crispy_field }}
+                  <!-- Primeira linha -->
+                  <div class="col">
+                    <div class="row">
+                      <div class="col">
+                        {{ item_saida_form.produto|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.dados_adicionais_item|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.quantidade|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.valor_unitario|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.numero_pedido|as_crispy_field }}
+                      </div>
+                    </div>
                   </div>
-                  <div class="col-md-1 col-sm-6">
-                    {{ item_saida_form.quantidade|as_crispy_field }}
-                  </div>
-                  <div class="col-md-2 col-sm-6">
-                    {{ item_saida_form.valor_unitario|as_crispy_field }}
-                  </div>
-                  <div class="col-md-2 col-sm-6">
-                    {{ item_saida_form.dados_adicionais_item|as_crispy_field }}
-                  </div>
-                  <div class="col-md-2 col-sm-6">
-                    {{ item_saida_form.numero_pedido|as_crispy_field }}
-                  </div>
-                  <div class="col-md-2 col-sm-6">
-                    {{ item_saida_form.item_pedido|as_crispy_field }}
-                  </div>
-                  <div class="col-md-1 col-sm-6">
-                    {{ item_saida_form.vendedor|as_crispy_field }}
-                  </div>
-                  <div class="col-md-1 col-sm-6">
-                    {{ item_saida_form.obs|as_crispy_field }}
-                  </div>
-                  <div class="col-md-1 col-sm-6">
-                    {{ item_saida_form.cfop|as_crispy_field }}
-                  </div>
-                  <div class="col-md-1 col-sm-1 d-flex align-items-center">
-                    <a href="#" class="btn btn-danger btn-lg  remove-form-btn float-end">
-                      <i class="bi bi-trash"></i>
-                    </a>
+
+                  <!-- Segunda linha -->
+                  <div class="">
+                    <div class="row">
+                      <div class="col">
+                        {{ item_saida_form.vendedor|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.obs|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.item_pedido|as_crispy_field }}
+                      </div>
+                      <div class="col">
+                        {{ item_saida_form.cfop|as_crispy_field }}
+                      </div>
+                      <div class="col ">
+                        <a href="#" class="btn btn-danger btn-lg remove-form-btn float-end">
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
+                <hr>
               {% endfor %}
             </div>
           </div>
@@ -150,29 +162,47 @@
   <!-- Script que gera novos formulários -->
   <script type="text/html" id="item-saida">
     <div id="item-__prefix__" class="row line-to-remove">
-      <div class="col-md-3 col-sm-6">
-        {{ formset.empty_form.produto|as_crispy_field }}
+      <div class="col">
+        <div class="row">
+          <div class="col">
+            {{ formset.empty_form.produto|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.dados_adicionais_item|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.quantidade|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.valor_unitario|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.numero_pedido|as_crispy_field }}
+          </div>
+        </div>
       </div>
-      <div class="col-md-1 col-sm-6">
-        {{ formset.empty_form.quantidade|as_crispy_field }}
+      <div class="">
+        <div class="row">
+          <div class="col">
+            {{ formset.empty_form.vendedor|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.obs|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.item_pedido|as_crispy_field }}
+          </div>
+          <div class="col">
+            {{ formset.empty_form.cfop|as_crispy_field }}
+          </div>
+          <div class="col">
+            <a href="#" class="btn btn-danger btn-lg btn-plus remove-form-btn float-end">
+              <i class="bi bi-trash"></i>
+            </a>
+          </div>
+        </div>
       </div>
-      <div class="col-md-2 col-sm-6">
-        {{ formset.empty_form.valor_unitario|as_crispy_field }}
-      </div>
-      <div class="col-md-2 col-sm-6">
-        {{ formset.empty_form.dados_adicionais_item|as_crispy_field }}
-      </div>
-      <div class="col-md-2 col-sm-6">
-        {{ formset.empty_form.numero_pedido|as_crispy_field }}
-      </div>
-      <div class="col-md-1 col-sm-6">
-        {{ formset.empty_form.cfop|as_crispy_field }}
-      </div>
-      <div class="col-md-1 col-sm-6 d-flex align-items-center">
-        <a href="#" class="btn btn-danger btn-lg btn-plus remove-form-btn float-end">
-          <i class="bi bi-trash"></i>
-        </a>
-      </div>
+      <hr>
     </div>
   </script>
 
@@ -278,11 +308,22 @@
   $(document).on('click', '.remove-form-btn', function(e) {
     e.preventDefault();
 
+    // Verifica a quantirade de formulários antes de tentar apagar, se houver apenas 1 formulário, não apaga
+    let count = parseInt($('#saidas').attr('data-form-count')) ;
+
+    if(count == 1) {
+
+      $(this).closest('.line-to-remove').before(
+        '<div class="alert alert-danger alert-dismissible fade show" role="alert">Você deve ter ao menos um produto para adicionar. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+      );
+      return;
+    }
+
     // Remove o formulário
     $(this).closest('.line-to-remove').remove();
 
     // Atualiza a contagem total dos formulários
-    let count = parseInt($('#saidas').attr('data-form-count')) - 1;
+    count =- 1;
 
     $('#id_saida_items-TOTAL_FORMS').attr('value', count);
     $('#saidas').attr('data-form-count', count);

@@ -30,6 +30,7 @@
               <th>Item Pedido</th>
               <th>Cfop</th>
               <th>Obs</th>
+              <th>Vendedor</th>
               <th>Data de Criação</th>
             </tr>
           </thead>
@@ -42,9 +43,9 @@
                 <td>{{ item.quantidade }}</td>
                 <td>R${{ item.valor_unitario }}</td>
                 <td>{{ item.item_pedido }}</td>
-                <td>{{ item.obs }}</td>
-                <td>{{ item.cod_vendedor }}</td>
                 <td>{{ item.cfop }}</td>
+                <td>{{ item.obs }}</td>
+                <td>{{ item.vendedor }}</td>
                 <td>{{ item.dt_criacao }}</td>
               </tr>
             {% endfor %}
