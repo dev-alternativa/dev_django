@@ -34,9 +34,9 @@
         {% csrf_token %}
 
         <!-- Formulário Superior -->
-        <div class="row">
+        <div class="row justify-content-center">
 
-          <div class="col-md">
+          <div class="col-md-4">
             <div class="form-group">
               {{ form.fornecedor|as_crispy_field }}
             </div>
@@ -46,14 +46,18 @@
             <div class="form-group">
                 {{ form.nf_entrada|as_crispy_field }}
             </div>
+
           </div>
 
-          <div class="col-md">
+          <div class="col-md-4">
             <div class="form-group">
                 {{ form.dt_recebimento|as_crispy_field }}
             </div>
             <div class="form-group">
                 {{ form.tipo_entrada|as_crispy_field }}
+            </div>
+            <div class="form-group">
+                {{ form.coordenada|as_crispy_field }}
             </div>
             <div class="form-group">
                 {{ form.obs|as_crispy_field }}
@@ -66,24 +70,30 @@
         <legend style="border-bottom: 1px solid #e5e5e5;">Produtos</legend>
         <div class="row">
           <div class="row mb-3">
-            <div id="entradas" class="row g-3" data-form-count="1">
+            <div id="entradas" class="row" data-form-count="1">
               {{ formset.management_form }}
               {% for item_estoque_form in formset %}
                 <div id="item-{{ forloop.counter0 }}" class="row line-to-remove">
-                  <div class="col-md-3 col-sm-6">
+                  <div class="col">
                     {{ item_estoque_form.produto|as_crispy_field }}
                   </div>
-                  <div class="col-md-2 col-sm-6">
+                  <div class="col-2">
                     {{ item_estoque_form.quantidade|as_crispy_field }}
                   </div>
-                  <div class="col-md-3 col-sm-6">
+                  <div class="col-1">
+                    {{ item_estoque_form.largura|as_crispy_field }}
+                  </div>
+                  <div class="col-1">
+                    {{ item_estoque_form.comprimento|as_crispy_field }}
+                  </div>
+                  <div class="col-2">
                     {{ item_estoque_form.valor_unitario|as_crispy_field }}
                   </div>
-                  <div class="col-md-2 col-sm-6">
+                  <div class="col-1">
                     {{ item_estoque_form.lote|as_crispy_field }}
                   </div>
-                  <div class="col-md-2 col-sm-6 d-flex align-items-center">
-                    <a href="#" class="btn btn-danger btn-lg btn-plus remove-form-btn">
+                  <div class="col-1 text-end">
+                    <a href="#" class="btn btn-danger btn-lg btn-plus  remove-form-btn">
                       <i class="bi bi-trash"></i>
                     </a>
                   </div>
@@ -119,20 +129,26 @@
 
   <!-- Script que gera novos formulários -->
   <script type="text/html" id="item-entrada">
-    <div id="item-__prefix__" class="row g-3 line-to-remove">
-      <div class="col-md-3 col-sm-6">
+    <div id="item-__prefix__" class="row line-to-remove">
+      <div class="col">
         {{ formset.empty_form.produto|as_crispy_field }}
       </div>
-      <div class="col-md-2 col-sm-6">
+      <div class="col-2">
         {{ formset.empty_form.quantidade|as_crispy_field }}
       </div>
-      <div class="col-md-3 col-sm-6">
+      <div class="col-1">
+        {{ formset.empty_form.largura|as_crispy_field }}
+      </div>
+      <div class="col-1">
+        {{ formset.empty_form.comprimento|as_crispy_field }}
+      </div>
+      <div class="col-2">
         {{ formset.empty_form.valor_unitario|as_crispy_field }}
       </div>
-      <div class="col-md-2 col-sm-6">
+      <div class="col-1">
         {{ formset.empty_form.lote|as_crispy_field }}
       </div>
-      <div class="col-md-2 col-sm-6 d-flex align-items-center">
+      <div class="col-1 text-end">
         <a href="#" class="btn btn-danger btn-lg btn-plus remove-form-btn">
           <i class="bi bi-trash"></i>
         </a>
@@ -185,7 +201,7 @@
       matcher: matchCustom
     });
 
-    $('#id_inflows_items-0-produto').select2({
+    $('#id_inflow_items-0-produto').select2({
       matcher: matchCustom
     });
 
@@ -194,14 +210,8 @@
       ev.preventDefault();
 
       // Obtém número atual de formulários usando atributo data
-      let count = parseInt($('#entradas').attr('data-form-count')) ;
+      let count =  $('#entradas .line-to-remove').length;
 
-      // Se não houver nenhum formulário, coloca o atributo como 1
-      if(count == 0) {
-        count = 1;
-      }else{
-        count += 1;
-      }
 
       let templateMarkup = $('#item-entrada').html();
       let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
@@ -213,11 +223,11 @@
       $('#entradas').attr('data-form-count', count);
 
       // Atualiza o campo com o total de formulários
-      $('#id_inflows_items-TOTAL_FORMS').attr('value', count);
+      $('#id_inflow_items-TOTAL_FORMS').attr('value', count + 1);
 
       // Scroll automático para ver o novo formulário adicionado
       $('html, body').animate({
-        scrollTop: $('#add-item').position().top-200
+        scrollTop: $('#add-item').position().top - 200
       }, 800);
 
       // Reaply Select2 to the new field added
@@ -229,30 +239,40 @@
   $(document).on('click', '.remove-form-btn', function(e) {
     e.preventDefault();
 
+    // Verifica a quantirade de formulários antes de tentar apagar, se houver apenas 1 formulário, não apaga
+    let count = $('#entradas .line-to-remove').length;
+
+    if(count == 1) {
+
+      $(this).closest('.line-to-remove').before(
+        '<div class="alert alert-danger alert-dismissible fade show" role="alert">Você deve ter ao menos um produto para adicionar. <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+      );
+      return;
+    }
+
     // Remove o formulário
     $(this).closest('.line-to-remove').remove();
 
-    // Atualiza a contagem total dos formulários
-    let count = parseInt($('#entradas').attr('data-form-count')) - 1;
-
-    $('#id_inflows_items-TOTAL_FORMS').attr('value', count);
+    // Decrementa a contagem total dos formulários
+    $('#id_inflow_items-TOTAL_FORMS').attr('value', count - 1);
     $('#entradas').attr('data-form-count', count);
 
 
     // Reorganiza os índices dos formulários restantes
-    $('#entradas .form-group').each(function(index) {
-        $(this).find('input, select, textarea').each(function() {
-            let name = $(this).attr('name');
-            let id = $(this).attr('id');
-            if (name) {
-                let newName = name.replace(/\d+/, index);
-                $(this).attr('name', newName);
-            }
-            if (id) {
-                let newId = id.replace(/\d+/, index);
-                $(this).attr('id', newId);
-            }
-        });
+    $('#entradas .line-to-remove').each(function(index) {
+      //Atualiza todos os inputs, selects e textareas
+      $(this).find('input, select, textarea').each(function() {
+          let name = $(this).attr('name');
+          let id = $(this).attr('id');
+          if (name) {
+            let newName = name.replace(/\d+/, index);
+            $(this).attr('name', newName);
+          }
+          if (id) {
+            let newId = id.replace(/\d+/, index);
+            $(this).attr('id', newId);
+          }
+      });
     });
   });
 </script>

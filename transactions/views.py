@@ -1,4 +1,5 @@
 from django.views.generic import ListView, CreateView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm,OutflowsItemsFormSet
@@ -36,7 +37,7 @@ class InflowsListView(ListView):
         return queryset
 
 
-class InflowsNewView(FormMessageMixin, CreateView):
+class InflowsNewView(FormMessageMixin, CreateView, LoginRequiredMixin):
     model = Inflows
     form_class = InflowsForm
     template_name = 'entrada/adicionar_entrada.html'
@@ -54,6 +55,7 @@ class InflowsNewView(FormMessageMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         formset = context['formset']
+        form.instance.operador = self.request.user
 
         # Verifica se ao menos um formulário do formset está preenchido
         valid_form_found = any(

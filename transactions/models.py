@@ -1,6 +1,11 @@
 from django.db import models
 from core.models import Base
+from accounts.models import CustomUsuario
 
+TIPO_PERDA = (
+    ('AJUSTE', 'Ajuste'),
+    ('ESTORNO', 'Estorno'),
+)
 
 TIPO_SAIDA = (
     ('V', 'Venda'),
@@ -18,7 +23,18 @@ class Inflows(Base):
     valor_total = models.DecimalField('Valor Total', max_digits=10, decimal_places=2)
     tipo_entrada = models.CharField('Tipo de Entrada', choices=TIPO_ENTRADA, max_length=50)
     nf_entrada = models.PositiveIntegerField('Nota Fiscal')
-    obs = models.TextField(max_length=500, blank=True, null=True)
+    coordenada = models.ForeignKey(
+        'products.CoordinateSetting',
+        verbose_name='Configuração de Coordenada',
+        max_length=50,
+        on_delete=models.PROTECT,
+        related_name='inventory',
+        null=True,
+        blank=True
+    )
+    container = models.CharField('Container', max_length=100, null=True, blank=True)
+    obs = models.CharField('Observações', max_length=500, blank=True, null=True)
+    operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
     dt_recebimento = models.DateTimeField('Data de Recebimento')
 
     class Meta:
@@ -30,18 +46,20 @@ class Inflows(Base):
 
 
 class InflowsItems(Base):
-    entrada = models.ForeignKey(Inflows, verbose_name='Entrada Items', on_delete=models.PROTECT, related_name='inflows_items')
-    produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='inflows_items')
-    quantidade = models.PositiveIntegerField('Quantidade')
-    valor_unitario = models.DecimalField('Valor Unitário', max_digits=10, decimal_places=2)
-    lote = models.CharField('Lote', max_length=50, blank=True, null=True)
+    entrada = models.ForeignKey('transactions.Inflows', on_delete=models.PROTECT, related_name='inflow_items')
+    produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='inflow_items')
+    quantidade = models.PositiveIntegerField('Quant.')
+    largura = models.FloatField('Larg.', max_length=10, null=True, blank=True)
+    comprimento = models.FloatField('Comp.', max_length=10, null=True, blank=True)
+    valor_unitario = models.DecimalField('Valor Unitário', max_digits=10, decimal_places=2, null=True, blank=True)
+    lote = models.PositiveIntegerField('Lote', null=True, blank=True)
 
     class Meta:
         ordering = ('pk',)
         verbose_name = 'Items de Entrada de Estoque'
 
     def __str__(self):
-        return    '{} - {}'.format(self.pk, self.entrada.pk, self.entrada)
+        return    '{} - {}'.format(self.pk, self.entrada)
 
 
 class Outflows(Base):
@@ -50,6 +68,7 @@ class Outflows(Base):
     pedido_interno_cliente = models.PositiveIntegerField()
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
     nf_saida = models.PositiveIntegerField()
+    tipo_perda = models.CharField('Tipo de Perda', choices=TIPO_PERDA, max_length=100, null=True, blank=True)
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas')
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_nf = models.TextField(max_length=500, blank=True, null=True)

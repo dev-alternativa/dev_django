@@ -2,12 +2,9 @@ from django.db import models
 from core.models import Base
 
 TIPO_ALTERACAO = (
-    ('CORRECAO', 'Correcao'),
-)
-
-TIPO_PERDA = (
-    ('AJUSTE', 'Ajuste'),
-    ('ESTORNO', 'Estorno'),
+    ('E', 'Entrada'),
+    ('S', 'Saída'),
+    ('A', 'Ajuste'),
 )
 
 PREDIO = (
@@ -28,7 +25,11 @@ TIPO_STATUS = (
     ('EXPEDIÇÃO', 'Em expedição'),
     ('TRANSFERENCIA', 'Em Transferência'),
     ('PERDA', 'Perda'),
+)
 
+SITUACAO_FISCAL = (
+    ('A', 'Aberto'),
+    ('B', 'Baixado'),
 )
 
 
@@ -84,23 +85,11 @@ class Product(Base):
 
 
 class Inventory(Base):
-    entrada_items_id = models.ForeignKey('transactions.InflowsItems', on_delete=models.PROTECT, related_name='inventory')
-    saida_items = models.ForeignKey('transactions.OutflowsItems', on_delete=models.PROTECT, related_name='inventory')
-    coordenada = models.ForeignKey(
-        'products.CoordinateSetting',
-        verbose_name='Configuração de Coordenada',
-        max_length=50,
-        on_delete=models.PROTECT,
-        related_name='inventory',
-        null=True,
-        blank=True
-    )
-    comprimento = models.FloatField('Comprimento', max_length=10, null=True, blank=True)
-    largura = models.FloatField('Largura', max_length=10, null=True, blank=True)
+    entrada_items_id = models.ForeignKey('transactions.InflowsItems', on_delete=models.PROTECT, related_name='inventory', null=True, blank=True)
+    saida_items = models.ForeignKey('transactions.OutflowsItems', on_delete=models.PROTECT, related_name='inventory', null=True, blank=True)
     status = models.CharField('Status', choices=TIPO_STATUS, max_length=20, null=True, blank=True)
-    container = models.CharField('Container', max_length=100, null=True, blank=True)
+    situacao_fiscal = models.CharField('Situação Fiscal', choices=SITUACAO_FISCAL, max_length=100, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
-    tipo_perda = models.CharField('Tipo de Perda', choices=TIPO_PERDA, max_length=100, null=True, blank=True)
     tipo_alteracao = models.CharField('Tipo de Alteração', choices=TIPO_ALTERACAO, max_length=100, null=True, blank=True)
 
 
@@ -109,7 +98,7 @@ class Inventory(Base):
         verbose_name_plural = 'Estoques'
 
     def __str__(self):
-        return  '{} - {} - {}'.format(self.entrada_items_id, self.comprimento, self.largura)
+        return  '{} - {} - {}'.format(self.entrada_items_id, self.saida_items, self.situacao_fiscal)
 
 
 class Location(Base):

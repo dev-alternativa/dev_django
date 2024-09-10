@@ -38,7 +38,7 @@
                 <td>{{ item.quantidade }}</td>
                 <td>R${{ item.valor_unitario }}</td>
                 <td>{{ item.lote|default_if_none:"" }}</td>
-                <td>{{ item.dt_criacao }}</td>
+                <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
               </tr>
             {% endfor %}
           </tbody>

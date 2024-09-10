@@ -1,10 +1,10 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, HTML, Field, Submit
+from crispy_forms.layout import Submit
 from .models import CustomUsuario
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
- 
+
 # Cria usuario, usado apenas no admin
 class CustomUsuarioCreateForm(UserCreationForm):
   class Meta:
@@ -22,7 +22,7 @@ class CustomUsuarioCreateForm(UserCreationForm):
         user.save()
     return user
 
- # Atualiza usuario, usado apenas no admin
+# Atualiza usuario, usado apenas no admin
 class CustomUsuarioChangeForm(UserChangeForm):
   class Meta:
     model = CustomUsuario

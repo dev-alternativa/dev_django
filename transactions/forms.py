@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
-
+from common.models import Category
 
 class InflowsForm(forms.ModelForm):
 
@@ -17,7 +17,6 @@ class InflowsForm(forms.ModelForm):
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
                     }
                 ),
-            'obs': Textarea(attrs={'rows': 3}),
             'dt_recebimento': forms.DateTimeInput(
                 attrs={
                     'type': 'date',
@@ -58,18 +57,18 @@ class InflowsItemsForm(forms.ModelForm):
             'produto': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    # 'data-placeholder': 'Começe digitando algo...',
-                    # 'data-minimum-input-length': 3,
                 }
             ),
             'quantidade': forms.NumberInput(attrs={'class': 'form-control'}),
+            'largura': forms.NumberInput(attrs={'class': 'form-control'}),
+            'comprimento': forms.NumberInput(attrs={'class': 'form-control'}),
             'valor_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
             'lote': forms.TextInput(attrs={'class': 'form-control'}),
 
         }
         label = {
             'produto': 'Produto',
-            'quantidade': 'Quantidade',
+            'quantidade': 'Quant.',
             'valor_unitario': 'Valor Unitário',
             'lote': 'Lote',
         }

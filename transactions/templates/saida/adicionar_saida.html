@@ -268,7 +268,7 @@
       ev.preventDefault();
 
       // Obtém número atual de formulários usando atributo data
-      let count = parseInt($('#saidas').attr('data-form-count')) ;
+      let count = parseInt($('#saidas').attr('data-form-count'));
 
       // Se não houver nenhum formulário, coloca o atributo como 1
       if(count == 0) {
@@ -276,7 +276,6 @@
       }else{
         count += 1;
       }
-      console.log(count)
 
       let templateMarkup = $('#item-saida').html();
       let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
