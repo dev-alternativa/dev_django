@@ -42,6 +42,7 @@ class InventoryListView(ListView):
     form_class = SearchInventoryForm
     paginate_by = 30
     ordering = '-id'
+    context_object_name = 'inventory_list'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -49,6 +50,39 @@ class InventoryListView(ListView):
         return context
 
 
+    def get_queryset(self):
+        queryset = Inventory.objects.all()
+        filtro_aplicado = False
+
+        # Verifica se foi informado algum filtro
+        est_produto = self.request.GET.get('est_produto')
+        est_id = self.request.GET.get('est_id')
+        est_situacao = self.request.GET.get('est_situacao')
+        est_status = self.request.GET.get('est_status')
+        est_nf = self.request.GET.get('est_nf')
+
+        # Aplica filtros conforme os campos preenchidos
+        if est_produto:
+            queryset = queryset.filter(entrada_items_id__produto = est_produto)
+            filtro_aplicado = True
+        if est_id:
+            queryset = queryset.filter(id = est_id)
+            filtro_aplicado = True
+        if est_situacao:
+            queryset = queryset.filter(status = est_situacao)
+            filtro_aplicado = True
+        if est_status:
+            queryset = queryset.filter(situacao_fiscal = est_status)
+            filtro_aplicado = True
+        if est_nf:
+            queryset = queryset.filter(entrada_items_id__entrada__nf_entrada = est_nf)
+            filtro_aplicado = True
+
+        # Se nenhum filtro foi aplicado, retorna queryset vazio
+        if not filtro_aplicado:
+            queryset = queryset.none()
+
+        return queryset
 
 # ********************************* UNIDADE  *********************************
 class LocationListView(ListView):
@@ -85,6 +119,7 @@ class ProductListView(ListView):
     template_name = 'produto/produto.html'
     context_object_name = 'itens_produto'
     paginate_by = 30
+    ordering = '-id'
 
     def get_queryset(self):
         queryset = super().get_queryset()

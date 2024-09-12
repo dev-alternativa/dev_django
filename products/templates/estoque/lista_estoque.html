@@ -1,30 +1,34 @@
 {% load static %}
 
 <div class="table-responsive border-secondary">
-    {% if itens_estoque %}
+    {% if inventory_list %}
     <table class="table table-hover table-bordered border-secondary-subtle">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Qtde.</th>
                 <th>Produto</th>
+                <th>Larg.</th>
+                <th>Comp.</th>
+                <th>Quantidade.</th>
+                <th>Dt. Recebimento</th>
                 <th>Status</th>
-                <th>Transação</th>
-                {% comment %} <th>Tipo Saída</th> {% endcomment %}
-                {% comment %} <th>m<sup>2</sup></th> {% endcomment %}
+                <th>Obs</th>
                 <th>Data Alteração</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
 
-                {% for item in itens_estoque %}
+                {% for item in inventory_list %}
                     <tr>
-                        <td>{{ item.produto_id }}</td>
-                        <td>{{ item.saldo }}</td>
-                        <td>{{ item.produto.nome_produto }}</td>
-                        <td>{{ item.ativo|yesno:"Ativo,Inativo" }}</td>
-                        <td>{{ item.tipo_transacao }}</td>
-                        <td>{{ item.dt_modificado }}</td>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.entrada_items_id.produto.nome_produto }}</td>
+                        <td>{{ item.entrada_items_id.largura }}</td>
+                        <td>{{ item.entrada_items_id.comprimento }}</td>
+                        <td>{{ item.entrada_items_id.quantidade }}</td>
+                        <td>{{ item.entrada_items_id.entrada.dt_recebimento|date:'d/m/Y' }}</td>
+                        <td>{{ item.status }}</td>
+                        <td>{{ item.obs|default:"" }}</td>
+                        <td>{{ item.dt_modificado|date:'d/m/Y' }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
