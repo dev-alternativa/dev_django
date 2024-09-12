@@ -1,20 +1,29 @@
+from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm,OutflowsItemsFormSet
+from products.models import Product
 from core.views import FormMessageMixin
 from django.urls import reverse_lazy
 from django.db.models import Q
 
 
-
 # Utility
-
 def is_form_empty(form):
     """Retorna True se todos os campos do formulário forem vazios"""
     return all(field is None or field == '' for field in form.cleaned_data.values())
 
+def get_products_by_category(request):
+    category_id = request.GET.get('category_id')
+    if category_id:
+        products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto')
+        products_list = list(products)
+    else:
+        products_list = []
+
+    return JsonResponse(products_list, safe=False)
 
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
@@ -64,7 +73,7 @@ class InflowsNewView(FormMessageMixin, CreateView, LoginRequiredMixin):
             not is_form_empty(form)
             for form in formset
         )
-        print(valid_form_found)
+
 
         if valid_form_found and formset.is_valid():
 

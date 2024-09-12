@@ -46,6 +46,9 @@
             <div class="form-group">
                 {{ form.nf_entrada|as_crispy_field }}
             </div>
+            <div class="form-group">
+              {{ form.categoria|as_crispy_field }}
+            </div>
 
           </div>
 
@@ -275,5 +278,30 @@
       });
     });
   });
+
+  $('#id_categoria').change(function() {
+    let categoryId = $(this).val();
+    if(categoryId) {
+      $.ajax({
+        url: '{% url "get_products_by_category" %}',
+        data: {
+          'category_id': categoryId
+        },
+        success: function(data) {
+          // Limpa o campo de produtos do formset
+          $("select[id$='-produto']").empty();
+          // Adiciona os produtos retornados pela requisição AJAX
+          $.each(data, function(index, item){
+            $("select[id$='-produto']").append($('<option>', {
+              value: item.id,
+              text: item.nome_produto
+            }));
+          });
+        }
+      });
+    }
+  });
+
+
 </script>
 {% endblock %}

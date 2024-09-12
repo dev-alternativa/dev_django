@@ -4,9 +4,20 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
+from crispy_forms.bootstrap import FieldWithButtons
 from common.models import Category
 
 class InflowsForm(forms.ModelForm):
+
+    categoria = forms.ModelChoiceField(
+        queryset = Category.objects.all(),
+        widget = Select2Widget(
+            attrs={
+                'data-placeholder': 'Selecione a categoria',
+                }
+            ),
+        required=False,
+    )
 
     class Meta:
         model = Inflows
@@ -31,22 +42,7 @@ class InflowsForm(forms.ModelForm):
         # self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.layout = Layout(
 
-            Row(
-                Column(
-                    Field('fornecedor', css_class='form-control col-md-2 mb-3'),
-                    Field('valor_total', css_class='form-control col-md-2 mb-3'),
-                    Field('nf_entrada', css_class='form-control col-md-2 mb-3'),
-                ),
-                Column(
-                    Field('tipo_entrada', css_class='form-control col-md-2 mb-0'),
-                    Field('dt_recebimento', css_class='form-control col-md-2 mb-0'),
-                    Field('obs', css_class='form-control col-md-2 mb-0'),
-                ),
-
-            ),
-        )
 
 class InflowsItemsForm(forms.ModelForm):
 

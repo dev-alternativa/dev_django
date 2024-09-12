@@ -9,4 +9,7 @@ urlpatterns = [
     path('outflows/', views.OutflowsListView.as_view(), name='outflow_list'),
     path('outflows/new/', views.OutflowsNewView.as_view(), name='outflow_new'),
     path('outflows/<int:pk>/detail/', views.OutflowsDetailView.as_view(), name='outflow_detail'),
+
+    # AJAX
+    path('get-products/', views.get_products_by_category, name='get_products_by_category'),
 ]
