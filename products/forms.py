@@ -134,7 +134,7 @@ class SearchInventoryForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
+        self.helper.form_method = 'get'
         self.helper.form_id = 'buscaestoque'
         self.helper.layout = Layout(
             Div(
@@ -162,7 +162,7 @@ class SearchInventoryForm(forms.Form):
                     Column('est_coordenada', css_class='col-lg-2'),
                     Column('est_lotes_origem', css_class='col-lg-2'),
                     Column(
-                        HTML('<button type="submit" class="btn btn-success disable_click"><i class="bi bi-funnel"></i> Aplicar Filtro</button>'),
+                        HTML('<button type="submit" class="btn btn-success"><i class="bi bi-funnel"></i> Aplicar Filtro</button>'),
                         css_class='col-lg-2 form-group grupo-botoes d-grid gap-2'
                     ),
                     Column(

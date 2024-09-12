@@ -96,6 +96,7 @@ class Inventory(Base):
     class Meta:
         verbose_name = 'Estoque'
         verbose_name_plural = 'Estoques'
+        ordering = ['id']
 
     def __str__(self):
         return  '{} - {} - {}'.format(self.entrada_items_id, self.saida_items, self.situacao_fiscal)
