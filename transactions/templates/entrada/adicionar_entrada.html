@@ -165,7 +165,7 @@
 <script src="{% static 'js/select2.min.js' %}"></script>
 
 
-<script>
+ <script>
   /********** 1- Verifica quantos formulários foram renderizados **********/
   /********** 2- Adiciona um novo formulário ******************************/
   /********** 3- Atualiza o total de formulários de items *****************/
@@ -200,13 +200,60 @@
     }
 
     // Inicializa o Select2 com a função de correspondência personalizada
-    $("#id_fornecedor").select2({
+    $("#id_fornecedor, #id_inflow_items-0-produto").select2({
       matcher: matchCustom
     });
 
-    $('#id_inflow_items-0-produto').select2({
-      matcher: matchCustom
+    // Função para carregar produtos baseado na categoria selecionada
+    const loadProductsForCategory = (categoryId, target) => {
+      if(categoryId){
+        $.ajax({
+          url: '{% url "get_products_by_category" %}',
+          data: {
+            'category_id': categoryId
+          },
+          success: function(data) {
+            $(target).empty();
+            $.each(data, function(index, item){
+              $(target).append($('<option>', {
+                value: item.id,
+                text: item.nome_produto
+              }));
+            });
+          }
+        });
+      }
+    }
+
+    $('#id_categoria').change(function () {
+      let category_id = $(this).val();
+
+      // Aplica aos produtos dos formsets existentes
+      $("select[id$='-produto']").each(function () {
+        loadProductsForCategory(category_id, $(this)); // Aqui corrigimos o escopo de `this`
+        reapplySelect2AndProductLoader();
+      });
     });
+
+    // Reaplica lógica ao adicionar novos formulários
+    const reapplySelect2AndProductLoader = () => {
+      let categoryId = $("#id_categoria").val();
+
+      // Itera sobre todos os selects de produto
+      $("select[id$='-produto']").each(function() {
+        let selectId = $(this).attr('id'); // Obtém o ID do campo select atual
+
+        // Adiciona ou reaplica Select2
+        $(`#${selectId}`).select2({
+          matcher: matchCustom
+        });
+
+        // Carrega os produtos para o campo atual com base na categoria selecionada
+        loadProductsForCategory(categoryId, `#${selectId}`);
+      });
+    };
+
+
 
     /************* Adicionar um item ao formset *************/
     $('#add-item').click( (ev) => {
@@ -214,8 +261,6 @@
 
       // Obtém número atual de formulários usando atributo data
       let count =  $('#entradas .line-to-remove').length;
-
-
       let templateMarkup = $('#item-entrada').html();
       let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
 
@@ -233,8 +278,8 @@
         scrollTop: $('#add-item').position().top - 200
       }, 800);
 
-      // Reaply Select2 to the new field added
-      $('select').select2();
+      // Reaplica o Select2 e lógica de produtos para o novo formulário
+      reapplySelect2AndProductLoader();
     });
   });
 
@@ -279,28 +324,7 @@
     });
   });
 
-  $('#id_categoria').change(function() {
-    let categoryId = $(this).val();
-    if(categoryId) {
-      $.ajax({
-        url: '{% url "get_products_by_category" %}',
-        data: {
-          'category_id': categoryId
-        },
-        success: function(data) {
-          // Limpa o campo de produtos do formset
-          $("select[id$='-produto']").empty();
-          // Adiciona os produtos retornados pela requisição AJAX
-          $.each(data, function(index, item){
-            $("select[id$='-produto']").append($('<option>', {
-              value: item.id,
-              text: item.nome_produto
-            }));
-          });
-        }
-      });
-    }
-  });
+
 
 
 </script>

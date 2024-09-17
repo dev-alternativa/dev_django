@@ -25,6 +25,11 @@ def get_products_by_category(request):
 
     return JsonResponse(products_list, safe=False)
 
+# def load_products(request):
+#     category_id = request.GET.get('category_id')
+#     products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto')
+#     return JsonResponse(list(products), safe=False)
+
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
     model = Inflows

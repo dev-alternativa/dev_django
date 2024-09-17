@@ -60,7 +60,10 @@ class InventoryListView(ListView):
         est_situacao = self.request.GET.get('est_situacao')
         est_status = self.request.GET.get('est_status')
         est_nf = self.request.GET.get('est_nf')
+        est_largura = self.request.GET.get('est_largura')
+        est_comprimento = self.request.GET.get('est_comprimento')
 
+        # print(est_status)
         # Aplica filtros conforme os campos preenchidos
         if est_produto:
             queryset = queryset.filter(entrada_items_id__produto = est_produto)
@@ -72,10 +75,16 @@ class InventoryListView(ListView):
             queryset = queryset.filter(status = est_situacao)
             filtro_aplicado = True
         if est_status:
-            queryset = queryset.filter(situacao_fiscal = est_status)
+            queryset = queryset.filter(status = est_status)
             filtro_aplicado = True
         if est_nf:
             queryset = queryset.filter(entrada_items_id__entrada__nf_entrada = est_nf)
+            filtro_aplicado = True
+        if est_largura:
+            queryset = queryset.filter(entrada_items_id__largura = est_largura)
+            filtro_aplicado = True
+        if est_comprimento:
+            queryset = queryset.filter(entrada_items_id__comprimento = est_comprimento)
             filtro_aplicado = True
 
         # Se nenhum filtro foi aplicado, retorna queryset vazio

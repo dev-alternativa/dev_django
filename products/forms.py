@@ -83,9 +83,13 @@ class SearchInventoryForm(forms.Form):
     est_status = forms.ChoiceField(
         label = 'Por Status',
         choices = [
-            ("", "Todos os tipos"), ("disponivel", "Em estoque"), ("em expedicao", "Em expedição"),
-            ("producao", "Em produção"), ("baixado", "Baixado"), ("transferencia", "Em transferência"),
-            ("transferido", "Transferido"), ("perda", "Perda")
+            ("", "Todos os tipos"),
+            ("ESTOQUE", "Em estoque"),
+            ("EXPEDIÇÃO", "Em expedição"),
+            # ("producao", "Em produção"),
+            ("FATURADO", "Faturado"),
+            # ("transferencia", "Em transferência"),
+            ("PERDA", "Perda")
         ],
         required = False,
         widget = forms.Select(attrs = {'class': 'form-select filtros'})
@@ -117,7 +121,10 @@ class SearchInventoryForm(forms.Form):
     est_containner = forms.CharField(
         label = 'Por Container',
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control filtros'})
+        widget=forms.TextInput(attrs={
+            'class': 'form-control filtros ',
+            'text-decoration': 'line-through'
+        })
     )
     est_coordenada = forms.ModelChoiceField(
         label = 'Por Coordenada',

@@ -23,7 +23,8 @@ TIPO_STATUS = (
     ('AJUSTE', 'Ajuste'),
     ('ESTOQUE', 'Em Estoque'),
     ('EXPEDIÇÃO', 'Em expedição'),
-    ('TRANSFERENCIA', 'Em Transferência'),
+    ('FATURADO', 'Baixado'),
+    # ('TRANSFERENCIA', 'Em Transferência'),
     ('PERDA', 'Perda'),
 )
 
