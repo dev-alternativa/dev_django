@@ -18,10 +18,11 @@ def is_form_empty(form):
 def get_products_by_category(request):
     category_id = request.GET.get('category_id')
     if category_id:
-        products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto')
-        products_list = list(products)
+        products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto', 'largura', 'comprimento')
     else:
-        products_list = []
+        products = Product.objects.values('id', 'nome_produto', 'largura', 'comprimento')
+
+    products_list = list(products)
 
     return JsonResponse(products_list, safe=False)
 
@@ -51,7 +52,7 @@ class InflowsListView(ListView):
         return queryset
 
 
-class InflowsNewView(FormMessageMixin, CreateView, LoginRequiredMixin):
+class InflowsNewView(LoginRequiredMixin, FormMessageMixin, CreateView):
     model = Inflows
     form_class = InflowsForm
     template_name = 'entrada/adicionar_entrada.html'
@@ -78,7 +79,6 @@ class InflowsNewView(FormMessageMixin, CreateView, LoginRequiredMixin):
             not is_form_empty(form)
             for form in formset
         )
-
 
         if valid_form_found and formset.is_valid():
 

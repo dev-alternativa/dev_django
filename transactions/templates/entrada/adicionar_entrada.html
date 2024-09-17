@@ -59,9 +59,7 @@
             <div class="form-group">
                 {{ form.tipo_entrada|as_crispy_field }}
             </div>
-            <div class="form-group">
-                {{ form.coordenada|as_crispy_field }}
-            </div>
+
             <div class="form-group">
                 {{ form.obs|as_crispy_field }}
             </div>
@@ -83,11 +81,8 @@
                   <div class="col-2">
                     {{ item_estoque_form.quantidade|as_crispy_field }}
                   </div>
-                  <div class="col-1">
-                    {{ item_estoque_form.largura|as_crispy_field }}
-                  </div>
-                  <div class="col-1">
-                    {{ item_estoque_form.comprimento|as_crispy_field }}
+                  <div class="col-2">
+                    {{ item_estoque_form.coordenada|as_crispy_field }}
                   </div>
                   <div class="col-2">
                     {{ item_estoque_form.valor_unitario|as_crispy_field }}
@@ -140,15 +135,12 @@
         {{ formset.empty_form.quantidade|as_crispy_field }}
       </div>
       <div class="col-1">
-        {{ formset.empty_form.largura|as_crispy_field }}
-      </div>
-      <div class="col-1">
-        {{ formset.empty_form.comprimento|as_crispy_field }}
+        {{ formset.empty_form.coordenada|as_crispy_field }}
       </div>
       <div class="col-2">
         {{ formset.empty_form.valor_unitario|as_crispy_field }}
       </div>
-      <div class="col-1">
+      <div class="col-2">
         {{ formset.empty_form.lote|as_crispy_field }}
       </div>
       <div class="col-1 text-end">
@@ -165,12 +157,13 @@
 <script src="{% static 'js/select2.min.js' %}"></script>
 
 
- <script>
+<script>
   /********** 1- Verifica quantos formulários foram renderizados **********/
   /********** 2- Adiciona um novo formulário ******************************/
   /********** 3- Atualiza o total de formulários de items *****************/
 
   $(document).ready( () => {
+
     // Função de // Função de correspondência personalizada
     function matchCustom(params, data) {
       // If there are no search terms, return all of the data
@@ -206,7 +199,7 @@
 
     // Função para carregar produtos baseado na categoria selecionada
     const loadProductsForCategory = (categoryId, target) => {
-      if(categoryId){
+
         $.ajax({
           url: '{% url "get_products_by_category" %}',
           data: {
@@ -215,15 +208,20 @@
           success: function(data) {
             $(target).empty();
             $.each(data, function(index, item){
+              console.log(target);
+
               $(target).append($('<option>', {
                 value: item.id,
-                text: item.nome_produto
+                text: item.nome_produto + ' / ' + item.largura + ' x ' + item.comprimento,
               }));
             });
           }
         });
-      }
+
     }
+
+    // Ao carregar a página trás todos os produtos já com largura e comprimento no texto
+    loadProductsForCategory(undefined, "select[id='id_inflow_items-0-produto']");
 
     $('#id_categoria').change(function () {
       let category_id = $(this).val();

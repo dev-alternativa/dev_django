@@ -20,19 +20,10 @@ TIPO_ENTRADA = (
 
 class Inflows(Base):
     fornecedor = models.ForeignKey('common.CustomerSupplier', verbose_name='Fornecedor', on_delete=models.PROTECT, related_name='inflows')
-    valor_total = models.DecimalField('Valor Total', max_digits=10, decimal_places=2)
-    tipo_entrada = models.CharField('Tipo de Entrada', choices=TIPO_ENTRADA, max_length=50)
+    valor_total = models.DecimalField('Valor Total dos Produtos', max_digits=10, decimal_places=2)
+    tipo_entrada = models.CharField('Tipo de Entrada', choices=TIPO_ENTRADA, max_length=50, default=TIPO_ENTRADA[0])
     nf_entrada = models.PositiveIntegerField('Nota Fiscal')
-    coordenada = models.ForeignKey(
-        'products.CoordinateSetting',
-        verbose_name='Configuração de Coordenada',
-        max_length=50,
-        on_delete=models.PROTECT,
-        related_name='inventory',
-        null=True,
-        blank=True
-    )
-    container = models.CharField('Container', max_length=100, null=True, blank=True)
+    # container = models.CharField('Container', max_length=100, null=True, blank=True)
     obs = models.CharField('Observações', max_length=500, blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
     dt_recebimento = models.DateTimeField('Data de Recebimento')
@@ -48,11 +39,20 @@ class Inflows(Base):
 class InflowsItems(Base):
     entrada = models.ForeignKey('transactions.Inflows', on_delete=models.PROTECT, related_name='inflow_items')
     produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='inflow_items')
+    coordenada = models.ForeignKey(
+        'products.CoordinateSetting',
+        verbose_name='Coordenada',
+        max_length=50,
+        on_delete=models.PROTECT,
+        related_name='inventory',
+        null=True,
+        blank=True
+    )
     quantidade = models.PositiveIntegerField('Quant.')
-    largura = models.FloatField('Larg.', max_length=10, null=True, blank=True)
-    comprimento = models.FloatField('Comp.', max_length=10, null=True, blank=True)
+    # largura = models.FloatField('Larg.', max_length=10, null=True, blank=True)
+    # comprimento = models.FloatField('Comp.', max_length=10, null=True, blank=True)
     valor_unitario = models.DecimalField('Valor Unitário', max_digits=10, decimal_places=2, null=True, blank=True)
-    lote = models.PositiveIntegerField('Lote', null=True, blank=True)
+    lote = models.CharField('Lote', max_length=50, null=True, blank=True)
 
     class Meta:
         ordering = ('pk',)

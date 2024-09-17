@@ -7,11 +7,12 @@ from products.models import Inventory
 @receiver(post_save, sender=InflowsItems)
 def adicionar_estoque_inventario(sender, instance, created, **kwargs):
     if created:
-        Inventory.objects.create(
-            entrada_items_id=instance,
-            status='ESTOQUE',
-            tipo_alteracao='E',
-        )
+        for _ in range(instance.quantidade):
+            Inventory.objects.create(
+                entrada_items_id=instance,
+                status='ESTOQUE',
+                tipo_alteracao='E',
+            )
 
 # # @receiver(post_save, sender=EstoqueRemocao)
 # # def remover_estaque_inventario(sender, instance, created, **kwargs):

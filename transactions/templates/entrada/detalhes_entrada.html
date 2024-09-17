@@ -24,7 +24,6 @@
             <tr>
               <th>Item</th>
               <th>Produto</th>
-              <th>Quantidade</th>
               <th>Valor Unitário</th>
               <th>Lote</th>
               <th>Data de Criação</th>
@@ -35,7 +34,6 @@
               <tr>
                 <td>{{ item.id }}</td>
                 <td>{{ item.produto.nome_produto }}</td>
-                <td>{{ item.quantidade }}</td>
                 <td>R${{ item.valor_unitario }}</td>
                 <td>{{ item.lote|default_if_none:"" }}</td>
                 <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
@@ -43,6 +41,10 @@
             {% endfor %}
           </tbody>
         </table>
+      </div>
+      <div class="card-footer">
+        <legend>Observações:</legend>
+        <p>{{ inflow.obs|default_if_none:"" }}</p>
       </div>
   </div>
 

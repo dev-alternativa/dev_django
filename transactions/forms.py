@@ -5,7 +5,7 @@ from crispy_forms.layout import Layout, Field, Row, Column
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
 from crispy_forms.bootstrap import FieldWithButtons
-from common.models import Category
+from common.models import Category, CustomerSupplier
 
 class InflowsForm(forms.ModelForm):
 
@@ -39,7 +39,7 @@ class InflowsForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(InflowsForm, self).__init__(*args, **kwargs)
-        # self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)
+        self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
 

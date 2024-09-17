@@ -9,7 +9,6 @@
                 <th>Produto</th>
                 <th>Larg.</th>
                 <th>Comp.</th>
-                <th>Quantidade.</th>
                 <th>Dt. Recebimento</th>
                 <th>Status</th>
                 <th>Obs</th>
@@ -22,9 +21,8 @@
                     <tr>
                         <td>{{ item.id }}</td>
                         <td>{{ item.entrada_items_id.produto.nome_produto }}</td>
-                        <td>{{ item.entrada_items_id.largura }}</td>
-                        <td>{{ item.entrada_items_id.comprimento }}</td>
-                        <td>{{ item.entrada_items_id.quantidade }}</td>
+                        <td>{{ item.entrada_items_id.produto.largura }}</td>
+                        <td>{{ item.entrada_items_id.produto.comprimento }}</td>
                         <td>{{ item.entrada_items_id.entrada.dt_recebimento|date:'d/m/Y' }}</td>
                         <td>{{ item.status }}</td>
                         <td>{{ item.obs|default:"" }}</td>
