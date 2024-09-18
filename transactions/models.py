@@ -26,7 +26,7 @@ class Inflows(Base):
     # container = models.CharField('Container', max_length=100, null=True, blank=True)
     obs = models.CharField('Observações', max_length=500, blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
-    dt_recebimento = models.DateTimeField('Data de Recebimento')
+    dt_recebimento = models.DateField('Data de Recebimento')
 
     class Meta:
         ordering = ('pk',)
@@ -74,7 +74,7 @@ class Outflows(Base):
     dados_adicionais_nf = models.TextField(max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    dt_faturamento = models.DateTimeField(blank=True, null=True)
+    dt_faturamento = models.DateField(blank=True, null=True)
 
     class Meta:
         ordering = ('pk',)

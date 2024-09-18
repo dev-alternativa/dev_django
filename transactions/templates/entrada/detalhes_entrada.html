@@ -25,6 +25,7 @@
               <th>Item</th>
               <th>Produto</th>
               <th>Valor Unitário</th>
+              <th>Quantidade</th>
               <th>Lote</th>
               <th>Data de Criação</th>
             </tr>
@@ -35,6 +36,7 @@
                 <td>{{ item.id }}</td>
                 <td>{{ item.produto.nome_produto }}</td>
                 <td>R${{ item.valor_unitario }}</td>
+                <td>{{ item.quantidade }}</td>
                 <td>{{ item.lote|default_if_none:"" }}</td>
                 <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
               </tr>

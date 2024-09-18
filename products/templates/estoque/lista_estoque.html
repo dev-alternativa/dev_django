@@ -20,10 +20,10 @@
                 {% for item in inventory_list %}
                     <tr>
                         <td>{{ item.id }}</td>
-                        <td>{{ item.entrada_items_id.produto.nome_produto }}</td>
-                        <td>{{ item.entrada_items_id.produto.largura }}</td>
-                        <td>{{ item.entrada_items_id.produto.comprimento }}</td>
-                        <td>{{ item.entrada_items_id.entrada.dt_recebimento|date:'d/m/Y' }}</td>
+                        <td>{{ item.entrada_items.produto.nome_produto }}</td>
+                        <td>{{ item.entrada_items.produto.largura }}</td>
+                        <td>{{ item.entrada_items.produto.comprimento }}</td>
+                        <td>{{ item.entrada_items.entrada.dt_recebimento|date:'d/m/Y' }}</td>
                         <td>{{ item.status }}</td>
                         <td>{{ item.obs|default:"" }}</td>
                         <td>{{ item.dt_modificado|date:'d/m/Y' }}</td>

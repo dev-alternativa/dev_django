@@ -55,36 +55,77 @@ class InventoryListView(ListView):
         filtro_aplicado = False
 
         # Verifica se foi informado algum filtro
-        est_produto = self.request.GET.get('est_produto')
-        est_id = self.request.GET.get('est_id')
-        est_situacao = self.request.GET.get('est_situacao')
-        est_status = self.request.GET.get('est_status')
-        est_nf = self.request.GET.get('est_nf')
-        est_largura = self.request.GET.get('est_largura')
-        est_comprimento = self.request.GET.get('est_comprimento')
+        filter_produto = self.request.GET.get('est_produto')
+        filter_id = self.request.GET.get('est_id')
+        filter_largura = self.request.GET.get('est_largura')
+        filter_comprimento = self.request.GET.get('est_comprimento')
+        filter_data_recebimento = self.request.GET.get('est_data_recebimento')
+        filter_data_faturamento = self.request.GET.get('est_data_faturamento')
+        filter_categoria = self.request.GET.get('est_categoria')
+        filter_situacao = self.request.GET.get('est_situacao')
+        filter_status = self.request.GET.get('est_status')
+        filter_motivo = self.request.GET.get('est_tipo_perda')
+        filter_baixa = self.request.GET.get('est_baixa')
+        filter_pedido_cliente = self.request.GET.get('est_pedido_cliente')
+        filter_nf_entrada = self.request.GET.get('est_nf_entrada')
+        filter_nf_saida = self.request.GET.get('est_nf_saida')
+        filter_coordenada = self.request.GET.get('est_coordenada')
+        filter_lote = self.request.GET.get('est_lote')
 
-        # print(est_status)
         # Aplica filtros conforme os campos preenchidos
-        if est_produto:
-            queryset = queryset.filter(entrada_items_id__produto = est_produto)
+        if filter_produto:
+            queryset = queryset.filter(entrada_items__produto = filter_produto)
             filtro_aplicado = True
-        if est_id:
-            queryset = queryset.filter(id = est_id)
+
+        if filter_id:
+            queryset = queryset.filter(id = filter_id)
             filtro_aplicado = True
-        if est_situacao:
-            queryset = queryset.filter(status = est_situacao)
+
+        if filter_largura:
+            queryset = queryset.filter(entrada_items__produto__largura = filter_largura)
             filtro_aplicado = True
-        if est_status:
-            queryset = queryset.filter(status = est_status)
+
+        if filter_comprimento:
+            queryset = queryset.filter(entrada_items__produto__comprimento = filter_comprimento)
             filtro_aplicado = True
-        if est_nf:
-            queryset = queryset.filter(entrada_items_id__entrada__nf_entrada = est_nf)
+
+        if filter_data_recebimento:
+            queryset = queryset.filter(entrada_items__entrada__dt_recebimento = filter_data_recebimento)
             filtro_aplicado = True
-        if est_largura:
-            queryset = queryset.filter(entrada_items_id__largura = est_largura)
+
+        if filter_data_faturamento:
+            queryset = queryset.filter(saida_items__saida__dt_faturamento = filter_data_faturamento)
             filtro_aplicado = True
-        if est_comprimento:
-            queryset = queryset.filter(entrada_items_id__comprimento = est_comprimento)
+
+        if filter_categoria:
+            queryset = queryset.filter(entrada_items__produto__tipo_categoria = filter_categoria)
+            filtro_aplicado = True
+
+        if filter_situacao:
+            queryset = queryset.filter(status = filter_situacao)
+            filtro_aplicado = True
+
+        if filter_status:
+            queryset = queryset.filter(status = filter_status)
+            filtro_aplicado = True
+
+        if filter_motivo:
+            queryset = queryset.filter(motivo = filter_motivo)
+
+        if filter_nf_entrada:
+            queryset = queryset.filter(entrada_items__entrada__nf_entrada = filter_nf_entrada)
+            filtro_aplicado = True
+
+        if filter_nf_saida:
+            queryset = queryset.filter(saida_items__saida__nf_saida = filter_nf_saida)
+            filtro_aplicado = True
+
+        if filter_coordenada:
+            queryset = queryset.filter(entrada_items__coordenada = filter_coordenada)
+            filtro_aplicado = True
+
+        if filter_lote:
+            queryset = queryset.filter(entrada_items__lote = filter_lote)
             filtro_aplicado = True
 
         # Se nenhum filtro foi aplicado, retorna queryset vazio

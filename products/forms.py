@@ -5,6 +5,7 @@ from crispy_forms.layout import Layout, Field, Row, Column, HTML, Div
 from crispy_forms.bootstrap import TabHolder, Tab
 from django_select2.forms import Select2Widget
 from products.models import Product, CoordinateSetting, Location
+from common.models import Category
 
 
 class CoordinateForm(ModelForm):
@@ -40,39 +41,54 @@ class CoordinateForm(ModelForm):
 
 class SearchInventoryForm(forms.Form):
     est_produto = forms.ModelChoiceField(
-        label = 'Por Produto',
+        label = 'Produto',
         queryset = Product.objects.all(),
         required = False,
         widget = forms.Select(attrs = {'class': 'form-select filtros', 'aria-label': 'Default select example'})
     )
     est_id = forms.CharField(
-        label = 'Por ID',
+        label = 'ID',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_largura = forms.CharField(
-        label = 'Por Largura',
+        label = 'Largura',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_comprimento = forms.CharField(
-        label = 'Por Comprimento',
+        label = 'Comprimento',
         required=False, widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
-
-    est_datatime = forms.CharField(
-        label = 'Por Data',
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control filtros data'})
-    )
-    est_origem = forms.ChoiceField(
-        label = 'Pela Origem',
-        choices = [("", "Todos os tipos"), ("Jumbo", "Jumbo"), ("Estoque", "Estoque")],
+    est_data_recebimento = forms.DateField(
+        label = 'Data de Recebimento',
         required = False,
-        widget = forms.Select(attrs = {'class': 'form-select filtros'})
+        widget = forms.DateInput(
+            attrs = {
+                'class': 'form-control filtros data',
+                'type' : 'date',
+            }
+        )
     )
+    est_data_faturamento = forms.DateField(
+        label = 'Data de Faturamento',
+        required = False,
+        widget = forms.DateInput(
+            attrs = {
+                'class': 'form-control filtros data',
+                'type' : 'date',
+            }
+        )
+    )
+    est_categoria = forms.ModelChoiceField(
+        label = 'Categoria',
+        queryset = Category.objects.all(),
+        required = False,
+        widget = forms.Select(attrs={'class': 'form-select filtros'})
+    )
+
     est_situacao = forms.ChoiceField(
-        label = 'Por Situação',
+        label = 'Situação',
         choices = [
             ("", "Todos os tipos"), ("aberto", "Aberto"), ("ajuste", "Ajuste"), ("amostra", "Amostra"),
             ("baixado", "Baixado"), ("fechado", "Fechado")
@@ -81,62 +97,62 @@ class SearchInventoryForm(forms.Form):
         widget = forms.Select(attrs = {'class': 'form-select filtros'})
     )
     est_status = forms.ChoiceField(
-        label = 'Por Status',
+        label = 'Status',
         choices = [
             ("", "Todos os tipos"),
             ("ESTOQUE", "Em estoque"),
             ("EXPEDIÇÃO", "Em expedição"),
-            # ("producao", "Em produção"),
             ("FATURADO", "Faturado"),
-            # ("transferencia", "Em transferência"),
             ("PERDA", "Perda")
         ],
         required = False,
         widget = forms.Select(attrs = {'class': 'form-select filtros'})
     )
     est_tipo_perda = forms.ChoiceField(
-        label = 'Por Tipo de Perda',
+        label = 'Tipo de Perda',
         choices = [
-            ("", "Todos os tipos"), ("ajuste", "Ajuste"), ("Ajuste Jumbo", "Ajuste Jumbo"),
-            ("Fim de Jumbo", "Fim Jumbo"), ("producao", "Produção"), ("refile", "Refile"), ("Estorno", "Estorno")
+            ("", "Todos os tipos"),
+            ("I", "Motivo Interno"),
+            ("E", "Motivo Externo"),
         ],
         required = False,
         widget = forms.Select(attrs={'class': 'form-select filtros'})
     )
     est_baixa = forms.CharField(
-        label = 'Por Baixa',
+        label = 'Baixa',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros data'})
     )
     est_pedido_cliente = forms.CharField(
-        label = 'Por Pedido',
+        label = 'Pedido',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
-    est_nf = forms.CharField(
-        label = 'Por NF',
+    est_nf_entrada = forms.CharField(
+        label = 'NF de Entrada',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
-    est_containner = forms.CharField(
-        label = 'Por Container',
+    est_nf_saida = forms.CharField(
+        label = 'NF de Saída',
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control filtros ',
-            'text-decoration': 'line-through'
         })
     )
     est_coordenada = forms.ModelChoiceField(
-        label = 'Por Coordenada',
+        label = 'Coordenada',
         queryset = CoordinateSetting.objects.all(),
         required = False,
         widget = forms.Select(attrs={'class': 'form-select filtros'})
     )
-    est_lotes_origem = forms.CharField(
-        label = 'Por Lote de Origem',
+
+    est_lote = forms.CharField(
+        label = 'Lote',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -150,12 +166,12 @@ class SearchInventoryForm(forms.Form):
                     Column('est_id', css_class='col-lg-2'),
                     Column('est_largura', css_class='col-lg-2'),
                     Column('est_comprimento', css_class='col-lg-2'),
-                    # Column('est_lote', css_class='col-lg-2'),
-                    Column('est_datatime', css_class='col-lg-2'),
+                    Column('est_data_recebimento', css_class='col-lg-2'),
+                    Column('est_data_faturamento', css_class='col-lg-2'),
                     css_class='row'
                 ),
                 Row(
-                    Column('est_origem', css_class='col-lg-2'),
+                    Column('est_categoria', css_class='col-lg-2'),
                     Column('est_situacao', css_class='col-lg-2'),
                     Column('est_status', css_class='col-lg-2'),
                     Column('est_tipo_perda', css_class='col-lg-2'),
@@ -164,10 +180,10 @@ class SearchInventoryForm(forms.Form):
                     css_class='row filter-spaces'
                 ),
                 Row(
-                    Column('est_nf', css_class='col-lg-2'),
-                    Column('est_containner', css_class='col-lg-2'),
+                    Column('est_nf_entrada', css_class='col-lg-2'),
+                    Column('est_nf_saida', css_class='col-lg-2'),
                     Column('est_coordenada', css_class='col-lg-2'),
-                    Column('est_lotes_origem', css_class='col-lg-2'),
+                    Column('est_lote', css_class='col-lg-2'),
                     Column(
                         HTML('<button type="submit" class="btn btn-success"><i class="bi bi-funnel"></i> Aplicar Filtro</button>'),
                         css_class='col-lg-2 form-group grupo-botoes d-grid gap-2'

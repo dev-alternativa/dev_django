@@ -24,8 +24,12 @@ TIPO_STATUS = (
     ('ESTOQUE', 'Em Estoque'),
     ('EXPEDIÇÃO', 'Em expedição'),
     ('FATURADO', 'Baixado'),
-    # ('TRANSFERENCIA', 'Em Transferência'),
     ('PERDA', 'Perda'),
+)
+
+CHOICES_MOTIVO = (
+    ('I', 'Interno'),
+    ('E', 'Externo'),
 )
 
 SITUACAO_FISCAL = (
@@ -86,9 +90,10 @@ class Product(Base):
 
 
 class Inventory(Base):
-    entrada_items_id = models.ForeignKey('transactions.InflowsItems', on_delete=models.PROTECT, related_name='inventory', null=True, blank=True)
+    entrada_items = models.ForeignKey('transactions.InflowsItems', on_delete=models.PROTECT, related_name='inventory', null=True, blank=True)
     saida_items = models.ForeignKey('transactions.OutflowsItems', on_delete=models.PROTECT, related_name='inventory', null=True, blank=True)
     status = models.CharField('Status', choices=TIPO_STATUS, max_length=20, null=True, blank=True)
+    motivo = models.CharField('Motivo', choices=CHOICES_MOTIVO, max_length=100, null=True, blank=True)
     situacao_fiscal = models.CharField('Situação Fiscal', choices=SITUACAO_FISCAL, max_length=100, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
     tipo_alteracao = models.CharField('Tipo de Alteração', choices=TIPO_ALTERACAO, max_length=100, null=True, blank=True)
@@ -100,7 +105,7 @@ class Inventory(Base):
         ordering = ['id']
 
     def __str__(self):
-        return  '{} - {} - {}'.format(self.entrada_items_id, self.saida_items, self.situacao_fiscal)
+        return  '{} - {} - {}'.format(self.entrada_items, self.saida_items, self.situacao_fiscal)
 
 
 class Location(Base):
