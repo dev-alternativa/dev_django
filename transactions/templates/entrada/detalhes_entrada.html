@@ -35,7 +35,7 @@
               <tr>
                 <td>{{ item.id }}</td>
                 <td>{{ item.produto.nome_produto }}</td>
-                <td>R${{ item.valor_unitario }}</td>
+                <td>R${{ item.valor_unitario|default_if_none:" 0,00" }}</td>
                 <td>{{ item.quantidade }}</td>
                 <td>{{ item.lote|default_if_none:"" }}</td>
                 <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>

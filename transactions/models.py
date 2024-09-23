@@ -2,10 +2,7 @@ from django.db import models
 from core.models import Base
 from accounts.models import CustomUsuario
 
-TIPO_PERDA = (
-    ('AJUSTE', 'Ajuste'),
-    ('ESTORNO', 'Estorno'),
-)
+
 
 TIPO_SAIDA = (
     ('V', 'Venda'),
@@ -59,22 +56,22 @@ class InflowsItems(Base):
         verbose_name = 'Items de Entrada de Estoque'
 
     def __str__(self):
-        return    '{} - {}'.format(self.pk, self.entrada)
+        return str(self.pk)
 
 
 class Outflows(Base):
     numero_pedido_cliente = models.PositiveIntegerField()
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True)
-    pedido_interno_cliente = models.PositiveIntegerField()
+    pedido_interno_cliente = models.PositiveIntegerField(null=True, blank=True)
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
-    nf_saida = models.PositiveIntegerField()
-    tipo_perda = models.CharField('Tipo de Perda', choices=TIPO_PERDA, max_length=100, null=True, blank=True)
-    transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas')
+    nf_saida = models.PositiveIntegerField('NF Saída', null=True, blank=True)
+    transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas', null=True, blank=True)
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    dados_adicionais_nf = models.TextField(max_length=500, blank=True, null=True)
+    dados_adicionais_nf = models.TextField('Dados Adicionais NF',max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_faturamento = models.DateField(blank=True, null=True)
+    operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ('pk',)

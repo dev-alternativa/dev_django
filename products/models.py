@@ -37,6 +37,11 @@ SITUACAO_FISCAL = (
     ('B', 'Baixado'),
 )
 
+TIPO_PERDA = (
+    ('AJUSTE', 'Ajuste'),
+    ('ESTORNO', 'Estorno'),
+)
+
 
 class CoordinateSetting(Base):
     titulo = models.CharField('Configuração de Coordenada', max_length=100)
@@ -97,6 +102,7 @@ class Inventory(Base):
     situacao_fiscal = models.CharField('Situação Fiscal', choices=SITUACAO_FISCAL, max_length=100, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
     tipo_alteracao = models.CharField('Tipo de Alteração', choices=TIPO_ALTERACAO, max_length=100, null=True, blank=True)
+    tipo_perda = models.CharField('Tipo de Perda', choices=TIPO_PERDA, max_length=100, null=True, blank=True)
 
 
     class Meta:

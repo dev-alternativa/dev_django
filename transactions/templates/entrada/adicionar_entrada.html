@@ -78,7 +78,7 @@
                   <div class="col">
                     {{ item_estoque_form.produto|as_crispy_field }}
                   </div>
-                  <div class="col-2">
+                  <div class="col-1">
                     {{ item_estoque_form.quantidade|as_crispy_field }}
                   </div>
                   <div class="col-2">
@@ -131,16 +131,16 @@
       <div class="col">
         {{ formset.empty_form.produto|as_crispy_field }}
       </div>
-      <div class="col-2">
+      <div class="col-1">
         {{ formset.empty_form.quantidade|as_crispy_field }}
       </div>
-      <div class="col-1">
+      <div class="col-2">
         {{ formset.empty_form.coordenada|as_crispy_field }}
       </div>
       <div class="col-2">
         {{ formset.empty_form.valor_unitario|as_crispy_field }}
       </div>
-      <div class="col-2">
+      <div class="col-1">
         {{ formset.empty_form.lote|as_crispy_field }}
       </div>
       <div class="col-1 text-end">
@@ -207,6 +207,13 @@
           },
           success: function(data) {
             $(target).empty();
+
+            // Adiciona a opção padrão vazia: '---------'
+            $(target).append($('<option>', {
+              value: '',
+              text: '---------',
+            }));
+
             $.each(data, function(index, item){
               console.log(target);
 

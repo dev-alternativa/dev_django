@@ -4,8 +4,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Row, Column
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
-from crispy_forms.bootstrap import FieldWithButtons
 from common.models import Category, CustomerSupplier
+from products.models import Product
 
 class InflowsForm(forms.ModelForm):
 
@@ -107,6 +107,7 @@ class OutflowsForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(OutflowsForm, self).__init__(*args, **kwargs)
+        self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -122,7 +123,10 @@ class OutflowsForm(forms.ModelForm):
                     Field('transportadora', css_class='form-control col-md-2 mb-3'),
                 ),
                 Column(
-                    Field('dolar_ptax', css_class='form-control col-md-2 mb-3'),
+                    Field(
+                        'dolar_ptax',
+                        css_class='form-control col-md-2 mb-3',
+                    ),
                     Field('dados_adicionais_nf', css_class='form-control col-md-2 mb-3'),
                     Field('cod_cenario_fiscal', css_class='form-control col-md-2 mb-3'),
                 ),

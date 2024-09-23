@@ -47,7 +47,7 @@ class SearchInventoryForm(forms.Form):
         widget = forms.Select(attrs = {'class': 'form-select filtros', 'aria-label': 'Default select example'})
     )
     est_id = forms.CharField(
-        label = 'ID',
+        label = 'ID do Item',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
