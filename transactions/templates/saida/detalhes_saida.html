@@ -46,7 +46,7 @@
                 <td>{{ item.cfop }}</td>
                 <td>{{ item.obs }}</td>
                 <td>{{ item.vendedor }}</td>
-                <td>{{ item.dt_criacao }}</td>
+                <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
               </tr>
             {% endfor %}
           </tbody>

@@ -247,15 +247,7 @@
     }
 
     // Inicializa o Select2 nas Select com a função de correspondência personalizada
-    $("#id_cliente").select2({
-      matcher: matchCustom
-    });
-
-    $("#id_transportadora").select2({
-      matcher: matchCustom
-    });
-
-    $('#id_saida_items-0-produto').select2({
+    $("#id_cliente, #id_transportadora, #id_saida_items-0-produto").select2({
       matcher: matchCustom
     });
 
@@ -268,7 +260,7 @@
       ev.preventDefault();
 
       // Obtém número atual de formulários usando atributo data
-      let count = parseInt($('#saidas').attr('data-form-count'));
+      let count = $('#saidas .line-to-remove').length;
 
       // Se não houver nenhum formulário, coloca o atributo como 1
       if(count == 0) {

@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -162,16 +163,23 @@ class OutflowsNewView(FormMessageMixin, CreateView):
 
         if valid_form_found and formset.is_valid():
 
-            # Salva formulário principal
-            self.object = form.save()
+            try:
 
-            # Associa formset à instância do form principal
-            formset.instance = self.object
+                with transaction.atomic():
+                    # Salva formulário principal
+                    self.object = form.save()
 
-            # Salva os itens do formset
-            formset.save()
+                    # Associa formset à instância do form principal
+                    formset.instance = self.object
 
-            return super().form_valid(form)
+                    # Salva os itens do formset
+                    formset.save()
+
+                    return super().form_valid(form)
+            except ValueError as e:
+                messages.error(self.request, str(e))
+                return super().form_invalid(form)
+
         else:
             messages.error(self.request, 'É necessário incluir pelo menos 1 produto!')
             return super().form_invalid(form)
