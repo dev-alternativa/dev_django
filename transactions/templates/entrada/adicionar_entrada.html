@@ -260,8 +260,9 @@
 
 
 
-    /************* Adicionar um item ao formset *************/
+    /************************** Adicionar um item ao formset **************************/
     $('#add-item').click( (ev) => {
+      // Reseta o tamanho da área de texto do novo form
       ev.preventDefault();
 
       // Obtém número atual de formulários usando atributo data
@@ -310,10 +311,9 @@
     $('#id_inflow_items-TOTAL_FORMS').attr('value', count - 1);
     $('#entradas').attr('data-form-count', count);
 
-
     // Reorganiza os índices dos formulários restantes
     $('#entradas .line-to-remove').each(function(index) {
-      //Atualiza todos os inputs, selects e textareas
+      // Atualiza todos os inputs, selects e textareas
       $(this).find('input, select, textarea').each(function() {
           let name = $(this).attr('name');
           let id = $(this).attr('id');
@@ -328,9 +328,6 @@
       });
     });
   });
-
-
-
 
 </script>
 {% endblock %}

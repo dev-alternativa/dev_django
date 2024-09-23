@@ -251,9 +251,11 @@
       matcher: matchCustom
     });
 
+    // Defini tamanho das linhas do textarea
     $('textarea').attr('rows', 3);
 
-    /************* Adicionar um item ao formset *************/
+
+    /************************** Adicionar um item ao formset **************************/
     $('#add-item').click( (ev) => {
       // Reseta o tamanho da área de texto do novo form
 
@@ -261,14 +263,6 @@
 
       // Obtém número atual de formulários usando atributo data
       let count = $('#saidas .line-to-remove').length;
-
-      // Se não houver nenhum formulário, coloca o atributo como 1
-      if(count == 0) {
-        count = 1;
-      }else{
-        count += 1;
-      }
-
       let templateMarkup = $('#item-saida').html();
       let compiledTemplate = templateMarkup.replace(/__prefix__/g, count);
 
@@ -279,11 +273,11 @@
       $('#saidas').attr('data-form-count', count);
 
       // Atualiza o campo com o total de formulários
-      $('#id_saida_items-TOTAL_FORMS').attr('value', count);
+      $('#id_saida_items-TOTAL_FORMS').attr('value', count + 1);
 
       // Scroll automático para ver o novo formulário adicionado
       $('html, body').animate({
-        scrollTop: $('#add-item').position().top-200
+        scrollTop: $('#add-item').position().top - 200
       }, 800);
 
       // Reaply Select2 to the new field added
@@ -300,7 +294,7 @@
     e.preventDefault();
 
     // Verifica a quantirade de formulários antes de tentar apagar, se houver apenas 1 formulário, não apaga
-    let count = parseInt($('#saidas').attr('data-form-count')) ;
+    let count = $('#saidas .line-to-remove').length;
 
     if(count == 1) {
 
@@ -313,15 +307,13 @@
     // Remove o formulário
     $(this).closest('.line-to-remove').remove();
 
-    // Atualiza a contagem total dos formulários
-    count =- 1;
-
-    $('#id_saida_items-TOTAL_FORMS').attr('value', count);
+    // Decrementa a contagem de formulários do formset
+    $('#id_saida_items-TOTAL_FORMS').attr('value', count - 1);
     $('#saidas').attr('data-form-count', count);
 
-
     // Reorganiza os índices dos formulários restantes
-    $('#saidas .form-group').each(function(index) {
+    $('#saidas .line-to-remove').each(function(index) {
+      // Atualiza todos os inputs, selects e textareas
         $(this).find('input, select, textarea').each(function() {
             let name = $(this).attr('name');
             let id = $(this).attr('id');
@@ -336,5 +328,6 @@
         });
     });
   });
+
 </script>
 {% endblock %}
