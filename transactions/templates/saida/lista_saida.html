@@ -79,8 +79,8 @@
                                                 <td>{{ outflow.get_tipo_saida_display }}</td>
                                                 <td>{{ outflow.pedido_interno_cliente  }}</td>
                                                 <td>{{ outflow.cliente  }}</td>
-                                                <td>{{ outflow.nf_saida }}</td>
-                                                <td>{{ outflow.transportadora }}</td>
+                                                <td>{{ outflow.nf_saida|default_if_none:'-' }}</td>
+                                                <td>{{ outflow.transportadora|default_if_none:'-' }}</td>
                                                 <td>{{ outflow.dt_faturamento|date:'d/m/Y' }}</td>
                                                 <td>{{ outflow.dt_criacao|date:'d/m/Y' }}</td>
                                                 <td class="action_size_column">

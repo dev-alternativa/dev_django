@@ -16,7 +16,7 @@
 
     <div class="card">
       <div class="card-header">
-        Itens da Entrada #<strong>{{ outflow.id }}</strong> de Nota Fiscal: <strong>{{ outflow.nf_saida }}</strong>
+        Itens da Entrada #<strong>{{ outflow.id }}</strong> de Nota Fiscal: <strong>{{ outflow.nf_saida|default:"" }}</strong>
     </div>
       <div class="card-body text-center">
         <table class="table table-hover  border-secondary-subtle">
@@ -38,13 +38,13 @@
             {% for item in outflow_items %}
               <tr>
                 <td>{{ item.id }}</td>
-                <td>{{ item.numero_pedido }}</td>
+                <td>{{ item.saida.pedido_interno_cliente }}</td>
                 <td>{{ item.produto.nome_produto }}</td>
                 <td>{{ item.quantidade }}</td>
                 <td>R${{ item.valor_unitario }}</td>
                 <td>{{ item.item_pedido }}</td>
-                <td>{{ item.cfop }}</td>
-                <td>{{ item.obs }}</td>
+                <td>{{ item.cfop|default_if_none:'-' }}</td>
+                <td>{{ item.obs|default_if_none:'-' }}</td>
                 <td>{{ item.vendedor }}</td>
                 <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
               </tr>
