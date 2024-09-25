@@ -4,12 +4,12 @@ import re
 
 
 CNPJ_FATURAMENTO = (
-    ('COM', 'Comércio'),
-    ('IND', 'Indústria'),
-    ('SRV', 'Serviços'),
-    ('MRX', 'Manaus'),
-    ('FLX', 'Flexo'),
-    ('PRE', 'Pré-Impressão'),
+    ('COM', 'COM'),
+    ('IND', 'IND'),
+    ('SRV', 'SRV'),
+    ('MRX', 'MRX'),
+    ('FLX', 'FLX'),
+    ('PRE', 'PRE'),
 )
 
 TIPO_FRETE = (

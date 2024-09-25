@@ -20,4 +20,7 @@ urlpatterns = [
     path("vendedor/<int:pk>/update/", views.SellerUpdateView.as_view(), name="update_seller"),
     path("vendedor/<int:pk>/delete/", views.SellerDeleteView.as_view(), name="delete_seller"),
     path("vendedor/<int:pk>/detail/", views.SellerDetailView.as_view(), name="detail_seller"),
+
+    path("preco/", views.PriceListView.as_view(), name="price"),
+    path('preco/adicionar/', views.PriceNewView.as_view(), name='add_price'),
 ]

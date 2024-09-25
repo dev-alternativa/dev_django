@@ -1,8 +1,8 @@
 from pyexpat.errors import messages
 from django.urls import reverse_lazy
 from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView
-from common.forms import CategoryForm, CustomerSupplierForm, SellerForm
-from common.models import Category, CustomerSupplier, Seller
+from common.forms import CategoryForm, CustomerSupplierForm, PriceForm, SellerForm
+from common.models import Category, CustomerSupplier, Seller, Price
 from django.db.models import Q
 from core.views import FormataDadosMixin,  FormMessageMixin, DeleteSuccessMessageMixin
 
@@ -181,3 +181,19 @@ class SellerDetailView(DetailView, FormataDadosMixin):
     model = Seller
     template_name =  'vendedores/visualizar_vendedor.html'
     context_object_name = 'seller'
+
+
+
+# ********************************* PREÇO *********************************
+class PriceListView(ListView):
+    model = Price
+    template_name = 'preco/preco.html'
+    context_object_name = 'itens_preco'
+
+
+class PriceNewView(FormMessageMixin, CreateView):
+    model = Price
+    form_class = PriceForm
+    template_name = "preco/adicionar_preco.html"
+    success_url = reverse_lazy('price')
+    success_message = 'Preço cadastrado com sucesso!'
