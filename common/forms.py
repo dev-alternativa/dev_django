@@ -1,12 +1,13 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, HTML, Div
+from crispy_forms.layout import Layout, Field, Row, Column, HTML, Submit
 from common.models import Category, CustomerSupplier, Seller, Price
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, FieldWithButtons, StrictButton
 from crispy_bootstrap5.bootstrap5 import Switch
 from products.models import Product
+from logistic.models import LeadTime
 
 
 class CategoryForm(ModelForm):
@@ -222,172 +223,81 @@ class CustomerSupplierForm(ModelForm):
         self.fields['inscricao_estadual'].widget.attrs.update({ 'inscricao_estadual': 10 })
 
 
-class PriceForm(ModelForm):
+class PriceFormCustomer(Form):
 
-    diversos = forms.ModelChoiceField(
-        queryset=Product.objects.filter(tipo_categoria__nome='DIVERSOS'),
+    cliente = forms.ModelChoiceField(
+        queryset=CustomerSupplier.objects.filter(tag_cliente=True),
+        label='Cliente',
         widget=Select2Widget(
             attrs={
-                'data-placeholder': 'Selecione um produto',
+                'data-placeholder': 'Selecione um cliente',
+                'data-minimum-input-length': 3,
+                'style': 'width: 40%'
             }
-        ),
-        label='Produto'
+        )
     )
 
-    laminas = forms.ModelChoiceField(
-        queryset=Product.objects.filter(tipo_categoria__nome='LAMINAS'),
-        widget=Select2Widget(
-            attrs={
-                'data-placeholder':  'Selecione um produto'
-            }
-        ),
-        label='Produto'
-    )
+    def __init__(self, *args, **kwargs):
+        super(PriceFormCustomer, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            HTML('<h3>Pametrizar preço de cliente</h3>'),
+            Row(
+                Column(
+                    FieldWithButtons(
+                        Field('cliente', css_class='form-control col-md-2 mb-0'),
+                        StrictButton('Selecionar Cliente', css_class='btn btn-danger', id='select-cliente'),
+                    ),
+                ),
+            ),
+        )
 
-    nyloflex = forms.ModelChoiceField(
-        queryset=Product.objects.filter(tipo_categoria__nome='NYLOFLEX'),
-        widget=Select2Widget(
-            attrs={
-                'data-placeholder': 'Selecione um produto'
-            }
-        ),
-        label='Produto'
-    )
 
-    nyloprint = forms.ModelChoiceField(
-        queryset=Product.objects.filter(tipo_categoria__nome='NYLOPRINT'),
-        widget=Select2Widget(
-            attrs={
-                'data-placeholder': 'Selecione um produto'
-            }
-        ),
-        label='Produto'
-    )
+class TabsPriceFormset(ModelForm):
 
     class Meta:
         model = Price
         exclude = ['dt_criacao', 'dt_modificado']
-        widgets = {
-            'produto': Select2Widget(
-                attrs={
-                    'data-placeholder': 'Selecione um produto',
-                }
-            ),
-            'cliente': Select2Widget(
-                attrs={
-                    'data-placeholder': 'Selecione um cliente',
-                }
-            ),
-            'prazo': Select2Widget(
-                attrs={
-                    'data-placeholder': 'Começe digitando algo...',
-                    'data-minimum-input-length': 3,
-                    'data-width': '100%',
-                }
-            ),
-        }
 
     def __init__(self, *args, **kwargs):
-        super(PriceForm, self).__init__(*args, **kwargs)
-        self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
+        super(TabsPriceFormset, self).__init__(*args, **kwargs)
+        self.fields['produto'].queryset = Product.objects.none()
+        self.fields['prazo'].queryset = LeadTime.objects.none()
+
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-
         self.helper.layout = Layout(
-
-            HTML('<h3>Pametrizar preço de cliente</h3>'),
-            Field('cliente', css_class='form-control col-md-6 mb-1'),
-
-            TabHolder(
-
-                Tab(
-                    'DIVERSOS',
-                    Row(
-                        Column(
-                            Field('diversos', css_class='form-control col-mb-3 mb-0')
-                        ),
-                        Column(
-                            Field('valor', css_class='form-control col-md-3 mb-0'),
-                        ),
-                        Column(
-                            Field('prazo', css_class='form-control col-md-3 mb-0'),
-                        ),
-                        Column(
-                            Field('cnpj_faturamento', css_class='form-control col-md-3 mb-0'),
-                        ),
-                        Column(
-                            Field('condicao', css_class='form-control col-md-3 mb-0'),
-                        ),
-                    ),
-                    Row(
-                        Column(
-                            Field('obs', css_class='form-control col-md-3 mb-0', rows="2"),
-                        )
-                    ),
-                ),
-                Tab(
-                    'LAMINAS',
-                    Row(
-                        Column(
-                            Field('laminas', css_class='form-control text-center')
-                        ),
-                        Column(
-                            Field('valor', css_class='form-control col-md-3 mb-0'),
-                        ),
-                        Column(
-                            Field('prazo', css_class='form-control col-md-3 mb-0'),
-                        ),
-                        Column(
-                            Field('cnpj_faturamento', css_class='form-control col-md-3 mb-0'),
-                        ),
-                        Column(
-                            Field('condicao', css_class='form-control col-md-3 mb-0'),
-                        ),
-                    ),
-                    Row(
-                        Column(
-                            Field('obs', css_class='form-control col-md-3 mb-0', rows="2"),
-                        )
-                    )
-                ),
-                Tab(
-                    'MÁQUINAS',
-                ),
-                Tab(
-                    'NOVOS',
-                ),
-                Tab(
-                    'NYLOFLEX',
-                    Row(
-                        Column(
-                            Field('nyloflex', css_class='form-control text-center')
-                        ), css_class="text-center"
-                    )
-                ),
-                Tab(
-                    'NYLOPRINT',
-                    Row(
-                        Column(
-                            Field('nyloprint', css_class='form-control text-center')
-                        ), css_class="text-center"
-                    )
-                ),
-                Tab(
-                    'QSPAC',
-                ),
-                Tab(
-                    'SuperLam',
-                ),
-                Tab(
-                    'TESA',
-                ),
-            ),
             Row(
-
+                Column(
+                    Field('produto', css_class='form-control col-md-6 mb-0'),
+                    Field('vendedor', css_class='form-control col-md-6 mb-0'),
+                ),
+                Column(
+                    Field('condicao', css_class='form-control col-md-3 mb-0'),
+                    Field('valor', css_class='form-control col-md-3 mb-0'),
+                    Switch('is_dolar', css_class='form-control col-md-3 mb-0'),
+                ),
+                Column(
+                    Field('prazo', css_class='form-control col-md-6 mb-0'),
+                    Field('cnpj_faturamento', css_class='form-control col-md-6 mb-0'),
+                    Submit('btnAddClientPrice', '+', css_class='btn btn-info float-end'),
+                ),
             ),
-            HTML('<hr>'),
+            # Row(
+            #     Column(
+            #     ),
+            # )
         )
 
+DiversosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+LaminasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+MaquinasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+NovosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+NyloflexFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+NyloprintFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+QSPACFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+SuperLamFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+TesaFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
 
 class SellerForm(ModelForm):
     class Meta:
