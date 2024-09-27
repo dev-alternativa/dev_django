@@ -16,13 +16,270 @@
                 <div class='btn-group top-buttons space_from_margin center_content' role="group" aria-label="Grupo de botões">
                     <form method="POST" autocomplete="off">
                       {% csrf_token %}
-                      {% crispy form %}
+                        <div class="container">
+                          <!-- Campo Cliente -->
+                          <div class="row">
+                            {% crispy customer_form %}
+                          </div>
+                          <hr>
+                          <!-- Tabs com os formsets -->
+                          <div class="row invisible" id='groub-tabs'>
+                            <ul class="nav nav-tabs">
+                              <li class="nav-item">
+                                <a class="nav-link active" id="diversos-tab" data-bs-toggle="tab" href="#diversos">DIVERSOS</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="laminas-tab" data-bs-toggle="tab" href="#laminas">LAMINAS</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="maquinas-tab" data-bs-toggle="tab" href="#maquinas">MÁQUINAS</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="novos-tab" data-bs-toggle="tab" href="#novos">NOVOS</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="nyloflex-tab" data-bs-toggle="tab" href="#nyloflex">NYLOFLEX</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="qspac-tab" data-bs-toggle="tab" href="#qspac">QSPAC</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="superlam-tab" data-bs-toggle="tab" href="#superlam">SuperLam</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="nyloprint-tab" data-bs-toggle="tab" href="#nyloprint">NYLOPRINT</a>
+                              </li>
+                              <li class="nav-item">
+                                <a class="nav-link" id="tesa-tab" data-bs-toggle="tab" href="#tesa">Tesa</a>
+                              </li>
+                            </ul>
+
+                            <div class="tab-content" style='margin-top: 1rem;'>
+                              <div class="tab-pane fade show active" id="diversos" role="tabpanel" aria-labelledby="diversos-tab">
+                                {{ diversos_formset.management_form }}
+                                {% for form in diversos_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="laminas" role="tabpanel" aria-labelledby="laminas-tab">
+                                {{ laminas_formset.management_form }}
+                                {% for form in laminas_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="maquinas" role="tabpanel" aria-labelledby="maquinas-tab">
+                                {{ maquinas_formset.management_form }}
+                                {% for form in maquinas_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="novos" role="tabpanel" aria-labelledby="novos-tab">
+                                {{ novos_formset.management_form }}
+                                {% for form in novos_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="nyloflex" role="tabpanel" aria-labelledby="nyloflex-tab">
+                                {{ nyloflex_formset.management_form }}
+                                {% for form in nyloflex_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="qspac" role="tabpanel" aria-labelledby="qspac-tab">
+                                {{ qspac_formset.management_form }}
+                                {% for form in qspac_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="superlam" role="tabpanel" aria-labelledby="superlam-tab">
+                                {{ superlam_formset.management_form }}
+                                {% for form in superlam_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="nyloprint" role="tabpanel" aria-labelledby="nyloprint-tab">
+                                {{ nyloprint_formset.management_form }}
+                                {% for form in nyloprint_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                              <div class="tab-pane fade" id="tesa" role="tabpanel" aria-labelledby="tesa-tab">
+                                {{ tesa_formset.management_form }}
+                                {% for form in tesa_formset %}
+                                  {% crispy form %}
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
 
                     </form>
                 </div>
+                <hr>
+                {% include "preco/_lista_preco_clientes.html" %}
             </div>
           </div>
         </div>
     </div>
 </div>
 {% endblock  %}
+{% block extra_scripts %}
+<script>
+
+  const formataData = (dataString) => {
+    let data = new Date(dataString);
+
+    let dia = String(data.getDate()).padStart(2, '0');
+    let mes = String(data.getMonth() + 1).padStart(2, '0');
+    let ano  = String(data.getFullYear());
+
+    return dia + '/' + mes + '/' + ano;
+  }
+
+  $(document).ready(function(){
+    // Desabilita o campo de selecionar cliente
+
+    let selectDisabled = false;
+    $('#select-cliente').click(function(){
+      if($('#id_cliente option:checked').val() == ''){
+
+        // Exibe formulários se existir cliente
+        alert('Selecione um cliente!');
+        return false;
+      }else{
+          selectDisabled = !selectDisabled;
+            $('#id_cliente').prop('disabled', selectDisabled);
+          if($('#id_cliente').is(':disabled')){
+            $('#groub-tabs').removeClass('invisible');
+          }
+        }
+
+      // AJAX para listar preços do cliente selecionado
+      const client = $('#id_cliente option:checked').text();
+
+       // Verifica se o cliente foi selecionado
+      if (client) {
+        $.ajax({
+            url: "{% url 'get_prices' %}",  // URL da view que retorna os preços
+            method: 'GET',
+            data: {
+                'client': client // Envia o ID do cliente
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Processa os dados retornados
+
+
+                // Exemplo: Itera sobre os dados e exibe em uma tabela ou qualquer outro elemento HTML
+                $('#prices-table tbody').empty();  // Limpa a tabela de preços
+                $.each(data, function(index, price) {
+                    $('#prices-table tbody').append(
+                        '<tr>' +
+                        '<td>' + price.produto__nome_produto + '</td>' +
+                        '<td>R$ ' + price.valor.replace('.', ',') + '</td>' +
+                        '<td>' + (price.is_dolar ? 'Sim' : 'Não') + '</td>' +
+                        '<td>' + price.prazo__parcelas + '</td>' +
+                        '<td>' + price.cnpj_faturamento + '</td>' +
+                        '<td>' + price.condicao + '</td>' +
+                        '<td>' + price.vendedor__nome + '</td>' +
+                        '<td>' + formataData(price.dt_criacao) + '</td>' +
+                        '</tr>'
+                    );
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro na requisição AJAX:', error);
+            }
+        });
+      }
+
+
+      /* REALIZA AS REQUISIÇÕES DE ACORDO COM A TAB SELECIONADA */
+
+      const requestCategoryProducts = (category) => {
+        $.ajax({
+          url: "{% url 'get_category_products' %}",
+          data: {
+            'categoria': category,
+          },
+          method: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            console.log(category);
+            $("#id_" + category + "-0-produto").empty();
+            $("#id_" + category + "-0-produto").append('<option value="">---------</option>');
+
+            $.each(data, function(index, produto){
+
+              $("#id_" + category + "-0-produto").append('<option value="' + produto.id + '">' + produto.nome_produto + '</option>');
+            });
+          }
+        });
+      };
+
+      const requestLeadTime = (tab) => {
+        $.ajax({
+          url: "{% url 'get_leadtimes' %}",
+          data: {
+            'aba': tab,
+          },
+          method: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            $("#id_" + tab + "-0-prazo").empty();
+            $("#id_" + tab + "-0-prazo").append('<option value="">---------</option>');
+            $.each(data, function(index, produto){
+              $("#id_" + tab + "-0-prazo").append('<option value="' + produto.id + '">' + produto.parcelas + '</option>');
+            });
+          }
+        });
+
+      };
+
+      /* Se a tab selecionada é a DIVERSOS (INICIAL) */
+      // Chama a função para carregar os produtos, como diversos é a primeira aba, carrega automático ao abrir a página
+      requestCategoryProducts('diversos');
+
+      // Ao clicar em cada aba, carregas os produtos para a respectiva categoria
+      $('#laminas-tab').click( () => {
+        requestCategoryProducts('laminas');
+        requestLeadTime('laminas');
+      });
+      $('#maquinas-tab').click( () => {
+        requestCategoryProducts('maquinas');
+        requestLeadTime('maquinas');
+      });
+      $('#novos-tab').click( () => {
+        requestCategoryProducts('novos');
+        requestLeadTime('novos');
+      });
+      $('#nyloflex-tab').click( () => {
+        requestCategoryProducts('nyloflex');
+        requestLeadTime('nyloflex');
+      });
+      $('#qspac-tab').click( () => {
+        requestCategoryProducts('qspac');
+        requestLeadTime('qspac');
+      });
+      $('#tesa-tab').click( () => {
+        requestCategoryProducts('tesa');
+        requestLeadTime('tesa');
+      });
+      $('#superlam-tab').click( () => {
+        requestCategoryProducts('superlam');
+        requestLeadTime('superlam');
+      });
+      $('#nyloprint-tab').click( () => {
+        requestCategoryProducts('nyloprint');
+        requestLeadTime('nyloprint');
+      });
+
+
+    });
+
+
+  });
+
+</script>
+{% endblock %}
