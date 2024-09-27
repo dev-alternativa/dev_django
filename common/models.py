@@ -2,6 +2,13 @@ from django.db import models
 from core.models import Base
 import re
 
+CONDICAO_PRECO = (
+    ('N', 'Normal'),
+    ('E1', 'Especial 1'),
+    ('E2', 'Especial 2'),
+    ('E3', 'Especial 3'),
+)
+
 
 CNPJ_FATURAMENTO = (
     ('COM', 'COM'),
@@ -142,7 +149,8 @@ class Price(Base):
     is_dolar = models.BooleanField('Dolar', default=False)
     prazo = models.ForeignKey('logistic.LeadTime', verbose_name='Prazo', on_delete=models.PROTECT, null=True, blank=True, related_name='precos')
     cnpj_faturamento = models.CharField('CNPJ do Faturamento', choices=CNPJ_FATURAMENTO, max_length=30, null=True, blank=True)
-    condicao = models.CharField('Condição de Cálculo', max_length=100, null=True, blank=True)
+    condicao = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100, null=True, blank=True)
+    vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.PROTECT,  related_name='precos')
     obs = models.TextField('Observações', null=True, blank=True)
 
     class Meta:
