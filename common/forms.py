@@ -308,9 +308,12 @@ class PriceForms(ModelForm):
         exclude = ['dt_criacao', 'dt_modificado', 'cliente']
 
     def __init__(self, *args, **kwargs):
-        categoria_id = kwargs.pop('categoria_id')
+
+        categoria_id = kwargs.pop('categoria_id', None)
         super(PriceForms, self).__init__(*args, **kwargs)
+
         self.fields['produto'].queryset = Product.objects.filter(tipo_categoria=categoria_id)
+        self.fields['valor'].label = 'Preço Unitário'
 
 
         self.helper = FormHelper()
@@ -320,6 +323,10 @@ class PriceForms(ModelForm):
                 Column(
                     Field('produto', css_class='form-control col-md-4 mb-0'),
                     Field('vendedor', css_class='form-control col-md-4 mb-0'),
+                    PrependedText(
+                        'frete', 'R$',
+                        css_class='form-control col-md-4 mb-0 numericValorOnly mask-money'
+                    ),
                 ),
                 Column(
                     Field('condicao', css_class='form-control col-md-4 mb-0'),

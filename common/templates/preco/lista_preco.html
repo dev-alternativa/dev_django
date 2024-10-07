@@ -41,11 +41,11 @@
             <td class="action_size_column">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <!-- Editar -->
-                <a class="btn btn-warning btn-edit" href="#" role="button">
+                <a class="btn btn-warning btn-edit" href="{% url 'update_price' preco.id preco.produto.tipo_categoria.id %}" role="button">
                   <i class="bi bi-pencil-square"></i>
                 </a>
                 <!-- Apagar -->
-                <a class="btn btn-danger btn-delete" href="#" role="button">
+                <a class="btn btn-danger btn-delete" href="{% url 'delete_price' preco.id %}" role="button">
                   <i class="bi bi-trash3"></i>
                 </a>
               </div>

@@ -13,6 +13,7 @@ class LeadTime(Base):
         constraints = [
             models.UniqueConstraint(fields=['parcelas', 'codigo'], name='unique_parcelas_codigo')
         ]
+        ordering = ['parcelas', ]
 
     def __str__(self):
         return self.descricao

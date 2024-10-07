@@ -1,7 +1,9 @@
 from django.contrib import messages
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DeleteView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.db.models import ProtectedError
+from django.shortcuts import redirect
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
@@ -94,12 +96,30 @@ class FormMessageMixin:
 
 
 # Mensagens de exclusão de itens
-class DeleteSuccessMessageMixin:
+class DeleteSuccessMessageMixin(SuccessMessageMixin, DeleteView):
   delete_success_message = 'Item excluído com sucesso!'
+  delete_error_message = 'Erro ao exluir o item!'
+  protected_error_message = 'Este item não pode ser excluído pois está sendo referenciado por outros registros.'
+  success_message = 'Item Excluído com sucesso'
 
-  def delete(self, request, *args, **kwargs):
-    response = super().delete(request, *args, **kwargs)
-    if self.delete_success_message:
-      messages.success(self.request, self.delete_success_message)
+  def post(self, request, *args, **kwargs):
+    self.object = self.get_object()
+    try:
+      print('METODO DELETE: Antes de tentar apagar')
+      response = super().delete(request, *args, **kwargs)
+      print('METODO DELETE depois de tentar apagar')
 
-      return response
+      if self.delete_success_message:
+        messages.success(self.request, self.delete_success_message)
+        return response
+
+    except ProtectedError as e:
+      messages.error(self.request, self.protected_error_message)
+      print('Erro Protegido')
+      return redirect(self.success_url)
+
+    except Exception as e:
+
+      print('Erro Exception')
+      messages.error(self.request, self.delete_error_message)
+      return redirect(self.success_url)

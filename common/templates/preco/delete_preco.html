@@ -14,10 +14,18 @@
                 </div>
                 <div class="card-body delete-box">
                     <form method="POST">
-                      <p>Tem certeza de que deseja excluir este preço "{{ object.nome }}"?</p>
                       {% csrf_token %}
+                      <p>Tem certeza de que deseja excluir o preço customizado
+                        <strong>
+                          R$ {{ object.valor }}
+                        </strong> do produto
+                      </p>
+                      <p>
+                        <strong>{{ object.produto }}</strong> referente ao cliente
+                        <strong>{{ object.cliente }}</strong>?
+                      </p>
                       <button type="submit" class="btn btn-danger">Excluir</button>
-                      <a href="{% url 'category' %}" class="btn btn-secondary">Cancelar</a>
+                      <a href="{% url 'price' %}" class="btn btn-secondary">Cancelar</a>
                     </form>
                 </div>
             </div>

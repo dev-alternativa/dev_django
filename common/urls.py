@@ -22,9 +22,11 @@ urlpatterns = [
     path("vendedor/<int:pk>/detail/", views.SellerDetailView.as_view(), name="detail_seller"),
 
     path("preco/", views.PriceListView.as_view(), name="price"),
-    path('preco/selecionar-cliente/', views.CustomerSelectView.as_view(), name='select_client'),
-    path('preco/selecionar-categoria/<int:pk>/cliente/', views.CategorySelectView.as_view(), name='select_category'),
+    path('preco/selecionar-cliente/', views.CustomerPriceSelectView.as_view(), name='select_client'),
+    path('preco/selecionar-categoria/<int:pk>/cliente/', views.CategoryPriceSelectView.as_view(), name='select_category'),
     path('preco/adicionar/<int:cliente_id>/<int:categoria_id>/', views.PriceCreateView.as_view(), name='add_price_client'),
+    path('preco/<int:pk>/<int:categoria_id>/update/', views.PriceUpdateView.as_view(), name='update_price'),
+    path('preco/<int:pk>/delete/', views.PriceDeleteView.as_view(), name='delete_price'),
 
     # AJAX
     path('get-prices/', views.GetPricesByClient.as_view(), name='get_prices'),

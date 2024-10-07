@@ -4,26 +4,42 @@
   <thead>
     <tr>
       <th>Produto</th>
-      <th>Valor</th>
+      <th>Preço Unitário</th>
       <th>Dólar?</th>
       <th>Prazo</th>
       <th>CNPJ Faturamento</th>
       <th>Condição de Cálculo</th>
       <th>Vendedor</th>
       <th>Data de Criação</th>
+      <th>Ações</th>
     </tr>
   </thead>
   <tbody class="text-center">
     {% for item in itens_preco %}
       <tr>
         <td>{{ item.produto }}</td>
-        <td>{{ item.valor }}</td>
+        <td>
+          {% if item.is_dolar == 0 %}R$ {% else %}$ {% endif %}
+          {{ item.valor }}
+        </td>
         <td>{{ item.is_dolar|yesno:"S, N" }}</td>
         <td>{{ item.prazo }}</td>
         <td>{{ item.cnpj_faturamento }}</td>
         <td>{{ item.condicao }}</td>
         <td>{{ item.vendedor }}</td>
         <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
+        <td class="action_size_column">
+          <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+            <!-- Editar -->
+            <a class="btn btn-warning btn-sm btn-edit" href="{% url 'update_price' item.id categoria_id %}" role="button">
+              <i class="bi bi-pencil-square"></i>
+            </a>
+            <!-- Apagar -->
+            <a class="btn btn-danger btn-sm btn-delete" href="{% url 'delete_price' item.id %}" role="button">
+              <i class="bi bi-trash3"></i>
+            </a>
+          </div>
+        </td>
       </tr>
     {% endfor %}
   </tbody>

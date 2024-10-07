@@ -240,67 +240,17 @@ class PriceListView(ListView):
     context_object_name = 'itens_preco'
     success_url = reverse_lazy('add_price')
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.GET.get('search')
+        if search:
+            search_terms = search.split()
+            query = Q()
+            for term in search_terms:
+                query |= Q(cliente__nome_fantasia__icontains=term)
+            queryset = queryset.filter(query).distinct()
+        return queryset
 
-# class PriceClientCreateView(View, FormMessageMixin):
-#     model = Price
-#     template_name = "preco/adicionar_preco_categorias.html"
-
-#     def get_context_data(self, **kwargs):
-#         context = {}
-#         cliente_id = self.kwargs.get('pk')
-#         context['cliente_id'] = cliente_id
-#         context['cliente_nome'] = CustomerSupplier.objects.get(id=cliente_id).nome_fantasia
-
-#         # Inicializa os formsetspara cada categoria
-#         formset_map = {}
-#         category_prefix = ['diversos', 'laminas', 'maquinas', 'novos', 'nyloflex', 'nyloprint', 'qspac', 'superlam', 'tesa']
-#         for prefix in category_prefix:
-#             formest = self.get_formset(prefix)
-#             context[f'{prefix}_formset'] = formest
-#             formset_map[prefix] = formest
-
-#         return context
-
-#     def get_formset(self, prefix):
-#         formset_class = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo'])
-#         return formset_class(queryset=Price.objects.none(), prefix=prefix)
-
-#     def get_success_url(self):
-#         return reverse_lazy('add_price_client', kwargs={'pk': self.kwargs.get('pk')})
-
-#     def get(self, request, *args, **kwargs):
-#         # Lida com requisições GET
-#         context = self.get_context_data(**kwargs)
-#         return render(request, self.template_name, context)
-
-#     def post(self, request, *args, **kwargs):
-#         # Recupera ID do cliente
-#         cliente_id = self.kwargs.get('pk')
-#         cliente = CustomerSupplier.objects.get(id=cliente_id)
-
-#         # Recupera a aba ativa
-#         active_tab = request.POST.get('active_tab')
-#         formset = self.get_formset(active_tab)
-
-#         if formset and formset.is_valid():
-#             print('TESTE')
-#             # Salva o formset ativo
-#             for form in formset:
-#                 price_instance = form.save(commit=False)
-#                 price_instance.cliente = cliente
-#                 price_instance.produto = form.cleaned_data('produto')
-
-#                 price_instance.save()
-
-#             return redirect(self.get_success_url())
-
-#         else:
-#             # Se nenhum formset for válido, renderize novamente com erros
-#             context = self.get_context_data()
-#             context.update({
-#                 f'{active_tab}_formset': formset, # Passa Formset inválido pra o contexto
-#             })
-#             return render(request, self.template_name, context)
 
 class PriceCreateView(FormMessageMixin, CreateView):
     model = Price
@@ -352,7 +302,7 @@ class PriceCreateView(FormMessageMixin, CreateView):
         return super(PriceCreateView, self).form_invalid(form)
 
 
-class CustomerSelectView(FormMessageMixin, FormView):
+class CustomerPriceSelectView(FormMessageMixin, FormView):
     template_name =  'preco/novo_preco_base.html'
     form_class = PriceFormCustomer
 
@@ -369,21 +319,43 @@ class CustomerSelectView(FormMessageMixin, FormView):
         return redirect(reverse('select_category', kwargs={'pk': customer.id}))
 
 
-class CategorySelectView(FormMessageMixin, FormView):
+class CategoryPriceSelectView(FormMessageMixin, FormView):
     template_name =  'preco/novo_preco_base.html'
     form_class = PriceFormCategory
-
-
 
     def form_valid(self, form):
         cliente_id = self.kwargs.get('pk')
         categoria = form.cleaned_data['categoria']
 
         return redirect(reverse('add_price_client', kwargs={'cliente_id': cliente_id, 'categoria_id': categoria.id}))
-        # try:
-        #     category = CustomerSupplier.objects.get(nome_fantasia=cliente)
-        # except CustomerSupplier.DoesNotExist:
-        #     return self.form_invalid(form)
 
-        # Aqui você pode redirecionar ou processar o cliente selecionado
-        # return redirect(reverse('select_category', kwargs={'pk': customer.id}))
+
+class PriceUpdateView(FormMessageMixin, UpdateView):
+    model = Price
+    form_class = PriceForms
+    template_name = 'preco/update_preco.html'
+    success_url = reverse_lazy('price')
+    success_message = 'Preço atualizado com sucesso!'
+
+    def get_form_kwargs(self):
+        kwargs = super(PriceUpdateView, self).get_form_kwargs()
+        kwargs['categoria_id'] = self.kwargs.get('categoria_id')  # Adiciona o categoria_id aos kwargs
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(PriceUpdateView, self).get_context_data(**kwargs)
+        price = self.get_object()
+
+        context['cliente'] = price.cliente
+        categoria_id = self.kwargs.get('categoria_id')
+        context['categoria'] = Category.objects.get(id=categoria_id)
+
+        return context
+
+
+class PriceDeleteView(DeleteSuccessMessageMixin):
+    model = Price
+    template_name = 'preco/delete_preco.html'
+    success_url = reverse_lazy('price')
+
+
