@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Adicionar Preço{% endblock %}
+{% block content %}
+<div id="page-wrapper">
+    <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <h1 class="text-body-secondary text-center mb-3">Preços</h1>
+            <div class="card">
+                <div class="card-header">
+                    Adicionar Novo Preço
+                    {% if cliente_id %}
+                      para o cliente <strong>{{ cliente_nome }},</strong>
+                    {% endif %}
+                    {% if categoria_id %}
+                      para a categoria <strong>{{ categoria_nome }}</strong>
+                    {% endif %}
+                </div>
+                <div class='btn-group top-buttons space_from_margin center_content' role="group" aria-label="Grupo de botões">
+                    <form method="POST" autocomplete="off">
+                      {% csrf_token %}
+                        <div class="container">
+                          <!-- Campo Cliente -->
+                          <div class="row">
+                            {% crispy form %}
+                          </div>
+                          <a href="{% url 'price' %}" class="btn btn-secondary">
+                            <i class="bi bi-backspace"></i>
+                            Cancelar
+                          </a>
+                          {% if cliente_id %}
+                            <button type="submit" class="btn btn-success float-end">Salvar</button>
+                          {% endif %}
+
+                        </div>
+
+                    </form>
+                </div>
+                <hr>
+                {% if cliente_id %}
+                  {% include "preco/_lista_preco_clientes.html" %}
+
+                {% endif %}
+
+
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock  %}

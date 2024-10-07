@@ -246,58 +246,103 @@ class PriceFormCustomer(Form):
                 Column(
                     FieldWithButtons(
                         Field('cliente', css_class='form-control col-md-2 mb-0'),
-                        StrictButton('Selecionar Cliente', css_class='btn btn-danger', id='select-cliente'),
+                        Submit(
+                            value='Selecionar Cliente',
+                            name='select-cliente',
+                            css_class='btn btn-danger',
+                            id='select-cliente'
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+class PriceFormCategory(Form):
+
+    categoria = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        label='Categoria',
+        widget=forms.Select(attrs={
+            'class': 'form-control',  # Adiciona a classe CSS para estilização
+
+            'id': 'categoria-select'   # Adiciona um ID para JavaScript ou CSS, se necessário
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(PriceFormCategory, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            HTML('<h3>Selecione a Categoria para Parametrizar</h3>'),
+            Row(
+                Column(
+                    FieldWithButtons(
+                        Field('categoria', css_class='form-control col-md-2 mb-0'),
+                        Submit(
+                            value='Selecionar Categoria',
+                            name='select-categoria',
+                            css_class='btn btn-primary',
+                            id='select-categoria'
+                        ),
                     ),
                 ),
             ),
         )
 
 
-class TabsPriceFormset(ModelForm):
+class PriceForms(ModelForm):
+
+    prazo =  forms.ModelChoiceField(
+        queryset=LeadTime.objects.all(),
+        widget=Select2Widget(
+            attrs={
+                'data-placeholder': 'Selecione prazo',
+                'style': 'width: 100%!important'
+
+            }
+        )
+    )
 
     class Meta:
         model = Price
-        exclude = ['dt_criacao', 'dt_modificado']
+        exclude = ['dt_criacao', 'dt_modificado', 'cliente']
 
     def __init__(self, *args, **kwargs):
-        super(TabsPriceFormset, self).__init__(*args, **kwargs)
-        self.fields['produto'].queryset = Product.objects.none()
-        self.fields['prazo'].queryset = LeadTime.objects.none()
+        categoria_id = kwargs.pop('categoria_id')
+        super(PriceForms, self).__init__(*args, **kwargs)
+        self.fields['produto'].queryset = Product.objects.filter(tipo_categoria=categoria_id)
+
 
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Row(
                 Column(
-                    Field('produto', css_class='form-control col-md-6 mb-0'),
-                    Field('vendedor', css_class='form-control col-md-6 mb-0'),
+                    Field('produto', css_class='form-control col-md-4 mb-0'),
+                    Field('vendedor', css_class='form-control col-md-4 mb-0'),
                 ),
                 Column(
-                    Field('condicao', css_class='form-control col-md-3 mb-0'),
-                    Field('valor', css_class='form-control col-md-3 mb-0'),
-                    Switch('is_dolar', css_class='form-control col-md-3 mb-0'),
+                    Field('condicao', css_class='form-control col-md-4 mb-0'),
+                    Field('valor', css_class='form-control col-md-4 mb-0'),
+                    Switch('is_dolar', css_class='form-control col-md-4 mb-0'),
                 ),
                 Column(
                     Field('prazo', css_class='form-control col-md-6 mb-0'),
                     Field('cnpj_faturamento', css_class='form-control col-md-6 mb-0'),
-                    Submit('btnAddClientPrice', '+', css_class='btn btn-info float-end'),
+                    # Submit('btnAddClientPrice', '+', css_class='btn btn-info float-end'),
                 ),
             ),
-            # Row(
-            #     Column(
-            #     ),
-            # )
         )
 
-DiversosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-LaminasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-MaquinasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-NovosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-NyloflexFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-NyloprintFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-QSPACFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-SuperLamFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
-TesaFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# DiversosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# LaminasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# MaquinasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# NovosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# NyloflexFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# NyloprintFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# QSPACFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# SuperLamFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+# TesaFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
 
 class SellerForm(ModelForm):
     class Meta:

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Adicionar Preço{% endblock %}
+{% block content %}
+<div id="page-wrapper">
+    <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <h1 class="text-body-secondary text-center mb-3">Preços</h1>
+            <div class="card">
+                <div class="card-header">
+                    Adicionar Novo Preço
+                </div>
+                <div class='btn-group top-buttons space_from_margin center_content' role="group" aria-label="Grupo de botões">
+                    <form method="POST" autocomplete="off">
+                      {% csrf_token %}
+
+                      <input type="hidden" id="active_tab" name="active_tab" value="diversos">
+
+                        <div class="container">
+                          <!-- Campo Cliente -->
+                          <div class="row">
+                            <legend>Cliente de ID {{ cliente_nome  }}</legend>
+                            <p>Cliente de ID: {{ cliente_id }}</p>
+
+                          </div>
+                          <a href="{% url 'price' %}" class="btn btn-secondary">Cancelar</a>
+                          <hr>
+                          <!-- Tabs com os formsets -->
+                          {% include "preco/_formsets.html" %}
+                          <button type="submit" class="btn btn-primary">
+                            +
+                          </button>
+                        </div>
+
+                    </form>
+                </div>
+                <hr>
+                {% include "preco/_lista_preco_clientes.html" %}
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock  %}
+{% block extra_scripts %}
+<script>
+
+  const formataData = (dataString) => {
+    let data = new Date(dataString);
+
+    let dia = String(data.getDate()).padStart(2, '0');
+    let mes = String(data.getMonth() + 1).padStart(2, '0');
+    let ano  = String(data.getFullYear());
+
+    return dia + '/' + mes + '/' + ano;
+  }
+
+  $(document).ready(function(){
+
+    $('.nav-link').on('click', function() {
+      var activeTab = $(this).attr('href').substring(1);  // Ex: "diversos"
+      $('#active_tab').val(activeTab);
+    });
+
+      // AJAX para listar preços do cliente selecionado
+      const client = `{{ cliente_nome  }}`;
+
+       // Verifica se o cliente foi selecionado
+      if (client) {
+        $.ajax({
+            url: "{% url 'get_prices' %}",  // URL da view que retorna os preços
+            method: 'GET',
+            data: {
+                'client': client // Envia o ID do cliente
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Processa os dados retornados
+
+
+                // Exemplo: Itera sobre os dados e exibe em uma tabela ou qualquer outro elemento HTML
+                $('#prices-table tbody').empty();  // Limpa a tabela de preços
+                $.each(data, function(index, price) {
+                    $('#prices-table tbody').append(
+                        '<tr>' +
+                        '<td>' + price.produto__nome_produto + '</td>' +
+                        '<td>R$ ' + price.valor.replace('.', ',') + '</td>' +
+                        '<td>' + (price.is_dolar ? 'Sim' : 'Não') + '</td>' +
+                        '<td>' + price.prazo__parcelas + '</td>' +
+                        '<td>' + price.cnpj_faturamento + '</td>' +
+                        '<td>' + price.condicao + '</td>' +
+                        '<td>' + price.vendedor__nome + '</td>' +
+                        '<td>' + formataData(price.dt_criacao) + '</td>' +
+                        '</tr>'
+                    );
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro na requisição AJAX:', error);
+            }
+        });
+      }
+
+
+      /* REALIZA AS REQUISIÇÕES DE ACORDO COM A TAB SELECIONADA */
+
+      const requestCategoryProducts = (category) => {
+        $.ajax({
+          url: "{% url 'get_category_products' %}",
+          data: {
+            'categoria': category,
+          },
+          method: 'GET',
+          dataType: 'json',
+          success: function(data) {
+
+            $("#id_" + category + "-0-produto").empty();
+            $("#id_" + category + "-0-produto").append('<option value="">---------</option>');
+
+            $.each(data, function(index, produto){
+
+              $("#id_" + category + "-0-produto").append('<option value="' + produto.id + '">' + produto.nome_produto + '</option>');
+            });
+          }
+        });
+      };
+
+      const requestLeadTime = (tab) => {
+        $.ajax({
+          url: "{% url 'get_leadtimes' %}",
+          data: {
+            'aba': tab,
+          },
+          method: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            $("#id_" + tab + "-0-prazo").empty();
+            $("#id_" + tab + "-0-prazo").append('<option value="">---------</option>');
+            $.each(data, function(index, produto){
+              $("#id_" + tab + "-0-prazo").append('<option value="' + produto.id + '">' + produto.parcelas + '</option>');
+            });
+          }
+        });
+
+      };
+
+      /* Se a tab selecionada é a DIVERSOS (INICIAL) */
+      // Chama a função para carregar os produtos, como diversos é a primeira aba, carrega automático ao abrir a página
+      requestCategoryProducts('diversos');
+      requestLeadTime('diversos');
+
+      // Ao clicar em cada aba, carregas os produtos para a respectiva categoria
+      $('#laminas-tab').click( () => {
+        requestCategoryProducts('laminas');
+        requestLeadTime('laminas');
+      });
+      $('#maquinas-tab').click( () => {
+        requestCategoryProducts('maquinas');
+        requestLeadTime('maquinas');
+      });
+      $('#novos-tab').click( () => {
+        requestCategoryProducts('novos');
+        requestLeadTime('novos');
+      });
+      $('#nyloflex-tab').click( () => {
+        requestCategoryProducts('nyloflex');
+        requestLeadTime('nyloflex');
+      });
+      $('#qspac-tab').click( () => {
+        requestCategoryProducts('qspac');
+        requestLeadTime('qspac');
+      });
+      $('#tesa-tab').click( () => {
+        requestCategoryProducts('tesa');
+        requestLeadTime('tesa');
+      });
+      $('#superlam-tab').click( () => {
+        requestCategoryProducts('superlam');
+        requestLeadTime('superlam');
+      });
+      $('#nyloprint-tab').click( () => {
+        requestCategoryProducts('nyloprint');
+        requestLeadTime('nyloprint');
+      });
+
+
+  });
+
+</script>
+{% endblock %}

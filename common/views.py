@@ -1,9 +1,9 @@
 from pyexpat.errors import messages
 from django.http import JsonResponse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
-from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView
-from common.forms import CategoryForm, CustomerSupplierForm, PriceFormCustomer, SellerForm, DiversosFormSet, LaminasFormSet, MaquinasFormSet, NovosFormSet, NyloflexFormSet, NyloprintFormSet, QSPACFormSet, SuperLamFormSet, TesaFormSet
+from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView, TemplateView, FormView
+from common.forms import *
 from common.models import Category, CustomerSupplier, Seller, Price
 from products.models import Product
 from django.db.models import Q
@@ -50,7 +50,7 @@ class GetLeadTimes(View):
     def get(self, request, *args, **kwargs):
         leadtimes = LeadTime.objects.all()
 
-        prazos = [{'id': leadtime.id, 'parcelas': leadtime.parcelas} for leadtime in leadtimes]
+        prazos = [{'id': leadtime.id, 'parcelas': leadtime.descricao} for leadtime in leadtimes]
 
         return JsonResponse(prazos, safe=False)
 
@@ -241,120 +241,149 @@ class PriceListView(ListView):
     success_url = reverse_lazy('add_price')
 
 
-class PriceListCreateView(FormMessageMixin, CreateView, ListView):
-    template_name = "preco/adicionar_preco.html"
-    context_object_name = 'itens_preco_cliente'
+# class PriceClientCreateView(View, FormMessageMixin):
+#     model = Price
+#     template_name = "preco/adicionar_preco_categorias.html"
 
-    def get_success_url(self):
-        return reverse_lazy('add_price')
+#     def get_context_data(self, **kwargs):
+#         context = {}
+#         cliente_id = self.kwargs.get('pk')
+#         context['cliente_id'] = cliente_id
+#         context['cliente_nome'] = CustomerSupplier.objects.get(id=cliente_id).nome_fantasia
+
+#         # Inicializa os formsetspara cada categoria
+#         formset_map = {}
+#         category_prefix = ['diversos', 'laminas', 'maquinas', 'novos', 'nyloflex', 'nyloprint', 'qspac', 'superlam', 'tesa']
+#         for prefix in category_prefix:
+#             formest = self.get_formset(prefix)
+#             context[f'{prefix}_formset'] = formest
+#             formset_map[prefix] = formest
+
+#         return context
+
+#     def get_formset(self, prefix):
+#         formset_class = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo'])
+#         return formset_class(queryset=Price.objects.none(), prefix=prefix)
+
+#     def get_success_url(self):
+#         return reverse_lazy('add_price_client', kwargs={'pk': self.kwargs.get('pk')})
+
+#     def get(self, request, *args, **kwargs):
+#         # Lida com requisições GET
+#         context = self.get_context_data(**kwargs)
+#         return render(request, self.template_name, context)
+
+#     def post(self, request, *args, **kwargs):
+#         # Recupera ID do cliente
+#         cliente_id = self.kwargs.get('pk')
+#         cliente = CustomerSupplier.objects.get(id=cliente_id)
+
+#         # Recupera a aba ativa
+#         active_tab = request.POST.get('active_tab')
+#         formset = self.get_formset(active_tab)
+
+#         if formset and formset.is_valid():
+#             print('TESTE')
+#             # Salva o formset ativo
+#             for form in formset:
+#                 price_instance = form.save(commit=False)
+#                 price_instance.cliente = cliente
+#                 price_instance.produto = form.cleaned_data('produto')
+
+#                 price_instance.save()
+
+#             return redirect(self.get_success_url())
+
+#         else:
+#             # Se nenhum formset for válido, renderize novamente com erros
+#             context = self.get_context_data()
+#             context.update({
+#                 f'{active_tab}_formset': formset, # Passa Formset inválido pra o contexto
+#             })
+#             return render(request, self.template_name, context)
+
+class PriceCreateView(FormMessageMixin, CreateView):
+    model = Price
+    form_class = PriceForms
+    template_name = "preco/novo_preco_base.html"
+    success_url = reverse_lazy('price')
+    success_message = 'Preço cadastrado com sucesso!'
+
+    def get_context_data(self, **kwargs):
+        context = super(PriceCreateView, self).get_context_data(**kwargs)
+        cliente_id = self.kwargs.get('cliente_id')
+        categoria_id = self.kwargs.get('categoria_id')
+
+        # Filtra pelos campos 'cliente' e 'categoria' no modelo Price
+        context['itens_preco'] = Price.objects.filter(cliente_id=cliente_id, produto__tipo_categoria=categoria_id)
+
+        return context
+
 
     def get(self, request, *args, **kwargs):
+        self.object = None
+        cliente_id = self.kwargs.get('cliente_id')
+        categoria_id = self.kwargs.get('categoria_id')
+        context = self.get_context_data(**kwargs)
+        context['cliente_id'] = cliente_id
+        context['cliente_nome'] = CustomerSupplier.objects.get(id=cliente_id).nome_fantasia
+        context['categoria_id'] = categoria_id
+        context['categoria_nome'] = Category.objects.get(id=categoria_id).nome
 
-        customer_form = PriceFormCustomer()
+        return self.render_to_response(context)
 
-        # Inicializa os formsetspara cada categoria
-        diversos_formset = DiversosFormSet(queryset=Price.objects.none(), prefix='diversos')
-        laminas_formset = LaminasFormSet(queryset=Price.objects.none(), prefix='laminas')
-        maquinas_formset = MaquinasFormSet(queryset=Price.objects.none(), prefix='maquinas')
-        novos_formset = NovosFormSet(queryset=Price.objects.none(), prefix='novos')
-        nyloflex_formset = NyloflexFormSet(queryset=Price.objects.none(), prefix='nyloflex')
-        nyloprint_formset = NyloprintFormSet(queryset=Price.objects.none(), prefix='nyloprint')
-        qspac_formset = QSPACFormSet(queryset=Price.objects.none(), prefix='qspac')
-        superlam_formset = SuperLamFormSet(queryset=Price.objects.none(), prefix='superlam')
-        tesa_formset = TesaFormSet(queryset=Price.objects.none(), prefix='tesa')
+    def get_form_kwargs(self):
+        kwargs = super(PriceCreateView, self).get_form_kwargs()
+        kwargs['categoria_id'] = self.kwargs.get('categoria_id')
 
-        context = {
-            'customer_form': customer_form,
-            'diversos_formset': diversos_formset,
-            'laminas_formset': laminas_formset,
-            'maquinas_formset': maquinas_formset,
-            'novos_formset': novos_formset,
-            'nyloflex_formset': nyloflex_formset,
-            'nyloprint_formset': nyloprint_formset,
-            'qspac_formset': qspac_formset,
-            'superlam_formset': superlam_formset,
-            'tesa_formset': tesa_formset,
-        }
+        return kwargs
 
-        return render(request, 'preco/adicionar_preco.html', context)
+    def form_valid(self, form):
+        cliente_id = self.kwargs.get('cliente_id')
+        print(f'Cliente ID: {cliente_id}')
+        cliente = CustomerSupplier.objects.get(id=cliente_id)
+        print(f'Cliente: {cliente}')
+        form.instance.cliente = cliente
 
-    def post(self, request, *args, **kwargs):
+        return super(PriceCreateView, self).form_valid(form)
 
-        customer_form = PriceFormCustomer(request.POST)
-
-        # Recarreca os formsets com os dados do POST
-        diversos_formset = DiversosFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Diversos'))
-        laminas_formset = LaminasFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Laminas'))
-        maquinas_formset = MaquinasFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Maquinas'))
-        novos_formset = NovosFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Novos'))
-        nyloflex_formset = NyloflexFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Nyloflex'))
-        nyloprint_formset = NyloprintFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Nyloprint'))
-        qspac_formset = QSPACFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='QSPAC'))
-        superlam_formset = SuperLamFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='SuperLam'))
-        tesa_formset = TesaFormSet(request.POST, queryset=Price.objects.filter(produto__tipo_categoria='Tesa'))
+    def form_invalid(self, form):
+        messages.error(self.request, 'Foram encontrados erros ao salvar o preço!')
+        return super(PriceCreateView, self).form_invalid(form)
 
 
-        # Verifica se form cliente é válido
-        if customer_form.is_valid():
+class CustomerSelectView(FormMessageMixin, FormView):
+    template_name =  'preco/novo_preco_base.html'
+    form_class = PriceFormCustomer
 
-            # Verifica se qualquer formset é valido
-            if diversos_formset.is_valid():
-                diversos_formset.save()
 
-            elif laminas_formset.is_valid():
-                laminas_formset.save()
+    def form_valid(self, form):
+        cliente = form.cleaned_data['cliente']
 
-            elif maquinas_formset.is_valid():
-                maquinas_formset.save()
+        try:
+            customer = CustomerSupplier.objects.get(nome_fantasia=cliente)
+        except CustomerSupplier.DoesNotExist:
+            return self.form_invalid(form)
 
-            elif novos_formset.is_valid():
-                novos_formset.save()
+        # Aqui você pode redirecionar ou processar o cliente selecionado
+        return redirect(reverse('select_category', kwargs={'pk': customer.id}))
 
-            elif nyloflex_formset.is_valid():
-                nyloflex_formset.save()
 
-            elif nyloprint_formset.is_valid():
-                nyloprint_formset.save()
+class CategorySelectView(FormMessageMixin, FormView):
+    template_name =  'preco/novo_preco_base.html'
+    form_class = PriceFormCategory
 
-            elif qspac_formset.is_valid():
-                qspac_formset.save()
 
-            elif superlam_formset.is_valid():
-                superlam_formset.save()
 
-            elif tesa_formset.is_valid():
-                tesa_formset.save()
+    def form_valid(self, form):
+        cliente_id = self.kwargs.get('pk')
+        categoria = form.cleaned_data['categoria']
 
-            else:
-                # Se nada for válido, renderiza novamente com erros
-                context = {
-                    'customer_form': customer_form,
-                    'diversos_formset': diversos_formset,
-                    'laminas_formset': laminas_formset,
-                    'maquinas_formset': maquinas_formset,
-                    'novos_formset': novos_formset,
-                    'nyloflex_formset': nyloflex_formset,
-                    'nyloprint_formset': nyloprint_formset,
-                    'qspac_formset': qspac_formset,
-                    'superlam_formset': superlam_formset,
-                    'tesa_formset': tesa_formset,
-                }
-                return render(request, self.template_name, context)
+        return redirect(reverse('add_price_client', kwargs={'cliente_id': cliente_id, 'categoria_id': categoria.id}))
+        # try:
+        #     category = CustomerSupplier.objects.get(nome_fantasia=cliente)
+        # except CustomerSupplier.DoesNotExist:
+        #     return self.form_invalid(form)
 
-            return redirect(self.get_success_url())
-
-        # Se o customer_form for inválido, renderiza novamente com os erros
-        context = {
-            'customer_form': customer_form,
-                'diversos_formset': diversos_formset,
-                'laminas_formset': laminas_formset,
-                'maquinas_formset': maquinas_formset,
-                'novos_formset': novos_formset,
-                'nyloflex_formset': nyloflex_formset,
-                'nyloprint_formset': nyloprint_formset,
-                'qspac_formset': qspac_formset,
-                'superlam_formset': superlam_formset,
-                'tesa_formset': tesa_formset,
-        }
-
-        return render(request, self.template_name, context)
+        # Aqui você pode redirecionar ou processar o cliente selecionado
+        # return redirect(reverse('select_category', kwargs={'pk': customer.id}))

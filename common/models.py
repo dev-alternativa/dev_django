@@ -151,6 +151,7 @@ class Price(Base):
     cnpj_faturamento = models.CharField('CNPJ do Faturamento', choices=CNPJ_FATURAMENTO, max_length=30, null=True, blank=True)
     condicao = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100, null=True, blank=True)
     vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.PROTECT,  related_name='precos')
+    frete = models.DecimalField('Frete', max_digits=10, decimal_places=2, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
 
     class Meta:

@@ -1,3 +1,5 @@
+{% load static %}
+
 <table id="prices-table" class="table table-hover">
   <thead>
     <tr>
@@ -12,6 +14,17 @@
     </tr>
   </thead>
   <tbody class="text-center">
-
+    {% for item in itens_preco %}
+      <tr>
+        <td>{{ item.produto }}</td>
+        <td>{{ item.valor }}</td>
+        <td>{{ item.is_dolar|yesno:"S, N" }}</td>
+        <td>{{ item.prazo }}</td>
+        <td>{{ item.cnpj_faturamento }}</td>
+        <td>{{ item.condicao }}</td>
+        <td>{{ item.vendedor }}</td>
+        <td>{{ item.dt_criacao|date:'d/m/Y' }}</td>
+      </tr>
+    {% endfor %}
   </tbody>
 </table>
