@@ -1,0 +1,71 @@
+{% load crispy_forms_tags %}
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Adicionar Produto</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+        <div class="row">
+            <div class="row mb-3">
+            <div id="pedidos" class="row g-2" data-form-count="1">
+                <div id="new-item" class="row line-to-remove">
+                    <form id='itemForm' method="post">
+                    {% csrf_token %}
+
+                    <!-- Primeira linha -->
+                        <div class="row">
+                        <div class="col-md-10">
+                            {{ item_form.produto|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ item_form.cfop|as_crispy_field }}
+                        </div>
+                        </div>
+
+                    <!-- Segunda linha -->
+                    <div class="col">
+                        <div class="row">
+                        <div class="col">
+                            {{ item_form.quantidade|as_crispy_field }}
+                        </div>
+                        <div class="col">
+                            {{ item_form.preco|as_crispy_field }}
+                        </div>
+                        <div class="col">
+                            {{ item_form.item_pedido|as_crispy_field }}
+                        </div>
+                        <div class="col ">
+                            {{ item_form.numero_pedido|as_crispy_field }}
+                        </div>
+                        <div class="col">
+                            {{ item_form.vendedor_item|as_crispy_field }}
+                        </div>
+                        </div>
+                    </div>
+                    <!-- Terceira linha -->
+                    <div class="row">
+                        <div class="col">
+                        {{ item_form.dados_adicionais_item|as_crispy_field }}
+                        </div>
+                        <div class="col">
+                        {{ item_form.obs|as_crispy_field }}
+                        </div>
+                    </div>
+                    </form>
+                </div>
+
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button type="button" id="submitBtn" class="btn btn-primary" onclick="adicionar_produto()">Adicionar</button>
+        </div>
+    </div>
+    </div>
+</div>

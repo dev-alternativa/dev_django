@@ -1,6 +1,7 @@
 from django.db import models
 from core.models import Base
 from accounts.models import CustomUsuario
+from products.models import Product
 
 
 
@@ -61,7 +62,7 @@ class InflowsItems(Base):
 
 class Outflows(Base):
     numero_pedido_cliente = models.PositiveIntegerField()
-    tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True)
+    tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
     pedido_interno_cliente = models.PositiveIntegerField(null=True, blank=True)
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
     nf_saida = models.PositiveIntegerField('NF Saída', null=True, blank=True)
@@ -72,25 +73,26 @@ class Outflows(Base):
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_faturamento = models.DateField(blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
+    vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saidas')
 
     class Meta:
         ordering = ('pk',)
         verbose_name = 'Saída de Estoque'
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.pedido_interno_cliente, self.tipo_saida, self.numero_pedido_cliente)
+        return '{} - {} - {}'.format(self.id, self.tipo_saida, self.numero_pedido_cliente)
 
 
 class OutflowsItems(Base):
     saida = models.ForeignKey(Outflows, on_delete=models.PROTECT, related_name='saida_items')
     produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='saida_items')
     quantidade = models.PositiveIntegerField()
-    valor_unitario = models.ForeignKey('common.Price', on_delete=models.PROTECT, related_name='saida_items')
+    preco = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(max_length=50, blank=True, null=True)
     item_pedido = models.IntegerField(verbose_name='Item Pedido')
     obs = models.TextField(max_length=500, blank=True, null=True)
-    vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
+    vendedor_item = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
     cfop = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
@@ -98,7 +100,7 @@ class OutflowsItems(Base):
         verbose_name = 'Items de Saída de Estoque'
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.pk, self.saida.pk, self.produto)
+        return '{} - {} - {}'.format(self.saida.pk, self.produto, self.quantidade)
 
 
 class TaxScenario(Base):

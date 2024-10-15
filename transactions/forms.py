@@ -96,13 +96,6 @@ class OutflowsForm(forms.ModelForm):
                     }
                 ),
             'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
-            'dt_faturamento': forms.DateTimeInput(
-                attrs={
-                    'type': 'date',
-                    'class': 'form-control',
-                    'placeholder': 'Selecione uma data'
-                    }
-                ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -110,32 +103,6 @@ class OutflowsForm(forms.ModelForm):
         self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    Field('numero_pedido_cliente', css_class='form-control col-md-2 mb-3'),
-                    Field('tipo_saida', css_class='form-control col-md-2 mb-3'),
-                    Field('pedido_interno_cliente', css_class='form-control col-md-2 mb-3'),
-                ),
-                Column(
-                    Field('cliente', css_class='form-control col-md-2 mb-3'),
-                    Field('nf_saida', css_class='form-control col-md-2 mb-3'),
-                    Field('transportadora', css_class='form-control col-md-2 mb-3'),
-                ),
-                Column(
-                    Field(
-                        'dolar_ptax',
-                        css_class='form-control col-md-2 mb-3',
-                    ),
-                    Field('dados_adicionais_nf', css_class='form-control col-md-2 mb-3'),
-                    Field('cod_cenario_fiscal', css_class='form-control col-md-2 mb-3'),
-                ),
-                Column(
-                    Field('desconto', css_class='form-control col-md-2 mb-3'),
-                    Field('dt_faturamento', css_class='form-control col-md-2 mb-3'),
-                ),
-            ),
-        )
 
 
 class OutflowsItemsForm(forms.ModelForm):
@@ -149,8 +116,7 @@ class OutflowsItemsForm(forms.ModelForm):
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
                     }
                 ),
-            'quantidade': forms.NumberInput(attrs={'class': 'form-control'}),
-            'valor_unitario': forms.NumberInput(
+            'preco': forms.NumberInput(
                 attrs={
                     'class': 'form-control',
                     'max_length': '4',
@@ -167,3 +133,19 @@ OutflowsItemsFormSet = inlineformset_factory(
     extra=1,
     can_delete=False
 )
+
+class OrderItemsForm(forms.ModelForm):
+
+    class Meta:
+        model = OutflowsItems
+        exclude = ['dt_criacao', 'dt_modificado', 'ativo']
+        widgets = {
+            'produto': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    'data-minimum-input-length': 3,
+                    }
+                ),
+            'dados_adicionais_item': forms.Textarea(attrs={'rows': 3}),
+            'obs': forms.Textarea(attrs={'rows': 3}),
+        }

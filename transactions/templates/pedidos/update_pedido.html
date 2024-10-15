@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Novo Pedido - Items{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/select2.css' %}">
+
+<div class="row">
+  <div class="cols">
+    {% if not order.pk %}
+      <h1 class="text-body-secondary text-center mb-3">Novo Pedido</h1>
+    {% else %}
+    <h1 class="text-body-secondary text-center mb-3">Pedido #{{ order.pk }}</h1>
+    {% endif %}
+  <div class="row" style="margin-bottom: 1rem;">
+    <div class='col-md-6'>
+      <a href="{% url 'outflow_list' %}" class='btn btn-danger btn-lg'>
+        <i class="bi bi-backspace space_from_margin"></i>
+        Voltar
+      </a>
+    </div>
+  </div>
+  {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+
+      <!-- O FORMULÁRIO COMEÇA AQUI -->
+      <form method="POST" autocomplete="off" novalidate>
+        {% csrf_token %}
+        <!-- Formulário Superior -->
+        <div class="row justify-content-center">
+          <div class="col">
+            <div class="form-group">
+              {{ form.cliente|as_crispy_field }}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.numero_pedido_cliente|as_crispy_field }}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.pedido_interno_cliente|as_crispy_field }}
+            </div>
+          </div>
+          <div class='col'>
+            <div class="form-group">
+                {{ form.dolar_ptax|as_crispy_field }}
+            </div>
+          </div>
+        </div>
+        <div class='row'>
+
+          <div class="col">
+            <div class="form-group">
+              {{ form.desconto|as_crispy_field }}
+            </div>
+          </div>
+
+          <div class='col'>
+            <div class="form-group">
+                {{ form.cod_cenario_fiscal|as_crispy_field }}
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              {{ form.nf_saida|as_crispy_field }}
+            </div>
+          </div>
+          <div class='col'>
+            <div class="form-group">
+              {{ form.transportadora|as_crispy_field }}
+            </div>
+          </div>
+          <div class='col'>
+            <div class="form-group">
+              {{ form.vendedor|as_crispy_field }}
+            </div>
+          </div>
+        </div>
+        <div class='row'>
+          <div class="col">
+            <div class="form-group">
+              {{ form.dados_adicionais_nf|as_crispy_field }}
+            </div>
+          </div>
+
+        </div>
+          </div>
+        </div>
+        <!-- O FORMULÁRIO TERMINA AQUI -->
+      </form>
+
+        <!-- Botão de adicionar item -->
+        <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >
+          <i class="bi bi-plus-lg"></i>
+          Adicionar Item
+        </a>
+
+        <!-- Modal de adição de produtos -->
+        {% include "pedidos/_modal_item_pedido.html" %}
+
+        <!-- Botão de salvar -->
+        {% if not order.pk %}
+
+          <div class="row float-end">
+            <div class="col-sm-12" style="margin-top: 10px;">
+              <div class="form-inline buttons">
+                <button class="btn btn-primary" value="Save">
+                  <i class="bi bi-floppy-o"></i>
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+
+        {% endif %}
+
+    </div>
+    <!-- Tabela dinâmica de itens do carrinho -->
+    <div class="row" id="dinamic-table">
+      {% include "pedidos/_tabela_carrinho.html" %}
+    </div>
+  </div>
+
+  <script>
+
+    // Desabilita os campos do formulário de Pedido
+    const formElements = document.querySelectorAll("form:not(#itemForm) input, form:not(#itemForm) select, form:not(#itemForm) textarea");
+    formElements.forEach(element => element.setAttribute("disabled", true));
+
+    // Reseta valores no formulário de produtos
+    $('.btn-close').on('click', function(){
+      $('#itemForm')[0].reset();
+      $('#itemForm').find('.is-invalid').removeClass('is-invalid');
+    });
+
+
+    // Salva produtos no pedido atual
+    function adicionar_produto() {
+
+
+      // Pega os valores dos campos
+      const produto = $('#id_produto').val() ? $('#id_produto').val() : '';
+      const quantidade = $('#id_quantidade').val() ? $('#id_quantidade').val() : '';
+      const preco = $('#id_preco').val() ? $('#id_preco').val() : '';
+      const itemPedido = $('#id_item_pedido').val() ? $('#id_item_pedido').val() : '';
+      const dadosAdicionais = $('#id_dados_adicionais_item').val() ? $('#id_dados_adicionais_item').val() : '';
+      const numeroPedido = $('#id_numero_pedido').val() ? $('#id_numero_pedido').val() : '';
+      const obs = $('#id_obs').val() ? $('#id_obs').val() : '';
+      const cfop = $('#id_cfop').val() ? $('#id_cfop').val() : '';
+      const vendedor_item = $('#id_vendedor_item').val();
+
+      // Variável para controlar se o formulário é válido
+      let isValid = true;
+
+      // Verifica o campo 'Produto'
+      if (!produto) {
+          $('#id_produto').addClass('is-invalid');
+          isValid = false;
+      } else {
+          $('#id_produto').removeClass('is-invalid');
+      }
+
+      // Verifica o campo 'Quantidade'
+      if (!quantidade) {
+          $('#id_quantidade').addClass('is-invalid');
+          isValid = false;
+      } else {
+          $('#id_quantidade').removeClass('is-invalid');
+      }
+
+      // Verifica o campo 'Valor Unitário'
+      if (!preco) {
+          $('#id_preco').addClass('is-invalid');
+          isValid = false;
+      } else {
+          $('#id_preco').removeClass('is-invalid');
+      }
+
+      // Verifica o campo 'Item Pedido'
+      if (!itemPedido) {
+          $('#id_item_pedido').addClass('is-invalid');
+          isValid = false;
+      } else {
+          $('#id_item_pedido').removeClass('is-invalid');
+      }
+
+      // Se o formulário for válido, envie os dados via AJAX
+      if (isValid) {
+          // Aqui você pode fazer a chamada AJAX para enviar o formulário
+          $.ajax({
+              url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
+              method: 'POST',
+              data: {
+                produto: produto,
+                quantidade: quantidade,
+                preco: preco,
+                item_pedido: itemPedido,
+                dadosAdicionais: dadosAdicionais,
+                numeroPedido: numeroPedido,
+                obs: obs,
+                cfop: cfop,
+                vendedor_item: vendedor_item,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+              },
+              success: function(response) {
+                  // Sucesso
+                  alert("Item adicionado com sucesso!");
+              },
+              error: function(response) {
+                  // Erro
+                  alert(`Erro ao adicionar item: ${response.error}`);
+                  console.log(response.error);
+              }
+          });
+      }
+    }
+
+
+  </script>
+
+{% endblock content %}
+{% block extra_scripts %}
+  <script src="{% static 'js/select2.min.js' %}"></script>
+{% endblock %}

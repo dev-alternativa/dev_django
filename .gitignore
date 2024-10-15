@@ -67,3 +67,6 @@ docker-compose.override.yml
 exemplo*
 *.json
 .gitignore
+
+# Código antigo
+cadastro/

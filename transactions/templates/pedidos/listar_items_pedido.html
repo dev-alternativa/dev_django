@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %} Lista de Itens {% endblock %}
+
+
+{% block content %}
+    <div id="page-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class = "text-body-secondary text-center mb-3">Pedido #{{ pedido_id }}</h1>
+
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class='col-md-4'>
+                            <a href="#" class='btn btn-danger float-start'>
+                                <i class="bi bi-backspace"></i>
+                                Cancelar Pedido
+                            </a>
+                        </div>
+                        <div class='col-md-4'>
+                        <a class="btn btn-success">
+                            <i class="bi bi-check2"></i>
+                            Finalizar Pedido
+                        </a>
+                        </div>
+                        <div class='col-md-4'>
+                            <a class="btn btn-secondary float-end" id="add-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            <i class="bi bi-plus-lg"></i>
+                            Adicionar Item
+                            </a>
+                        </div>
+                    </div>
+
+                    {% include "pedidos/_modal_item_pedido.html" %}
+
+                    <div class="card">
+                        <div class="space_from_margin">
+                            <table class="table table-hover ">
+                                {% if itens_produtos %}
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>produto</th>
+                                            <th>quantidade</th>
+                                            <th>valor_unitario</th>
+                                            <th>cfop</th>
+                                            <th>dados_adicionais_item</th>
+                                            <th>numero_pedido</th>
+                                            <th>item_pedido</th>
+                                            <th>vendedor</th>
+                                            <th>Data Criação</th>
+                                            <th>Remover produto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for produto in itens_produtos %}
+                                            <tr>
+                                                <td>{{ produto.id }}</td>
+                                                <td>{{ produto.produto }}</td>
+                                                <td>{{ produto.quantidade }}</td>
+                                                <td>{{ produto.valor_unitario  }}</td>
+                                                <td>{{ produto.cfop }}</td>
+                                                <td>{{ produto.dados_adicionais_item }}</td>
+                                                <td>{{ produto.numero_pedido }}</td>
+                                                <td>{{ produto.item_pedido }}</td>
+                                                <td>{{ produto.vendedor }}</td>
+                                                <td>{{ produto.dt_criacao|date:'d/m/Y' }}</td>
+                                                <td class="action_size_column">
+                                                    <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                                                        <!-- Visualizar detalhes -->
+                                                        <a class="btn btn-danger btn-view" href="#" role="button">
+                                                            <i class="bi bi-trash"></i>
+                                                        </a>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    {% else %}
+                                        <p class="no-results">Nenhum item encontrado...</p>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
