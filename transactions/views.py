@@ -1,9 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.db.models import Sum
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from common.models import Seller
 from products.models import Product
@@ -338,6 +340,19 @@ def adicionar_produto(request, order_id):
         }
         return render(request, 'pedidos/update_pedido.html', context)
 
+
+def get_itens_pedido(request, order_id):
+    items = OutflowsItems.objects.filter(saida__id=order_id)
+    total_pedido = items.aggregate(total=Sum('preco'))['total']
+    quantidade_total = items.aggregate(total=Sum('quantidade'))['total']
+    html = render_to_string(
+        'pedidos/_tabela_items.html', {
+            'itens_produtos': items,
+            'total_pedido': total_pedido,
+            'quantidade_total': quantidade_total
+        }
+    )
+    return JsonResponse({'html': html})
 
 # class OrderItemList(ListView):
 #     model = OutflowsItems

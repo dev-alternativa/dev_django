@@ -129,7 +129,7 @@
     </div>
     <!-- Tabela dinâmica de itens do carrinho -->
     <div class="row" id="dinamic-table">
-      {% include "pedidos/_tabela_carrinho.html" %}
+      {% include "pedidos/_tabela_items.html" %}
     </div>
   </div>
 
@@ -139,16 +139,41 @@
     const formElements = document.querySelectorAll("form:not(#itemForm) input, form:not(#itemForm) select, form:not(#itemForm) textarea");
     formElements.forEach(element => element.setAttribute("disabled", true));
 
+    const atualizarTabela = (orderID) => {
+
+      $.ajax({
+        url: `/get_itens_pedido/${orderID}/`,
+        method: 'GET',
+        success: function(response) {
+          // Sucesso
+          console.log(response);
+          $('#dinamic-table').html(response.html);
+        },
+        error: function(response) {
+          // Erro
+          console.log('Erro ao atualizar: ', response);
+        }
+      });
+    }
+
+    const resetForm = () => {
+      $('#itemForm')[0].reset();
+      $('#itemForm').find('.is-invalid').removeClass('is-invalid');
+      $('#staticBackdrop').modal('hide');
+    }
+
     // Reseta valores no formulário de produtos
     $('.btn-close').on('click', function(){
       $('#itemForm')[0].reset();
       $('#itemForm').find('.is-invalid').removeClass('is-invalid');
     });
 
+    $(document).ready(
+      atualizarTabela({{ order.pk }})
+    );
 
     // Salva produtos no pedido atual
     function adicionar_produto() {
-
 
       // Pega os valores dos campos
       const produto = $('#id_produto').val() ? $('#id_produto').val() : '';
@@ -217,6 +242,8 @@
               success: function(response) {
                   // Sucesso
                   alert("Item adicionado com sucesso!");
+                  resetForm();
+                  atualizarTabela();
               },
               error: function(response) {
                   // Erro
