@@ -17,6 +17,7 @@ urlpatterns = [
     path('get-products/', views.get_products_by_category, name='get_products_by_category'),
     path('pedidos/<int:order_id>/adicionar_produto/', views.adicionar_produto, name='add_product_to_order'),
     path('get_itens_pedido/<int:order_id>/', views.get_itens_pedido, name='get_itens_pedido'),
+    path('pedidos/editar/<int:order_id>/', views.edit_pedido, name='edit_order'),
 
     # Pedidos
     path('pedidos/', views.OrderListView.as_view(), name='order_list'),

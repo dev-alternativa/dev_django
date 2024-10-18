@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.db import transaction
 from django.http import JsonResponse
@@ -7,8 +7,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Sum
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
-from common.models import Seller
-from products.models import Product
+from common.models import Seller, CustomerSupplier
+from products.models import Product, Inventory
+from transactions.models import TaxScenario
+from logistic.models import Carrier
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from core.views import FormMessageMixin
 from django.urls import reverse_lazy, reverse
@@ -210,6 +212,10 @@ class OrderListView(ListView):
     template_name = 'pedidos/lista_pedido.html'
     context_object_name = 'pedidos'
 
+    def get_queryset(self, **kwargs):
+        return Outflows.objects.filter(tipo_saida="V")
+
+
 
 class OrderCreateView(FormMessageMixin, CreateView):
     model = Outflows
@@ -308,6 +314,20 @@ def adicionar_produto(request, order_id):
             product = Product.objects.get(pk=produto)
             seller = Seller.objects.get(pk=vendedor_item)
 
+            itens_estoque = Inventory.objects.filter(
+                entrada_items__produto=product,
+                status='ESTOQUE',
+            ).order_by('id')
+
+            total_disponivel = itens_estoque.count()
+            quantidade_saida = int(quantidade)
+
+            if total_disponivel < quantidade_saida:
+                return JsonResponse({
+                    'error': f'Estoque insuficiente para o produto {product.nome_produto}: '
+                            f'{total_disponivel} disponíveis, mas {quantidade_saida} necessários.'
+                }, status=400)
+
             # Cria uma nova instância de OutflowsItems
             outflows_item = OutflowsItems(
                 saida=order,
@@ -321,13 +341,13 @@ def adicionar_produto(request, order_id):
                 vendedor_item=seller,
                 item_pedido=item_pedido
             )
-            print(outflows_item)
             outflows_item.save()  # Salva a instância no banco de dados
+            print('Não é pra Salvar')
 
             return JsonResponse({'message': 'Produto adicionado com sucesso!'}, status=200)
 
         except Exception as e:
-            print(e)
+            print(f'ERRO: {e}')
             return JsonResponse({'error': str(e)}, status=500)
 
     else:
@@ -353,6 +373,55 @@ def get_itens_pedido(request, order_id):
         }
     )
     return JsonResponse({'html': html})
+
+
+def edit_pedido(request, order_id):
+    if request.method == 'POST':
+        try:
+            order = get_object_or_404(Outflows, pk=order_id)
+            dados_modificados = request.POST
+            if 'cliente' in dados_modificados:
+                cliente_id = dados_modificados.get('cliente')
+                cliente = get_object_or_404(CustomerSupplier, id=cliente_id)
+                order.cliente = cliente
+            if 'numero_pedido_cliente' in dados_modificados:
+                order.numero_pedido_cliente = int(dados_modificados.get('numero_pedido_cliente'))
+            if 'dolar_ptax' in dados_modificados:
+                order.dolar_ptax = float(dados_modificados.get('dolar_ptax'))
+            if 'desconto' in dados_modificados:
+                order.desconto = float(dados_modificados.get('desconto'))
+            if 'nf_saida' in dados_modificados:
+                order.nf_saida = int(dados_modificados.get('nf_saida'))
+            if 'transportadora' in dados_modificados:
+                transportadora_id = dados_modificados.get('transportadora')
+                transportadora = get_object_or_404(Carrier, id=transportadora_id)
+                order.transportadora = transportadora
+            if 'pedido_interno_cliente' in dados_modificados:
+                print(dados_modificados.get('pedido_interno_cliente'))
+                order.pedido_interno_cliente = int(dados_modificados.get('pedido_interno_cliente'))
+            if 'dados_adicionais_nf' in dados_modificados:
+                order.dados_adicionais_nf = dados_modificados.get('dados_adicionais_nf')
+            if 'cod_cenario_fiscal' in dados_modificados:
+                cod_cenario_fiscal_id = dados_modificados.get('cod_cenario_fiscal')
+                cod_cenario_fiscal = get_object_or_404(TaxScenario, id=cod_cenario_fiscal_id)
+                order.cod_cenario_fiscal = cod_cenario_fiscal
+            if 'vendedor' in dados_modificados:
+                vendedor_id = dados_modificados.get('vendedor')
+                print(vendedor_id)
+                vendedor = get_object_or_404(Seller, id=vendedor_id)
+                order.vendedor = vendedor
+            if 'item_pedido' in dados_modificados:
+                order.item_pedido = dados_modificados.get('item_pedido')
+
+            order.save()
+            return JsonResponse({'message': 'Pedido atualizado com sucesso!'}, status=200)
+
+        except Exception as e:
+            print(f'Ocorreu um erro {e}')
+            return JsonResponse({'ERRO:': str(e)}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Método não permitido!'}, status=405)
 
 # class OrderItemList(ListView):
 #     model = OutflowsItems

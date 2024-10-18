@@ -22,7 +22,7 @@
           {% if item.is_dolar == 0 %}R$ {% else %}$ {% endif %}
           {{ item.valor }}
         </td>
-        <td>{{ item.is_dolar|yesno:"S, N" }}</td>
+        <td>{{ item.is_dolar|yesno:"Sim, Não" }}</td>
         <td>{{ item.prazo }}</td>
         <td>{{ item.cnpj_faturamento }}</td>
         <td>{{ item.condicao }}</td>

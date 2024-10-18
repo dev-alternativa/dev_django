@@ -35,7 +35,10 @@
           <tr>
             <td>{{ preco.produto }}</td>
             <td>{{ preco.cliente }}</td>
-            <td>{{ preco.valor }}</td>
+            <td>
+              {% if preco.is_dolar == 0 %}R$ {% else %}$ {% endif %}
+              {{ preco.valor }}
+            </td>
             <td>{{ preco.is_dolar|yesno:"Sim, Não" }}</td>
             <td>{{ preco.prazo }}</td>
             <td class="action_size_column">

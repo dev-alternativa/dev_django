@@ -57,7 +57,7 @@
                     <div class="card">
                         <div class="space_from_margin">
                             <table class="table table-hover table-bordered border-secondary-subtle">
-                                {% if orders %}
+                                {% if pedidos %}
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -67,28 +67,28 @@
                                             <th>Nome Cliente</th>
                                             <th>NF Saída</th>
                                             <th>Transportadora</th>
-                                            <th>Data Faturamento</th>
+                                            <th>Previsão de Faturamento</th>
                                             <th>Data Criação</th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody class="table table-hover table-bordered border-secondary-subtle">
-                                        {% for order in orders %}
+                                        {% for pedido in pedidos %}
                                             <tr>
-                                                <td>{{ order.id }}</td>
-                                                <td>{{ order.numero_pedido_cliente }}</td>
-                                                <td>{{ order.get_tipo_saida_display }}</td>
-                                                <td>{{ order.pedido_interno_cliente  }}</td>
-                                                <td>{{ order.cliente  }}</td>
-                                                <td>{{ order.nf_saida|default_if_none:'-' }}</td>
-                                                <td>{{ order.transportadora|default_if_none:'-' }}</td>
-                                                <td>{{ order.dt_faturamento|date:'d/m/Y' }}</td>
-                                                <td>{{ order.dt_criacao|date:'d/m/Y' }}</td>
+                                                <td>{{ pedido.id }}</td>
+                                                <td>{{ pedido.numero_pedido_cliente }}</td>
+                                                <td>{{ pedido.get_tipo_saida_display }}</td>
+                                                <td>{{ pedido.pedido_interno_cliente  }}</td>
+                                                <td>{{ pedido.cliente  }}</td>
+                                                <td>{{ pedido.nf_saida|default_if_none:'-' }}</td>
+                                                <td>{{ pedido.transportadora|default_if_none:'-' }}</td>
+                                                <td>{{ pedido.dt_faturamento|date:'d/m/Y' }}</td>
+                                                <td>{{ pedido.dt_criacao|date:'d/m/Y' }}</td>
                                                 <td class="action_size_column">
                                                     <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                                                         <!-- Visualizar detalhes -->
-                                                        <a class="btn btn-secondary btn-view" href="{% url 'order_detail' order.pk %}" role="button">
-                                                            <i class="bi bi-eye"></i>
+                                                        <a class="btn btn-secondary btn-view" href="{% url 'update_order' pedido.id %}" role="button">
+                                                            <i class="bi bi-pencil"></i>
                                                         </a>
 
                                                     </div>

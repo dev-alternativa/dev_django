@@ -97,6 +97,9 @@ class OutflowsForm(forms.ModelForm):
                 ),
             'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
         }
+        label = {
+            'dt_faturamento': 'Previsão de Faturamento',
+        }
 
     def __init__(self, *args, **kwargs):
         super(OutflowsForm, self).__init__(*args, **kwargs)

@@ -3,10 +3,10 @@ from core.models import Base
 import re
 
 CONDICAO_PRECO = (
-    ('N', 'Normal'),
-    ('E1', 'Especial 1'),
-    ('E2', 'Especial 2'),
-    ('E3', 'Especial 3'),
+    ('Normal', 'Normal'),
+    ('Especial1', 'Especial 1'),
+    ('Especial2', 'Especial 2'),
+    ('Especial3', 'Especial 3'),
 )
 
 

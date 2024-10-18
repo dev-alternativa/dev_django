@@ -4,6 +4,13 @@ from accounts.models import CustomUsuario
 from products.models import Product
 
 
+CONDICAO_PRECO = (
+    ('Normal', 'Normal'),
+    ('Especial1', 'Especial 1'),
+    ('Especial2', 'Especial 2'),
+    ('Especial3', 'Especial 3'),
+)
+
 
 TIPO_SAIDA = (
     ('V', 'Venda'),
@@ -91,6 +98,7 @@ class OutflowsItems(Base):
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(max_length=50, blank=True, null=True)
     item_pedido = models.IntegerField(verbose_name='Item Pedido')
+    condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
     obs = models.TextField(max_length=500, blank=True, null=True)
     vendedor_item = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
     cfop = models.CharField(max_length=50, blank=True, null=True)
