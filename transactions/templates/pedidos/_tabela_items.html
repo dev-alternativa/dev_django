@@ -8,6 +8,7 @@
             <th>Preço</th>
             <th>CFOP</th>
             <th>Vendedor</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +20,18 @@
             <td>{{ item.preco }}</td>
             <td>{{ item.cfop }}</td>
             <td>{{ item.vendedor_item.nome }}</td>
+            <td>
+                <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
+                    <!-- Editar -->
+                    <a class="btn btn-warning btn-edit btn-sm" href="#" role="button">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <!-- Apagar -->
+                    <button type="button" id="btn-delete" class="btn btn-sm btn-danger btn-delete" data-id="{{  item.id }}">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </td>
         </tr>
         {% empty %}
         <tr>

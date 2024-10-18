@@ -129,7 +129,7 @@
       <div class='row float-end' id="editButton">
         <div class="col-md-12" style="margin-top: 10px;">
           <div class="form-inline buttons">
-            <button class="btn btn-warning" value="Edit">
+            <button class="btn btn-warning btn-lg" value="Edit">
               <i class="bi bi-pencil"></i>
               Editar Pedido
             </button>
@@ -152,109 +152,137 @@
   $(document).ready(function() {
     atualizarTabela({{ order.pk }})
 
-  // Valores iniciais, usado para verificar o que foi alterado no formulário
-  var initialValues = {};
+    // Valores iniciais, usado para verificar o que foi alterado no formulário
+    var initialValues = {};
 
-  // Ao clicar no botão Editar
-  $('#editButton button').click(function(e) {
-    e.preventDefault(); // Previne o comportamento padrão do botão
+    // Ao clicar no botão Editar
+    $('#editButton button').click(function(e) {
+      e.preventDefault(); // Previne o comportamento padrão do botão
 
-    // Salva os valores iniciais dos campos do formulário
-    $('form :input').each(function(){
-      const input = $(this);
-      initialValues[input.attr('name')] = input.val();
+      // Salva os valores iniciais dos campos do formulário
+      $('form :input').each(function(){
+        const input = $(this);
+        initialValues[input.attr('name')] = input.val();
 
-    });
+      });
 
-    // Habilita os campos do formulário
-    $('form :input').prop('disabled', false);
+      // Habilita os campos do formulário
+      $('form :input').prop('disabled', false);
 
-    // Esconde o botão Editar
-    $('#editButton').hide();
+      // Esconde o botão Editar
+      $('#editButton').hide();
 
-    // Insere o botão Salvar no mesmo lugar
-    var saveButton = `
-      <div class='row float-end' id="saveButton">
-        <div class="col-md-12" style="margin-top: 10px;">
-          <div class="form-inline buttons">
-            <button class="btn btn-primary" value="Save">
-              <i class="bi bi-floppy-o"></i>
-              Salvar
-            </button>
+      // Insere o botão Salvar no mesmo lugar
+      var saveButton = `
+        <div class='row float-end' id="saveButton">
+          <div class="col-md-12" style="margin-top: 10px;">
+            <div class="form-inline buttons">
+              <button class="btn btn-primary" value="Save">
+                <i class="bi bi-floppy-o"></i>
+                Salvar
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
 
-    $('#editButton').after(saveButton); // Insere o botão Salvar
-  });
-
-  // Atualiza os dados ao clicar em `Salvar`
-  $(document).on('click', '#saveButton button', function(e){
-    e.preventDefault()
-
-    var modifiedData = {};
-
-    // Verifica cada campo e compara com o valor inicial
-    $('form :input').each(function(){
-      const input = $(this);
-      const name = input.attr('name');
-      const currentValue = input.val();
-
-      if (initialValues[name] !== currentValue) {
-        modifiedData[name] = currentValue;
-      }
+      $('#editButton').after(saveButton); // Insere o botão Salvar
     });
 
-    // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
-    if(Object.keys(modifiedData).length > 0){
+    // Atualiza os dados ao clicar em `Salvar`
+    $(document).on('click', '#saveButton button', function(e){
+      e.preventDefault()
 
-      $.ajax({
-        type: 'POST',
-        url: "{% url 'edit_order' order.pk %}",
-        data: {
-          ...modifiedData,
-          'csrfmiddlewaretoken': '{{ csrf_token }}',
-        },
-        success: function(response) {
-            // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
-            let message = "Campos alterados com sucesso."
+      var modifiedData = {};
 
-            let alertElement = `
-              <div class="alert alert-success alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>`;
-            $('#alertsOrder').append(alertElement);
+      // Verifica cada campo e compara com o valor inicial
+      $('form :input').each(function(){
+        const input = $(this);
+        const name = input.attr('name');
+        const currentValue = input.val();
 
-            // Opcionalmente, você pode desabilitar novamente os campos após salvar
-            $('form :input').prop('disabled', true);
-
-            // Esconder o botão Salvar e mostrar o botão Editar novamente
-            $('#saveButton').remove();
-            $('#editButton').show();
-        },
-        error: function(xhr, status, error) {
-            // Exibe mensagem de erro caso a requisição falhe
-            console.log(`Erro: ${status}: ${error}`);
-            alert("Ocorreu um erro ao salvar o pedido.");
+        if (initialValues[name] !== currentValue) {
+          modifiedData[name] = currentValue;
         }
       });
 
-    }else{
-      let message = "Nenhum campo alterado, nada salvo..."
+      // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
+      if(Object.keys(modifiedData).length > 0){
 
-      let alertElement = `
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
-      $('#alertsOrder').append(alertElement);
-      $('#saveButton').remove();
-      $('#editButton').show();
-    }
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'edit_order' order.pk %}",
+          data: {
+            ...modifiedData,
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+          },
+          success: function(response) {
+              // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
+              let message = "Campos alterados com sucesso."
+
+              let alertElement = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  ${message}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+              $('#alertsOrder').append(alertElement);
+
+              // Opcionalmente, você pode desabilitar novamente os campos após salvar
+              $('form :input').prop('disabled', true);
+
+              // Esconder o botão Salvar e mostrar o botão Editar novamente
+              $('#saveButton').remove();
+              $('#editButton').show();
+          },
+          error: function(xhr, status, error) {
+              // Exibe mensagem de erro caso a requisição falhe
+              console.log(`Erro: ${status}: ${error}`);
+              alert("Ocorreu um erro ao salvar o pedido.");
+          }
+        });
+
+      }else{
+        let message = "Nenhum campo alterado, nada salvo..."
+
+        let alertElement = `
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`;
+        $('#alertsPage').append(alertElement);
+        $('#saveButton').remove();
+        $('#editButton').show();
+      }
   });
 
+  // Botão de apagar item da lista de items
+  $(document).on('click', '#btn-delete', function(e){
+    const itemID = $(this).data('id');
+    const deleteURL = "{% url 'remove_product_from_order' 0 %}".replace("0", itemID);
+
+    $.ajax({
+      type: 'POST',
+      url: deleteURL,
+      data: {
+          'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: function(response) {
+
+          let message = response.message;
+
+          let alertElement = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              ${message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+          $('#alertsPage').append(alertElement);
+      },
+      error: function(xhr, status, error) {
+          alert(`Erro: ${xhr.responseJSON.ERRO || status}`);
+      }
+    });
+
+  });
 
 });
 
