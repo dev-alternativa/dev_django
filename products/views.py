@@ -73,6 +73,12 @@ class InventoryListView(ListView):
         filter_lote = self.request.GET.get('est_lote')
 
         # Aplica filtros conforme os campos preenchidos
+        if filter_pedido_cliente:
+            print(filter_pedido_cliente)
+            queryset = queryset.filter(saida_items__saida__id = filter_pedido_cliente)
+            print(queryset)
+            filtro_aplicado = True
+
         if filter_produto:
             queryset = queryset.filter(entrada_items__produto = filter_produto)
             filtro_aplicado = True
