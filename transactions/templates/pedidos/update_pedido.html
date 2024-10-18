@@ -7,255 +7,386 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/select2.css' %}">
 
-<div class="row">
+<div class="row" id="panel">
   <div class="cols">
     {% if not order.pk %}
       <h1 class="text-body-secondary text-center mb-3">Novo Pedido</h1>
     {% else %}
-    <h1 class="text-body-secondary text-center mb-3">Pedido #{{ order.pk }}</h1>
+      <h1 class="text-body-secondary text-center mb-3">Pedido #{{ order.pk }}</h1>
     {% endif %}
-  <div class="row" style="margin-bottom: 1rem;">
-    <div class='col-md-6'>
-      <a href="{% url 'outflow_list' %}" class='btn btn-danger btn-lg'>
-        <i class="bi bi-backspace space_from_margin"></i>
-        Voltar
-      </a>
-    </div>
-  </div>
-  {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    </div>
-  {% endif %}
-
-      <!-- O FORMULÁRIO COMEÇA AQUI -->
-      <form method="POST" autocomplete="off" novalidate>
-        {% csrf_token %}
-        <!-- Formulário Superior -->
-        <div class="row justify-content-center">
-          <div class="col">
-            <div class="form-group">
-              {{ form.cliente|as_crispy_field }}
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              {{ form.numero_pedido_cliente|as_crispy_field }}
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              {{ form.pedido_interno_cliente|as_crispy_field }}
-            </div>
-          </div>
-          <div class='col'>
-            <div class="form-group">
-                {{ form.dolar_ptax|as_crispy_field }}
-            </div>
-          </div>
-        </div>
-        <div class='row'>
-
-          <div class="col">
-            <div class="form-group">
-              {{ form.desconto|as_crispy_field }}
-            </div>
-          </div>
-
-          <div class='col'>
-            <div class="form-group">
-                {{ form.cod_cenario_fiscal|as_crispy_field }}
-            </div>
-          </div>
-          <div class="col">
-            <div class="form-group">
-              {{ form.nf_saida|as_crispy_field }}
-            </div>
-          </div>
-          <div class='col'>
-            <div class="form-group">
-              {{ form.transportadora|as_crispy_field }}
-            </div>
-          </div>
-          <div class='col'>
-            <div class="form-group">
-              {{ form.vendedor|as_crispy_field }}
-            </div>
-          </div>
-        </div>
-        <div class='row'>
-          <div class="col">
-            <div class="form-group">
-              {{ form.dados_adicionais_nf|as_crispy_field }}
-            </div>
-          </div>
-
-        </div>
-          </div>
-        </div>
-        <!-- O FORMULÁRIO TERMINA AQUI -->
-      </form>
-
-        <!-- Botão de adicionar item -->
-        <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >
-          <i class="bi bi-plus-lg"></i>
-          Adicionar Item
+    <div class="row" style="margin-bottom: 1rem;">
+      <div class='col-md-6'>
+        <a href="{% url 'order_list' %}" class='btn btn-danger btn-lg'>
+          <i class="bi bi-backspace space_from_margin"></i>
+          Voltar
         </a>
-
-        <!-- Modal de adição de produtos -->
-        {% include "pedidos/_modal_item_pedido.html" %}
-
-        <!-- Botão de salvar -->
-        {% if not order.pk %}
-
-          <div class="row float-end">
-            <div class="col-sm-12" style="margin-top: 10px;">
-              <div class="form-inline buttons">
-                <button class="btn btn-primary" value="Save">
-                  <i class="bi bi-floppy-o"></i>
-                  Salvar
-                </button>
-              </div>
-            </div>
-          </div>
-
-        {% endif %}
-
+      </div>
     </div>
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div id='alertsOrder'></div>
+    <!-- O FORMULÁRIO COMEÇA AQUI -->
+    <form method="POST" autocomplete="off" novalidate id='orderForm'>
+      {% csrf_token %}
+      <!-- Formulário Superior -->
+      <div class="row justify-content-center">
+        <div class="col">
+          <div class="form-group">
+            {{ form.cliente|as_crispy_field }}
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            {{ form.numero_pedido_cliente|as_crispy_field }}
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            {{ form.pedido_interno_cliente|as_crispy_field }}
+          </div>
+        </div>
+        <div class='col'>
+          <div class="form-group">
+              {{ form.dolar_ptax|as_crispy_field }}
+          </div>
+        </div>
+      </div>
+      <div class='row'>
+
+        <div class="col">
+          <div class="form-group">
+            {{ form.desconto|as_crispy_field }}
+          </div>
+        </div>
+
+        <div class='col'>
+          <div class="form-group">
+              {{ form.cod_cenario_fiscal|as_crispy_field }}
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            {{ form.nf_saida|as_crispy_field }}
+          </div>
+        </div>
+        <div class='col'>
+          <div class="form-group">
+            {{ form.transportadora|as_crispy_field }}
+          </div>
+        </div>
+        <div class='col'>
+          <div class="form-group">
+            {{ form.vendedor|as_crispy_field }}
+          </div>
+        </div>
+      </div>
+      <div class='row'>
+        <div class="col">
+          <div class="form-group">
+            {{ form.dados_adicionais_nf|as_crispy_field }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- O FORMULÁRIO TERMINA AQUI -->
+    </form>
+  </div>
+
+    <!-- Botão de adicionar item -->
+    <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >
+      <i class="bi bi-plus-lg"></i>
+      Adicionar Item
+    </a>
+
+    <!-- Modal de adição de produtos -->
+    {% include "pedidos/_modal_item_pedido.html" %}
+
+    <!-- Botão de salvar -->
+
+    {% if not order.pk %}
+
+      <div class="row float-end" id="saveButton">
+        <div class="col-sm-12" style="margin-top: 10px;">
+          <div class="form-inline buttons">
+            <button class="btn btn-primary" value="Save">
+              <i class="bi bi-floppy-o"></i>
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+
+      <div class='row float-end' id="editButton">
+        <div class="col-md-12" style="margin-top: 10px;">
+          <div class="form-inline buttons">
+            <button class="btn btn-warning" value="Edit">
+              <i class="bi bi-pencil"></i>
+              Editar Pedido
+            </button>
+          </div>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
     <!-- Tabela dinâmica de itens do carrinho -->
     <div class="row" id="dinamic-table">
       {% include "pedidos/_tabela_items.html" %}
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
+  $('#orderForm :input').prop('disabled', true);
 
-    // Desabilita os campos do formulário de Pedido
-    const formElements = document.querySelectorAll("form:not(#itemForm) input, form:not(#itemForm) select, form:not(#itemForm) textarea");
-    formElements.forEach(element => element.setAttribute("disabled", true));
+  $(document).ready(function() {
+    atualizarTabela({{ order.pk }})
 
-    const atualizarTabela = (orderID) => {
+  // Valores iniciais, usado para verificar o que foi alterado no formulário
+  var initialValues = {};
 
-      $.ajax({
-        url: `/get_itens_pedido/${orderID}/`,
-        method: 'GET',
-        success: function(response) {
-          // Sucesso
-          console.log(response);
-          $('#dinamic-table').html(response.html);
-        },
-        error: function(response) {
-          // Erro
-          console.log('Erro ao atualizar: ', response);
-        }
-      });
-    }
+  // Ao clicar no botão Editar
+  $('#editButton button').click(function(e) {
+    e.preventDefault(); // Previne o comportamento padrão do botão
 
-    const resetForm = () => {
-      $('#itemForm')[0].reset();
-      $('#itemForm').find('.is-invalid').removeClass('is-invalid');
-      $('#staticBackdrop').modal('hide');
-    }
+    // Salva os valores iniciais dos campos do formulário
+    $('form :input').each(function(){
+      const input = $(this);
+      initialValues[input.attr('name')] = input.val();
 
-    // Reseta valores no formulário de produtos
-    $('.btn-close').on('click', function(){
-      $('#itemForm')[0].reset();
-      $('#itemForm').find('.is-invalid').removeClass('is-invalid');
     });
 
-    $(document).ready(
-      atualizarTabela({{ order.pk }})
-    );
+    // Habilita os campos do formulário
+    $('form :input').prop('disabled', false);
 
-    // Salva produtos no pedido atual
-    function adicionar_produto() {
+    // Esconde o botão Editar
+    $('#editButton').hide();
 
-      // Pega os valores dos campos
-      const produto = $('#id_produto').val() ? $('#id_produto').val() : '';
-      const quantidade = $('#id_quantidade').val() ? $('#id_quantidade').val() : '';
-      const preco = $('#id_preco').val() ? $('#id_preco').val() : '';
-      const itemPedido = $('#id_item_pedido').val() ? $('#id_item_pedido').val() : '';
-      const dadosAdicionais = $('#id_dados_adicionais_item').val() ? $('#id_dados_adicionais_item').val() : '';
-      const numeroPedido = $('#id_numero_pedido').val() ? $('#id_numero_pedido').val() : '';
-      const obs = $('#id_obs').val() ? $('#id_obs').val() : '';
-      const cfop = $('#id_cfop').val() ? $('#id_cfop').val() : '';
-      const vendedor_item = $('#id_vendedor_item').val();
+    // Insere o botão Salvar no mesmo lugar
+    var saveButton = `
+      <div class='row float-end' id="saveButton">
+        <div class="col-md-12" style="margin-top: 10px;">
+          <div class="form-inline buttons">
+            <button class="btn btn-primary" value="Save">
+              <i class="bi bi-floppy-o"></i>
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
 
-      // Variável para controlar se o formulário é válido
-      let isValid = true;
+    $('#editButton').after(saveButton); // Insere o botão Salvar
+  });
 
-      // Verifica o campo 'Produto'
-      if (!produto) {
-          $('#id_produto').addClass('is-invalid');
-          isValid = false;
-      } else {
-          $('#id_produto').removeClass('is-invalid');
+  // Atualiza os dados ao clicar em `Salvar`
+  $(document).on('click', '#saveButton button', function(e){
+    e.preventDefault()
+
+    var modifiedData = {};
+
+    // Verifica cada campo e compara com o valor inicial
+    $('form :input').each(function(){
+      const input = $(this);
+      const name = input.attr('name');
+      const currentValue = input.val();
+
+      if (initialValues[name] !== currentValue) {
+        modifiedData[name] = currentValue;
       }
+    });
 
-      // Verifica o campo 'Quantidade'
-      if (!quantidade) {
-          $('#id_quantidade').addClass('is-invalid');
-          isValid = false;
-      } else {
-          $('#id_quantidade').removeClass('is-invalid');
-      }
+    // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
+    if(Object.keys(modifiedData).length > 0){
 
-      // Verifica o campo 'Valor Unitário'
-      if (!preco) {
-          $('#id_preco').addClass('is-invalid');
-          isValid = false;
-      } else {
-          $('#id_preco').removeClass('is-invalid');
-      }
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'edit_order' order.pk %}",
+        data: {
+          ...modifiedData,
+          'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+        success: function(response) {
+            // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
+            let message = "Campos alterados com sucesso."
 
-      // Verifica o campo 'Item Pedido'
-      if (!itemPedido) {
-          $('#id_item_pedido').addClass('is-invalid');
-          isValid = false;
-      } else {
-          $('#id_item_pedido').removeClass('is-invalid');
-      }
+            let alertElement = `
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>`;
+            $('#alertsOrder').append(alertElement);
 
-      // Se o formulário for válido, envie os dados via AJAX
-      if (isValid) {
-          // Aqui você pode fazer a chamada AJAX para enviar o formulário
-          $.ajax({
-              url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
-              method: 'POST',
-              data: {
-                produto: produto,
-                quantidade: quantidade,
-                preco: preco,
-                item_pedido: itemPedido,
-                dadosAdicionais: dadosAdicionais,
-                numeroPedido: numeroPedido,
-                obs: obs,
-                cfop: cfop,
-                vendedor_item: vendedor_item,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-              },
-              success: function(response) {
-                  // Sucesso
-                  alert("Item adicionado com sucesso!");
-                  resetForm();
-                  atualizarTabela();
-              },
-              error: function(response) {
-                  // Erro
-                  alert(`Erro ao adicionar item: ${response.error}`);
-                  console.log(response.error);
-              }
-          });
+            // Opcionalmente, você pode desabilitar novamente os campos após salvar
+            $('form :input').prop('disabled', true);
+
+            // Esconder o botão Salvar e mostrar o botão Editar novamente
+            $('#saveButton').remove();
+            $('#editButton').show();
+        },
+        error: function(xhr, status, error) {
+            // Exibe mensagem de erro caso a requisição falhe
+            console.log(`Erro: ${status}: ${error}`);
+            alert("Ocorreu um erro ao salvar o pedido.");
+        }
+      });
+
+    }else{
+      let message = "Nenhum campo alterado, nada salvo..."
+
+      let alertElement = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+      $('#alertsOrder').append(alertElement);
+      $('#saveButton').remove();
+      $('#editButton').show();
+    }
+  });
+
+
+});
+
+
+
+  // Atualiza a tabela de itens do pedido
+  const atualizarTabela = (orderID) => {
+    $.ajax({
+      url: `/get_itens_pedido/${orderID}/`,
+      method: 'GET',
+      success: function(response) {
+        // Sucesso
+        $('#dinamic-table').html(response.html);
+
+      },
+      error: function(response) {
+        // Erro
+        alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
+        console.log('Erro ao atualizar: ', response);
       }
+    });
+  }
+
+  // Reseta valores no formulário de produtos
+  const resetForm = () => {
+    $('#itemForm')[0].reset();
+    $('#itemForm').find('.is-invalid').removeClass('is-invalid');
+    $('#staticBackdrop').modal('hide');
+  }
+
+  $('.btn-close').on('click', function(){
+    resetForm();
+  });
+
+  // Salva produtos no pedido atual
+  function adicionar_produto() {
+
+    // Pega os valores dos campos
+    const produto = $('#id_produto').val() ? $('#id_produto').val() : '';
+    const quantidade = $('#id_quantidade').val() ? $('#id_quantidade').val() : '';
+    const preco = $('#id_preco').val() ? $('#id_preco').val() : '';
+    const itemPedido = $('#id_item_pedido').val() ? $('#id_item_pedido').val() : '';
+    const dadosAdicionais = $('#id_dados_adicionais_item').val() ? $('#id_dados_adicionais_item').val() : '';
+    const numeroPedido = $('#id_numero_pedido').val() ? $('#id_numero_pedido').val() : '';
+    const obs = $('#id_obs').val() ? $('#id_obs').val() : '';
+    const cfop = $('#id_cfop').val() ? $('#id_cfop').val() : '';
+    const vendedor_item = $('#id_vendedor_item').val();
+
+    // Variável para controlar se o formulário é válido
+    let isValid = true;
+
+    // Verifica o campo 'Produto'
+    if (!produto) {
+        $('#id_produto').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#id_produto').removeClass('is-invalid');
     }
 
+    // Verifica o campo 'Quantidade'
+    if (!quantidade) {
+        $('#id_quantidade').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#id_quantidade').removeClass('is-invalid');
+    }
 
-  </script>
+    // Verifica o campo 'Valor Unitário'
+    if (!preco) {
+        $('#id_preco').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#id_preco').removeClass('is-invalid');
+    }
+
+    // Verifica o campo 'Item Pedido'
+    if (!itemPedido) {
+        $('#id_item_pedido').addClass('is-invalid');
+        isValid = false;
+    } else {
+        $('#id_item_pedido').removeClass('is-invalid');
+    }
+
+    // Se o formulário for válido, envie os dados via AJAX
+    if (isValid) {
+        // Aqui você pode fazer a chamada AJAX para enviar o formulário
+        $.ajax({
+            url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
+            method: 'POST',
+            data: {
+              produto: produto,
+              quantidade: quantidade,
+              preco: preco,
+              item_pedido: itemPedido,
+              dadosAdicionais: dadosAdicionais,
+              numeroPedido: numeroPedido,
+              obs: obs,
+              cfop: cfop,
+              vendedor_item: vendedor_item,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+              // Sucesso
+              let message = "Item adicionado com sucesso!";
+
+              resetForm();
+              atualizarTabela({{ order.pk }});
+              let alertElement = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  ${message}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+
+              $('#alertsModal').append(alertElement);
+            },
+            error: function(response) {
+              // Erro
+              let erro = response.responseJSON.error;
+              let alertElement = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  ${erro}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+
+              $('#alertsModal').append(alertElement);
+              //alert(`Erro ao adicionar item: ${erro}`);
+            }
+        });
+    }
+  }
+
+</script>
 
 {% endblock content %}
 {% block extra_scripts %}
