@@ -363,16 +363,18 @@ def adicionar_produto(request, order_id):
 
 def get_itens_pedido(request, order_id):
     items = OutflowsItems.objects.filter(saida__id=order_id)
-    total_pedido = items.aggregate(total=Sum('preco'))['total']
-    quantidade_total = items.aggregate(total=Sum('quantidade'))['total']
-    html = render_to_string(
-        'pedidos/_tabela_items.html', {
-            'itens_produtos': items,
-            'total_pedido': total_pedido,
-            'quantidade_total': quantidade_total
-        }
-    )
-    return JsonResponse({'html': html})
+    print(items)
+    if items:
+        total_pedido = items.aggregate(total=Sum('preco'))['total']
+        quantidade_total = items.aggregate(total=Sum('quantidade'))['total']
+        html = render_to_string(
+            'pedidos/_tabela_items.html', {
+                'itens_produtos': items,
+                'total_pedido': total_pedido,
+                'quantidade_total': quantidade_total
+            }
+        )
+        return JsonResponse({'html': html})
 
 
 def edit_pedido(request, order_id):

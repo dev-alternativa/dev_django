@@ -37,6 +37,7 @@ class InflowsForm(forms.ModelForm):
                 ),
         }
 
+    nf_entrada = forms.CharField(max_length=44, required=False)
     def __init__(self, *args, **kwargs):
         super(InflowsForm, self).__init__(*args, **kwargs)
         self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)

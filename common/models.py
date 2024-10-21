@@ -60,6 +60,11 @@ ESTADOS_BRASIL = (
 )
 
 
+class CNPJFaturamento(models.Model):
+    sigla = models.CharField('Tipo CNPJ', max_length=5)
+    codigo = models.CharField('Código CNPJ', max_length=20)
+
+
 class Category(Base):
     nome = models.CharField('Nome', max_length=100)
     descricao = models.TextField('Descrição', null=True, blank=True)

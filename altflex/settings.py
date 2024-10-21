@@ -105,7 +105,7 @@ WSGI_APPLICATION = 'altflex.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE','playground'),
+        'NAME': os.getenv('MYSQL_DATABASE','mydatabase'),
         'USER': os.getenv('MYSQL_USER','pasklan'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD', 'H3l3n@2024'),
         'HOST': os.getenv('DB_HOST', 'db'),

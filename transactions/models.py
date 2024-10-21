@@ -12,6 +12,16 @@ CONDICAO_PRECO = (
 )
 
 
+TIPO_FRETE = (
+    ('0', '0 - (CIF)'),
+    ('1', '1 - (FOB)'),
+    ('2', '2 - Frete por conta de Terceiros'),
+    ('3', '3 - Transporte Próprio por conta do Remetente'),
+    ('4', '4 - Transporte Próprio por conta do Destinatário'),
+    ('9', '9 - Sem Ocorrência de Transporte'),
+)
+
+
 TIPO_SAIDA = (
     ('V', 'Venda'),
     ('A', 'Ajuste'),
@@ -27,7 +37,7 @@ class Inflows(Base):
     fornecedor = models.ForeignKey('common.CustomerSupplier', verbose_name='Fornecedor', on_delete=models.PROTECT, related_name='inflows')
     valor_total = models.DecimalField('Valor Total dos Produtos', max_digits=10, decimal_places=2)
     tipo_entrada = models.CharField('Tipo de Entrada', choices=TIPO_ENTRADA, max_length=50, default=TIPO_ENTRADA[0])
-    nf_entrada = models.PositiveIntegerField('Nota Fiscal')
+    nf_entrada = models.CharField('Nota Fiscal', max_length=44, null=True, blank=True)
     # container = models.CharField('Container', max_length=100, null=True, blank=True)
     obs = models.CharField('Observações', max_length=500, blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
@@ -72,11 +82,12 @@ class Outflows(Base):
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
     pedido_interno_cliente = models.PositiveIntegerField(null=True, blank=True)
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
-    nf_saida = models.PositiveIntegerField('NF Saída', null=True, blank=True)
+    nf_saida = models.CharField('NF Saída', null=True, blank=True, max_length=44)
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas', null=True, blank=True)
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_nf = models.TextField('Dados Adicionais NF',max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
+    tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_faturamento = models.DateField(blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
@@ -99,6 +110,8 @@ class OutflowsItems(Base):
     numero_pedido = models.CharField(max_length=50, blank=True, null=True)
     item_pedido = models.IntegerField(verbose_name='Item Pedido')
     condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
+    cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.PROTECT, related_name='saida_items')
+    prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.PROTECT, null=True, blank=True, related_name='saida_items')
     obs = models.TextField(max_length=500, blank=True, null=True)
     vendedor_item = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
     cfop = models.CharField(max_length=50, blank=True, null=True)
