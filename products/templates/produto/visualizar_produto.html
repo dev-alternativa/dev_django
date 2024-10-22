@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="container mt-5">
-    <h1 class="text-body-secondary text-center mb-3">Visualização de Dados</h1>
+    <h1 class="text-body-secondary text-center mb-3">{{ object.nome_produto }}</h1>
     <div class="card">
         <div class="card-header">
             Dados do Produto
@@ -136,7 +136,7 @@
         </div>
         <div class="row mb-2 text-center">
             <div class='col-md-6'>
-                <a href="{% url 'product' %}" class="btn btn-danger btn-lg">Cancelar</a>
+                <a href="{% url 'product' %}" class="btn btn-danger btn-lg">Voltar</a>
             </div>
             <div class='col-md-6'>
                 <a href="{% url 'update_product' object.pk %}" class="btn btn-warning btn-lg btn-view">Editar</a>

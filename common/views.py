@@ -110,7 +110,14 @@ class CustomerSupplierListView(FormataDadosMixin, ListView):
             search_terms = search.split()
             query = Q()
             for term in search_terms:
-                query |= Q(nome_fantasia__icontains=term) | Q(cnpj__icontains=term)
+                query |= Q(nome_fantasia__icontains=term)
+                query |= Q(cnpj__icontains=term)
+                query |= Q(tag_cadastro_omie_com__icontains=term)
+                query |= Q(tag_cadastro_omie_ind__icontains=term)
+                query |= Q(tag_cadastro_omie_pre__icontains=term)
+                query |= Q(tag_cadastro_omie_mrx__icontains=term)
+                query |= Q(tag_cadastro_omie_flx__icontains=term)
+                query |= Q(tag_cadastro_omie_srv__icontains=term)
             queryset = queryset.filter(query).distinct()
         return queryset
 

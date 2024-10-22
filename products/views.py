@@ -185,7 +185,16 @@ class ProductListView(ListView):
             query = Q()
 
             for term in search_terms:
-                query |= Q(tipo_categoria__nome__icontains=term) | Q(nome_produto__icontains=term) | Q(m_quadrado__icontains=term)
+                query |= Q(tipo_categoria__nome__icontains=term)
+                query |= Q(nome_produto__icontains=term)
+                query |= Q(m_quadrado__icontains=term)
+                query |= Q(cod_oculto_omie_com__icontains=term)
+                query |= Q(cod_oculto_omie_ind__icontains=term)
+                query |= Q(cod_oculto_omie_pre__icontains=term)
+                query |= Q(cod_oculto_omie_mrx__icontains=term)
+                query |= Q(cod_oculto_omie_flx__icontains=term)
+                query |= Q(cod_oculto_omie_srv__icontains=term)
+
             queryset = queryset.filter(query).distinct()
         return queryset
 
