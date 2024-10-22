@@ -78,9 +78,10 @@ class InflowsItems(Base):
 
 
 class Outflows(Base):
-    numero_pedido_cliente = models.PositiveIntegerField()
+    numero_pedido_cliente = models.CharField(max_length=100, null=True, blank=True)
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
-    pedido_interno_cliente = models.PositiveIntegerField(null=True, blank=True)
+    cod_pedido_omie = models.CharField(max_length=100, null=True, blank=True)
+    pedido_interno_cliente = models.CharField(max_length=100, null=True, blank=True)
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
     nf_saida = models.CharField('NF Saída', null=True, blank=True, max_length=44)
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas', null=True, blank=True)
@@ -89,7 +90,7 @@ class Outflows(Base):
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
     tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    dt_faturamento = models.DateField(blank=True, null=True)
+    dt_previao_faturamento = models.DateField(blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
     vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saidas')
 
@@ -98,11 +99,12 @@ class Outflows(Base):
         verbose_name = 'Saída de Estoque'
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.id, self.tipo_saida, self.numero_pedido_cliente)
+        return '{} - {} - {}'.format(self.id, self.tipo_saida, self.cod_pedido_omie)
 
 
 class OutflowsItems(Base):
     saida = models.ForeignKey(Outflows, on_delete=models.PROTECT, related_name='saida_items')
+    cod_item_omie = models.PositiveBigIntegerField(null=True, blank=True)
     produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='saida_items')
     quantidade = models.PositiveIntegerField()
     preco = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
