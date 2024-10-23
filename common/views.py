@@ -198,6 +198,8 @@ class SellerListView(ListView):
     model = Seller
     template_name = 'vendedores/vendedor.html'
     context_object_name = 'sellers'
+    paginate_by = 50
+    ordering = 'nome'
 
     def get_queryset(self):
         queryset = super().get_queryset()

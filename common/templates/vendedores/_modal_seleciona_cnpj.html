@@ -1,0 +1,28 @@
+
+<!-- Modal -->
+<div class="modal fade" id="selectCNPJ" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="selectCNPJLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="selectCNPJLabel">Selecione de qual CNPJ deseja importar do OMIE:</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id='alertsSellers'></div>
+      <div class="modal-body">
+        <select class="form-select" aria-label="Select_CNPJ" id="selectAppOmie">
+          <option selected>...</option>
+          <option value="COM">COM</option>
+          <option value="IND">IND</option>
+          <option value="PRE">PRE</option>
+          <option value="FLX">FLX</option>
+          <option value="SRV">SRV</option>
+          <option value="MRX">MRX</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-primary " id="importBtn">Importar</button>
+      </div>
+    </div>
+  </div>
+</div>

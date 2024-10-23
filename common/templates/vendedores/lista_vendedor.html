@@ -43,8 +43,8 @@
               <td>{{ seller.cod_omie_ind|default_if_none:"" }}</td>
               <td>{{ seller.cod_omie_pre|default_if_none:"" }}</td>
               <td>{{ seller.cod_omie_mrx|default_if_none:"" }}</td>
-              <td>{{ seller.cod_omie_flx|default_if_none:"" }}</td>
               <td>{{ seller.cod_omie_srv|default_if_none:"" }}</td>
+              <td>{{ seller.cod_omie_flx|default_if_none:"" }}</td>
               <td class="action_size_column">
                 <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                   <!-- Visualizar -->
@@ -71,4 +71,5 @@
         <p class="no-results">Nenhum item encontrado...</p>
     {% endif %}
   </table>
+  {% include 'paginacao.html' %}
 </div>

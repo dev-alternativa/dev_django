@@ -12,8 +12,8 @@ urlpatterns = [
     path('', include('transactions.urls')),
     path('', include('imports.urls')),
     path("select2/", include("django_select2.urls")),
-
     path('api/', include('api.urls')),
+    path('', include('api_omie.urls')),
 ]
 
 admin.AdminSite.site_header = 'Administração Sistema Alternativa Flexo'

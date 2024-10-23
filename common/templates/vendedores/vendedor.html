@@ -21,6 +21,7 @@
                         </div>
                     {% endif %}
 
+                    {% include "vendedores/_modal_seleciona_cnpj.html" %}
                     <div class="card">
                         {% include "vendedores/home_vendedor.html" %}
                     </div>
@@ -29,3 +30,49 @@
         </div>
     </div>
 {% endblock content %}
+{% block extra_scripts %}
+    <script>
+        $(document).ready(function() {
+            const importButton = document.querySelector('#importBtn');
+
+            importButton.addEventListener('click', function() {
+
+                const appOmie = $("#selectAppOmie").val();
+
+                if (appOmie != '...') {
+                    // Perform an AJAX request to send the selected app_omie value
+                    fetch('{% url 'fetch_sellers' %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' // Django CSRF protection
+                        },
+                        body: JSON.stringify({
+                            app_omie: appOmie
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        let message = `Foram incluidos ${data.total_created} registros e atualizados ${data.total_update}`;
+                        let alertElement = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`;
+                        alert(message);
+                        //$("alertsSellers").append(alertElement);
+                        $('#selectCNPJ').modal('hide');
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar vendedores:', error);
+                    });
+                } else {
+                    alert('Selecione uma opção válida!');
+                }
+            });
+        });
+
+    </script>
+{% endblock %}

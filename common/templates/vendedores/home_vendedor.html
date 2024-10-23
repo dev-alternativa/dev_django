@@ -3,10 +3,14 @@
     Vendedores cadastrados
 </div>
 <div class='btn-group top-buttons space_from_margin' role="group" aria-label="Grupo de botões">
+
     <a href="{% url 'add_seller' %}" class="btn btn-outline-primary">
         <i class="bi bi-plus-lg"></i>
         Adicionar Novo Vendedor
     </a>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#selectCNPJ">
+        Importar/Atualizar Vendedores do OMIE
+    </button>
 </div>
 <div class="space_from_margin">
     {% include "vendedores/lista_vendedor.html" %}
