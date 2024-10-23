@@ -17,12 +17,12 @@
 </form>
 
 <div class="table-responsive border-secondary">
-  <table class="table table-hover table-bordered border-secondary-subtle">
+  <table class="table table-hover table-bordered border-secondary-subtle text-center">
     {% if sellers %}
       <thead>
           <tr>
               <th>Nome</th>
-              <th>E-mail</th>
+              <th>Representante</th>
               <th>cod_COM</th>
               <th>cod_IND</th>
               <th>cod_PRE</th>
@@ -38,7 +38,7 @@
           {% if seller.ativo %}
             <tr>
               <td>{{ seller.nome }}</td>
-              <td>{{ seller.email|default_if_none:"" }}</td>
+              <td>{{ seller.representante|yesno:"Sim, Não" }}</td>
               <td>{{ seller.cod_omie_com|default_if_none:"" }}</td>
               <td>{{ seller.cod_omie_ind|default_if_none:"" }}</td>
               <td>{{ seller.cod_omie_pre|default_if_none:"" }}</td>
