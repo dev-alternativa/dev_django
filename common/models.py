@@ -60,6 +60,15 @@ ESTADOS_BRASIL = (
 )
 
 
+class ContaCorrete(models.Model):
+    descricao = models.CharField('Descrição', max_length=50)
+    nCodCC = models.CharField('Código Conta Corrente', max_length=15)
+    CNPJ = models.CharField('CNPJ', choices=CNPJ_FATURAMENTO, max_length=5)
+
+    def __str__(self):
+        return self.descricao
+
+
 class CNPJFaturamento(models.Model):
     sigla = models.CharField('Tipo CNPJ', max_length=5)
     codigo = models.CharField('Código CNPJ', max_length=20)
