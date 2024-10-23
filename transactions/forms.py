@@ -97,6 +97,13 @@ class OutflowsForm(forms.ModelForm):
                     }
                 ),
             'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
+            'dt_previao_faturamento': forms.DateTimeInput(
+                attrs={
+                    'type': 'date',
+                    'class': 'form-control',
+                    'placeholder': 'Selecione uma data'
+                    }
+                ),
         }
         label = {
             'dt_faturamento': 'Previsão de Faturamento',
@@ -137,6 +144,7 @@ OutflowsItemsFormSet = inlineformset_factory(
     extra=1,
     can_delete=False
 )
+
 
 class OrderItemsForm(forms.ModelForm):
 

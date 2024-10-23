@@ -223,9 +223,14 @@ class OrderCreateView(FormMessageMixin, CreateView):
     success_message = 'Novo Pedido Gerado com sucesso!'
     form_class = OutflowsForm
 
+    def form_invalid(self, form):
+        print(f'Erros ao criar pedido {form.errors}')
+        return super().form_invalid(form)
+
     def form_valid(self, form):
-        respose = super().form_valid(form)
-        return respose
+        response = super().form_valid(form)
+        print(f'Pedido Criado com sucesso: {self.object}')
+        return response
 
     def get_success_url(self):
         return reverse('update_order', kwargs={'pk': self.object.pk})

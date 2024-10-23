@@ -58,6 +58,16 @@
               {{ form.dolar_ptax|as_crispy_field }}
           </div>
         </div>
+        <div class='col'>
+          <div class="form-group">
+              {{ form.tipo_frete|as_crispy_field }}
+          </div>
+        </div>
+        <div class='col'>
+          <div class="form-group">
+              {{ form.dt_previao_faturamento|as_crispy_field }}
+          </div>
+        </div>
       </div>
       <div class='row'>
 
@@ -300,7 +310,7 @@
       },
       error: function(response) {
         // Erro
-        alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
+        //alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
         console.log('Erro ao atualizar: ', response);
       }
     });
