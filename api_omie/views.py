@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from common.models import Seller
 from django.shortcuts import redirect
 
-
+# *********************************** VENDEDORES  **************************************
 def fetch_and_save_sellers(app_omie):
     url = 'https://app.omie.com.br/api/v1/geral/vendedores/'
 
@@ -55,6 +55,9 @@ def fetch_and_save_sellers(app_omie):
 
             for seller_data in data['cadastro']:
                 if 'Enviado via API' in seller_data['nome']:
+                    continue
+
+                if 'S' in seller_data['inativo']:
                     continue
 
                 seller_dict = {
