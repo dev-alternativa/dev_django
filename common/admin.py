@@ -36,4 +36,4 @@ class CNPJFaturamentoAdmin(admin.ModelAdmin):
 
 @admin.register(ContaCorrete)
 class ContaCorreteAdmin(admin.ModelAdmin):
-    list_display = ('descricao', 'nCodCC', 'CNPJ')
+    list_display = ('descricao', 'nCodCC', 'CNPJ', 'padrao')

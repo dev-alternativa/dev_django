@@ -90,7 +90,7 @@ class Outflows(Base):
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
     tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    dt_previao_faturamento = models.DateField(blank=True, null=True)
+    dt_previao_faturamento = models.DateField('Previsão de Faturamento', blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
     vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saidas')
 

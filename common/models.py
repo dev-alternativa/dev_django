@@ -64,6 +64,7 @@ class ContaCorrete(models.Model):
     descricao = models.CharField('Descrição', max_length=50)
     nCodCC = models.CharField('Código Conta Corrente', max_length=15)
     CNPJ = models.CharField('CNPJ', choices=CNPJ_FATURAMENTO, max_length=5)
+    padrao = models.BooleanField('Padrão', default=False)
 
     def __str__(self):
         return self.descricao
@@ -186,6 +187,7 @@ class Seller(Base):
     cod_omie_srv = models.PositiveBigIntegerField('Código OMIE SRV', null=True, blank=True)
     representante = models.BooleanField('Representante', default=False)
     email = models.EmailField('E-mail', max_length=300, null=True, blank=True)
+    incluir_omie = models.BooleanField('Incluir no OMIE', default=True)
 
     class Meta:
         verbose_name = 'Vendedor'

@@ -247,46 +247,6 @@ class OrderEditDetailsView(UpdateView):
         context['item_form'] = OrderItemsForm()
         return context
 
-# def adicionar_item(request):
-#     if request.method == 'POST':
-#         produto = request.POST.get('produto_id')
-#         quantidade = request.POST.get('quantidade')
-#         preco = request.POST.get('preco_id')
-#         dados_adicionais = request.POST.get('dados_adicionais_item')
-#         numero_pedido = request.POST.get('numero_pedido')
-#         item_pedido = request.POST.get('item_pedido')
-#         obs = request.POST.get('obs')
-#         cfop = request.POST.get('cfop')
-#         vendedor = request.POST.get('vendedor')
-
-
-#         # Verifica campos obrigatórios
-#         if not produto or not quantidade or not preco or not item_pedido:
-#             return JsonResponse(
-#                 {
-#                     'error': 'Dados Obrigatórios Incompletos',
-#                     'produto': produto,
-#                     'quantidade': quantidade,
-#                     'preco': preco,
-#                     'item_pedido': item_pedido
-#                 }, status=400
-#             )
-
-#         # Obtém produto e preço a partir dos IDs
-#         produto = get_object_or_404(Product, id=produto)
-#         preco = get_object_or_404(Price, id=preco)
-#         user = get_object_or_404(CustomUsuario, id=request.user.id)
-
-
-#         return render(
-#             request, 'pedidos/_tabela_carrinho.html',
-#             {
-#                 'cart_items': cart_items,
-#                 'message': 'Item adicionado ao carrinho com sucesso!'
-#             }
-#         )
-
-
 
 def adicionar_produto(request, order_id):
 
@@ -368,7 +328,7 @@ def adicionar_produto(request, order_id):
 
 def get_itens_pedido(request, order_id):
     items = OutflowsItems.objects.filter(saida__id=order_id)
-    print(items)
+
     if items:
         total_pedido = items.aggregate(total=Sum('preco'))['total']
         quantidade_total = items.aggregate(total=Sum('quantidade'))['total']
@@ -380,6 +340,8 @@ def get_itens_pedido(request, order_id):
             }
         )
         return JsonResponse({'html': html})
+    else:
+        return JsonResponse({'html': ''})
 
 
 def edit_pedido(request, order_id):
@@ -441,40 +403,6 @@ def remove_product_from_order(request, order_id):
         except Exception as e:
             print(f'Ocorreu um erro {e}')
             return JsonResponse({'ERRO:': str(e)}, status=500)
-
-
-
-# class OrderItemList(ListView):
-#     model = OutflowsItems
-#     template_name = 'pedidos/listar_items_pedido.html'
-#     context_object_name = 'itens_produtos'
-
-#     def post(self, request, *args, **kwargs):
-#         pedido_id = self.kwargs.get('order_id')
-#         pedido = get_object_or_404(Outflows, id=pedido_id)
-
-#         form = self.form_class(request.POST)
-#         if form.is_valid():
-#             item = form.save(commit=False)
-#             item.saida = pedido
-#             item.save()
-
-#             return redirect('order_item_list', order_id=pedido_id)
-#         else:
-#             return self.get(request, *args, **kwargs)
-
-#     def get_queryset(self):
-#         pedido_id = self.kwargs.get('order_id')
-#         return OutflowsItems.objects.filter(saida__id=pedido_id)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         pedido_id = self.kwargs.get('order_id')
-#         form = OrderItemsForm()
-#         context['form'] = form
-#         context['pedido_id'] = pedido_id
-#         context['pedido'] = get_object_or_404(Outflows, id=pedido_id)
-#         return context
 
 
 class PedidosDetailView(DetailView):
