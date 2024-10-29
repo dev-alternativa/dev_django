@@ -14,7 +14,7 @@
                       Adicionar Novo Vendedor
                   </div>
                   <div class='btn-group top-buttons space_from_margin center_content' role="group" aria-label="Grupo de botões">
-                      <form method="POST" autocomplete="off">
+                      <form method="POST" autocomplete="off" id="upload-form">
                         {% csrf_token %}
                         {% crispy form %}
                       </form>

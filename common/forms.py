@@ -400,5 +400,16 @@ class SellerForm(ModelForm):
                     ),
                 ),
                 css_class='form-group col-12 text-center'
-            )
+            ),
+            HTML(
+                '''
+                <div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9998;"></div>
+                <div id="loading">
+                <p>Aguarde...</p>
+                <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                </div>
+                </div>
+                '''
+            ),
         )

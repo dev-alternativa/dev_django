@@ -232,19 +232,19 @@ class SellerNewView(FormMessageMixin, CreateView):
         if form.cleaned_data.get('incluir_omie'):
 
             api_response_com = add_seller_to_omie(self.object, 'COM')
-            # api_response_ind = add_seller_to_omie(self.object, 'IND')
-            # api_response_pre = add_seller_to_omie(self.object, 'PRE')
-            # api_response_flx = add_seller_to_omie(self.object, 'FLX')
-            # api_response_mrx = add_seller_to_omie(self.object, 'MRX')
-            # api_response_srv = add_seller_to_omie(self.object, 'SRV')
+            api_response_ind = add_seller_to_omie(self.object, 'IND')
+            api_response_pre = add_seller_to_omie(self.object, 'PRE')
+            api_response_flx = add_seller_to_omie(self.object, 'FLX')
+            api_response_mrx = add_seller_to_omie(self.object, 'MRX')
+            api_response_srv = add_seller_to_omie(self.object, 'SRV')
 
             api_responses = {
                 'com': api_response_com,
-                # 'ind': api_response_ind,
-                # 'pre': api_response_pre,
-                # 'flx': api_response_flx,
-                # 'mrx': api_response_mrx,
-                # 'srv': api_response_srv
+                'ind': api_response_ind,
+                'pre': api_response_pre,
+                'flx': api_response_flx,
+                'mrx': api_response_mrx,
+                'srv': api_response_srv
             }
 
             for key, api_response in api_responses.items():

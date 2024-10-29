@@ -207,7 +207,7 @@ def add_seller_to_omie(seller, app_omie):
         response.raise_for_status()
         response_data = response.json()
 
-        print(response_data)
+        # print(response_data)
 
         if response_data.get('status') == "0":
             return {
