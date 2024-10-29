@@ -3,8 +3,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from common.models import Seller
 from django.shortcuts import redirect
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # *********************************** VENDEDORES  **************************************
+
+# Processa request e salva no banco dependendo do tipo de App  do OMIE `COM, IND, FLX, etc`
 def fetch_and_save_sellers(app_omie):
     url = 'https://app.omie.com.br/api/v1/geral/vendedores/'
 
@@ -126,9 +132,9 @@ class FetchSellersView(APIView):
             return Response({'error': 'app_omie não informado'}, status=400)
 
         try:
-            print(f'APP_OMIE: {app_omie}')
+
             result = fetch_and_save_sellers(app_omie)
-            print(result)
+
             if result['success']:
                 print(f'{result['total_created']} vendedores criados e {result["total_update"]} atualizados')
 
@@ -146,3 +152,79 @@ class FetchSellersView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=500)
+
+
+def add_seller_to_omie(seller, app_omie):
+    if 'COM' in app_omie:
+        app_key = os.getenv('COM_OMIE_API_KEY')
+        app_secret = os.getenv('COM_OMIE_API_SECRET')
+    elif 'IND' in app_omie:
+        app_key = os.getenv('IND_OMIE_API_KEY')
+        app_secret = os.getenv('IND_OMIE_API_SECRET')
+    elif 'PRE' in app_omie:
+        app_key = os.getenv('PRE_OMIE_API_KEY')
+        app_secret = os.getenv('PRE_OMIE_API_SECRET')
+    elif 'SRV' in app_omie:
+        app_key = os.getenv('SRV_OMIE_API_KEY')
+        app_secret = os.getenv('SRV_OMIE_API_SECRET')
+    elif 'MRX' in app_omie:
+        app_key = os.getenv('MRX_OMIE_API_KEY')
+        app_secret = os.getenv('MRX_OMIE_API_SECRET')
+    elif 'FLX' in app_omie:
+        app_key = os.getenv('FLX_OMIE_API_KEY')
+        app_secret = os.getenv('FLX_OMIE_API_SECRET')
+    else:
+        return {'error': 'App omie não encontrada'}
+
+
+    data = {
+        "call": "UpsertVendedor",
+        "app_key": app_key,
+        "app_secret": app_secret,
+        "param": [
+            {
+                "codInt": seller.id,  # Aqui usamos o id do vendedor recém-criado
+                "nome": seller.nome,
+                "inativo": "N",
+                "email": seller.email,
+                "fatura_pedido": "N",
+                "visualiza_pedido": "S",
+                "comissao": 0  # Exemplo de valor fixo ou extraído de algum lugar
+            }
+        ]
+    }
+
+    url = "https://app.omie.com.br/api/v1/geral/vendedores/"
+
+    # print(f'{data},')
+    # return {
+    #         'success': True,
+    #         'message': f'Vendedor adicionado ao OMIE \"{app_omie}\" com sucesso!'
+    #     }
+
+    try:
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+        response_data = response.json()
+
+        print(response_data)
+
+        if response_data.get('status') == "0":
+            return {
+                'response': response_data,
+                'success': True,
+                'message': 'Vendedor adicionado ao OMIE com sucesso!'
+            }
+        else:
+            return {
+                'success': False,
+                'error': response_data,
+                'message': 'Erro ao adicionar vendedor ao OMIE'
+            }
+    except requests.exceptions.RequestException as e:
+        print(f'Erro ao adicionar vendedor ao OMIE: {e}')
+        return {
+            'success': False,
+            'error': str(e),
+            'message': 'Erro ao adicionar vendedor ao OMIE'
+        }

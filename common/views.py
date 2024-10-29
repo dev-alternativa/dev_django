@@ -1,7 +1,8 @@
-from pyexpat.errors import messages
+from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
+from django.forms.models import model_to_dict
 from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView, TemplateView, FormView
 from common.forms import *
 from common.models import Category, CustomerSupplier, Seller, Price
@@ -10,6 +11,7 @@ from django.db.models import Q
 from core.views import FormataDadosMixin,  FormMessageMixin, DeleteSuccessMessageMixin
 from django.views import View
 from logistic.models import LeadTime
+from api_omie.views import add_seller_to_omie
 
 
 # *************** AJAX REQUESTS ************ #
@@ -219,6 +221,55 @@ class SellerNewView(FormMessageMixin, CreateView):
     template_name = "vendedores/adicionar_vendedor.html"
     success_url = reverse_lazy('seller')
     success_message = 'Vendedor cadastrado com sucesso!'
+
+    def form_valid(self, form):
+        success_message_parts = [self.success_message]
+        api_responses = {}
+
+        response = super().form_valid(form)
+
+
+        if form.cleaned_data.get('incluir_omie'):
+
+            api_response_com = add_seller_to_omie(self.object, 'COM')
+            # api_response_ind = add_seller_to_omie(self.object, 'IND')
+            # api_response_pre = add_seller_to_omie(self.object, 'PRE')
+            # api_response_flx = add_seller_to_omie(self.object, 'FLX')
+            # api_response_mrx = add_seller_to_omie(self.object, 'MRX')
+            # api_response_srv = add_seller_to_omie(self.object, 'SRV')
+
+            api_responses = {
+                'com': api_response_com,
+                # 'ind': api_response_ind,
+                # 'pre': api_response_pre,
+                # 'flx': api_response_flx,
+                # 'mrx': api_response_mrx,
+                # 'srv': api_response_srv
+            }
+
+            for key, api_response in api_responses.items():
+                if api_response.get('error'):
+                    print(f'Erro na integração {key.upper()}: {api_response["error"]}')
+                    messages.warning(self.request, f'Erro na integração {key.upper()}: {api_response["error"]}')
+                else:
+                    codigo = api_response['response'].get('codigo')
+                    print(f"codigo: {codigo}")
+                    self.success_message += ' Incluido no OMIE ' + key.upper() + '! '
+                    if codigo:
+                        setattr(self.object, f'cod_omie_{key}', codigo)
+                        success_message_parts.append(f'Inclúido no OMIE {key.upper()} com sucesso!')
+
+        self.object.save()
+
+        self.success_message = ' '.join(success_message_parts)
+        response = super().form_valid(form)
+        descricao_msg = '\n'.join(
+            api_response['response']['descricao'] for api_response in api_responses.values()
+            if not api_response.get('error')
+        )
+        print(descricao_msg)
+
+        return response
 
 
 class SellerUpdateView(FormMessageMixin, UpdateView):

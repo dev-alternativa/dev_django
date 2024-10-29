@@ -352,17 +352,13 @@ class PriceForms(ModelForm):
 # TesaFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
 
 class SellerForm(ModelForm):
+
     class Meta:
         model = Seller
         fields = [
             'nome',
-            'cod_omie_com',
-            'cod_omie_ind',
-            'cod_omie_pre',
-            'cod_omie_mrx',
-            'cod_omie_flx',
-            'cod_omie_srv',
             'representante',
+            'incluir_omie',
             'email',
             'ativo',
         ]
@@ -371,32 +367,25 @@ class SellerForm(ModelForm):
         super(SellerForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.fields['cod_omie_com'].required = False
-        self.fields['cod_omie_ind'].required = False
-        self.fields['cod_omie_pre'].required = False
-        self.fields['cod_omie_mrx'].required = False
-        self.fields['cod_omie_flx'].required = False
-        self.fields['cod_omie_srv'].required = False
+        # self.fields['cod_omie_com'].required = False
+        # self.fields['cod_omie_ind'].required = False
+        # self.fields['cod_omie_pre'].required = False
+        # self.fields['cod_omie_mrx'].required = False
+        # self.fields['cod_omie_flx'].required = False
+        # self.fields['cod_omie_srv'].required = False
         self.fields['email'].required = False
         self.helper.layout = Layout(
             Row(
                 Column(
                     Field('nome', css_class='form-control col-md-6 mb-0'),
-                    Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
-                    Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
-                    Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
-
                 ),
                 Column(
                     Field('email', css_class='form-control col-md-6 mb-0'),
-                    Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
-                    Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
-                    Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
-
                 ),
                 Column(
                     Switch('ativo', css_class='form-control col-md-6 mb-0 '),
                     Switch('representante', css_class='form-control col-md-6 mb-0'),
+                    Switch('incluir_omie', css_class='form-control col-md-6 mb-0'),
                 ),
                 # css_class='form-group col-12 text-center'
             ),

@@ -105,9 +105,8 @@ class DeleteSuccessMessageMixin(SuccessMessageMixin, DeleteView):
   def post(self, request, *args, **kwargs):
     self.object = self.get_object()
     try:
-      print('METODO DELETE: Antes de tentar apagar')
+
       response = super().delete(request, *args, **kwargs)
-      print('METODO DELETE depois de tentar apagar')
 
       if self.delete_success_message:
         messages.success(self.request, self.delete_success_message)
