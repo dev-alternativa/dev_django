@@ -11,7 +11,7 @@ from django.db.models import Q
 from core.views import FormataDadosMixin,  FormMessageMixin, DeleteSuccessMessageMixin
 from django.views import View
 from logistic.models import LeadTime
-from api_omie.views import add_seller_to_omie
+from api_omie.views import add_seller_to_omie, delete_seller_from_omie
 
 
 # *************** AJAX REQUESTS ************ #
@@ -284,6 +284,34 @@ class SellerDeleteView(DeleteSuccessMessageMixin, DeleteView):
     model = Seller
     template_name = 'vendedores/delete_vendedor.html'
     success_url = reverse_lazy('seller')
+
+    def post(self, request, *args, **kwargs):
+        return self.delete(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        chaves_omie = ['com', 'ind', 'pre', 'srv', 'mrx', 'flx']
+
+        def remove_integration(cod_omie, chave):
+            if cod_omie:
+                response = delete_seller_from_omie(cod_omie, chave)
+                if not response['success']:
+                    return f'Erro ao remover do OMIE {chave.upper()}: {response["error"]}'
+            return None
+
+        error_messages = [
+            remove_integration(getattr(self.object, f'cod_omie_{chave}', None), chave.upper())
+            for chave in chaves_omie
+            if getattr(self.object, f'cod_omie_{chave}', None)
+        ]
+
+        if any(error_messages):
+            messages.warning(self.request, ' | '.join(filter(None, error_messages)))
+        else:
+            messages.success(self.request, self.success_message)
+
+        return super().delete(request, *args, **kwargs)
 
 
 class SellerDetailView(DetailView, FormataDadosMixin):

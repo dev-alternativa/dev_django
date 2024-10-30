@@ -13,11 +13,17 @@
                       Excluir Vendedor
                   </div>
                   <div class="card-body delete-box">
-                      <form method="POST">
+                      <form method="POST" action="{% url 'delete_seller' object.id %}">
                         <p>Tem certeza de que deseja excluir o vendedor "{{ object.nome }}"?</p>
                         {% csrf_token %}
+                        <div class="col d-flex justify-content-center align-items-center">
+                          <div class="form-check form-switch my-3 ">
+                            <input class="form-check-input" type="checkbox" role="switch" id="delete-omie">
+                            <label class="form-check-label" for="delete-omie">Excluir também no OMIE</label>
+                          </div>
+                        </div>
                         <button type="submit" class="btn btn-danger">Excluir</button>
-                        <a href="{% url 'category' %}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{% url 'seller' %}" class="btn btn-secondary">Cancelar</a>
                       </form>
                   </div>
               </div>

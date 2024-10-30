@@ -228,3 +228,55 @@ def add_seller_to_omie(seller, app_omie):
             'error': str(e),
             'message': 'Erro ao adicionar vendedor ao OMIE'
         }
+
+
+def delete_seller_from_omie(cod_omie, app_omie):
+    url = 'https://app.omie.com.br/api/v1/geral/vendedores/'
+
+    if 'COM' in app_omie:
+        app_key = os.getenv('COM_OMIE_API_KEY')
+        app_secret = os.getenv('COM_OMIE_API_SECRET')
+    elif 'IND' in app_omie:
+        app_key = os.getenv('IND_OMIE_API_KEY')
+        app_secret = os.getenv('IND_OMIE_API_SECRET')
+    elif 'PRE' in app_omie:
+        app_key = os.getenv('PRE_OMIE_API_KEY')
+        app_secret = os.getenv('PRE_OMIE_API_SECRET')
+    elif 'SRV' in app_omie:
+        app_key = os.getenv('SRV_OMIE_API_KEY')
+        app_secret = os.getenv('SRV_OMIE_API_SECRET')
+    elif 'MRX' in app_omie:
+        app_key = os.getenv('MRX_OMIE_API_KEY')
+        app_secret = os.getenv('MRX_OMIE_API_SECRET')
+    elif 'FLX' in app_omie:
+        app_key = os.getenv('FLX_OMIE_API_KEY')
+        app_secret = os.getenv('FLX_OMIE_API_SECRET')
+    else:
+        return {'error': 'App omie não encontrada'}
+
+    data = {
+        "call": "ExcluirVendedor",
+        "app_key": app_key,
+        "app_secret": app_secret,
+        "param": [
+            {
+                "codigo": cod_omie,
+            }
+        ]
+    }
+
+    print(data)
+
+    try:
+        response = requests.post(url, json=data, timeout=10)
+        response.raise_for_status()
+
+        return {
+            'success': True,
+            'message': 'Vendedor excluído do OMIE com sucesso!'
+        }
+    except requests.exceptions.RequestException as e:
+        return {
+            'success': False,
+            'error': str(e)
+        }
