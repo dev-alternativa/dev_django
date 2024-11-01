@@ -1,5 +1,5 @@
 from django.contrib import admin
-from common.models import Category, CustomerSupplier, Seller, Price, CNPJFaturamento, ContaCorrete
+from common.models import Category, CustomerSupplier, Seller, Price, CNPJFaturamento, ContaCorrente
 
 
 @admin.register(Category)
@@ -34,6 +34,6 @@ class CNPJFaturamentoAdmin(admin.ModelAdmin):
     list_display = ('sigla', 'codigo')
 
 
-@admin.register(ContaCorrete)
+@admin.register(ContaCorrente)
 class ContaCorreteAdmin(admin.ModelAdmin):
-    list_display = ('descricao', 'nCodCC', 'CNPJ', 'padrao')
+    list_display = ('descricao', 'nCodCC', 'cnpj', 'padrao')
