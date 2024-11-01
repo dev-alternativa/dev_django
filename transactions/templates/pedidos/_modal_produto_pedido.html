@@ -1,0 +1,34 @@
+{% load crispy_forms_tags %}
+
+<!-- Modal -->
+<div class="modal fade" id="productOrderModal" aria-hidden="true" aria-labelledby="productOrderModalLabel" data-bs-backdrop="static" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="productOrderModalLabel">Selecione Produto e Condição de Cálculo:</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="id_productSelect">Produto:</label>
+        <select class="form-select" id="id_productSelect">
+          <option value="">----</option>
+          {% for product in products %}
+          <option value="{{ product.id }}">{{ product.nome }}</options>
+            {% endfor %}
+          </select>
+          <hr>
+        <label for="id_condicaoSelect">Condição:</label>
+        <select class="form-select" id="id_condicaoSelect">
+          <option value="">----</option>
+          <option value="Normal" selected>Normal</option>
+          <option value="Especial1">Especial 1</option>
+          <option value="Especial2">Especial 2</option>
+          <option value="Especial3">Especial 3</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="selectProductOrder" data-bs-target="#staticBackdrop" data-bs-toggle="modal">Selecionar</button>
+      </div>
+    </div>
+  </div>
+</div>

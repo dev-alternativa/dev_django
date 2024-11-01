@@ -1,0 +1,24 @@
+{% load crispy_forms_tags %}
+
+<!-- Modal -->
+<div class="modal fade" id="categoryOrderModal" aria-hidden="true" aria-labelledby="categoryOrderModalLabel" data-bs-backdrop="static" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="categoryOrderModalLabel">Selecione a Categoria:</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <select class="form-select" id="id_categoriaSelect">
+          <option value="">----</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.nome }}</options>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="selectCategoryOrder" >Selecionar</button>
+      </div>
+    </div>
+  </div>
+</div>

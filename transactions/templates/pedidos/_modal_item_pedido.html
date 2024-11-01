@@ -16,15 +16,18 @@
                                 <form id='itemForm' method="post">
                                     {% csrf_token %}
 
-                                <!-- Primeira linha -->
+                                    <!-- Primeira linha -->
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            {{ item_form.produto|as_crispy_field }}
+                                        <div class="col">
+                                            {{ item_form.quantidade|as_crispy_field }}
                                         </div>
-                                        <div class="col-md-2">
-                                            {{ item_form.condicao_preco|as_crispy_field }}
+                                        <div class="col">
+                                            {{ item_form.preco|as_crispy_field }}
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col">
+                                            {{ item_form.cnpj_faturamento|as_crispy_field}}
+                                        </div>
+                                        <div class="col">
                                             {{ item_form.prazo|as_crispy_field }}
                                         </div>
                                     </div>
@@ -32,21 +35,19 @@
                                 <!-- Segunda linha -->
                                 <div class="col">
                                     <div class="row">
-                                    <div class="col">
-                                        {{ item_form.quantidade|as_crispy_field }}
-                                    </div>
-                                    <div class="col">
-                                        {{ item_form.preco|as_crispy_field }}
-                                    </div>
-                                    <div class="col">
-                                        {{ item_form.item_pedido|as_crispy_field }}
-                                    </div>
-                                    <div class="col ">
-                                        {{ item_form.numero_pedido|as_crispy_field }}
-                                    </div>
-                                    <div class="col">
-                                        {{ item_form.vendedor_item|as_crispy_field }}
-                                    </div>
+
+                                        <div class="col">
+                                            {{ item_form.conta_corrente|as_crispy_field}}
+                                        </div>
+                                        <div class="col">
+                                            {{ item_form.item_pedido|as_crispy_field }}
+                                        </div>
+                                        <div class="col ">
+                                            {{ item_form.numero_pedido|as_crispy_field }}
+                                        </div>
+                                        <div class="col">
+                                            {{ item_form.vendedor_item|as_crispy_field }}
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Terceira linha -->

@@ -78,7 +78,7 @@ class InflowsItems(Base):
 
 
 class Outflows(Base):
-    numero_pedido_cliente = models.CharField(max_length=100, null=True, blank=True)
+    numero_pedido_cliente = models.CharField(verbose_name='N° Pedido', max_length=100, null=True, blank=True)
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
     cod_pedido_omie = models.CharField(max_length=100, null=True, blank=True)
     pedido_interno_cliente = models.CharField(max_length=100, null=True, blank=True)
@@ -109,11 +109,12 @@ class OutflowsItems(Base):
     quantidade = models.PositiveIntegerField()
     preco = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
-    numero_pedido = models.CharField(max_length=50, blank=True, null=True)
-    item_pedido = models.IntegerField(verbose_name='Item Pedido')
+    numero_pedido = models.CharField(verbose_name='N° Pedido', max_length=50, blank=True, null=True)
+    item_pedido = models.CharField(verbose_name='Item Pedido', max_length=50, null=True, blank=True)
     condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
     cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.PROTECT, related_name='saida_items')
     prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.PROTECT, null=True, blank=True, related_name='saida_items')
+    conta_corrente = models.ForeignKey('common.ContaCorrente', on_delete=models.PROTECT, related_name='saida_items')
     obs = models.TextField(max_length=500, blank=True, null=True)
     vendedor_item = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
     cfop = models.CharField(max_length=50, blank=True, null=True)

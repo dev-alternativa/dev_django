@@ -1,5 +1,6 @@
 from django.urls import path
 from transactions import views
+from common.views import get_category_view
 
 
 urlpatterns = [
@@ -19,6 +20,8 @@ urlpatterns = [
     path('get_itens_pedido/<int:order_id>/', views.get_itens_pedido, name='get_itens_pedido'),
     path('pedidos/editar/<int:order_id>/', views.edit_pedido, name='edit_order'),
     path('pedidos/<int:order_id>/remover_produto/', views.remove_product_from_order, name='remove_product_from_order'),
+    path('get-category/', get_category_view, name="get_categories"),
+    path('product_filter_category/', views.filter_products, name="product_filter_category"),
 
     # Pedidos
     path('pedidos/', views.OrderListView.as_view(), name='order_list'),

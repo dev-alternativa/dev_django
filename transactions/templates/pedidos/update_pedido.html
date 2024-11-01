@@ -111,13 +111,20 @@
   </div>
 
     <!-- Botão de adicionar item -->
-    <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" >
+    <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#categoryOrderModal" >
       <i class="bi bi-plus-lg"></i>
       Adicionar Item
     </a>
 
+    <!-- Modal de Categorias -->
+    {% include "pedidos/_modal_categoria_pedido.html" %}
+
+    <!-- Modal de Produtos -->
+    {% include "pedidos/_modal_produto_pedido.html" %}
+
     <!-- Modal de adição de produtos -->
     {% include "pedidos/_modal_item_pedido.html" %}
+
 
     <!-- Botão de salvar -->
 
@@ -139,6 +146,10 @@
       <div class='row float-end' id="editButton">
         <div class="col-md-12" style="margin-top: 10px;">
           <div class="form-inline buttons">
+            <button class="btn btn-success btn-lg" value="OMIE">
+              <i class="bi bi-send-arrow-up"></i>
+              Enviar OMIE
+            </button>
             <button class="btn btn-warning btn-lg" value="Edit">
               <i class="bi bi-pencil"></i>
               Editar Pedido
@@ -157,9 +168,90 @@
 </div>
 
 <script>
-  $('#orderForm :input').prop('disabled', true);
 
   $(document).ready(function() {
+    $('#orderForm :input').prop('disabled', true);
+    let categoriaSelect;
+    let productSelect;
+    let condicao;
+
+    const validateField = (fieldId, value) => {
+      const element = $(`#id_${fieldId}`);
+      element.toggleClass('is-invalid', !value);
+      if (!value) isValid = false;
+    };
+
+    $('#selectCategoryOrder').click(function(e) {
+
+      categoriaSelect = $("#id_categoriaSelect").val();
+      let isValid = true;
+
+      validateField('categoriaSelect', categoriaSelect);
+
+      if(isValid) {
+
+        $.ajax({
+          url: "{% url 'product_filter_category' %}",
+          method: "GET",
+          data: {
+            category_id: categoriaSelect
+          },
+          success: function(data){
+            const $productSelect = $("#id_productSelect");
+            $("#id_categoriaSelect").removeClass('is-invalid');
+            $("#id_categoriaSelect").val('');
+            $('#categoryOrderModal').modal('hide');
+            $('#productOrderModal').modal('show');
+            $productSelect.empty();
+
+
+            $.each(data.products, function(index, product){
+              $productSelect.append(
+                $('<option>', {
+                  value: product.id,
+                  text: product.nome_produto
+                })
+              );
+            });
+          },
+          error: function(xmr, status,error){
+            console.error('Erro ao carregar produtos', error);
+          }
+        });
+
+      }else{
+        e.preventDefault();
+      }
+    });
+
+    $('#selectProductOrder').click(function(e) {
+      productSelect = $("#id_productSelect").val();
+      condicao = $("#id_condicaoSelect").val();
+      let isValid = true;
+
+      validateField('productSelect', productSelect);
+      validateField('condicaoSelect', condicao);
+
+      if(isValid){
+        $.ajax({
+          url: "teste",
+          method: "GET",
+          data: {
+            product_id = productSelect,
+            condicao = condicao,
+          },
+          success: function(data){
+            console.log(`Dados: ${data}`);
+
+          },
+          error: function(xmr, status, error){
+            console.log(`Erro: ${status}: ${error}`);
+          }
+        });
+      }
+
+    });
+
     atualizarTabela({{ order.pk }})
 
     // Valores iniciais, usado para verificar o que foi alterado no formulário
@@ -330,51 +422,40 @@
   // Salva produtos no pedido atual
   function adicionar_produto() {
 
+    const getVal = id => $(`#id_${id}`).val() || '';
+
     // Pega os valores dos campos
-    const produto = $('#id_produto').val() ? $('#id_produto').val() : '';
-    const quantidade = $('#id_quantidade').val() ? $('#id_quantidade').val() : '';
-    const preco = $('#id_preco').val() ? $('#id_preco').val() : '';
-    const itemPedido = $('#id_item_pedido').val() ? $('#id_item_pedido').val() : '';
-    const dadosAdicionais = $('#id_dados_adicionais_item').val() ? $('#id_dados_adicionais_item').val() : '';
-    const numeroPedido = $('#id_numero_pedido').val() ? $('#id_numero_pedido').val() : '';
-    const obs = $('#id_obs').val() ? $('#id_obs').val() : '';
-    const cfop = $('#id_cfop').val() ? $('#id_cfop').val() : '';
-    const vendedor_item = $('#id_vendedor_item').val();
+    const produto = getVal('produto');
+    const cnpj_faturamento = getVal('cnpj_faturamento');
+    const condicao_preco = getVal('condicao_preco');
+    const prazo = getVal('prazo');
+    const quantidade = getVal('quantidade');
+    const preco = getVal('preco');
+    const conta_corrente = getVal('conta_corrente');
+    const itemPedido = getVal('item_pedido');
+    const numero_pedido = getVal('numero_pedido');
+    const vendedor_item = getVal('vendedor_item');
+    const dados_adicionais_item = getVal('dados_adicionais_item');
+    const obs = getVal('obs');
+    //const cfop = getVal('cfop');
 
     // Variável para controlar se o formulário é válido
     let isValid = true;
 
-    // Verifica o campo 'Produto'
-    if (!produto) {
-        $('#id_produto').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#id_produto').removeClass('is-invalid');
-    }
+    const validateField = (fieldId, value) => {
+      const element = $(`#id_${fieldId}`);
+      element.toggleClass('is-invalid', !value);
+      if (!value) isValid = false;
+    };
 
-    // Verifica o campo 'Quantidade'
-    if (!quantidade) {
-        $('#id_quantidade').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#id_quantidade').removeClass('is-invalid');
-    }
-
-    // Verifica o campo 'Valor Unitário'
-    if (!preco) {
-        $('#id_preco').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#id_preco').removeClass('is-invalid');
-    }
-
-    // Verifica o campo 'Item Pedido'
-    if (!itemPedido) {
-        $('#id_item_pedido').addClass('is-invalid');
-        isValid = false;
-    } else {
-        $('#id_item_pedido').removeClass('is-invalid');
-    }
+    validateField('produto', produto);
+    validateField('cnpj_faturamento', cnpj_faturamento);
+    validateField('condicao_calculo', condicao_preco);
+    validateField('prazo', prazo);
+    validateField('quantidade', quantidade);
+    validateField('preco', preco);
+    validateField('conta_corrente', conta_corrente);
+    validateField('item_pedido', itemPedido);
 
     // Se o formulário for válido, envie os dados via AJAX
     if (isValid) {
@@ -384,14 +465,18 @@
             method: 'POST',
             data: {
               produto: produto,
+              cnpj_faturamento: cnpj_faturamento,
+              condicao_preco: condicao_preco,
+              prazo: prazo,
               quantidade: quantidade,
               preco: preco,
+              conta_corrente: conta_corrente,
               item_pedido: itemPedido,
-              dadosAdicionais: dadosAdicionais,
-              numeroPedido: numeroPedido,
-              obs: obs,
-              cfop: cfop,
+              numero_pedido: numero_pedido,
               vendedor_item: vendedor_item,
+              dados_adicionais_item: dados_adicionais_item,
+              obs: obs,
+              //cfop: cfop,
               'csrfmiddlewaretoken': '{{ csrf_token }}'
             },
             success: function(response) {
@@ -409,6 +494,7 @@
               $('#alertsModal').append(alertElement);
             },
             error: function(response) {
+              console.log(response);
               // Erro
               let erro = response.responseJSON.error;
               let alertElement = `

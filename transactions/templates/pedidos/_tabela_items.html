@@ -6,7 +6,7 @@
             <th>Produto</th>
             <th>Quantidade</th>
             <th>Preço</th>
-            <th>CFOP</th>
+            <th>Cod OMIE</th>
             <th>Vendedor</th>
             <th>Ações</th>
         </tr>
@@ -18,7 +18,7 @@
             <td>{{ item.produto.nome_produto }}</td>
             <td>{{ item.quantidade }}</td>
             <td>{{ item.preco }}</td>
-            <td>{{ item.cfop }}</td>
+            <td>{{ item.cod_item_omie|default_if_none:"" }}</td>
             <td>{{ item.vendedor_item.nome }}</td>
             <td>
                 <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">

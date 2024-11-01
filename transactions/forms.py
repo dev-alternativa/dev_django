@@ -102,11 +102,12 @@ class OutflowsForm(forms.ModelForm):
                     'type': 'date',
                     'class': 'form-control',
                     'placeholder': 'Selecione uma data'
-                    }
+                    },
+                    format='%Y-%m-%d',
                 ),
         }
         label = {
-            'dt_faturamento': 'Previsão de Faturamento',
+            'dt_previao_faturamento': 'Previsão de Faturamento',
         }
 
     def __init__(self, *args, **kwargs):

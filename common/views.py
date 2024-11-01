@@ -97,6 +97,10 @@ class CategoryDeleteView(DeleteSuccessMessageMixin, DeleteView):
     success_url = reverse_lazy('category')
 
 
+def get_category_view(request):
+    categories = Category.objects.all()
+    return render(request, 'pedidos/_modal_categoria_pedido.html', {'categorias': categories})
+
 # ******************************* CLIENTE / FORNECEDOR *******************************
 class CustomerSupplierListView(FormataDadosMixin, ListView):
     model = CustomerSupplier

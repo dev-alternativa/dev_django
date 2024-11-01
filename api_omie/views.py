@@ -268,7 +268,7 @@ def delete_seller_from_omie(cod_omie, app_omie):
     print(data)
 
     try:
-        response = requests.post(url, json=data, timeout=10)
+        response = requests.post(url, json=data, timeout=20)
         response.raise_for_status()
 
         return {
@@ -276,7 +276,11 @@ def delete_seller_from_omie(cod_omie, app_omie):
             'message': 'Vendedor excluído do OMIE com sucesso!'
         }
     except requests.exceptions.RequestException as e:
+        print(f'Erro da API: {e}')
         return {
             'success': False,
             'error': str(e)
         }
+
+
+# *********************************** PEDIDOS  **************************************

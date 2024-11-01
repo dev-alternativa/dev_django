@@ -7,10 +7,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Sum
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
-from common.models import Seller, CustomerSupplier
+from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente
 from products.models import Product, Inventory
 from transactions.models import TaxScenario
-from logistic.models import Carrier
+from logistic.models import Carrier, LeadTime
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from core.views import FormMessageMixin
 from django.urls import reverse_lazy, reverse
@@ -33,10 +33,12 @@ def get_products_by_category(request):
 
     return JsonResponse(products_list, safe=False)
 
-# def load_products(request):
-#     category_id = request.GET.get('category_id')
-#     products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto')
-#     return JsonResponse(list(products), safe=False)
+def filter_products(request):
+
+    category_id = request.GET.get('category_id')
+    products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto')
+
+    return JsonResponse({'products': list(products)})
 
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
@@ -245,39 +247,82 @@ class OrderEditDetailsView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['item_form'] = OrderItemsForm()
+        context['categories'] = Category.objects.all()
+
         return context
 
 
 def adicionar_produto(request, order_id):
 
     if request.method == 'POST':
-        produto = int(request.POST.get('produto'))
-        quantidade = int(request.POST.get('quantidade'))
-        preco = float(request.POST.get('preco'))
-        item_pedido = int(request.POST.get('item_pedido'))
-        dados_adicionais_item = request.POST.get('dadosAdicionais')
-        numero_pedido = request.POST.get('numeroPedido')
-        obs = request.POST.get('obs')
-        cfop = request.POST.get('cfop')
-        vendedor_item = int(request.POST.get('vendedor_item'))
+        field_types = {
+            'produto': int,
+            'cnpj_faturamento': int,
+            'condicao_calculo': str,
+            'prazo': int,
+            'quantidade': int,
+            'preco': float,
+            'conta_corrente': int,
+            'item_pedido': str,
+            'numero_pedido': str,
+            'vendedor_item': int,
+            'dados_adicionais_item': str,
+            'obs': str,
+            # 'cfop': str,
+        }
+
+        data = {}
+
+        # for key in field_types:
+        #     raw_value = request.POST.get(key, "")
+        #     print(f"Chave: {key}, Valor antes da conversão: {raw_value}")  # Debug: imprime a chave e o valor original
+
+        #     # Aplica valor padrão para evitar erro ao converter
+        #     value = raw_value or (0 if field_types[key] in [int, float] else "")
+
+        #     try:
+        #         data[key] = field_types[key](value)
+        #     except ValueError as e:
+        #         print(f"Erro ao converter o valor da chave '{key}': {e}")
+
+        data = {
+            key: field_types[key](
+                request.POST.get(key, "")
+            ) or (
+                    0 if field_types[key] in [int, float] else ""
+                )
+            for key in field_types
+        }
 
         # Verifica campos obrigatórios
-        if not produto or not quantidade or not preco or not item_pedido:
+        if (
+                not data["produto"]
+                or not data["quantidade"]
+                or not data["preco"]
+                or not data["item_pedido"]
+                or not data["cnpj_faturamento"]
+                or not data["prazo"]
+            ):
             return JsonResponse(
                 {
                     'error': 'Dados Obrigatórios Incompletos',
-                    'produto': produto,
-                    'quantidade': quantidade,
-                    'preco': preco,
-                    'item_pedido': item_pedido
+                    'produto': data["produto"],
+                    'quantidade': data["quantidade"],
+                    'preco': data["preco"],
+                    'item_pedido': data["item_pedido"],
+                    'cnpj_faturamento': data["cnpj_faturamento"],
+                    'prazo': data["prazo"]
                 }, status=400
             )
 
         try:
             # Recupera instâncias de cada chave estrangeira
             order = Outflows.objects.get(pk=order_id)
-            product = Product.objects.get(pk=produto)
-            seller = Seller.objects.get(pk=vendedor_item)
+            product = Product.objects.get(pk=data["produto"])
+            seller = Seller.objects.get(pk=data["vendedor_item"])
+            cnpj_faturamento = CNPJFaturamento.objects.get(pk=data["cnpj_faturamento"])
+            prazo = LeadTime.objects.get(pk=data["prazo"])
+            conta_corrente = ContaCorrente.objects.get(pk=data["conta_corrente"])
 
             itens_estoque = Inventory.objects.filter(
                 entrada_items__produto=product,
@@ -285,7 +330,7 @@ def adicionar_produto(request, order_id):
             ).order_by('id')
 
             total_disponivel = itens_estoque.count()
-            quantidade_saida = int(quantidade)
+            quantidade_saida = int(data["quantidade"])
 
             if total_disponivel < quantidade_saida:
                 return JsonResponse({
@@ -297,14 +342,17 @@ def adicionar_produto(request, order_id):
             outflows_item = OutflowsItems(
                 saida=order,
                 produto=product,
-                quantidade=quantidade,
-                preco=preco,
-                dados_adicionais_item=dados_adicionais_item,
-                numero_pedido=numero_pedido,
-                obs=obs,
-                cfop=cfop,
+                quantidade=data["quantidade"],
+                preco=data["preco"],
+                dados_adicionais_item=data["dados_adicionais_item"],
+                numero_pedido=data["numero_pedido"],
+                item_pedido=data["item_pedido"],
+                condicao_preco=data["condicao_calculo"],
+                cnpj_faturamento=cnpj_faturamento,
+                prazo=prazo,
+                conta_corrente=conta_corrente,
+                obs=data["obs"],
                 vendedor_item=seller,
-                item_pedido=item_pedido
             )
             outflows_item.save()  # Salva a instância no banco de dados
             print('Não é pra Salvar')
