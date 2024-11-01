@@ -171,9 +171,7 @@
 
   $(document).ready(function() {
     $('#orderForm :input').prop('disabled', true);
-    let categoriaSelect;
-    let productSelect;
-    let condicao;
+    let categoriaSelect, productSelect, condicao, isValid;
 
     const validateField = (fieldId, value) => {
       const element = $(`#id_${fieldId}`);
@@ -181,15 +179,15 @@
       if (!value) isValid = false;
     };
 
+    // 1º Modal
     $('#selectCategoryOrder').click(function(e) {
-
+      e.preventDefault();
       categoriaSelect = $("#id_categoriaSelect").val();
-      let isValid = true;
+      isValid = true;
 
       validateField('categoriaSelect', categoriaSelect);
 
       if(isValid) {
-
         $.ajax({
           url: "{% url 'product_filter_category' %}",
           method: "GET",
@@ -203,7 +201,6 @@
             $('#categoryOrderModal').modal('hide');
             $('#productOrderModal').modal('show');
             $productSelect.empty();
-
 
             $.each(data.products, function(index, product){
               $productSelect.append(
@@ -220,36 +217,25 @@
         });
 
       }else{
-        e.preventDefault();
+        alert('Selecione uma categoria!');
       }
     });
 
+    // 2º Modal
     $('#selectProductOrder').click(function(e) {
+      e.preventDefault();
       productSelect = $("#id_productSelect").val();
       condicao = $("#id_condicaoSelect").val();
       let isValid = true;
 
       validateField('productSelect', productSelect);
       validateField('condicaoSelect', condicao);
-
-      if(isValid){
-        $.ajax({
-          url: "teste",
-          method: "GET",
-          data: {
-            product_id = productSelect,
-            condicao = condicao,
-          },
-          success: function(data){
-            console.log(`Dados: ${data}`);
-
-          },
-          error: function(xmr, status, error){
-            console.log(`Erro: ${status}: ${error}`);
-          }
-        });
+      if(!isValid) {
+        e.preventDefault();
+      }else{
+        $('#productOrderModal').modal('hide');
+        $('#staticBackdrop').modal('show');
       }
-
     });
 
     atualizarTabela({{ order.pk }})
@@ -425,9 +411,9 @@
     const getVal = id => $(`#id_${id}`).val() || '';
 
     // Pega os valores dos campos
-    const produto = getVal('produto');
+    const produto = productSelect;
     const cnpj_faturamento = getVal('cnpj_faturamento');
-    const condicao_preco = getVal('condicao_preco');
+    const condicao_preco = condicao;
     const prazo = getVal('prazo');
     const quantidade = getVal('quantidade');
     const preco = getVal('preco');
