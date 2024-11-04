@@ -442,10 +442,11 @@ def edit_pedido(request, order_id):
 
 
 def remove_product_from_order(request, order_id):
-    print(order_id)
+
     if request.method == 'POST':
         try:
             order = get_object_or_404(OutflowsItems, pk=order_id)
+            order.delete()
 
             return JsonResponse({'message': 'Item removido com sucesso!'}, status=200)
         except Exception as e:

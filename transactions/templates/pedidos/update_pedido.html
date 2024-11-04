@@ -117,14 +117,13 @@
     </a>
 
     <!-- Modal de Categorias -->
-    {% include "pedidos/_modal_categoria_pedido.html" %}
+{% include "pedidos/_modal_categoria_pedido.html" %}
 
-    <!-- Modal de Produtos -->
-    {% include "pedidos/_modal_produto_pedido.html" %}
+<!-- Modal de Produtos -->
+{% include "pedidos/_modal_produto_pedido.html" %}
 
-    <!-- Modal de adição de produtos -->
-    {% include "pedidos/_modal_item_pedido.html" %}
-
+<!-- Modal de adição de produtos -->
+{% include "pedidos/_modal_item_pedido.html" %}
 
     <!-- Botão de salvar -->
 
@@ -169,15 +168,136 @@
 
 <script>
 
-  $(document).ready(function() {
-    $('#orderForm :input').prop('disabled', true);
-    let categoriaSelect, productSelect, condicao, isValid;
+  let categoriaSelect, productSelect, condicao, isValid;
+
+  // Reseta valores no formulário de produtos
+  const resetForm = () => {
+    $('#itemForm')[0].reset();
+    $('#itemForm').find('.is-invalid').removeClass('is-invalid');
+    $('#staticBackdrop').modal('hide');
+  }
+
+  // Salva produtos no pedido atual
+  function adicionar_produto() {
+    console.log(`Produto: ${productSelect}`);
+    console.log(`Condição: ${condicao}`);
+
+    const getVal = id => $(`#id_${id}`).val() || '';
+
+    // Pega os valores dos campos
+    const produto = productSelect;
+    const cnpj_faturamento = getVal('cnpj_faturamento');
+    const condicao_preco = condicao;
+    const prazo = getVal('prazo');
+    const quantidade = getVal('quantidade');
+    const preco = getVal('preco');
+    const conta_corrente = getVal('conta_corrente');
+    const itemPedido = getVal('item_pedido');
+    const numero_pedido = getVal('numero_pedido');
+    const vendedor_item = getVal('vendedor_item');
+    const dados_adicionais_item = getVal('dados_adicionais_item');
+    const obs = getVal('obs');
+    //const cfop = getVal('cfop');
+
+    // Variável para controlar se o formulário é válido
+    let isValid = true;
 
     const validateField = (fieldId, value) => {
       const element = $(`#id_${fieldId}`);
       element.toggleClass('is-invalid', !value);
       if (!value) isValid = false;
     };
+
+    validateField('produto', produto);
+    validateField('cnpj_faturamento', cnpj_faturamento);
+    validateField('condicao_calculo', condicao_preco);
+    validateField('prazo', prazo);
+    validateField('quantidade', quantidade);
+    validateField('preco', preco);
+    validateField('conta_corrente', conta_corrente);
+    validateField('item_pedido', itemPedido);
+
+    // Se o formulário for válido, envie os dados via AJAX
+    if (isValid) {
+        // Aqui você pode fazer a chamada AJAX para enviar o formulário
+        $.ajax({
+            url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
+            method: 'POST',
+            data: {
+              produto: produto,
+              cnpj_faturamento: cnpj_faturamento,
+              condicao_preco: condicao_preco,
+              prazo: prazo,
+              quantidade: quantidade,
+              preco: preco,
+              conta_corrente: conta_corrente,
+              item_pedido: itemPedido,
+              numero_pedido: numero_pedido,
+              vendedor_item: vendedor_item,
+              dados_adicionais_item: dados_adicionais_item,
+              obs: obs,
+              //cfop: cfop,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+              // Sucesso
+              let message = "Item adicionado com sucesso!";
+
+              resetForm();
+              atualizarTabela({{ order.pk }});
+              let alertElement = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  ${message}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+
+              $('#alertsModal').append(alertElement);
+            },
+            error: function(response) {
+              console.log(response);
+              // Erro
+              let erro = response.responseJSON.error;
+              let alertElement = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  ${erro}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+
+              $('#alertsModal').append(alertElement);
+              //alert(`Erro ao adicionar item: ${erro}`);
+            }
+        });
+    }
+  }
+
+    // Atualiza a tabela de itens do pedido
+    const atualizarTabela = (orderID) => {
+      $.ajax({
+        url: `/get_itens_pedido/${orderID}/`,
+        method: 'GET',
+        success: function(response) {
+          // Sucesso
+          $('#dinamic-table').html(response.html);
+
+        },
+        error: function(response) {
+          // Erro
+          //alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
+          console.log('Erro ao atualizar: ', response);
+        }
+      });
+    }
+
+    const validateField = (fieldId, value) => {
+      const element = $(`#id_${fieldId}`);
+      element.toggleClass('is-invalid', !value);
+      if (!value) isValid = false;
+    };
+
+
+
+  $(document).ready(function() {
+    $('#orderForm :input').prop('disabled', true);
 
     // 1º Modal
     $('#selectCategoryOrder').click(function(e) {
@@ -225,8 +345,9 @@
     $('#selectProductOrder').click(function(e) {
       e.preventDefault();
       productSelect = $("#id_productSelect").val();
+      console.log(`Produto selecionado 2: ${productSelect}`);
       condicao = $("#id_condicaoSelect").val();
-      let isValid = true;
+      isValid = true;
 
       validateField('productSelect', productSelect);
       validateField('condicaoSelect', condicao);
@@ -347,6 +468,7 @@
   $(document).on('click', '#btn-delete', function(e){
     const itemID = $(this).data('id');
     const deleteURL = "{% url 'remove_product_from_order' 0 %}".replace("0", itemID);
+    console.log(itemID);
 
     $.ajax({
       type: 'POST',
@@ -364,6 +486,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`;
           $('#alertsPage').append(alertElement);
+          atualizarTabela({{ order.pk }});
       },
       error: function(xhr, status, error) {
           alert(`Erro: ${xhr.responseJSON.ERRO || status}`);
@@ -372,133 +495,22 @@
 
   });
 
+
+
+    $('.btn-close').on('click', function(){
+      resetForm();
+    });
+
+
+
 });
 
 
-
-  // Atualiza a tabela de itens do pedido
-  const atualizarTabela = (orderID) => {
-    $.ajax({
-      url: `/get_itens_pedido/${orderID}/`,
-      method: 'GET',
-      success: function(response) {
-        // Sucesso
-        $('#dinamic-table').html(response.html);
-
-      },
-      error: function(response) {
-        // Erro
-        //alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
-        console.log('Erro ao atualizar: ', response);
-      }
-    });
-  }
-
-  // Reseta valores no formulário de produtos
-  const resetForm = () => {
-    $('#itemForm')[0].reset();
-    $('#itemForm').find('.is-invalid').removeClass('is-invalid');
-    $('#staticBackdrop').modal('hide');
-  }
-
-  $('.btn-close').on('click', function(){
-    resetForm();
-  });
-
-  // Salva produtos no pedido atual
-  function adicionar_produto() {
-
-    const getVal = id => $(`#id_${id}`).val() || '';
-
-    // Pega os valores dos campos
-    const produto = productSelect;
-    const cnpj_faturamento = getVal('cnpj_faturamento');
-    const condicao_preco = condicao;
-    const prazo = getVal('prazo');
-    const quantidade = getVal('quantidade');
-    const preco = getVal('preco');
-    const conta_corrente = getVal('conta_corrente');
-    const itemPedido = getVal('item_pedido');
-    const numero_pedido = getVal('numero_pedido');
-    const vendedor_item = getVal('vendedor_item');
-    const dados_adicionais_item = getVal('dados_adicionais_item');
-    const obs = getVal('obs');
-    //const cfop = getVal('cfop');
-
-    // Variável para controlar se o formulário é válido
-    let isValid = true;
-
-    const validateField = (fieldId, value) => {
-      const element = $(`#id_${fieldId}`);
-      element.toggleClass('is-invalid', !value);
-      if (!value) isValid = false;
-    };
-
-    validateField('produto', produto);
-    validateField('cnpj_faturamento', cnpj_faturamento);
-    validateField('condicao_calculo', condicao_preco);
-    validateField('prazo', prazo);
-    validateField('quantidade', quantidade);
-    validateField('preco', preco);
-    validateField('conta_corrente', conta_corrente);
-    validateField('item_pedido', itemPedido);
-
-    // Se o formulário for válido, envie os dados via AJAX
-    if (isValid) {
-        // Aqui você pode fazer a chamada AJAX para enviar o formulário
-        $.ajax({
-            url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
-            method: 'POST',
-            data: {
-              produto: produto,
-              cnpj_faturamento: cnpj_faturamento,
-              condicao_preco: condicao_preco,
-              prazo: prazo,
-              quantidade: quantidade,
-              preco: preco,
-              conta_corrente: conta_corrente,
-              item_pedido: itemPedido,
-              numero_pedido: numero_pedido,
-              vendedor_item: vendedor_item,
-              dados_adicionais_item: dados_adicionais_item,
-              obs: obs,
-              //cfop: cfop,
-              'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-              // Sucesso
-              let message = "Item adicionado com sucesso!";
-
-              resetForm();
-              atualizarTabela({{ order.pk }});
-              let alertElement = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  ${message}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-
-              $('#alertsModal').append(alertElement);
-            },
-            error: function(response) {
-              console.log(response);
-              // Erro
-              let erro = response.responseJSON.error;
-              let alertElement = `
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                  ${erro}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-
-              $('#alertsModal').append(alertElement);
-              //alert(`Erro ao adicionar item: ${erro}`);
-            }
-        });
-    }
-  }
-
 </script>
+
 
 {% endblock content %}
 {% block extra_scripts %}
   <script src="{% static 'js/select2.min.js' %}"></script>
 {% endblock %}
+
