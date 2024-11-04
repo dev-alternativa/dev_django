@@ -1,7 +1,10 @@
+from collections import defaultdict
 import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import JsonResponse
 from common.models import Seller
+from transactions.models import OutflowsItems, Outflows
 from django.shortcuts import redirect
 from dotenv import load_dotenv
 import os
@@ -284,3 +287,136 @@ def delete_seller_from_omie(cod_omie, app_omie):
 
 
 # *********************************** PEDIDOS  **************************************
+def add_order_to_omie(request, order_id):
+    items = OutflowsItems.objects.get(saida=order_id)
+    if not items:
+        return JsonResponse({'error': 'Não existe itens para esse pedido'}, status=404)
+
+    order = Outflows.objects.get(pk=order_id)
+    cliente = order.cliente
+    cod_omie_cliente = 0
+
+    #  Verifica se todos os objetos estão com o mesmo códido OMIE informado
+    for item in items:
+        app_omie = item.cnpj_faturamento.sigla
+
+        if 'COM' in app_omie and cliente.tag_cadastro_omie_com and item.produto.cod_oculto_omie_com:
+            app_key = os.getenv('COM_OMIE_API_KEY')
+            app_secret = os.getenv('COM_OMIE_API_SECRET')
+            cod_omie_cliente = cliente.tag_cadastro_omie_com
+            cod_omie_item = item.produto.cod_oculto_omie_com
+        elif 'IND' in app_omie and cliente.tag_cadastro_omie_ind and item.produto.cod_oculto_omie_ind:
+            app_key = os.getenv('IND_OMIE_API_KEY')
+            app_secret = os.getenv('IND_OMIE_API_SECRET')
+            cod_omie_cliente = cliente.tag_cadastro_omie_ind
+            cod_omie_item = item.produto.cod_oculto_omie_ind
+        elif 'PRE' in app_omie and cliente.tag_cadastro_omie_pre and item.produto.cod_oculto_omie_pre:
+            app_key = os.getenv('PRE_OMIE_API_KEY')
+            app_secret = os.getenv('PRE_OMIE_API_SECRET')
+            cod_omie_cliente = cliente.tag_cadastro_omie_pre
+            cod_omie_item = item.produto.cod_oculto_omie_pre
+        elif 'SRV' in app_omie and cliente.tag_cadastro_omie_srv and item.produto.cod_oculto_omie_srv:
+            app_key = os.getenv('SRV_OMIE_API_KEY')
+            app_secret = os.getenv('SRV_OMIE_API_SECRET')
+            cod_omie_cliente = cliente.tag_cadastro_omie_srv
+            cod_omie_item = item.produto.cod_oculto_omie_srv
+        elif 'MRX' in app_omie and cliente.tag_cadastro_omie_mrx and item.produto.cod_oculto_omie_mrx:
+            app_key = os.getenv('MRX_OMIE_API_KEY')
+            app_secret = os.getenv('MRX_OMIE_API_SECRET')
+            cod_omie_cliente = cliente.tag_cadastro_omie_mrx
+            cod_omie_item = item.produto.cod_oculto_omie_mrx
+        elif 'FLX' in app_omie and cliente.tag_cadastro_omie_flx and item.produto.cod_oculto_omie_flx:
+            app_key = os.getenv('FLX_OMIE_API_KEY')
+            app_secret = os.getenv('FLX_OMIE_API_SECRET')
+            cod_omie_cliente = cliente.tag_cadastro_omie_flx
+            cod_omie_item = item.produto.cod_oculto_omie_flx
+        else:
+            error_message= 'Erro: '
+            if "COM" not in app_omie:
+                error_message += "App OMIE 'COM' não encontrado, "
+            if 'cliente.tag_cadastro_omie_com' not in locals():
+                error_message += "Cliente não tem Cadastro no APP Omie 'COM', "
+            if 'item.produto.cod_oculto_omie_com' not in locals():
+                error_message += "Produto não tem Código Oculto no APP Omie 'COM', "
+            if 'IND' not in app_omie:
+                error_message += "App OMIE 'IND' não encontrada, "
+            if 'cliente.tag_cadastro_omie_ind' not in locals():
+                error_message += "Cliente não tem Cadastro no APP Omie 'IND', "
+            if 'item.produto.cod_oculto_omie_ind' not in locals():
+                error_message += "Produto não tem Código Oculto no APP Omie 'IND', "
+            if 'PRE' not in app_omie:
+                error_message += "App OMIE 'PRE' não encontrada, "
+            if 'cliente.tag_cadastro_omie_pre' not in locals():
+                error_message += "Cliente não tem Cadastro no APP Omie 'PRE', "
+            if 'item.produto.cod_oculto_omie_pre' not in locals():
+                error_message += "Produto não tem Código Oculto no APP Omie 'PRE', "
+            if 'SRV' not in app_omie:
+                error_message += "App OMIE 'SRV' não encontrada, "
+            if 'cliente.tag_cadastro_omie_srv' not in locals():
+                error_message += "Cliente não tem Cadastro no APP Omie 'SRV', "
+            if 'item.produto.cod_oculto_omie_srv' not in locals():
+                error_message += "Produto não tem Código Oculto no APP Omie 'SRV', "
+            if 'MRX' not in app_omie:
+                error_message += "App OMIE 'MRX' não encontrada, "
+            if 'cliente.tag_cadastro_omie_mrx' not in locals():
+                error_message += "Cliente não tem Cadastro no APP Omie 'MRX', "
+            if 'item.produto.cod_oculto_omie_mrx' not in locals():
+                error_message += "Produto não tem Código Oculto no APP Omie 'MRX', "
+            if 'FLX' not in app_omie:
+                error_message += "App OMIE 'FLX' não encontrada, "
+            if 'cliente.tag_cadastro_omie_flx' not in locals():
+                error_message += "Cliente não tem Cadastro no APP Omie 'FLX', "
+            if 'item.produto.cod_oculto_omie_flx' not in locals():
+                error_message += "Produto não tem Código Oculto no APP Omie 'FLX'"
+            return {"error": error_message}
+
+        # Cabeçalho do pedido
+        data = {
+            "call": "IncluirPedido",
+            "app_key": app_key,
+            "app_secret": app_secret,
+            "param": []
+        }
+
+        # Agrupa produtos com o mesmo CNPJ de faturamento
+        item_groups = defaultdict(list)
+        for item in items:
+            item_groups[item.conta_corrente.nCodCC].append(item)
+
+        for nCodCC, group_items in item_groups.items():
+            item_dict = {
+                {
+                    "cabecalho": {
+                        "codigo_cliente": int(cod_omie_cliente),
+                        "codigo_pedido_integracao": order.pk,
+                        "data_previsao": order.dt_previsao_faturamento.strftime("%d/%m/%Y"),
+                        "etapa": "10",
+                        "codigo_parcela": group_items[0].prazo.codigo,
+                        "quantidade_itens": len(group_items),
+                    },
+                    "det": [
+                        {
+                            "ide": {
+                                "codigo_item_integracao": item.pk,
+                            },
+                            "produto": {
+                                "codigo_produto": item.produto.cod_omie_item,
+                                "quantidade": item.quantidade,
+                                "valor_unitario": item.preco,
+                            }
+                        } for item in group_items
+                    ],
+                    "frete": {
+                        "modalidade": "9",
+                    },
+                    "informacoes_adicionais": {
+                        "codigo_categoria": "01.01.01",
+                        "codigo_conta_corrente": nCodCC,
+                        "consumidor_final": "N",
+                        "utilizar_emails": "N",
+                    },
+                }
+            }
+            data["param"].append(item_dict)
+            print(data)
+            return JsonResponse({'response': data}, status=200)

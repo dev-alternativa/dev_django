@@ -80,7 +80,7 @@
                                                 <td>{{ pedido.get_tipo_saida_display }}</td>
                                                 <td>{{ pedido.pedido_interno_cliente  }}</td>
                                                 <td>{{ pedido.cliente  }}</td>
-                                                <td>{{ pedido.nf_saida|default_if_none:'-' }}</td>
+                                                <td>{{ pedido.nf_saida|default_if_none:'' }}</td>
                                                 <td>{{ pedido.transportadora|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.dt_previao_faturamento|date:'d/m/Y' }}</td>
                                                 <td>{{ pedido.dt_criacao|date:'d/m/Y' }}</td>

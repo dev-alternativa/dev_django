@@ -137,7 +137,7 @@
       <div class="row float-end" id="saveButton">
         <div class="col-sm-12" style="margin-top: 10px;">
           <div class="form-inline buttons">
-            <button class="btn btn-primary" value="Save">
+            <button class="btn btn-primary btn-lg" value="Save">
               <i class="bi bi-floppy-o"></i>
               Salvar
             </button>
@@ -147,14 +147,14 @@
 
     {% else %}
 
-      <div class='row float-end' id="editButton">
+      <div class='row float-end' id="edit">
         <div class="col-md-12" style="margin-top: 10px;">
           <div class="form-inline buttons">
-            <button class="btn btn-success btn-lg" value="OMIE">
+            <button class="btn btn-success btn-lg" value="OMIE" id="sendOMIEButton">
               <i class="bi bi-send-arrow-up"></i>
               Enviar OMIE
             </button>
-            <button class="btn btn-warning btn-lg" value="Edit">
+            <button class="btn btn-warning btn-lg" value="Edit" id="editButton">
               <i class="bi bi-pencil"></i>
               Editar Pedido
             </button>
@@ -366,7 +366,7 @@
     var initialValues = {};
 
     // Ao clicar no botão Editar
-    $('#editButton button').click(function(e) {
+    $('#editButton').click(function(e) {
       e.preventDefault(); // Previne o comportamento padrão do botão
 
       // Salva os valores iniciais dos campos do formulário
@@ -380,14 +380,14 @@
       $('form :input').prop('disabled', false);
 
       // Esconde o botão Editar
-      $('#editButton').hide();
+      $('#edit').hide();
 
       // Insere o botão Salvar no mesmo lugar
       var saveButton = `
         <div class='row float-end' id="saveButton">
           <div class="col-md-12" style="margin-top: 10px;">
             <div class="form-inline buttons">
-              <button class="btn btn-primary" value="Save">
+              <button class="btn btn-primary btn-lg" value="Save">
                 <i class="bi bi-floppy-o"></i>
                 Salvar
               </button>
@@ -396,7 +396,7 @@
         </div>
       `;
 
-      $('#editButton').after(saveButton); // Insere o botão Salvar
+      $('#edit').after(saveButton); // Insere o botão Salvar
     });
 
     // Atualiza os dados ao clicar em `Salvar`
@@ -442,7 +442,7 @@
 
               // Esconder o botão Salvar e mostrar o botão Editar novamente
               $('#saveButton').remove();
-              $('#editButton').show();
+              $('#edit').show();
           },
           error: function(xhr, status, error) {
               // Exibe mensagem de erro caso a requisição falhe
@@ -461,7 +461,7 @@
           </div>`;
         $('#alertsPage').append(alertElement);
         $('#saveButton').remove();
-        $('#editButton').show();
+        $('#edit').show();
       }
   });
 
@@ -495,13 +495,29 @@
 
   });
 
+  $('.btn-close').on('click', function(){
+    resetForm();
+  });
 
+  $("#sendOMIEButton").click(function(){
 
-    $('.btn-close').on('click', function(){
-      resetForm();
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'create_omie_order' order.pk %}",
+      data:{
+        'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: function(response){
+        console.log(response);
+      },
+      error: function(xhr, status, error){
+        console.log(xhr);
+        console.log(status);
+        console.log(error);
+      }
     });
 
-
+  });
 
 });
 

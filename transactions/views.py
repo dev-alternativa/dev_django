@@ -332,11 +332,11 @@ def adicionar_produto(request, order_id):
             total_disponivel = itens_estoque.count()
             quantidade_saida = int(data["quantidade"])
 
-            if total_disponivel < quantidade_saida:
-                return JsonResponse({
-                    'error': f'Estoque insuficiente para o produto {product.nome_produto}: '
-                            f'{total_disponivel} disponíveis, mas {quantidade_saida} necessários.'
-                }, status=400)
+            # if total_disponivel < quantidade_saida:
+            #     return JsonResponse({
+            #         'error': f'Estoque insuficiente para o produto {product.nome_produto}: '
+            #                 f'{total_disponivel} disponíveis, mas {quantidade_saida} necessários.'
+            #     }, status=400)
 
             # Cria uma nova instância de OutflowsItems
             outflows_item = OutflowsItems(
@@ -391,7 +391,6 @@ def get_itens_pedido(request, order_id):
     else:
         return JsonResponse({'html': ''})
 
-
 def edit_pedido(request, order_id):
     if request.method == 'POST':
         try:
@@ -408,7 +407,7 @@ def edit_pedido(request, order_id):
             if 'desconto' in dados_modificados:
                 order.desconto = float(dados_modificados.get('desconto'))
             if 'nf_saida' in dados_modificados:
-                order.nf_saida = int(dados_modificados.get('nf_saida'))
+                order.nf_saida = dados_modificados.get('nf_saida')
             if 'transportadora' in dados_modificados:
                 transportadora_id = dados_modificados.get('transportadora')
                 transportadora = get_object_or_404(Carrier, id=transportadora_id)
