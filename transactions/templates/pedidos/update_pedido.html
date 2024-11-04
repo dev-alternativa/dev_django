@@ -14,11 +14,16 @@
     {% else %}
       <h1 class="text-body-secondary text-center mb-3">Pedido #{{ order.pk }}</h1>
     {% endif %}
+
     <div class="row" style="margin-bottom: 1rem;">
-      <div class='col-md-6'>
+      <div class='d-flex justify-content-between'>
         <a href="{% url 'order_list' %}" class='btn btn-danger btn-lg'>
           <i class="bi bi-backspace space_from_margin"></i>
           Voltar
+        </a>
+        <a href="{% url 'order_list' %}" class='btn btn-success btn-lg'>
+          <i class="bi bi-arrow-right-square space_from_margin"></i>
+          Faturar
         </a>
       </div>
     </div>
@@ -65,7 +70,7 @@
         </div>
         <div class='col'>
           <div class="form-group">
-              {{ form.dt_previao_faturamento|as_crispy_field }}
+              {{ form.dt_previsao_faturamento|as_crispy_field }}
           </div>
         </div>
       </div>
@@ -179,8 +184,6 @@
 
   // Salva produtos no pedido atual
   function adicionar_produto() {
-    console.log(`Produto: ${productSelect}`);
-    console.log(`Condição: ${condicao}`);
 
     const getVal = id => $(`#id_${id}`).val() || '';
 
@@ -254,7 +257,6 @@
               $('#alertsModal').append(alertElement);
             },
             error: function(response) {
-              console.log(response);
               // Erro
               let erro = response.responseJSON.error;
               let alertElement = `
@@ -345,7 +347,6 @@
     $('#selectProductOrder').click(function(e) {
       e.preventDefault();
       productSelect = $("#id_productSelect").val();
-      console.log(`Produto selecionado 2: ${productSelect}`);
       condicao = $("#id_condicaoSelect").val();
       isValid = true;
 
@@ -468,7 +469,6 @@
   $(document).on('click', '#btn-delete', function(e){
     const itemID = $(this).data('id');
     const deleteURL = "{% url 'remove_product_from_order' 0 %}".replace("0", itemID);
-    console.log(itemID);
 
     $.ajax({
       type: 'POST',

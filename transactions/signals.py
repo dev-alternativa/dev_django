@@ -34,20 +34,20 @@ def atualizar_estoque_inventario(sender, instance, created, **kwargs):
         total_disponivel = itens_estoque.count()
 
         # Verifica se há estoque suficiente
-        if total_disponivel < quantidade_saida:
-            raise ValueError(f'Estoque insuficiente para o produto {produto_saida.nome_produto}: '
-                            f'{total_disponivel} disponíveis, mas {quantidade_saida} necessários.')
+        # if total_disponivel < quantidade_saida:
+        #     raise ValueError(f'Estoque insuficiente para o produto {produto_saida.nome_produto}: '
+        #                     f'{total_disponivel} disponíveis, mas {quantidade_saida} necessários.')
 
-        # Atualiza o status dos itens no inventário, um por um
-        for item_estoque in itens_estoque:
-            if quantidade_saida <= 0:
-                break  # Se já tiver processado a quantidade necessária, interrompe o loop
+        # # Atualiza o status dos itens no inventário, um por um
+        # for item_estoque in itens_estoque:
+        #     if quantidade_saida <= 0:
+        #         break  # Se já tiver processado a quantidade necessária, interrompe o loop
 
-            # Atualiza o status do item para "EXPEDIÇÃO" e associa o item de inventário à saída de item
-            item_estoque.status = "EXPEDIÇÃO"
-            item_estoque.saida_item = instance  # Associa o item de inventário ao item de saída correto
-            item_estoque.save()
+        #     # Atualiza o status do item para "EXPEDIÇÃO" e associa o item de inventário à saída de item
+        #     item_estoque.status = "EXPEDIÇÃO"
+        #     item_estoque.saida_item = instance  # Associa o item de inventário ao item de saída correto
+        #     item_estoque.save()
 
-            # Reduz a quantidade restante a ser processada
-            quantidade_saida -= 1
+        #     # Reduz a quantidade restante a ser processada
+        #     quantidade_saida -= 1
 

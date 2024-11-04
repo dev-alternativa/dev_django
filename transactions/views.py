@@ -414,8 +414,11 @@ def edit_pedido(request, order_id):
                 transportadora = get_object_or_404(Carrier, id=transportadora_id)
                 order.transportadora = transportadora
             if 'pedido_interno_cliente' in dados_modificados:
-                print(dados_modificados.get('pedido_interno_cliente'))
                 order.pedido_interno_cliente = int(dados_modificados.get('pedido_interno_cliente'))
+            if 'dt_previsao_faturamento' in dados_modificados:
+                order.dt_previsao_faturamento = dados_modificados.get('dt_previsao_faturamento')
+            if 'tipo_frete' in dados_modificados:
+                order.tipo_frete = dados_modificados.get('tipo_frete')
             if 'dados_adicionais_nf' in dados_modificados:
                 order.dados_adicionais_nf = dados_modificados.get('dados_adicionais_nf')
             if 'cod_cenario_fiscal' in dados_modificados:

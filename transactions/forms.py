@@ -97,7 +97,7 @@ class OutflowsForm(forms.ModelForm):
                     }
                 ),
             'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
-            'dt_previao_faturamento': forms.DateTimeInput(
+            'dt_previsao_faturamento': forms.DateTimeInput(
                 attrs={
                     'type': 'date',
                     'class': 'form-control',
@@ -107,7 +107,7 @@ class OutflowsForm(forms.ModelForm):
                 ),
         }
         label = {
-            'dt_previao_faturamento': 'Previsão de Faturamento',
+            'dt_previsao_faturamento': 'Previsão de Faturamento',
         }
 
     def __init__(self, *args, **kwargs):
@@ -135,6 +135,14 @@ class OutflowsItemsForm(forms.ModelForm):
                 }
             ),
             'dados_adicionais_item': Textarea(attrs={'rows': 3}),
+            # 'dt_previao_faturamento': forms.DateInput(
+            #     format='%d/%d/%Y',
+            #     attrs={
+            #         'type': 'date',
+            #         'class': 'form-control',
+            #         'placeholder': 'dd/mm/aaaa',
+            #     }
+            #     ),
         }
 
 
