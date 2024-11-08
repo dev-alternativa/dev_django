@@ -13,6 +13,11 @@
       <h1 class="text-body-secondary text-center mb-3">Novo Pedido</h1>
     {% else %}
       <h1 class="text-body-secondary text-center mb-3">Pedido #{{ order.pk }}</h1>
+      <h4 class="text-center">Cliente Cadastrado no OMIE #{{ order.numero_pedido|default_if_none:"" }}</h4>
+      <legend class="text-body-seconday text-center">Cliente Cadastrado no OMIE:
+        <p>{{ cliente_tags|join:"/" }}</p>
+      </legend>
+
     {% endif %}
 
     <div class="row" style="margin-bottom: 1rem;">
@@ -50,7 +55,7 @@
         </div>
         <div class="col">
           <div class="form-group">
-            {{ form.numero_pedido_cliente|as_crispy_field }}
+            {{ form.numero_pedido|as_crispy_field }}
           </div>
         </div>
         <div class="col">
@@ -501,6 +506,7 @@
 
   $("#sendOMIEButton").click(function(){
 
+
     $.ajax({
       type: 'POST',
       url: "{% url 'create_omie_order' order.pk %}",
@@ -516,7 +522,6 @@
         console.log(error);
       }
     });
-
   });
 
 });

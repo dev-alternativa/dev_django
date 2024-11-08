@@ -2,14 +2,14 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}Novo Pedido{% endblock %}
+{% block title %}Novo Pedido/{{ proximo_pedido }}{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/select2.css' %}">
 
 <div class="row">
   <div class="cols">
-    <h1 class="text-body-secondary text-center mb-3">Novo Pedido</h1>
+    <h1 class="text-body-secondary text-center mb-3">Novo Pedido #{{ proximo_pedido }}</h1>
   <div class="row" style="margin-bottom: 1rem;">
     <div class='col-md-6'>
       <a href="{% url 'order_list' %}" class='btn btn-danger btn-lg'>
@@ -40,11 +40,11 @@
               {{ form.cliente|as_crispy_field }}
             </div>
           </div>
-          <div class="col">
+          {% comment %} <div class="col">
             <div class="form-group">
-              {{ form.numero_pedido_cliente|as_crispy_field }}
+              {{ form.numero_pedido|as_crispy_field }}
             </div>
-          </div>
+          </div> {% endcomment %}
           <div class="col">
             <div class="form-group">
               {{ form.pedido_interno_cliente|as_crispy_field }}
@@ -62,7 +62,7 @@
           </div>
           <div class='col'>
             <div class="form-group">
-                {{ form.dt_previao_faturamento|as_crispy_field }}
+                {{ form.dt_previsao_faturamento|as_crispy_field }}
             </div>
           </div>
         </div>
