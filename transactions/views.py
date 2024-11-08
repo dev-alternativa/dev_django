@@ -225,6 +225,13 @@ class OrderCreateView(FormMessageMixin, CreateView):
     success_message = 'Novo Pedido Gerado com sucesso!'
     form_class = OutflowsForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        next_id = Outflows.objects.order_by('-dt_criacao').values('id').first()
+        context['proximo_pedido'] = next_id.get('id') + 1 if next_id else None
+        return context
+
+
     def form_invalid(self, form):
         print(f'Erros ao criar pedido {form.errors}')
         return super().form_invalid(form)
@@ -248,6 +255,17 @@ class OrderEditDetailsView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['item_form'] = OrderItemsForm()
         context['categories'] = Category.objects.all()
+        order = self.get_object()
+        cliente = order.cliente
+        valid_tags = [
+            (cliente.tag_cadastro_omie_com, 'COM'),
+            (cliente.tag_cadastro_omie_ind, 'IND'),
+            (cliente.tag_cadastro_omie_pre, 'PRE'),
+            (cliente.tag_cadastro_omie_srv, 'SRV'),
+            (cliente.tag_cadastro_omie_mrx, 'MRX'),
+            (cliente.tag_cadastro_omie_flx, 'FLX'),
+        ]
+        context['cliente_tags'] = [tag for valor, tag in valid_tags if int(valor)]
 
         return context
 
