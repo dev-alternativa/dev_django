@@ -21,12 +21,12 @@ class LeadTime(Base):
 class Carrier(Base):
     nome = models.CharField('Nome Fantasia', max_length=100)
     cnpj = models.CharField('CNPJ / CPF', max_length=20)
-    cod_omie_COM = models.CharField('Cód. OMIE COM', max_length=15, null=True, blank=True)
-    cod_omie_IND = models.CharField('Cód. OMIE IND', max_length=15, null=True, blank=True)
-    cod_omie_PRE = models.CharField('Cód. OMIE PRE', max_length=15, null=True, blank=True)
-    cod_omie_MRX = models.CharField('Cód. OMIE MRX', max_length=15, null=True, blank=True)
-    cod_omie_SRV = models.CharField('Cód. OMIE SRV', max_length=15, null=True, blank=True)
-    cod_omie_FLX = models.CharField('Cód. OMIE FLX', max_length=15, null=True, blank=True)
+    cod_omie_com = models.CharField('Cód. OMIE COM', max_length=15, null=True, blank=True)
+    cod_omie_ind = models.CharField('Cód. OMIE IND', max_length=15, null=True, blank=True)
+    cod_omie_pre = models.CharField('Cód. OMIE PRE', max_length=15, null=True, blank=True)
+    cod_omie_mrx = models.CharField('Cód. OMIE MRX', max_length=15, null=True, blank=True)
+    cod_omie_srv = models.CharField('Cód. OMIE SRV', max_length=15, null=True, blank=True)
+    cod_omie_flx = models.CharField('Cód. OMIE FLX', max_length=15, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True, max_length=200)
 
     class Meta:

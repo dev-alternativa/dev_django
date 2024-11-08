@@ -22,12 +22,12 @@ class CarrierForm(ModelForm):
         super(CarrierForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.fields['obs'].required = False
-        self.fields['cod_omie_COM'].required = False
-        self.fields['cod_omie_IND'].required = False
-        self.fields['cod_omie_PRE'].required = False
-        self.fields['cod_omie_MRX'].required = False
-        self.fields['cod_omie_SRV'].required = False
-        self.fields['cod_omie_FLX'].required = False
+        self.fields['cod_omie_com'].required = False
+        self.fields['cod_omie_ind'].required = False
+        self.fields['cod_omie_pre'].required = False
+        self.fields['cod_omie_mrx'].required = False
+        self.fields['cod_omie_srv'].required = False
+        self.fields['cod_omie_flx'].required = False
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
         Row(
@@ -37,12 +37,12 @@ class CarrierForm(ModelForm):
                 Field('obs', css_class='form-control col-md-6 mb-0'),
             ),
             Column(
-                Field('cod_omie_COM', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_IND', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_PRE', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_MRX', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_SRV', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_FLX', css_class='form-control col-md-6 mb-0'),
+                Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
+                Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
+                Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
+                Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
+                Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
+                Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
             ),
         ),
         Row(

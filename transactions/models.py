@@ -78,7 +78,7 @@ class InflowsItems(Base):
 
 
 class Outflows(Base):
-    numero_pedido_cliente = models.CharField(verbose_name='N° Pedido', max_length=100, null=True, blank=True)
+    numero_pedido = models.CharField(verbose_name='N° Pedido', max_length=100, null=True, blank=True)
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
     cod_pedido_omie = models.CharField(max_length=100, null=True, blank=True)
     pedido_interno_cliente = models.CharField(max_length=100, null=True, blank=True)

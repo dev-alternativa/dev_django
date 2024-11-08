@@ -6,6 +6,7 @@
             <th>Produto</th>
             <th>Quantidade</th>
             <th>Preço</th>
+            <th>CPNJ Fat.</th>
             <th>Cod OMIE</th>
             <th>Vendedor</th>
             <th>Ações</th>
@@ -18,6 +19,7 @@
             <td>{{ item.produto.nome_produto }}</td>
             <td>{{ item.quantidade }}</td>
             <td>{{ item.preco }}</td>
+            <td>{{ item.cnpj_faturamento }}</td>
             <td>{{ item.cod_item_omie|default_if_none:"" }}</td>
             <td>{{ item.vendedor_item.nome }}</td>
             <td>
