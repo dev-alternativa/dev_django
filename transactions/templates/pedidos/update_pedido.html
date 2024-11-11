@@ -442,12 +442,14 @@
                 </div>`;
               $('#alertsOrder').append(alertElement);
 
-              // Opcionalmente, você pode desabilitar novamente os campos após salvar
+              // Desabilita novamente os campos após salvar
               $('form :input').prop('disabled', true);
 
               // Esconder o botão Salvar e mostrar o botão Editar novamente
               $('#saveButton').remove();
               $('#edit').show();
+              setTimeout( () => location.reload(), 1000);
+
           },
           error: function(xhr, status, error) {
               // Exibe mensagem de erro caso a requisição falhe
@@ -492,6 +494,7 @@
             </div>`;
           $('#alertsPage').append(alertElement);
           atualizarTabela({{ order.pk }});
+          location.reload();
       },
       error: function(xhr, status, error) {
           alert(`Erro: ${xhr.responseJSON.ERRO || status}`);
@@ -506,7 +509,6 @@
 
   $("#sendOMIEButton").click(function(){
 
-
     $.ajax({
       type: 'POST',
       url: "{% url 'create_omie_order' order.pk %}",
@@ -517,6 +519,7 @@
         console.log(response);
       },
       error: function(xhr, status, error){
+        alert(`Ocorreu um erro: ${xhr.responseJSON.error}!` )
         console.log(xhr);
         console.log(status);
         console.log(error);
