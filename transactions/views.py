@@ -253,10 +253,20 @@ class OrderEditDetailsView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['item_form'] = OrderItemsForm()
-        context['categories'] = Category.objects.all()
         order = self.get_object()
+
+
         cliente = order.cliente
+
+        # Conta o número de itens já existentes no pedido
+        num_itens_existentes = order.saida_items.count()
+        next_item_index = num_itens_existentes + 1
+        # Define o próximo índice do item
+        item_form = OrderItemsForm(initial={'item_pedido': next_item_index})
+        context['item_form'] = item_form
+        context['categories'] = Category.objects.all()
+
+
         valid_tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
             (cliente.tag_cadastro_omie_ind, 'IND'),
@@ -418,8 +428,8 @@ def edit_pedido(request, order_id):
                 cliente_id = dados_modificados.get('cliente')
                 cliente = get_object_or_404(CustomerSupplier, id=cliente_id)
                 order.cliente = cliente
-            if 'numero_pedido_cliente' in dados_modificados:
-                order.numero_pedido_cliente = int(dados_modificados.get('numero_pedido_cliente'))
+            if 'numero_pedido' in dados_modificados:
+                order.numero_pedido = dados_modificados.get('numero_pedido')
             if 'dolar_ptax' in dados_modificados:
                 order.dolar_ptax = float(dados_modificados.get('dolar_ptax'))
             if 'desconto' in dados_modificados:
@@ -444,7 +454,7 @@ def edit_pedido(request, order_id):
                 order.cod_cenario_fiscal = cod_cenario_fiscal
             if 'vendedor' in dados_modificados:
                 vendedor_id = dados_modificados.get('vendedor')
-                print(vendedor_id)
+                # print(vendedor_id)
                 vendedor = get_object_or_404(Seller, id=vendedor_id)
                 order.vendedor = vendedor
             if 'item_pedido' in dados_modificados:
