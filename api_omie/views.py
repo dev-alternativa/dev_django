@@ -311,6 +311,7 @@ def add_order_to_omie(request, order_id):
     # Cria os pedidos para cada app OMIE
     all_orders = []
     for app_type, app_items in items_by_app.items():
+
         # Verifica se o cliente tem o código para este app
         client_code_attr = f'tag_cadastro_omie_{app_type.lower()}'
         client_code = getattr(cliente, client_code_attr, None)
@@ -318,13 +319,24 @@ def add_order_to_omie(request, order_id):
         if not int(client_code):
             return JsonResponse({'error': f'Cliente não possui o código OMIE para o app {app_type}'}, status=400)
 
-        # Verifica se o transportador tem o código para este app
+        # Verifica se o transportadora tem o código para este app
         transp_code_attr = f'cod_omie_{app_type.lower()}'
+        transp_code = getattr(transportadora, transp_code_attr, None)
 
-        # Verifica se todos os items têm código oculto OMIE
+        if not int(transp_code):
+            return JsonResponse({'error': f'Transportadora não possui o código OMIE para o app {app_type}'}, status=400)
+
+
         missing_item_codes = [item.pk for item in app_items if not getattr(item.produto, f'cod_oculto_omie_{app_type.lower()}', None)]
+        # Verifica se todos os items têm código oculto OMIE
+
+
+        # if all(isinstance(item, int) and item != 0 for item in missing_item_codes ):
         if missing_item_codes:
-            return JsonResponse({'error': f'Alguns itens não possuem código OMIE para o app {app_type}: {", ".join(map(str, missing_item_codes))}'},status=400)
+            return JsonResponse({'error': f'Produto {item.produto} não possuem código OMIE para o app {app_type}: {", ".join(map(str, missing_item_codes))}'},status=400)
+
+        else:
+            print(f'Todos os itens possuem código OMIE para o app {app_type}')
 
         credentials = get_omie_credentials(app_type)
 
@@ -344,7 +356,7 @@ def add_order_to_omie(request, order_id):
                     },
                     "inf_adic":{
                         "dados_adicionais_item": item.dados_adicionais_item,
-                        "item_pedido_compra": int(item.item_pedido)
+                        "item_pedido_compra": int(item.item_pedido),
                     },
                     "produto": {
                         "codigo_produto": getattr(item.produto, f'cod_oculto_omie_{app_type.lower()}'),
@@ -352,25 +364,27 @@ def add_order_to_omie(request, order_id):
                         "valor_unitario": float(item.preco),
                     },
                     "observacao":{
-                        "obs_venda": item.obs
+                        "obs_item": item.obs
                     },
                 } for item in app_items
             ],
             "frete": {
                 "modalidade": "9",
+                "codigo_transportadora": transp_code,
             },
             "informacoes_adicionais": {
                 "codigo_categoria": "01.01.01",
                 "codigo_conta_corrente": item.conta_corrente.nCodCC,
                 "consumidor_final": "N",
                 "utilizar_emails": "N",
+                "numero_pedido_cliente": order.pedido_interno_cliente,
             },
         }
         all_orders.append(order_dict)
 
-        send_to_omie(all_orders, credentials)
+        api_response = send_to_omie(all_orders, credentials)
 
-    return JsonResponse({'response': all_orders}, status=200)
+    return JsonResponse({'api_response': api_response}, status=200)
 
 
 def send_to_omie(all_orders, credentials):
@@ -381,21 +395,56 @@ def send_to_omie(all_orders, credentials):
         'app_secret': credentials['app_secret'],
         'param': all_orders
     }
+    url = "https://app.omie.com.br/api/v1/produtos/pedido/"
 
-    print(f'DATA: {data}')
-    response = {
-        "codigo_pedido": 3599261298,
-        "codigo_pedido_integracao": "2",
-        "codigo_status": "0",
-        "descricao_status": "Pedido cadastrado com sucesso!",
-        "numero_pedido": "000000000007949"
-    }
-    if not handle_omie_response(response):
-        return JsonResponse({'error': 'Falha ao cadastrar pedido no OMIE, tente novamente'}, status= 400)
+    print(data)
+    return  True
+
+    try:
+        print('Preparando chamada para o OMIE')
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+        response_data = response.json()
+
+        print('Chamda efetuada, tratando.')
+        print(f'Retorno cru da API: {response}')
+
+        print(f"Resposta do OMIE: {response_data}")
+
+        if response_data.get('status') == "0":
+            if not update_local_order(response_data):
+                return JsonResponse({'error': 'Falha ao cadastrar pedido no OMIE, tente novamente'}, status= 400)
+            else:
+                return {
+                    'response': response_data,
+                    'success': True,
+                    'message': f'Pedido {response_data.get('numero_pedido')} criado com sucesso no OMIE!'
+                }
+        else:
+            return {
+                'success': False,
+                'error': response_data,
+                'message': 'Erro ao criar Pedido ao OMIE'
+            }
+    except requests.exceptions.RequestException as e:
+        print(f'Erro ao dicionar pedido ao OMIE: {e}')
+        return {
+            'success': False,
+            'error': str(e),
+            'message': 'Erro ao criar pedido no OMIE'
+        }
+    # response = {
+    #     "codigo_pedido": 3599261298,
+    #     "codigo_pedido_integracao": "2",
+    #     "codigo_status": "0",
+    #     "descricao_status": "Pedido cadastrado com sucesso!",
+    #     "numero_pedido": "000000000007949"
+    # }
 
 
-def handle_omie_response(response):
-    """Trata responsa da API do OMIE"""
+
+def update_local_order(response):
+    """Atualiza Pedido local com a responsa da API do OMIE"""
     if not 'codigo_pedido' in response:
         return False
     else:

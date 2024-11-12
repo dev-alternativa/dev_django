@@ -135,15 +135,8 @@ class OutflowsItemsForm(forms.ModelForm):
                 }
             ),
             'dados_adicionais_item': Textarea(attrs={'rows': 3}),
-            # 'dt_previao_faturamento': forms.DateInput(
-            #     format='%d/%d/%Y',
-            #     attrs={
-            #         'type': 'date',
-            #         'class': 'form-control',
-            #         'placeholder': 'dd/mm/aaaa',
-            #     }
-            #     ),
         }
+
 
 
 OutflowsItemsFormSet = inlineformset_factory(
