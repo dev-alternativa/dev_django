@@ -87,7 +87,7 @@ class Outflows(Base):
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas', null=True, blank=True)
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_nf = models.TextField('Dados Adicionais NF',max_length=500, blank=True, null=True)
-    cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas')
+    cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas', default=1)
     tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_previsao_faturamento = models.DateField('Previsão de Faturamento', blank=True, null=True)

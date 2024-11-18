@@ -236,10 +236,12 @@ class OrderCreateView(FormMessageMixin, CreateView):
         print(f'Erros ao criar pedido {form.errors}')
         return super().form_invalid(form)
 
+
     def form_valid(self, form):
         response = super().form_valid(form)
         print(f'Pedido Criado com sucesso: {self.object}')
         return response
+
 
     def get_success_url(self):
         return reverse('update_order', kwargs={'pk': self.object.pk})
@@ -255,7 +257,6 @@ class OrderEditDetailsView(UpdateView):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
 
-
         cliente = order.cliente
 
         # Conta o número de itens já existentes no pedido
@@ -265,7 +266,6 @@ class OrderEditDetailsView(UpdateView):
         item_form = OrderItemsForm(initial={'item_pedido': next_item_index})
         context['item_form'] = item_form
         context['categories'] = Category.objects.all()
-
 
         valid_tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
@@ -298,20 +298,6 @@ def adicionar_produto(request, order_id):
             'obs': str,
             # 'cfop': str,
         }
-
-        data = {}
-
-        # for key in field_types:
-        #     raw_value = request.POST.get(key, "")
-        #     print(f"Chave: {key}, Valor antes da conversão: {raw_value}")  # Debug: imprime a chave e o valor original
-
-        #     # Aplica valor padrão para evitar erro ao converter
-        #     value = raw_value or (0 if field_types[key] in [int, float] else "")
-
-        #     try:
-        #         data[key] = field_types[key](value)
-        #     except ValueError as e:
-        #         print(f"Erro ao converter o valor da chave '{key}': {e}")
 
         data = {
             key: field_types[key](

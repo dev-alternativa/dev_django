@@ -296,6 +296,10 @@ def add_order_to_omie(request, order_id):
         return JsonResponse({'error': 'Não há itens para esse pedido!'}, status=404)
 
     order = Outflows.objects.get(pk=order_id)
+    if order.numero_pedido:
+        return JsonResponse({'error': 'Já existe um código OMIE para este pedido!'}, status=500)
+
+
     cliente = order.cliente
     transportadora = order.transportadora
 
@@ -373,7 +377,7 @@ def add_order_to_omie(request, order_id):
                 "codigo_transportadora": transp_code,
             },
             "informacoes_adicionais": {
-                "codigo_categoria": "01.01.01",
+                "codigo_categoria": "1.01.01",
                 "codigo_conta_corrente": item.conta_corrente.nCodCC,
                 "consumidor_final": "N",
                 "utilizar_emails": "N",
@@ -398,7 +402,7 @@ def send_to_omie(all_orders, credentials):
     url = "https://app.omie.com.br/api/v1/produtos/pedido/"
 
     print(data)
-    return  True
+
 
     try:
         print('Preparando chamada para o OMIE')
@@ -406,12 +410,12 @@ def send_to_omie(all_orders, credentials):
         response.raise_for_status()
         response_data = response.json()
 
-        print('Chamda efetuada, tratando.')
+        print('Chamada efetuada, tratando.')
         print(f'Retorno cru da API: {response}')
 
         print(f"Resposta do OMIE: {response_data}")
 
-        if response_data.get('status') == "0":
+        if response_data.get('codigo_status') == "0":
             if not update_local_order(response_data):
                 return JsonResponse({'error': 'Falha ao cadastrar pedido no OMIE, tente novamente'}, status= 400)
             else:
@@ -427,10 +431,19 @@ def send_to_omie(all_orders, credentials):
                 'message': 'Erro ao criar Pedido ao OMIE'
             }
     except requests.exceptions.RequestException as e:
-        print(f'Erro ao dicionar pedido ao OMIE: {e}')
+        if e.response is not None and e.response.headers.get('Content-Type') == 'application/json':
+            error_data = None
+            try:
+                error_data = e.response.json()
+                print("mensagem de erro capturada:", error_data.get("faultstring"))
+            except ValueError:
+                print("Erro HTTP", e.response.text)
+        else:
+            print(f'Erro ao dicionar pedido ao OMIE: {e}')
+
         return {
             'success': False,
-            'error': str(e),
+            'error': str(e) if not error_data or not error_data.get('faultstring') else error_data.get("faultstring"),
             'message': 'Erro ao criar pedido no OMIE'
         }
     # response = {

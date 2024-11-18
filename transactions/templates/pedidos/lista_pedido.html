@@ -53,7 +53,6 @@
                         </div>
                     </div>
 
-
                     <div class="card">
                         <div class="space_from_margin">
                             <table class="table table-hover table-bordered border-secondary-subtle">
@@ -72,13 +71,13 @@
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="table table-hover table-bordered border-secondary-subtle">
+                                    <tbody class="table table-hover table-bordered border-secondary-subtle text-center">
                                         {% for pedido in pedidos %}
                                             <tr>
                                                 <td>{{ pedido.id }}</td>
-                                                <td>{{ pedido.cod_omie|default_if_none:'-' }}</td>
+                                                <td>{{ pedido.cod_pedido_omie|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.get_tipo_saida_display }}</td>
-                                                <td>{{ pedido.pedido_interno_cliente  }}</td>
+                                                <td>{{ pedido.pedido_interno_cliente|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.cliente  }}</td>
                                                 <td>{{ pedido.nf_saida|default_if_none:'' }}</td>
                                                 <td>{{ pedido.transportadora|default_if_none:'-' }}</td>
