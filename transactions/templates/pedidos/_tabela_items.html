@@ -7,7 +7,7 @@
             <th>Quantidade</th>
             <th>Preço</th>
             <th>CPNJ Fat.</th>
-            <th>Vendedor</th>
+            {% comment %} <th>Vendedor</th> {% endcomment %}
             <th>Ações</th>
         </tr>
     </thead>
@@ -19,7 +19,7 @@
             <td>{{ item.quantidade }}</td>
             <td>{{ item.preco }}</td>
             <td>{{ item.cnpj_faturamento }}</td>
-            <td>{{ item.vendedor_item.nome }}</td>
+            {% comment %} <td>{{ item.vendedor_item.nome }}</td> {% endcomment %}
             <td>
                 <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                     {% if not item.saida.cod_pedido_omie %}

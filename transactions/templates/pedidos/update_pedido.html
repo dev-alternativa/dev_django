@@ -13,10 +13,13 @@
       <h1 class="text-body-secondary text-center mb-3">Novo Pedido</h1>
     {% else %}
       <h1 class="text-body-secondary text-center mb-3">Pedido #{{ order.pk }}</h1>
-      <h4 class="text-center">Cliente Cadastrado no OMIE #
-        <strong>
-          {{ order.numero_pedido|default_if_none:"" }}</h4>
-        </strong>
+      {% if order.cod_pedido_omie %}
+        <h4 class="text-center">Código Pedido no OMIE #
+          <strong>
+            {{ order.numero_pedido|default_if_none:"" }}</h4>
+          </strong>
+
+      {% endif %}
       <legend class="text-body-seconday text-center">Cliente Cadastrado no OMIE:
         <p>{{ cliente_tags|join:"/" }}</p>
       </legend>
@@ -273,7 +276,7 @@
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`;
 
-              $('#alertsModal').append(alertElement);
+              $('#alertsPage').append(alertElement);
             },
             error: function(response) {
               // Erro
