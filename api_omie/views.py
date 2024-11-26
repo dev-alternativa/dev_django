@@ -514,7 +514,7 @@ def update_local_order(response):
         id = int(response['codigo_pedido_integracao'])
         order = Outflows.objects.get(pk=id)
         order.cod_pedido_omie = response['codigo_pedido']
-        order.numero_pedido = response['numero_pedido'].replace('0', '')
+        order.num_pedido_omie = response['numero_pedido'].replace('0', '')
         order.save()
         return True
 

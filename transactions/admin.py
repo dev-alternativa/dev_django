@@ -10,9 +10,34 @@ class TaxScenarioAdmin(admin.ModelAdmin):
 
 @admin.register(Outflows)
 class OutflowsAdmin(admin.ModelAdmin):
-    list_display = ('tipo_saida', 'cliente', 'nf_saida', 'numero_pedido', 'transportadora', 'tipo_frete', 'dolar_ptax', 'dados_adicionais_nf', 'cod_cenario_fiscal', 'desconto', )
+    list_display = (
+        'tipo_saida',
+        'cliente',
+        'nf_saida',
+        'num_pedido_omie',
+        'num_pedido_omie_secundario',
+        'transportadora',
+        'tipo_frete',
+        'dolar_ptax',
+        'dados_adicionais_nf',
+        'cod_cenario_fiscal',
+        'desconto',
+        )
 
 
 @admin.register(OutflowsItems)
 class OutflowItemsAdmin(admin.ModelAdmin):
-    list_display = ('produto', 'preco', 'quantidade', 'item_pedido', 'dados_adicionais_item', 'numero_pedido', 'vendedor_item', 'cfop', 'saida', 'cnpj_faturamento', 'prazo', 'obs')
+    list_display = (
+        'produto',
+        'preco',
+        'quantidade',
+        'item_pedido',
+        'dados_adicionais_item',
+        'numero_pedido',
+        'vendedor_item',
+        'cfop',
+        'saida',
+        'cnpj_faturamento',
+        'prazo',
+        'obs'
+    )

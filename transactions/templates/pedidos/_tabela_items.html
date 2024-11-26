@@ -25,11 +25,11 @@
                     {% if not item.saida.cod_pedido_omie %}
 
                         <!-- Editar -->
-                        <a class="btn btn-warning btn-edit btn-sm" href="#" role="button">
+                        <button type="button" class="btn btn-warning btn-edit btn-sm" id="btn-edit-product" data-id="{{ item.id }}" >
                             <i class="bi bi-pencil-square"></i>
-                        </a>
+                        </button>
                         <!-- Apagar -->
-                        <button type="button" id="btn-delete" class="btn btn-sm btn-danger btn-delete" data-id="{{  item.id }}">
+                        <button type="button" id="btn-delete" class="btn btn-sm btn-danger btn-delete" data-id="{{ item.id }}">
                             <i class="bi bi-trash3"></i>
                         </button>
                     {% endif %}

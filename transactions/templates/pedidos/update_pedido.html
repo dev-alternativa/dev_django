@@ -16,7 +16,7 @@
       {% if order.cod_pedido_omie %}
         <h4 class="text-center">Código Pedido no OMIE #
           <strong>
-            {{ order.numero_pedido|default_if_none:"" }}</h4>
+            {{ order.pk|default_if_none:"" }}</h4>
           </strong>
 
       {% endif %}
@@ -61,7 +61,12 @@
         </div>
         <div class="col">
           <div class="form-group">
-            {{ form.numero_pedido|as_crispy_field }}
+            {{ form.num_pedido_omie|as_crispy_field }}
+          </div>
+        </div>
+        <div class="col">
+          <div class="form-group">
+            {{ form.num_pedido_omie_secundario|as_crispy_field }}
           </div>
         </div>
         <div class="col">
@@ -79,14 +84,14 @@
               {{ form.tipo_frete|as_crispy_field }}
           </div>
         </div>
+      </div>
+      <div class='row'>
+
         <div class='col'>
           <div class="form-group">
               {{ form.dt_previsao_faturamento|as_crispy_field }}
           </div>
         </div>
-      </div>
-      <div class='row'>
-
         <div class="col">
           <div class="form-group">
             {{ form.desconto|as_crispy_field }}
@@ -141,6 +146,10 @@
 <!-- Modal de adição de produtos -->
 {% include "pedidos/_modal_item_pedido.html" %}
 
+<!-- Modal edição de produto -->
+{% include "pedidos/_modal_editar_item.html" %}
+
+
     <!-- Botão de salvar -->
 
     {% if not order.pk %}
@@ -194,301 +203,387 @@
 </div>
 
 <script>
+/* ######################################################## SCRIPTS ########################################################### */
 
-  let categoriaSelect, productSelect, condicao, isValid;
+// Variáveis globais
+let categoriaSelect, productSelect, condicao, isValid;
 
-  // Reseta valores no formulário de produtos
-  const resetForm = () => {
-    $('#itemForm')[0].reset();
-    $('#itemForm').find('.is-invalid').removeClass('is-invalid');
-    $('#staticBackdrop').modal('hide');
+/**
+* Seleciona uma opção de um <select> com base no texto da opção
+* @param {string} selectId - ID do <select>
+* @param {string} optionText - Texto da opção a ser selecionada
+
+*/
+function selectOptionByText(selectId, optionText){
+  const select = $(selectId);
+  if(!select){
+    console.error(`Elemento com ID ${selectId} não encontrado!`);
+    return;
   }
 
-  // Salva produtos no pedido atual
-  function adicionar_produto() {
+  const matchingOption = select.find("option").filter(function () {
+    return $(this).text().trim() === optionText;
+  });
 
-    const getVal = id => $(`#id_${id}`).val() || '';
+  if (matchingOption.length) {
+    select.val(matchingOption.val()).change();
+  }
+  else{
+    console.error(`Opção com texto ${optionText} não encontrada no select com id ${selectId}`);
+  }
+}
 
-    // Pega os valores dos campos
-    const produto = productSelect;
-    const cnpj_faturamento = getVal('cnpj_faturamento');
-    const condicao_preco = condicao;
-    const prazo = getVal('prazo');
-    const quantidade = getVal('quantidade');
-    const preco = getVal('preco');
-    const conta_corrente = getVal('conta_corrente');
-    const itemPedido = getVal('item_pedido');
-    const numero_pedido = getVal('numero_pedido');
-    const vendedor_item = getVal('vendedor_item');
-    const dados_adicionais_item = getVal('dados_adicionais_item');
-    const obs = getVal('obs');
-    //const cfop = getVal('cfop');
 
-    // Variável para controlar se o formulário é válido
-    let isValid = true;
+// Reinicia o formulário de adição de produtos
+const resetForm = () => {
+  $('#itemForm')[0].reset();
+  $('#itemForm').find('.is-invalid').removeClass('is-invalid');
+  $('#staticBackdrop').modal('hide');
+}
 
-    const validateField = (fieldId, value) => {
-      const element = $(`#id_${fieldId}`);
-      element.toggleClass('is-invalid', !value);
-      if (!value) isValid = false;
-    };
+/*
+  Atualiza a lista de itens de produto no pedido
+  :=> orderID, ID do pedido como parâmetro
+*/
+const atualizarTabela = (orderID) => {
+  $.ajax({
+    url: `/get_itens_pedido/${orderID}/`,
+    method: 'GET',
+    success: function(response) {
+      // Sucesso
+      $('#dinamic-table').html(response.html);
 
-    validateField('produto', produto);
-    validateField('cnpj_faturamento', cnpj_faturamento);
-    validateField('condicao_calculo', condicao_preco);
-    validateField('prazo', prazo);
-    validateField('quantidade', quantidade);
-    validateField('preco', preco);
-    validateField('conta_corrente', conta_corrente);
-    validateField('item_pedido', itemPedido);
-
-    // Se o formulário for válido, envie os dados via AJAX
-    if (isValid) {
-        // Aqui você pode fazer a chamada AJAX para enviar o formulário
-        $.ajax({
-            url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
-            method: 'POST',
-            data: {
-              produto: produto,
-              cnpj_faturamento: cnpj_faturamento,
-              condicao_preco: condicao_preco,
-              prazo: prazo,
-              quantidade: quantidade,
-              preco: preco,
-              conta_corrente: conta_corrente,
-              item_pedido: itemPedido,
-              numero_pedido: numero_pedido,
-              vendedor_item: vendedor_item,
-              dados_adicionais_item: dados_adicionais_item,
-              obs: obs,
-              //cfop: cfop,
-              'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-              // Sucesso
-              let message = "Item adicionado com sucesso!";
-
-              resetForm();
-              atualizarTabela({{ order.pk }});
-              let alertElement = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  ${message}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-
-              $('#alertsPage').append(alertElement);
-            },
-            error: function(response) {
-              // Erro
-              let erro = response.responseJSON.error;
-              let alertElement = `
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                  ${erro}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-
-              $('#alertsModal').append(alertElement);
-              //alert(`Erro ao adicionar item: ${erro}`);
-            }
-        });
+    },
+    error: function(response) {
+      // Erro
+      //alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
+      console.log('Erro ao atualizar: ', response);
     }
-  }
+  });
+}
 
-    // Atualiza a tabela de itens do pedido
-    const atualizarTabela = (orderID) => {
+/*
+Valida os campos do formulário de adição de produtos
+:= fieldId, ID do campo a ser validado
+:= value, valor do campo a ser validado
+*/
+const validateField = (fieldId, value) => {
+  const element = $(`#id_${fieldId}`);
+  element.toggleClass('is-invalid', !value);
+  if (!value) isValid = false;
+};
+
+
+// Salva produtos no pedido atual
+function adicionar_produto() {
+
+  const getVal = id => $(`#id_${id}`).val() || '';
+
+  // Pega os valores dos campos
+  const produto = productSelect;
+  const cnpj_faturamento = getVal('cnpj_faturamento');
+  const condicao_preco = condicao;
+  const prazo = getVal('prazo');
+  const quantidade = getVal('quantidade');
+  const preco = getVal('preco');
+  const conta_corrente = getVal('conta_corrente');
+  const itemPedido = getVal('item_pedido');
+  const numero_pedido = getVal('numero_pedido');
+  const vendedor_item = getVal('vendedor_item');
+  const dados_adicionais_item = getVal('dados_adicionais_item');
+  const obs = getVal('obs');
+  //const cfop = getVal('cfop');
+
+  // Variável para controlar se o formulário é válido
+  let isValid = true;
+
+  const validateField = (fieldId, value) => {
+    const element = $(`#id_${fieldId}`);
+    element.toggleClass('is-invalid', !value);
+    if (!value) isValid = false;
+  };
+
+  validateField('produto', produto);
+  validateField('cnpj_faturamento', cnpj_faturamento);
+  validateField('condicao_calculo', condicao_preco);
+  validateField('prazo', prazo);
+  validateField('quantidade', quantidade);
+  validateField('preco', preco);
+  validateField('conta_corrente', conta_corrente);
+  validateField('item_pedido', itemPedido);
+
+  // Se o formulário for válido, envie os dados via AJAX
+  if (isValid) {
+      // Aqui você pode fazer a chamada AJAX para enviar o formulário
       $.ajax({
-        url: `/get_itens_pedido/${orderID}/`,
-        method: 'GET',
-        success: function(response) {
-          // Sucesso
-          $('#dinamic-table').html(response.html);
-
-        },
-        error: function(response) {
-          // Erro
-          //alert(`Não foi possível atualizar a tabela de itens: ${response.error}`)
-          console.log('Erro ao atualizar: ', response);
-        }
-      });
-    }
-
-    const validateField = (fieldId, value) => {
-      const element = $(`#id_${fieldId}`);
-      element.toggleClass('is-invalid', !value);
-      if (!value) isValid = false;
-    };
-
-
-
-  $(document).ready(function() {
-    $('#orderForm :input').prop('disabled', true);
-
-    // 1º Modal
-    $('#selectCategoryOrder').click(function(e) {
-      e.preventDefault();
-      categoriaSelect = $("#id_categoriaSelect").val();
-      isValid = true;
-
-      validateField('categoriaSelect', categoriaSelect);
-
-      if(isValid) {
-        $.ajax({
-          url: "{% url 'product_filter_category' %}",
-          method: "GET",
+          url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
+          method: 'POST',
           data: {
-            category_id: categoriaSelect
-          },
-          success: function(data){
-            const $productSelect = $("#id_productSelect");
-            $("#id_categoriaSelect").removeClass('is-invalid');
-            $("#id_categoriaSelect").val('');
-            $('#categoryOrderModal').modal('hide');
-            $('#productOrderModal').modal('show');
-            $productSelect.empty();
-
-            $.each(data.products, function(index, product){
-              $productSelect.append(
-                $('<option>', {
-                  value: product.id,
-                  text: product.nome_produto
-                })
-              );
-            });
-          },
-          error: function(xmr, status,error){
-            console.error('Erro ao carregar produtos', error);
-          }
-        });
-
-      }else{
-        alert('Selecione uma categoria!');
-      }
-    });
-
-    // 2º Modal
-    $('#selectProductOrder').click(function(e) {
-      e.preventDefault();
-      productSelect = $("#id_productSelect").val();
-      nome_produto = $("#id_productSelect option:selected").text();
-      condicao = $("#id_condicaoSelect").val();
-      isValid = true;
-
-      validateField('productSelect', productSelect);
-      validateField('condicaoSelect', condicao);
-      if(!isValid) {
-        e.preventDefault();
-      }else{
-        $("#nome_produto").html(nome_produto);
-        $('#productOrderModal').modal('hide');
-        $('#staticBackdrop').modal('show');
-      }
-    });
-
-    atualizarTabela({{ order.pk }})
-
-    // Valores iniciais, usado para verificar o que foi alterado no formulário
-    var initialValues = {};
-
-    // Ao clicar no botão Editar
-    $('#editButton').click(function(e) {
-      e.preventDefault(); // Previne o comportamento padrão do botão
-
-      // Salva os valores iniciais dos campos do formulário
-      $('form :input').each(function(){
-        const input = $(this);
-        initialValues[input.attr('name')] = input.val();
-
-      });
-
-      // Habilita os campos do formulário
-      $('form :input').prop('disabled', false);
-
-      // Esconde o botão Editar
-      $('#edit').hide();
-
-      // Insere o botão Salvar no mesmo lugar
-      var saveButton = `
-        <div class='row float-end' id="saveButton">
-          <div class="col-md-12" style="margin-top: 10px;">
-            <div class="form-inline buttons">
-              <button class="btn btn-primary btn-lg" value="Save">
-                <i class="bi bi-floppy-o"></i>
-                Salvar
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      $('#edit').after(saveButton); // Insere o botão Salvar
-    });
-
-    // Atualiza os dados ao clicar em `Salvar`
-    $(document).on('click', '#saveButton button', function(e){
-      e.preventDefault()
-
-      var modifiedData = {};
-
-      // Verifica cada campo e compara com o valor inicial
-      $('form :input').each(function(){
-        const input = $(this);
-        const name = input.attr('name');
-        const currentValue = input.val();
-
-        if (initialValues[name] !== currentValue) {
-          modifiedData[name] = currentValue;
-        }
-      });
-
-      // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
-      if(Object.keys(modifiedData).length > 0){
-
-        $.ajax({
-          type: 'POST',
-          url: "{% url 'edit_order' order.pk %}",
-          data: {
-            ...modifiedData,
-            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            produto: produto,
+            cnpj_faturamento: cnpj_faturamento,
+            condicao_preco: condicao_preco,
+            prazo: prazo,
+            quantidade: quantidade,
+            preco: preco,
+            conta_corrente: conta_corrente,
+            item_pedido: itemPedido,
+            numero_pedido: numero_pedido,
+            vendedor_item: vendedor_item,
+            dados_adicionais_item: dados_adicionais_item,
+            obs: obs,
+            //cfop: cfop,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
           },
           success: function(response) {
-              // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
-              let message = "Campos alterados com sucesso."
+            // Sucesso
+            let message = "Item adicionado com sucesso!";
 
-              let alertElement = `
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                  ${message}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-              $('#alertsOrder').append(alertElement);
+            resetForm();
+            atualizarTabela({{ order.pk }});
+            let alertElement = `
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>`;
 
-              // Desabilita novamente os campos após salvar
-              $('form :input').prop('disabled', true);
-
-              // Esconder o botão Salvar e mostrar o botão Editar novamente
-              $('#saveButton').remove();
-              $('#edit').show();
-              setTimeout( () => location.reload(), 1000);
-
+            $('#alertsPage').append(alertElement);
           },
-          error: function(xhr, status, error) {
-              // Exibe mensagem de erro caso a requisição falhe
-              console.log(`Erro: ${status}: ${error}`);
-              alert("Ocorreu um erro ao salvar o pedido.");
+          error: function(response) {
+            // Erro
+            let erro = response.responseJSON.error;
+            let alertElement = `
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ${erro}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>`;
+
+            $('#alertsModal').append(alertElement);
+            //alert(`Erro ao adicionar item: ${erro}`);
           }
-        });
+      });
+  }
+}
 
-      }else{
-        let message = "Nenhum campo alterado, nada salvo..."
+/*
+  Chamada ao clicar no botão `Salvar` no modal de adição de produtos
+*/
+function atualizar_produto() {
+  const itemForm = $("#itemForm");
+  const itemId = itemForm.data("item-id"); // Supõe que você armazene o ID do item no formulário
 
-        let alertElement = `
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>`;
-        $('#alertsPage').append(alertElement);
-        $('#saveButton').remove();
-        $('#edit').show();
+  $.ajax({
+      url: `/update_product_from_order/${itemId}/editar`, // URL da view
+      type: "POST",
+      data: itemForm.serialize(), // Serializa os dados do formulário
+      headers: {
+          "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(), // CSRF token
+      },
+      success: function (response) {
+          // Exibe mensagem de sucesso
+          $("#alertsPage").html(
+              `<div class="alert alert-success">${response.message}</div>`
+          );
+          console.log("Dados atualizados:", response.data);
+          $("#editItemModal").modal("hide"); // Fecha o modal
+      },
+      error: function (xhr) {
+          // Exibe os erros retornados
+          const errors = xhr.responseJSON.errors;
+          let errorHtml = "<ul>";
+          for (const [field, messages] of Object.entries(errors)) {
+              errorHtml += `<li>${field}: ${messages.join(", ")}</li>`;
+          }
+          errorHtml += "</ul>";
+
+          $("#alertsModal").html(
+              `<div class="alert alert-danger">${xhr.responseJSON.message}<br>${errorHtml}</div>`
+          );
+      },
+  });
+}
+
+
+/*
+  Funções iniciadas ao carregar a página
+*/
+$(document).ready(function() {
+
+  // Remove os dados de um formulário ao clicar no botão `X` do modal
+  $('.btn-close').on('click', function(){
+    resetForm();
+  });
+
+  // Desabilita todos os campos do formulário
+  $('#orderForm :input').prop('disabled', true);
+
+  // Executa requisição AJAX para filtrar os produtos por categoria
+  $('#selectCategoryOrder').click(function(e) {
+    e.preventDefault();
+    categoriaSelect = $("#id_categoriaSelect").val();
+    isValid = true;
+
+    validateField('categoriaSelect', categoriaSelect);
+
+    if(isValid) {
+      $.ajax({
+        url: "{% url 'product_filter_category' %}",
+        method: "GET",
+        data: {
+          category_id: categoriaSelect
+        },
+        success: function(data){
+          const $productSelect = $("#id_productSelect");
+          $("#id_categoriaSelect").removeClass('is-invalid');
+          $("#id_categoriaSelect").val('');
+          $('#categoryOrderModal').modal('hide');
+          $('#productOrderModal').modal('show');
+          $productSelect.empty();
+
+          $.each(data.products, function(index, product){
+            $productSelect.append(
+              $('<option>', {
+                value: product.id,
+                text: product.nome_produto
+              })
+            );
+          });
+        },
+        error: function(xmr, status,error){
+          console.error('Erro ao carregar produtos', error);
+        }
+      });
+
+    }else{
+      alert('Selecione uma categoria!');
+    }
+  });
+
+  // Executa requisição AJAX para Selecionar qual produto será adicionado
+  $('#selectProductOrder').click(function(e) {
+    e.preventDefault();
+    productSelect = $("#id_productSelect").val();
+    nome_produto = $("#id_productSelect option:selected").text();
+    condicao = $("#id_condicaoSelect").val();
+    isValid = true;
+
+    validateField('productSelect', productSelect);
+    validateField('condicaoSelect', condicao);
+    if(!isValid) {
+      e.preventDefault();
+    }else{
+      $("#nome_produto").html(nome_produto);
+      $('#productOrderModal').modal('hide');
+      $('#staticBackdrop').modal('show');
+    }
+  });
+
+
+  atualizarTabela({{ order.pk }})
+
+
+  /*
+    Função executada ao clicar no botão `Editar`
+  */
+  var initialValues = {};
+  $('#editButton').click(function(e) {
+    e.preventDefault(); // Previne o comportamento padrão do botão
+
+    // Salva os valores iniciais dos campos do formulário
+    $('form :input').each(function(){
+      const input = $(this);
+      initialValues[input.attr('name')] = input.val();
+
+    });
+
+    // Habilita os campos do formulário
+    $('form :input').prop('disabled', false);
+
+    // Esconde o botão Editar
+    $('#edit').hide();
+
+    // Insere o botão Salvar no mesmo lugar
+    var saveButton = `
+      <div class='row float-end' id="saveButton">
+        <div class="col-md-12" style="margin-top: 10px;">
+          <div class="form-inline buttons">
+            <button class="btn btn-primary btn-lg" value="Save">
+              <i class="bi bi-floppy-o"></i>
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    $('#edit').after(saveButton); // Insere o botão Salvar
+  });
+
+   // Atualiza os dados do Pedido ao clicar em `Salvar`
+  $(document).on('click', '#saveButton button', function(e){
+    e.preventDefault()
+
+    var modifiedData = {};
+
+    // Verifica cada campo e compara com o valor inicial
+    $('form :input').each(function(){
+      const input = $(this);
+      const name = input.attr('name');
+      const currentValue = input.val();
+
+      if (initialValues[name] !== currentValue) {
+        modifiedData[name] = currentValue;
       }
+    });
+
+    // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
+    if(Object.keys(modifiedData).length > 0){
+
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'edit_order' order.pk %}",
+        data: {
+          ...modifiedData,
+          'csrfmiddlewaretoken': '{{ csrf_token }}',
+        },
+        success: function(response) {
+            // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
+            let message = "Campos alterados com sucesso."
+
+            let alertElement = `
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>`;
+            $('#alertsOrder').append(alertElement);
+
+            // Desabilita novamente os campos após salvar
+            $('form :input').prop('disabled', true);
+
+            // Esconder o botão Salvar e mostrar o botão Editar novamente
+            $('#saveButton').remove();
+            $('#edit').show();
+            setTimeout( () => location.reload(), 1000);
+
+        },
+        error: function(xhr, status, error) {
+            // Exibe mensagem de erro caso a requisição falhe
+            console.log(`Erro: ${status}: ${error}`);
+            alert("Ocorreu um erro ao salvar o pedido.");
+        }
+      });
+
+    }else{
+      let message = "Nenhum campo alterado, nada salvo..."
+
+      let alertElement = `
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+      $('#alertsPage').append(alertElement);
+      $('#saveButton').remove();
+      $('#edit').show();
+    }
   });
 
   // Botão de apagar item da lista de items
@@ -519,12 +614,77 @@
           alert(`Erro: ${xhr.responseJSON.ERRO || status}`);
       }
     });
-
   });
 
-  $('.btn-close').on('click', function(){
-    resetForm();
+  // Botão de editar produto da lista de items
+  $(document).on('click', '#btn-edit-product', function(e){
+    const itemID = $(this).data('id');
+    const updateURL = "{% url 'get_item_data' 0 %}".replace("0", itemID);
+
+    $.ajax({
+      type: 'GET',
+      url: updateURL,
+      success: function(response) {
+
+        if(response.success){
+          // Atualiza o título do modal com o nome do produto
+          const nome_produto = response.data.nome_produto;
+          const cnpj = response.data.cnpj_faturamento;
+          const prazo = response.data.prazo;
+          const conta_corrente = response.data.conta_corrente;
+          const vendedor = response.data.vendedor;
+
+          // Atualiza o título do modal com o nome do produto
+          document.querySelector('#staticBackdropLabel strong #nome_produto').textContent = nome_produto;
+
+          // Preenche os campos do modal com os dados retornados
+          selectOptionByText('#id_cnpj_faturamento', cnpj);
+          selectOptionByText('#id_prazo', prazo);
+          selectOptionByText('#id_conta_corrente', conta_corrente);
+          selectOptionByText('#id_vendedor_item', vendedor);
+
+          $("#id_quantidade").val(response.data.quantidade);
+          $("#id_preco").val(response.data.preco);
+          $("#id_item_pedido").val(response.data.item_pedido);
+          $("#id_numero_pedido").val(response.data.numero_pedido);
+          $("#id_dados_adicionais_item").val(response.data.dados_adicionais_item);
+          $("#id_obs").val(response.data.obs);
+
+          /*
+          Altera o button `Adicionar` para `Editar`
+          */
+          // Seleciona elemento pai
+          const modalFooter = document.getElementById('modal-footer-add-items');
+
+          // Cria o botão novo `Salvar`
+          const newButton = document.createElement('button');
+          newButton.type = 'button';
+          newButton.id = 'btn-editar';
+          newButton.className = 'btn btn-primary';
+          newButton.textContent = 'Salvar';
+          newButton.setAttribute('onclick', 'atualizar_produto()');
+
+          // Seleciona o botão que será substituído
+          const oldButton = document.querySelector('#submitBtn');
+
+          // Substitui o botão
+          if(oldButton){
+            modalFooter.replaceChild(newButton, oldButton);
+          }else{
+            console.error('BOtão a ser substituído não encontrado!');
+          }
+
+          // Abre o modal
+          $('#staticBackdrop').modal('show');
+        }
+
+      },
+      error: function(xhr, status, error) {
+          alert(`Erro: ${xhr.responseJSON.ERRO || status}`);
+      }
+    });
   });
+
 
   $("#sendOMIEButton").click(function(){
     $('#loading').show();
@@ -557,7 +717,6 @@
       $('#overlay').hide();
     });
   });
-
 });
 
 

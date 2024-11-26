@@ -3,6 +3,11 @@ from core.models import Base
 from accounts.models import CustomUsuario
 from products.models import Product
 
+STATUS = (
+    ('A', 'Aberto'),
+    ('F', 'Faturado'),
+    ('AF', 'Aguardando Faturamento'),
+)
 
 CONDICAO_PRECO = (
     ('Normal', 'Normal'),
@@ -78,10 +83,13 @@ class InflowsItems(Base):
 
 
 class Outflows(Base):
-    numero_pedido = models.CharField(verbose_name='N° Pedido', max_length=100, null=True, blank=True)
+    num_pedido_omie = models.CharField(verbose_name='N° Pedido no OMIE', max_length=100, null=True, blank=True)
+    num_pedido_omie_secundario = models.CharField(verbose_name='N° Pedido Secundário', max_length=100, null=True, blank=True)
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
     cod_pedido_omie = models.CharField(max_length=100, null=True, blank=True)
-    pedido_interno_cliente = models.CharField(max_length=100, null=True, blank=True)
+    cod_pedido_omie_secundario = models.CharField(max_length=100, null=True, blank=True)
+    pedido_interno_cliente = models.CharField(verbose_name='N ° Interno cliente', max_length=100, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS, null=True, blank=True)
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
     nf_saida = models.CharField('NF Saída', null=True, blank=True, max_length=44)
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas', null=True, blank=True)

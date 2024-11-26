@@ -470,5 +470,47 @@ def remove_product_from_order(request, order_id):
             return JsonResponse({'ERRO:': str(e)}, status=500)
 
 
-class PedidosDetailView(DetailView):
-    ...
+def get_item_data(request, item_id):
+    if request.method == 'GET':
+        try:
+            item = get_object_or_404(OutflowsItems, pk=item_id)
+
+            data = {
+                "quantidade": item.quantidade,
+                "preco": item.preco,
+                "cnpj_faturamento": item.cnpj_faturamento.sigla,
+                "prazo": item.prazo.descricao,
+                "conta_corrente": item.conta_corrente.descricao,
+                "item_pedido": item.item_pedido,
+                "numero_pedido": item.numero_pedido,
+                "vendedor_item": item.vendedor_item.nome,
+                "dados_adicionais_item": item.dados_adicionais_item,
+                "obs": item.obs,
+                "nome_produto": item.produto.nome_produto,
+                "vendedor" : item.vendedor_item.nome
+            }
+
+            print(data)
+
+            return JsonResponse({
+                "success": True,
+                "action": "update",
+                "data": data,
+            }, status=200)
+        except Exception as e:
+            print(f'Erro ao obter dados do item {item_id}: {e}')
+            return JsonResponse({
+                "success": False,
+                "error": str(e),
+            }, status=500)
+    else:
+        return JsonResponse({
+            "success": False,
+            "error": "Método não permitido!",
+        }, status=405)
+
+
+
+def update_product_from_order(request, item_id):
+    pass
+

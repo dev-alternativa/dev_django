@@ -60,7 +60,8 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>No OMIE</th>
+                                            <th>No Pedido OMIE</th>
+                                            <th>No OMIE Secundário</th>
                                             <th>Tipo de Saída</th>
                                             <th>Pedido Interno</th>
                                             <th>Nome Cliente</th>
@@ -75,7 +76,8 @@
                                         {% for pedido in pedidos %}
                                             <tr>
                                                 <td>{{ pedido.id }}</td>
-                                                <td>{{ pedido.numero_pedido|default_if_none:'-' }}</td>
+                                                <td>{{ pedido.num_pedido_omie|default_if_none:'-' }}</td>
+                                                <td>{{ pedido.num_pedido_omie_secundario|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.get_tipo_saida_display }}</td>
                                                 <td>{{ pedido.pedido_interno_cliente|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.cliente  }}</td>
