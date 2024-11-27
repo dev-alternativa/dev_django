@@ -490,7 +490,7 @@ def get_item_data(request, item_id):
                 "vendedor" : item.vendedor_item.nome
             }
 
-            print(data)
+            # print(data)
 
             return JsonResponse({
                 "success": True,
@@ -510,7 +510,64 @@ def get_item_data(request, item_id):
         }, status=405)
 
 
-
 def update_product_from_order(request, item_id):
-    pass
+    if request.method == 'POST':
 
+        try:
+
+            item = get_object_or_404(OutflowsItems, pk=item_id)
+
+            quantidade = request.POST.get('quantidade')
+            preco = request.POST.get('preco')
+            item_pedido = request.POST.get('item_pedido')
+            numero_pedido_id = request.POST.get('numero_pedido')
+            dados_adicionais_item = request.POST.get('dados_adicionais_item')
+            obs = request.POST.get('obs')
+
+            if quantidade:
+                item.quantidade = quantidade
+            if preco:
+                item.preco = preco
+            if item_pedido:
+                item.item_pedido = item_pedido
+            if item.dados_adicionais_item:
+                item.dados_adicionais_item = dados_adicionais_item
+            if numero_pedido_id:
+                item.numero_pedido_id = numero_pedido_id
+            if obs:
+                item.obs = obs
+
+            # Foreign Keys
+            prazo = request.POST.get('prazo')
+            cnpj_faturamento_id = request.POST.get('cnpj_faturamento')
+            conta_corrente_id = request.POST.get('conta_corrente')
+            vendedor_item_id = request.POST.get('vendedor_item')
+
+            if prazo:
+                item.prazo = get_object_or_404(LeadTime, pk=prazo)
+            if cnpj_faturamento_id:
+                item.cnpj_faturamento = get_object_or_404(CNPJFaturamento, pk=cnpj_faturamento_id)
+            if conta_corrente_id:
+                item.conta_corrente = get_object_or_404(ContaCorrente, pk=conta_corrente_id)
+            if vendedor_item_id:
+                item.vendedor_item = get_object_or_404(Seller, pk=vendedor_item_id)
+
+            item.save()
+
+            return JsonResponse({
+                "success": True,
+                "message": "Dados atualizados com sucesso",
+                "item_id": item.id,
+            }, status=200)
+
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "error": 'Houve um erro ao tentar atualizar os dados {e}',
+            }, status=500)
+
+    else:
+        return JsonResponse({
+            "success": False,
+            "error": "Método não permitido!",
+        }, status=405)

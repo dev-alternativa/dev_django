@@ -23,7 +23,7 @@ urlpatterns = [
     path('get-category/', get_category_view, name="get_categories"),
     path('product_filter_category/', views.filter_products, name="product_filter_category"),
     path('pedidos/<int:item_id>/', views.get_item_data, name='get_item_data'),
-    path('pedidos/<int:item_id>/editar/', views.editar_produto, name='update_product_from_order'),
+    path('pedidos/<int:item_id>/editar/', views.update_product_from_order, name='update_product_from_order'),
 
     # Pedidos
     path('pedidos/', views.OrderListView.as_view(), name='order_list'),

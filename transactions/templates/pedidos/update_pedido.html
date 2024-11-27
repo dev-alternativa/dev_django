@@ -147,7 +147,7 @@
 {% include "pedidos/_modal_item_pedido.html" %}
 
 <!-- Modal edição de produto -->
-{% include "pedidos/_modal_editar_item.html" %}
+{% comment %} {% include "pedidos/_modal_editar_item.html" %} {% endcomment %}
 
 
     <!-- Botão de salvar -->
@@ -368,38 +368,49 @@ function adicionar_produto() {
   Chamada ao clicar no botão `Salvar` no modal de adição de produtos
 */
 function atualizar_produto() {
-  const itemForm = $("#itemForm");
-  const itemId = itemForm.data("item-id"); // Supõe que você armazene o ID do item no formulário
 
-  $.ajax({
-      url: `/update_product_from_order/${itemId}/editar`, // URL da view
-      type: "POST",
-      data: itemForm.serialize(), // Serializa os dados do formulário
-      headers: {
-          "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(), // CSRF token
-      },
-      success: function (response) {
-          // Exibe mensagem de sucesso
-          $("#alertsPage").html(
-              `<div class="alert alert-success">${response.message}</div>`
-          );
-          console.log("Dados atualizados:", response.data);
-          $("#editItemModal").modal("hide"); // Fecha o modal
-      },
-      error: function (xhr) {
-          // Exibe os erros retornados
-          const errors = xhr.responseJSON.errors;
-          let errorHtml = "<ul>";
-          for (const [field, messages] of Object.entries(errors)) {
-              errorHtml += `<li>${field}: ${messages.join(", ")}</li>`;
-          }
-          errorHtml += "</ul>";
+  const titleTextModal = $("#staticBackdropLabel").text();
+  const match = titleTextModal.match(/#(\d+)/);
+  if (match) {
+    const itemId = match[1];
+    const itemForm = $("#itemForm");
+    $.ajax({
+        url: `/pedidos/${itemId}/editar/`, // URL da view
+        type: "POST",
+        data: itemForm.serialize(), // Serializa os dados do formulário
+        headers: {
+            "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(), // CSRF token
+        },
+        success: function (response) {
+            // Exibe mensagem de sucesso
+            let message = "Item atualizado com sucesso!";
+            $("#alertsPage").html(
+              `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>`
+            );
+            console.log("Dados atualizados:", response.data);
+            $("#editItemModal").modal("hide"); // Fecha o modal
+            location.reload();
+        },
+        error: function (xhr) {
+            // Exibe os erros retornados
+            const errors = xhr.responseJSON.errors;
+            let errorHtml = "<ul>";
+            for (const [field, messages] of Object.entries(errors)) {
+                errorHtml += `<li>${field}: ${messages.join(", ")}</li>`;
+            }
+            errorHtml += "</ul>";
 
-          $("#alertsModal").html(
-              `<div class="alert alert-danger">${xhr.responseJSON.message}<br>${errorHtml}</div>`
-          );
-      },
-  });
+            $("#alertsModal").html(
+                `<div class="alert alert-danger">${xhr.responseJSON.message}<br>${errorHtml}</div>`
+            );
+        },
+    });
+  }
+/*
+  */
 }
 
 
@@ -635,7 +646,10 @@ $(document).ready(function() {
           const vendedor = response.data.vendedor;
 
           // Atualiza o título do modal com o nome do produto
-          document.querySelector('#staticBackdropLabel strong #nome_produto').textContent = nome_produto;
+          $('#staticBackdropLabel').contents().first().replaceWith(`Editar Produto - #${itemID}: `);
+
+          $('#nome_produto').text(nome_produto);
+
 
           // Preenche os campos do modal com os dados retornados
           selectOptionByText('#id_cnpj_faturamento', cnpj);
@@ -670,8 +684,6 @@ $(document).ready(function() {
           // Substitui o botão
           if(oldButton){
             modalFooter.replaceChild(newButton, oldButton);
-          }else{
-            console.error('BOtão a ser substituído não encontrado!');
           }
 
           // Abre o modal
