@@ -131,11 +131,14 @@
     </form>
   </div>
 
-    <!-- Botão de adicionar item -->
-    <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#categoryOrderModal" >
-      <i class="bi bi-plus-lg"></i>
-      Adicionar Item
-    </a>
+
+    {% if not order.cod_pedido_omie %}
+      <!-- Botão de adicionar item -->
+      <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#categoryOrderModal" >
+        <i class="bi bi-plus-lg"></i>
+        Adicionar Item
+      </a>
+    {% endif %}
 
     <!-- Modal de Categorias -->
 {% include "pedidos/_modal_categoria_pedido.html" %}
@@ -145,9 +148,6 @@
 
 <!-- Modal de adição de produtos -->
 {% include "pedidos/_modal_item_pedido.html" %}
-
-<!-- Modal edição de produto -->
-{% comment %} {% include "pedidos/_modal_editar_item.html" %} {% endcomment %}
 
 
     <!-- Botão de salvar -->
@@ -206,7 +206,7 @@
 /* ######################################################## SCRIPTS ########################################################### */
 
 // Variáveis globais
-let categoriaSelect, productSelect, condicao, isValid;
+let categoriaSelect, productSelect, condicao, isValid, listaCategoriasMetragem = [3, 4];
 
 /**
 * Seleciona uma opção de um <select> com base no texto da opção
@@ -288,7 +288,7 @@ function adicionar_produto() {
   const preco = getVal('preco');
   const conta_corrente = getVal('conta_corrente');
   const itemPedido = getVal('item_pedido');
-  const numero_pedido = getVal('numero_pedido');
+  const num_pedido_omie = getVal('num_pedido_omie');
   const vendedor_item = getVal('vendedor_item');
   const dados_adicionais_item = getVal('dados_adicionais_item');
   const obs = getVal('obs');
@@ -327,7 +327,7 @@ function adicionar_produto() {
             preco: preco,
             conta_corrente: conta_corrente,
             item_pedido: itemPedido,
-            numero_pedido: numero_pedido,
+            num_pedido_omie: num_pedido_omie,
             vendedor_item: vendedor_item,
             dados_adicionais_item: dados_adicionais_item,
             obs: obs,
@@ -419,6 +419,22 @@ function atualizar_produto() {
 */
 $(document).ready(function() {
 
+  // Calcula metragem no modal de adição de produtos SuperLam
+  const largura = $('#id_largura');
+    const comprimento = $('#id_comprimento');
+    const metragem = $('#id_m2');
+
+    comprimento.on('change', function(){
+        if(comprimento.val() > 0){
+            if(largura.val() > 0){
+                area_metragem = comprimento.val() * largura.val();
+                console.log(area_metragem);
+                metragem.val(area_metragem);
+            }
+        }
+    });
+
+
   // Remove os dados de um formulário ao clicar no botão `X` do modal
   $('.btn-close').on('click', function(){
     resetForm();
@@ -469,7 +485,7 @@ $(document).ready(function() {
     }
   });
 
-  // Executa requisição AJAX para Selecionar qual produto será adicionado
+  // Selecionar qual produto será adicionado com base no filtro anterior de Categorias
   $('#selectProductOrder').click(function(e) {
     e.preventDefault();
     productSelect = $("#id_productSelect").val();
@@ -482,15 +498,24 @@ $(document).ready(function() {
     if(!isValid) {
       e.preventDefault();
     }else{
-      $("#nome_produto").html(nome_produto);
       $('#productOrderModal').modal('hide');
+      $("#nome_produto").html(nome_produto);
+
+      // Verifica se largura/comprimento/Metragem devem ser exibidos
+      if(listaCategoriasMetragem.includes(+categoriaSelect)){
+        $('.metric_field').prop('hidden', false);
+      }else{
+        $('.metric_field').prop('hidden', true);
+      }
+      resetForm();
+      $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);
       $('#staticBackdrop').modal('show');
+
+
     }
   });
 
-
   atualizarTabela({{ order.pk }})
-
 
   /*
     Função executada ao clicar no botão `Editar`
@@ -545,6 +570,7 @@ $(document).ready(function() {
         modifiedData[name] = currentValue;
       }
     });
+
 
     // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
     if(Object.keys(modifiedData).length > 0){

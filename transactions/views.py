@@ -263,7 +263,14 @@ class OrderEditDetailsView(UpdateView):
         num_itens_existentes = order.saida_items.count()
         next_item_index = num_itens_existentes + 1
         # Define o próximo índice do item
-        item_form = OrderItemsForm(initial={'item_pedido': next_item_index})
+        item_form = OrderItemsForm(
+            initial=
+                {
+                    'item_pedido': next_item_index,
+                    'numero_pedido': order.pedido_interno_cliente,
+                    'vendedor_item': order.vendedor,
+                }
+            )
         context['item_form'] = item_form
         context['categories'] = Category.objects.all()
 
@@ -407,15 +414,17 @@ def get_itens_pedido(request, order_id):
 
 def edit_pedido(request, order_id):
     if request.method == 'POST':
+
         try:
             order = get_object_or_404(Outflows, pk=order_id)
             dados_modificados = request.POST
+
             if 'cliente' in dados_modificados:
                 cliente_id = dados_modificados.get('cliente')
                 cliente = get_object_or_404(CustomerSupplier, id=cliente_id)
                 order.cliente = cliente
-            if 'numero_pedido' in dados_modificados:
-                order.numero_pedido = dados_modificados.get('numero_pedido')
+            if 'num_pedido_omie' in dados_modificados:
+                order.num_pedido_omie = dados_modificados.get('num_pedido_omie')
             if 'dolar_ptax' in dados_modificados:
                 order.dolar_ptax = float(dados_modificados.get('dolar_ptax'))
             if 'desconto' in dados_modificados:
@@ -520,7 +529,7 @@ def update_product_from_order(request, item_id):
             quantidade = request.POST.get('quantidade')
             preco = request.POST.get('preco')
             item_pedido = request.POST.get('item_pedido')
-            numero_pedido_id = request.POST.get('numero_pedido')
+            numero_pedido = request.POST.get('numero_pedido')
             dados_adicionais_item = request.POST.get('dados_adicionais_item')
             obs = request.POST.get('obs')
 
@@ -532,8 +541,8 @@ def update_product_from_order(request, item_id):
                 item.item_pedido = item_pedido
             if item.dados_adicionais_item:
                 item.dados_adicionais_item = dados_adicionais_item
-            if numero_pedido_id:
-                item.numero_pedido_id = numero_pedido_id
+            if numero_pedido:
+                item.numero_pedido = numero_pedido
             if obs:
                 item.obs = obs
 
