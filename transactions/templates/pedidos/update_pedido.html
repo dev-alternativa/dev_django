@@ -131,10 +131,9 @@
     </form>
   </div>
 
-
     {% if not order.cod_pedido_omie %}
       <!-- Botão de adicionar item -->
-      <a class="btn btn-secondary btn-lg" id="add-item" data-bs-toggle="modal" data-bs-target="#categoryOrderModal" >
+      <a class="btn btn-secondary btn-lg" id="add-item">
         <i class="bi bi-plus-lg"></i>
         Adicionar Item
       </a>
@@ -207,6 +206,7 @@
 
 // Variáveis globais
 let categoriaSelect, productSelect, condicao, isValid, listaCategoriasMetragem = [3, 4];
+const maxItems = 2 ;
 
 /**
 * Seleciona uma opção de um <select> com base no texto da opção
@@ -232,7 +232,6 @@ function selectOptionByText(selectId, optionText){
     console.error(`Opção com texto ${optionText} não encontrada no select com id ${selectId}`);
   }
 }
-
 
 // Reinicia o formulário de adição de produtos
 const resetForm = () => {
@@ -413,11 +412,33 @@ function atualizar_produto() {
   */
 }
 
-
 /*
   Funções iniciadas ao carregar a página
 */
 $(document).ready(function() {
+
+  // Impede a adição de mais de 2 itens na mesma ordem de pedido
+  $('#add-item').on('click', function(){
+    const lista_items = $('#tbody-items');
+    const qtd_items = lista_items.children().length;
+    const categoryModal = new bootstrap.Modal('#categoryOrderModal');
+
+    // Desabilita o botão `Adicionar Item` caso a quantidade de items já cadastrados seja igual a que 2
+    if(qtd_items == 2){
+      $(this).addClass('disabled');
+      let erro = "Não é possível adicionar mais de 2 itens na mesma ordem.";
+      let alertElement = `
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        ${erro}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>`;
+      $('#alertsPage').append(alertElement);
+    }else{
+      categoryModal.show();
+      $(this).removeClass('disabled');
+    }
+  });
+
 
   // Calcula metragem no modal de adição de produtos SuperLam
   const largura = $('#id_largura');

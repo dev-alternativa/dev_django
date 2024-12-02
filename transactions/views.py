@@ -345,6 +345,14 @@ def adicionar_produto(request, order_id):
             prazo = LeadTime.objects.get(pk=data["prazo"])
             conta_corrente = ContaCorrente.objects.get(pk=data["conta_corrente"])
 
+            # Limita a quantidade de produtos que podem ser adicionados em apenas 2
+            quantidade_items_pedido = OutflowsItems.objects.filter(saida=order_id).count()
+            if quantidade_items_pedido > 2:
+                return JsonResponse(
+                    {'error': 'Não é possível adicionar mais de 2 itens na mesma ordem.'},
+                    status=400
+                )
+
             itens_estoque = Inventory.objects.filter(
                 entrada_items__produto=product,
                 status='ESTOQUE',
