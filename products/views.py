@@ -49,7 +49,6 @@ class InventoryListView(ListView):
         context['form'] = self.form_class()
         return context
 
-
     def get_queryset(self):
         queryset = Inventory.objects.all()
         filtro_aplicado = False
@@ -65,7 +64,7 @@ class InventoryListView(ListView):
         filter_situacao = self.request.GET.get('est_situacao')
         filter_status = self.request.GET.get('est_status')
         filter_motivo = self.request.GET.get('est_tipo_perda')
-        filter_baixa = self.request.GET.get('est_baixa')
+        # filter_baixa = self.request.GET.get('est_baixa')
         filter_pedido_cliente = self.request.GET.get('est_pedido_cliente')
         filter_nf_entrada = self.request.GET.get('est_nf_entrada')
         filter_nf_saida = self.request.GET.get('est_nf_saida')
@@ -75,63 +74,63 @@ class InventoryListView(ListView):
         # Aplica filtros conforme os campos preenchidos
         if filter_pedido_cliente:
             print(filter_pedido_cliente)
-            queryset = queryset.filter(saida_items__saida__id = filter_pedido_cliente)
+            queryset = queryset.filter(saida_items__saida__id=filter_pedido_cliente)
             print(queryset)
             filtro_aplicado = True
 
         if filter_produto:
-            queryset = queryset.filter(entrada_items__produto = filter_produto)
+            queryset = queryset.filter(entrada_items__produto=filter_produto)
             filtro_aplicado = True
 
         if filter_id:
-            queryset = queryset.filter(id = filter_id)
+            queryset = queryset.filter(id=filter_id)
             filtro_aplicado = True
 
         if filter_largura:
-            queryset = queryset.filter(entrada_items__produto__largura = filter_largura)
+            queryset = queryset.filter(entrada_items__produto__largura=filter_largura)
             filtro_aplicado = True
 
         if filter_comprimento:
-            queryset = queryset.filter(entrada_items__produto__comprimento = filter_comprimento)
+            queryset = queryset.filter(entrada_items__produto__comprimento=filter_comprimento)
             filtro_aplicado = True
 
         if filter_data_recebimento:
-            queryset = queryset.filter(entrada_items__entrada__dt_recebimento = filter_data_recebimento)
+            queryset = queryset.filter(entrada_items__entrada__dt_recebimento=filter_data_recebimento)
             filtro_aplicado = True
 
         if filter_data_faturamento:
-            queryset = queryset.filter(saida_items__saida__dt_faturamento = filter_data_faturamento)
+            queryset = queryset.filter(saida_items__saida__dt_faturamento=filter_data_faturamento)
             filtro_aplicado = True
 
         if filter_categoria:
-            queryset = queryset.filter(entrada_items__produto__tipo_categoria = filter_categoria)
+            queryset = queryset.filter(entrada_items__produto__tipo_categoria=filter_categoria)
             filtro_aplicado = True
 
         if filter_situacao:
-            queryset = queryset.filter(status = filter_situacao)
+            queryset = queryset.filter(status=filter_situacao)
             filtro_aplicado = True
 
         if filter_status:
-            queryset = queryset.filter(status = filter_status)
+            queryset = queryset.filter(status=filter_status)
             filtro_aplicado = True
 
         if filter_motivo:
-            queryset = queryset.filter(motivo = filter_motivo)
+            queryset = queryset.filter(motivo=filter_motivo)
 
         if filter_nf_entrada:
-            queryset = queryset.filter(entrada_items__entrada__nf_entrada = filter_nf_entrada)
+            queryset = queryset.filter(entrada_items__entrada__nf_entrada=filter_nf_entrada)
             filtro_aplicado = True
 
         if filter_nf_saida:
-            queryset = queryset.filter(saida_items__saida__nf_saida = filter_nf_saida)
+            queryset = queryset.filter(saida_items__saida__nf_saida=filter_nf_saida)
             filtro_aplicado = True
 
         if filter_coordenada:
-            queryset = queryset.filter(entrada_items__coordenada = filter_coordenada)
+            queryset = queryset.filter(entrada_items__coordenada=filter_coordenada)
             filtro_aplicado = True
 
         if filter_lote:
-            queryset = queryset.filter(entrada_items__lote = filter_lote)
+            queryset = queryset.filter(entrada_items__lote=filter_lote)
             filtro_aplicado = True
 
         # Se nenhum filtro foi aplicado, retorna queryset vazio
@@ -139,6 +138,7 @@ class InventoryListView(ListView):
             queryset = queryset.none()
 
         return queryset
+
 
 # ********************************* UNIDADE  *********************************
 class LocationListView(ListView):
@@ -223,4 +223,4 @@ class ProductDeleteView(DeleteSuccessMessageMixin, DeleteView):
 
 class ProductDetailView(DetailView):
     model = Product
-    template_name= 'produto/visualizar_produto.html'
+    template_name = 'produto/visualizar_produto.html'

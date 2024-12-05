@@ -1,8 +1,7 @@
-from django.shortcuts import redirect
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from imports.forms import *
+from imports.forms import UploadLeadTimeForm, UploadCustomerSupplierForm, UploadCarrierForm, UploadProductForm
 import pandas as pd
 from common.models import CustomerSupplier, Category
 from products.models import Product
@@ -46,9 +45,9 @@ class ImportLeadTimeView(FormView):
             # Itera pelas linhas da coluna para adicionar
             for _, row in df.iterrows():
                 obj, created = LeadTime.objects.get_or_create(
-                    descricao = row['cDescricao'],
-                    codigo = row['nCodigo'],
-                    parcelas = row['nParcelas'],
+                    descricao=row['cDescricao'],
+                    codigo=row['nCodigo'],
+                    parcelas=row['nParcelas'],
                 )
                 if not created:
                     nao_incluidos += 1
@@ -85,7 +84,7 @@ class ImportCustomerSupplierView(FormView):
         else:
             return re.sub(r'\s*\(\w{2}\)\s*', '', str(texto))
 
-    #Upload do arquivo do formulário
+    # Upload do arquivo do formulário
     def form_valid(self, form):
         file = form.cleaned_data['file']
         nao_incluidos = 0
@@ -94,7 +93,7 @@ class ImportCustomerSupplierView(FormView):
         # Lista de possíveis categorias (Colunas booleanas na planilha)
         categorias_colunas = [
             'QSPAC', 'TESA', 'DIVERSOS', 'LAMINAS',
-            'MÁQUINAS', 'NYLOPRINT', 'NYLOFLEX','NOVOS'
+            'MÁQUINAS', 'NYLOPRINT', 'NYLOFLEX', 'NOVOS'
         ]
 
         # Tenta carregar arquivo Excel
@@ -102,14 +101,13 @@ class ImportCustomerSupplierView(FormView):
             print("Lendo arquivo Excel...")
             df = pd.read_excel(file, sheet_name, engine='openpyxl')
         except Exception as e:
-            print( f'Erro ao ler o arquivo Excel: {e}')
+            print(f'Erro ao ler o arquivo Excel: {e}')
             messages.error(self.request, f'Erro ao ler o arquivo Excel: {e}')
             return self.form_invalid(form)
 
-
         # Verifica se planilha está vazia
         if df.empty:
-            print(f'Erro ao ler o arquivo Excel: planilha vazia')
+            print('Erro ao ler o arquivo Excel: planilha vazia')
             messages.error(self.request, "A planilha está vazia...")
             return self.form_invalid(form)
 
@@ -151,7 +149,6 @@ class ImportCustomerSupplierView(FormView):
         df['codigo_cliente_omie_MRX'] = df['codigo_cliente_omie_MRX'].astype(int).astype(str)
         df['codigo_cliente_omie_FLX'] = df['codigo_cliente_omie_FLX'].astype(int).astype(str)
         df['codigo_cliente_omie_SRV'] = df['codigo_cliente_omie_SRV'].astype(int).astype(str)
-
 
         # Substitui 'NaN' por 'N/A'
         print("Preenchendo o resto das colunas com N/A...")
@@ -223,7 +220,7 @@ class ImportCustomerSupplierView(FormView):
 
                     print("Salvando dados no banco...")
                     obj, created = CustomerSupplier.objects.update_or_create(
-                        cnpj = self.remover_nao_numericos(row.get('cnpj_cpf', '')),
+                        cnpj=self.remover_nao_numericos(row.get('cnpj_cpf', '')),
                         defaults={
                             'nome_fantasia': row.get('nome_fantasia', ''),
                             'razao_social': row.get('razao_social', ''),
@@ -240,11 +237,12 @@ class ImportCustomerSupplierView(FormView):
                             'email': row.get('email', 'Não definido'),
                             'nome_contato': row.get('contato', ''),
                             'tipo_frete': row.get('Modalidade do Frete', ''),
-                            'taxa_frete': row.get('Frete') if int(row.get('Modalidade do Frete')) == 3 else '0,00', # Regra: taxa só existe se a modalidade de frete for do tipo 3
+                            # Regra: taxa só existe se a modalidade de frete for do tipo 3
+                            'taxa_frete': row.get('Frete') if int(row.get('Modalidade do Frete')) == 3 else '0,00',
                             'cliente_transportadora': transportadora,
                             'inscricao_estadual': self.remover_nao_numericos(row.get('inscricao_estadual', '')),
                             'limite_credito': row.get('valor_limite_credito_total', '0'),
-                            'contribuinte':  1 if row.get('contribuinte') == 'S' else 0,
+                            'contribuinte': 1 if row.get('contribuinte') == 'S' else 0,
                             'tag_cliente': 1 if int(row.get('Cliente')) == 1 else 0,
                             'tag_fornecedor': 1 if int(row.get('Fornecedor')) == 1 else 0,
                             'tag_cadastro_omie_com': row.get('codigo_cliente_omie_COM', '0'),
@@ -261,7 +259,7 @@ class ImportCustomerSupplierView(FormView):
                     if any(row.get(categoria_nome, 0) == 1 for categoria_nome in categorias_colunas):
                         # Adiciona as categorias ao objeto com base nos valores das colunas booleanas
                         for categoria_nome in categorias_colunas:
-                            if row.get(categoria_nome, 0) == 1: # Verifica se  o valor está como 1 (True)
+                            if row.get(categoria_nome, 0) == 1:
                                 categoria_obj, _ = Category.objects.get_or_create(nome=categoria_nome)
                                 obj.categoria.add(categoria_obj)
                     # contadores de itens adicionados e não adicionados
@@ -270,12 +268,11 @@ class ImportCustomerSupplierView(FormView):
                     else:
                         nao_incluidos += 1
 
-
                 except Exception as e:
                     #  Detalha o erro na linha específica
                     print(f"Erro ao processar linha {index + 1}: {e}\n")
                     print(f"Item {row.to_dict()}")
-                    print(f'\n')
+                    print('\n')
                     messages.error(self.request, f"Erro ao processar a linha {index + 1}: {e}")
                     nao_incluidos += 1
                     continue
@@ -283,7 +280,7 @@ class ImportCustomerSupplierView(FormView):
             if nao_incluidos != 0:
                 messages.info(self.request, f'{nao_incluidos} itens já estão cadastrados e não foram incluídos, {incluidos} itens foram incluídos')
 
-            messages.success(self.request, f'Arquivo importado e processado com sucesso!')
+            messages.success(self.request, 'Arquivo importado e processado com sucesso!')
             print("FIM DA IMPORTAÇÃO")
             return super().form_valid(form)
 
@@ -296,8 +293,7 @@ class ImportCustomerSupplierView(FormView):
 class ImportCarrierView(FormView):
     form_class = UploadCarrierForm
     template_name = 'importar_transportadora.html'
-    success_url =reverse_lazy('carrier')
-
+    success_url = reverse_lazy('carrier')
 
     def remover_nao_numericos(self, texto):
         return re.sub(r'\D', '', str(texto))
@@ -337,14 +333,14 @@ class ImportCarrierView(FormView):
             # primeiro tenta criar, se item existir incrementa variável de controle
             for _, row in df.iterrows():
                 obj, created = Carrier.objects.get_or_create(
-                    nome = row['Transportadora (Nome Fantasia)'],
-                    cnpj = self.remover_nao_numericos(row['Transportadora (CNPJ/CPF)']),
-                    cod_omie_COM = row['codigo_cliente_omie_COM'],
-                    cod_omie_IND = row['codigo_cliente_omie_IND'],
-                    cod_omie_PRE = row['codigo_cliente_omie_PRE'],
-                    cod_omie_MRX = row['codigo_cliente_omie_MRX'],
-                    cod_omie_SRV = row['codigo_cliente_omie_SRV'],
-                    cod_omie_FLX = row['codigo_cliente_omie_FLX'],
+                    nome=row['Transportadora (Nome Fantasia)'],
+                    cnpj=self.remover_nao_numericos(row['Transportadora (CNPJ/CPF)']),
+                    cod_omie_COM=row['codigo_cliente_omie_COM'],
+                    cod_omie_IND=row['codigo_cliente_omie_IND'],
+                    cod_omie_PRE=row['codigo_cliente_omie_PRE'],
+                    cod_omie_MRX=row['codigo_cliente_omie_MRX'],
+                    cod_omie_SRV=row['codigo_cliente_omie_SRV'],
+                    cod_omie_FLX=row['codigo_cliente_omie_FLX'],
                 )
 
                 if created:
@@ -352,11 +348,10 @@ class ImportCarrierView(FormView):
                 else:
                     nao_incluidos += 1
 
-
             if nao_incluidos != 0:
                 messages.info(self.request, f'{nao_incluidos} itens já estão cadastrados e não foram incluídos, {incluidos} itens foram incluídos')
 
-            messages.success(self.request, f'Arquivo importado e processado com sucesso!')
+            messages.success(self.request, 'Arquivo importado e processado com sucesso!')
 
             return super().form_valid(form)
         except Exception as e:
@@ -400,7 +395,7 @@ class ImportProductView(FormView):
         for index, row in df.iterrows():
             try:
                 categoria_nome = row['Categoria']
-                fornecedor_nome = row['Fornecedor']
+                # fornecedor_nome = row['Fornecedor']
 
                 # Adiciona nova categoria se não existir
                 categoria_obj, created = Category.objects.get_or_create(nome=categoria_nome)
@@ -411,7 +406,6 @@ class ImportProductView(FormView):
                 # except CustomerSupplier.DoesNotExist:
                 #     messages.error(self.request, f"Erro na linha {index + 1}: Fornecedor '{fornecedor_nome}' não encontrado. Cadastre o fornecedor primeiro.")
                 #     return self.form_invalid(form)
-
 
                 # Cria ou atualiza o produto
                 Product.objects.update_or_create(
@@ -493,5 +487,3 @@ class ImportProductView(FormView):
 #                     'saldo': row['Saldo'],
 #                   }
 #                 )
-
-

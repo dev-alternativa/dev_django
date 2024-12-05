@@ -18,6 +18,7 @@ class LeadTime(Base):
     def __str__(self):
         return self.descricao
 
+
 class Carrier(Base):
     nome = models.CharField('Nome Fantasia', max_length=100)
     cnpj = models.CharField('CNPJ / CPF', max_length=20)

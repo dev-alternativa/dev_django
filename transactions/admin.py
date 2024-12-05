@@ -22,7 +22,7 @@ class OutflowsAdmin(admin.ModelAdmin):
         'dados_adicionais_nf',
         'cod_cenario_fiscal',
         'desconto',
-        )
+    )
 
 
 @admin.register(OutflowsItems)

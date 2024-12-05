@@ -1,7 +1,7 @@
 from django.db import models
 from core.models import Base
 from accounts.models import CustomUsuario
-from products.models import Product
+
 
 STATUS = (
     ('A', 'Aberto'),
@@ -39,7 +39,7 @@ TIPO_ENTRADA = (
 
 
 class Inflows(Base):
-    fornecedor = models.ForeignKey('common.CustomerSupplier', verbose_name='Fornecedor', on_delete=models.PROTECT, related_name='inflows')
+    fornecedor = models.ForeignKey('common.CustomerSupplier', verbose_name='Fornecedor', on_delete=models.CASCADE, related_name='inflows')
     valor_total = models.DecimalField('Valor Total dos Produtos', max_digits=10, decimal_places=2)
     tipo_entrada = models.CharField('Tipo de Entrada', choices=TIPO_ENTRADA, max_length=50, default=TIPO_ENTRADA[0])
     nf_entrada = models.CharField('Nota Fiscal', max_length=44, null=True, blank=True)
@@ -57,13 +57,13 @@ class Inflows(Base):
 
 
 class InflowsItems(Base):
-    entrada = models.ForeignKey('transactions.Inflows', on_delete=models.PROTECT, related_name='inflow_items')
-    produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='inflow_items')
+    entrada = models.ForeignKey('transactions.Inflows', on_delete=models.CASCADE, related_name='inflow_items')
+    produto = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='inflow_items')
     coordenada = models.ForeignKey(
         'products.CoordinateSetting',
         verbose_name='Coordenada',
         max_length=50,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='inventory',
         null=True,
         blank=True
@@ -90,17 +90,17 @@ class Outflows(Base):
     cod_pedido_omie_secundario = models.CharField(max_length=100, null=True, blank=True)
     pedido_interno_cliente = models.CharField(verbose_name='N ° Interno cliente', max_length=100, null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS, null=True, blank=True)
-    cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.PROTECT, related_name='saidas')
+    cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.CASCADE, related_name='saidas')
     nf_saida = models.CharField('NF Saída', null=True, blank=True, max_length=44)
-    transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.PROTECT, related_name='saidas', null=True, blank=True)
+    transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.CASCADE, related_name='saidas', null=True, blank=True)
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    dados_adicionais_nf = models.TextField('Dados Adicionais NF',max_length=500, blank=True, null=True)
-    cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.PROTECT, null=True, blank=True, related_name='saidas', default=1)
+    dados_adicionais_nf = models.TextField('Dados Adicionais NF', max_length=500, blank=True, null=True)
+    cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.CASCADE, null=True, blank=True, related_name='saidas', default=1)
     tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_previsao_faturamento = models.DateField('Previsão de Faturamento', blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
-    vendedor = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saidas')
+    vendedor = models.ForeignKey('common.Seller', on_delete=models.CASCADE, verbose_name='Vendedor', null=True, blank=True, related_name='saidas')
 
     class Meta:
         ordering = ('pk',)
@@ -111,22 +111,22 @@ class Outflows(Base):
 
 
 class OutflowsItems(Base):
-    saida = models.ForeignKey(Outflows, on_delete=models.PROTECT, related_name='saida_items')
+    saida = models.ForeignKey(Outflows, on_delete=models.CASCADE, related_name='saida_items')
     cod_item_omie = models.PositiveBigIntegerField(null=True, blank=True)
-    produto = models.ForeignKey('products.Product', on_delete=models.PROTECT, related_name='saida_items')
+    produto = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='saida_items')
     quantidade = models.PositiveIntegerField()
-    preco = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    preco = models.DecimalField(verbose_name='Preço', max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(verbose_name='N° Interno cliente', max_length=50, blank=True, null=True)
-    largura = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    comprimento = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    item_pedido = models.CharField(verbose_name='Item Pedido', max_length=50, null=True, blank=True)
+    largura = models.DecimalField(verbose_name='Largura (mm)', max_digits=10, decimal_places=2, blank=True, null=True)
+    comprimento = models.DecimalField(verbose_name='Comprimento (m)', max_digits=10, decimal_places=2, blank=True, null=True)
+    item_pedido = models.CharField(verbose_name='Item #', max_length=50, null=True, blank=True)
     condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
-    cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.PROTECT, related_name='saida_items')
-    prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.PROTECT, null=True, blank=True, related_name='saida_items')
-    conta_corrente = models.ForeignKey('common.ContaCorrente', on_delete=models.PROTECT, related_name='saida_items')
+    cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='saida_items')
+    prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.CASCADE, null=True, blank=True, related_name='saida_items')
+    conta_corrente = models.ForeignKey('common.ContaCorrente', on_delete=models.CASCADE, related_name='saida_items')
     obs = models.TextField(max_length=500, blank=True, null=True)
-    vendedor_item = models.ForeignKey('common.Seller', on_delete=models.PROTECT, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
+    vendedor_item = models.ForeignKey('common.Seller', on_delete=models.CASCADE, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
     cfop = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:

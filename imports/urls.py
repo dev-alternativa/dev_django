@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import *
+from .views import ImportCarrierView, ImportLeadTimeView, ImportCustomerSupplierView, ImportProductView
 
 urlpatterns = [
     path("prazo/importacao", ImportLeadTimeView.as_view(), name="import_lead_time"),

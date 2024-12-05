@@ -50,19 +50,19 @@ class CustomerSupplierForm(ModelForm):
             'categoria': Select2MultipleWidget(attrs={'data-placeholder': 'Selecione uma categoria'}),
             'prazo': Select2Widget(
                 attrs={
-                'data-language': 'pt-br',
-                'data-placeholder': 'Começe digitando algo...',
-                'data-minimum-input-length': 3,
-                'data-width': '100%',
-                # 'data-height': '1rem',
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Começe digitando algo...',
+                    'data-minimum-input-length': 3,
+                    'data-width': '100%',
+                    # 'data-height': '1rem',
                 }
             ),
             'cliente_transportadora': Select2Widget(
                 attrs={
-                'data-language': 'pt-br',
-                'data-placeholder': 'Começe digitando algo...',
-                'data-minimum-input-length': 3,
-                'data-width': '100%',
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Começe digitando algo...',
+                    'data-minimum-input-length': 3,
+                    'data-width': '100%',
                 }
             )
         }
@@ -99,16 +99,16 @@ class CustomerSupplierForm(ModelForm):
                     Row(
                         Column(
                             Field('nome_fantasia', css_class='form-control col-md-6 mb-0'),
-                                Column(
-                                    FieldWithButtons(
-                                        Field('cnpj', css_class='form-control col-md-6 mb-0'),
-                                        StrictButton(
-                                            "Consultar CNPJ",
-                                            css_class="btn btn-primary",
-                                            css_id="btn_consulta_cnpj",
-                                            onclick="consultarCNPJ()"),
-                                    ),
+                            Column(
+                                FieldWithButtons(
+                                    Field('cnpj', css_class='form-control col-md-6 mb-0'),
+                                    StrictButton(
+                                        "Consultar CNPJ",
+                                        css_class="btn btn-primary",
+                                        css_id="btn_consulta_cnpj",
+                                        onclick="consultarCNPJ()"),
                                 ),
+                            ),
                             Field('tipo_frete', css_class='form-control col-md-6 mb-0'),
                             Field('cliente_transportadora', css_class='form-control col-md-6 mb-0'),
                         ),
@@ -116,7 +116,7 @@ class CustomerSupplierForm(ModelForm):
                             Field('razao_social', css_class='form_controle col-md-6 mb-0'),
                             Field('inscricao_estadual', css_class='form-control col-md-6 mb-0 numericValorOnly'),
                             PrependedText(
-                                'taxa_frete','R$',
+                                'taxa_frete', 'R$',
                                 css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
                             Field('prazo', css_class='form-control col-md-6 mb-0 '),
                         ),
@@ -217,10 +217,10 @@ class CustomerSupplierForm(ModelForm):
         self.fields['cnpj'].widget.attrs['onchange'] = 'validaCampoCPFCNPJ(this)'
 
         # Especifica quantidade máxima de alguns campos do formulário
-        self.fields['cnpj'].widget.attrs.update({ 'maxlength': 18 })
+        self.fields['cnpj'].widget.attrs.update({'maxlength': 18})
         # self.fields['taxa_frete'].widget.attrs.update({ 'maxlength': 6 })
-        self.fields['limite_credito'].widget.attrs.update({ 'maxlength': 8 })
-        self.fields['inscricao_estadual'].widget.attrs.update({ 'inscricao_estadual': 10 })
+        self.fields['limite_credito'].widget.attrs.update({'maxlength': 8})
+        self.fields['inscricao_estadual'].widget.attrs.update({'inscricao_estadual': 10})
 
 
 class PriceFormCustomer(Form):
@@ -257,6 +257,7 @@ class PriceFormCustomer(Form):
             ),
         )
 
+
 class PriceFormCategory(Form):
 
     categoria = forms.ModelChoiceField(
@@ -292,7 +293,7 @@ class PriceFormCategory(Form):
 
 class PriceForms(ModelForm):
 
-    prazo =  forms.ModelChoiceField(
+    prazo = forms.ModelChoiceField(
         queryset=LeadTime.objects.all(),
         widget=Select2Widget(
             attrs={
@@ -314,8 +315,6 @@ class PriceForms(ModelForm):
 
         self.fields['produto'].queryset = Product.objects.filter(tipo_categoria=categoria_id)
         self.fields['valor'].label = 'Preço Unitário'
-
-
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -350,6 +349,7 @@ class PriceForms(ModelForm):
 # QSPACFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
 # SuperLamFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
 # TesaFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
+
 
 class SellerForm(ModelForm):
 

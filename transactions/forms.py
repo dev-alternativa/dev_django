@@ -1,43 +1,43 @@
 from django import forms
 from django.forms import Textarea, inlineformset_factory
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
 from common.models import Category, CustomerSupplier
-from products.models import Product
+
 
 class InflowsForm(forms.ModelForm):
 
     categoria = forms.ModelChoiceField(
-        queryset = Category.objects.all(),
-        widget = Select2Widget(
+        queryset=Category.objects.all(),
+        widget=Select2Widget(
             attrs={
                 'data-placeholder': 'Selecione a categoria',
-                }
-            ),
+            }
+        ),
         required=False,
     )
 
     class Meta:
         model = Inflows
-        exclude = [ 'dt_criacao', 'dt_modificado']
+        exclude = ['dt_criacao', 'dt_modificado']
         widgets = {
             'fornecedor': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    }
-                ),
+                }
+            ),
             'dt_recebimento': forms.DateTimeInput(
                 attrs={
                     'type': 'date',
                     'class': 'form-control',
                     'placeholder': 'Selecione uma data'
-                    }
-                ),
+                }
+            ),
         }
 
     nf_entrada = forms.CharField(max_length=44, required=False)
+
     def __init__(self, *args, **kwargs):
         super(InflowsForm, self).__init__(*args, **kwargs)
         self.fields['fornecedor'].queryset = CustomerSupplier.objects.filter(tag_fornecedor=True)
@@ -49,7 +49,7 @@ class InflowsItemsForm(forms.ModelForm):
 
     class Meta:
         model = InflowsItems
-        exclude = [ 'dt_criacao', 'dt_modificado', 'ativo']
+        exclude = ['dt_criacao', 'dt_modificado', 'ativo']
         widgets = {
             'produto': Select2Widget(
                 attrs={
@@ -89,22 +89,22 @@ class OutflowsForm(forms.ModelForm):
             'cliente': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    }
-                ),
+                }
+            ),
             'transportadora': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    }
-                ),
+                }
+            ),
             'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
             'dt_previsao_faturamento': forms.DateTimeInput(
                 attrs={
                     'type': 'date',
                     'class': 'form-control',
                     'placeholder': 'Selecione uma data'
-                    },
-                    format='%Y-%m-%d',
-                ),
+                },
+                format='%Y-%m-%d',
+            ),
         }
         label = {
             'dt_previsao_faturamento': 'Previsão de Faturamento',
@@ -126,8 +126,8 @@ class OutflowsItemsForm(forms.ModelForm):
             'produto': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    }
-                ),
+                }
+            ),
             'preco': forms.NumberInput(
                 attrs={
                     'class': 'form-control',
@@ -136,7 +136,6 @@ class OutflowsItemsForm(forms.ModelForm):
             ),
             'dados_adicionais_item': Textarea(attrs={'rows': 3}),
         }
-
 
 
 OutflowsItemsFormSet = inlineformset_factory(
@@ -158,8 +157,8 @@ class OrderItemsForm(forms.ModelForm):
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
                     'data-minimum-input-length': 3,
-                    }
-                ),
+                }
+            ),
             'dados_adicionais_item': forms.Textarea(attrs={'rows': 3}),
             'obs': forms.Textarea(attrs={'rows': 3}),
         }

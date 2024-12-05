@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # classe base
 class Base(models.Model):
     dt_criacao = models.DateTimeField('Criação', auto_now_add=True)

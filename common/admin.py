@@ -26,7 +26,7 @@ class SellerAdmin(admin.ModelAdmin):
 class PriceAdmin(admin.ModelAdmin):
     list_display = ('produto', 'cliente', 'valor', 'is_dolar', 'prazo', 'cnpj_faturamento', 'condicao', 'obs')
     search_fields = ('cliente', 'valor', 'cnpj_faturamento', 'condicao')
-    list_filter = ('is_dolar',  'cnpj_faturamento')
+    list_filter = ('is_dolar', 'cnpj_faturamento')
 
 
 @admin.register(CNPJFaturamento)

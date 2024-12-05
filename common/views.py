@@ -2,13 +2,12 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
-from django.forms.models import model_to_dict
-from django.views.generic import  CreateView, UpdateView, ListView, DeleteView, DetailView, TemplateView, FormView
-from common.forms import *
-from common.models import Category, CustomerSupplier, Seller, Price
+from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView, FormView
+from common.forms import CategoryForm, CustomerSupplierForm, SellerForm, PriceForms
+from common.models import Category, CustomerSupplier, Seller, Price, PriceFormCategory, PriceFormCustomer
 from products.models import Product
 from django.db.models import Q
-from core.views import FormataDadosMixin,  FormMessageMixin, DeleteSuccessMessageMixin
+from core.views import FormataDadosMixin, FormMessageMixin, DeleteSuccessMessageMixin
 from django.views import View
 from logistic.models import LeadTime
 from api_omie.views import add_seller_to_omie, delete_seller_from_omie
@@ -101,6 +100,7 @@ def get_category_view(request):
     categories = Category.objects.all()
     return render(request, 'pedidos/_modal_categoria_pedido.html', {'categorias': categories})
 
+
 # ******************************* CLIENTE / FORNECEDOR *******************************
 class CustomerSupplierListView(FormataDadosMixin, ListView):
     model = CustomerSupplier
@@ -183,7 +183,7 @@ class CustomerSupplierDeleteView(DeleteSuccessMessageMixin, DeleteView):
 
 class CustomerSupplierDetailView(DetailView, FormataDadosMixin):
     model = CustomerSupplier
-    template_name =  'cliente_fornecedor/visualizar_cliente.html'
+    template_name = 'cliente_fornecedor/visualizar_cliente.html'
     context_object_name = 'cliente_fornecedor'
 
     def get_context_data(self, **kwargs):
@@ -231,7 +231,6 @@ class SellerNewView(FormMessageMixin, CreateView):
         api_responses = {}
 
         response = super().form_valid(form)
-
 
         if form.cleaned_data.get('incluir_omie'):
 
@@ -320,9 +319,8 @@ class SellerDeleteView(DeleteSuccessMessageMixin, DeleteView):
 
 class SellerDetailView(DetailView, FormataDadosMixin):
     model = Seller
-    template_name =  'vendedores/visualizar_vendedor.html'
+    template_name = 'vendedores/visualizar_vendedor.html'
     context_object_name = 'seller'
-
 
 
 # ********************************* PREÇO *********************************
@@ -361,7 +359,6 @@ class PriceCreateView(FormMessageMixin, CreateView):
 
         return context
 
-
     def get(self, request, *args, **kwargs):
         self.object = None
         cliente_id = self.kwargs.get('cliente_id')
@@ -395,9 +392,8 @@ class PriceCreateView(FormMessageMixin, CreateView):
 
 
 class CustomerPriceSelectView(FormMessageMixin, FormView):
-    template_name =  'preco/novo_preco_base.html'
+    template_name = 'preco/novo_preco_base.html'
     form_class = PriceFormCustomer
-
 
     def form_valid(self, form):
         cliente = form.cleaned_data['cliente']
@@ -412,7 +408,7 @@ class CustomerPriceSelectView(FormMessageMixin, FormView):
 
 
 class CategoryPriceSelectView(FormMessageMixin, FormView):
-    template_name =  'preco/novo_preco_base.html'
+    template_name = 'preco/novo_preco_base.html'
     form_class = PriceFormCategory
 
     def form_valid(self, form):
@@ -449,5 +445,3 @@ class PriceDeleteView(DeleteSuccessMessageMixin):
     model = Price
     template_name = 'preco/delete_preco.html'
     success_url = reverse_lazy('price')
-
-

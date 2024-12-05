@@ -41,118 +41,117 @@ class CoordinateForm(ModelForm):
 
 class SearchInventoryForm(forms.Form):
     est_produto = forms.ModelChoiceField(
-        label = 'Produto',
-        queryset = Product.objects.all(),
-        required = False,
-        widget = forms.Select(attrs = {'class': 'form-select filtros', 'aria-label': 'Default select example'})
+        label='Produto',
+        queryset=Product.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select filtros', 'aria-label': 'Default select example'})
     )
     est_id = forms.CharField(
-        label = 'ID do Item',
+        label='ID do Item',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_largura = forms.CharField(
-        label = 'Largura',
+        label='Largura',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_comprimento = forms.CharField(
-        label = 'Comprimento',
+        label='Comprimento',
         required=False, widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_data_recebimento = forms.DateField(
-        label = 'Data de Recebimento',
-        required = False,
-        widget = forms.DateInput(
-            attrs = {
+        label='Data de Recebimento',
+        required=False,
+        widget=forms.DateInput(
+            attrs={
                 'class': 'form-control filtros data',
-                'type' : 'date',
+                'type': 'date',
             }
         )
     )
     est_data_faturamento = forms.DateField(
-        label = 'Data de Faturamento',
-        required = False,
-        widget = forms.DateInput(
-            attrs = {
+        label='Data de Faturamento',
+        required=False,
+        widget=forms.DateInput(
+            attrs={
                 'class': 'form-control filtros data',
-                'type' : 'date',
+                'type': 'date',
             }
         )
     )
     est_categoria = forms.ModelChoiceField(
-        label = 'Categoria',
-        queryset = Category.objects.all(),
-        required = False,
-        widget = forms.Select(attrs={'class': 'form-select filtros'})
+        label='Categoria',
+        queryset=Category.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select filtros'})
     )
 
     est_situacao = forms.ChoiceField(
-        label = 'Situação',
-        choices = [
+        label='Situação',
+        choices=[
             ("", "Todos os tipos"), ("aberto", "Aberto"), ("ajuste", "Ajuste"), ("amostra", "Amostra"),
             ("baixado", "Baixado"), ("fechado", "Fechado")
         ],
-        required = False,
-        widget = forms.Select(attrs = {'class': 'form-select filtros'})
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select filtros'})
     )
     est_status = forms.ChoiceField(
-        label = 'Status',
-        choices = [
+        label='Status',
+        choices=[
             ("", "Todos os tipos"),
             ("ESTOQUE", "Em estoque"),
             ("EXPEDIÇÃO", "Em expedição"),
             ("FATURADO", "Faturado"),
             ("PERDA", "Perda")
         ],
-        required = False,
-        widget = forms.Select(attrs = {'class': 'form-select filtros'})
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select filtros'})
     )
     est_tipo_perda = forms.ChoiceField(
-        label = 'Tipo de Perda',
-        choices = [
+        label='Tipo de Perda',
+        choices=[
             ("", "Todos os tipos"),
             ("I", "Motivo Interno"),
             ("E", "Motivo Externo"),
         ],
-        required = False,
-        widget = forms.Select(attrs={'class': 'form-select filtros'})
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select filtros'})
     )
     est_baixa = forms.CharField(
-        label = 'Baixa',
+        label='Baixa',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros data'})
     )
     est_pedido_cliente = forms.CharField(
-        label = 'Pedido',
+        label='Pedido',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_nf_entrada = forms.CharField(
-        label = 'NF de Entrada',
+        label='NF de Entrada',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
     est_nf_saida = forms.CharField(
-        label = 'NF de Saída',
+        label='NF de Saída',
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control filtros ',
         })
     )
     est_coordenada = forms.ModelChoiceField(
-        label = 'Coordenada',
-        queryset = CoordinateSetting.objects.all(),
-        required = False,
-        widget = forms.Select(attrs={'class': 'form-select filtros'})
+        label='Coordenada',
+        queryset=CoordinateSetting.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select filtros'})
     )
 
     est_lote = forms.CharField(
-        label = 'Lote',
+        label='Lote',
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control filtros'})
     )
-
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -231,14 +230,13 @@ class ProductForm(ModelForm):
 
     class Meta:
         model = Product
-        fields = '__all__' # inclui todos os campos do model
+        fields = '__all__'
         widgets = {
-        'fornecedor': Select2Widget(
-            attrs={
-                'data-placeholder': 'Selecione um fornecedor',
-                'data-placeholder': 'Começe digitando algo...',
-                'data-minimum-input-length': 3,
-                'data-width': '100%',
+            'fornecedor': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Começe digitando algo...',
+                    'data-minimum-input-length': 3,
+                    'data-width': '100%',
                 }
             ),
         }
@@ -295,7 +293,7 @@ class ProductForm(ModelForm):
                     # ),
                 ),
                 Tab(
-                'Dados OMIE',
+                    'Dados OMIE',
                     Row(
                         Column(
                             Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),

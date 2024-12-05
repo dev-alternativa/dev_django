@@ -30,36 +30,36 @@ class CarrierForm(ModelForm):
         self.fields['cod_omie_flx'].required = False
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
-        Row(
-            Column(
-                Field('nome', css_class='form-control col-md-6 mb-0'),
-                Field('cnpj', css_class='form-control col-md-6 mb-0'),
-                Field('obs', css_class='form-control col-md-6 mb-0'),
+            Row(
+                Column(
+                    Field('nome', css_class='form-control col-md-6 mb-0'),
+                    Field('cnpj', css_class='form-control col-md-6 mb-0'),
+                    Field('obs', css_class='form-control col-md-6 mb-0'),
+                ),
+                Column(
+                    Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
+                    Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
+                ),
             ),
-            Column(
-                Field('cod_omie_com', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_ind', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_pre', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_mrx', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_srv', css_class='form-control col-md-6 mb-0'),
-                Field('cod_omie_flx', css_class='form-control col-md-6 mb-0'),
-            ),
-        ),
-        Row(
-            Column(
-                HTML("<a href='{% url 'carrier' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
-            ),
-            Column(
-                HTML(
-                    '<button type="submit" class="btn btn-primary btn-lg">'
-                    '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-                )
-            ),
-            css_class='form-group col-12 text-center'
-        )
+            Row(
+                Column(
+                    HTML("<a href='{% url 'carrier' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
+                ),
+                Column(
+                    HTML(
+                        '<button type="submit" class="btn btn-primary btn-lg">'
+                        '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+                    )
+                ),
+                css_class='form-group col-12 text-center'
+            )
         )
 
-        self.fields['cnpj'].widget.attrs.update({ 'maxlength': 18 })
+        self.fields['cnpj'].widget.attrs.update({'maxlength': 18})
 
 
 class LeadTimeForm(ModelForm):
@@ -83,11 +83,11 @@ class LeadTimeForm(ModelForm):
                 Column(
                     HTML("<a href='{% url 'lead_time' %}' class='btn btn-danger btn-lg'><i class='bi bi-x-lg space_from_margin'></i>Cancelar</a>"),
                 ),
-                    Column(
-                        HTML(
-                            '<button type="submit" class="btn btn-primary btn-lg">'
-                            '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
-                        ),
+                Column(
+                    HTML(
+                        '<button type="submit" class="btn btn-primary btn-lg">'
+                        '<i class="bi bi-floppy space_from_margin"></i>Salvar</button>'
+                    ),
                 ),
                 css_class='form-row text-center'
             )

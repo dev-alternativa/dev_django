@@ -440,20 +440,27 @@ $(document).ready(function() {
   });
 
 
-  // Calcula metragem no modal de adição de produtos SuperLam
+  /*
+    Calcula metragem no modal de adição de produtos SuperLam seguindo a fórmula:
+    SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
+  */
+  const quantidade = $('#id_quantidade');
   const largura = $('#id_largura');
-    const comprimento = $('#id_comprimento');
-    const metragem = $('#id_m2');
+  const comprimento = $('#id_comprimento');
+  const $inputs = [quantidade, largura, comprimento];
+  const metragem = $('#id_m2');
 
-    comprimento.on('change', function(){
-        if(comprimento.val() > 0){
-            if(largura.val() > 0){
-                area_metragem = comprimento.val() * largura.val();
-                console.log(area_metragem);
-                metragem.val(area_metragem);
-            }
-        }
+  $inputs.forEach(input => {
+    input.on('change', function(){
+      const valores = $inputs.map(i => i.val());
+
+      if(valores.every(valor => valor > 0)){
+        const area_metragem = (valores[0] * valores[1] * valores[2]) / 1000;
+        //console.log(area_metragem);
+        metragem.val(area_metragem);
+      }
     });
+  });
 
 
   // Remove os dados de um formulário ao clicar no botão `X` do modal
@@ -521,7 +528,7 @@ $(document).ready(function() {
     }else{
       $('#productOrderModal').modal('hide');
       $("#nome_produto").html(nome_produto);
-
+      $("#div_id_preco label").append(`/ <b>Condição: ${condicao}</b>`);
       // Verifica se largura/comprimento/Metragem devem ser exibidos
       if(listaCategoriasMetragem.includes(+categoriaSelect)){
         $('.metric_field').prop('hidden', false);
@@ -529,6 +536,7 @@ $(document).ready(function() {
         $('.metric_field').prop('hidden', true);
       }
       resetForm();
+      $("#div_id_preco label").html('Preço')
       $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);
       $('#staticBackdrop').modal('show');
 

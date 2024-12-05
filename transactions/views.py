@@ -7,8 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Sum
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
-from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente
-from products.models import Product, Inventory
+from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
+from products.models import Product
 from transactions.models import TaxScenario
 from logistic.models import Carrier, LeadTime
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
@@ -22,10 +22,11 @@ def is_form_empty(form):
     """Retorna True se todos os campos do formulário forem vazios"""
     return all(field is None or field == '' for field in form.cleaned_data.values())
 
+
 def get_products_by_category(request):
     category_id = request.GET.get('category_id')
     if category_id:
-        products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto', 'largura', 'comprimento')
+        products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto', 'largura', 'comprimento')
     else:
         products = Product.objects.values('id', 'nome_produto', 'largura', 'comprimento')
 
@@ -33,12 +34,14 @@ def get_products_by_category(request):
 
     return JsonResponse(products_list, safe=False)
 
+
 def filter_products(request):
 
     category_id = request.GET.get('category_id')
-    products = Product.objects.filter(tipo_categoria_id = category_id).values('id', 'nome_produto')
+    products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto')
 
     return JsonResponse({'products': list(products)})
+
 
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
@@ -83,9 +86,9 @@ class InflowsNewView(LoginRequiredMixin, FormMessageMixin, CreateView):
 
         # Verifica se ao menos um formulário do formset está preenchido
         valid_form_found = any(
-            form.is_valid() and
-            not form.cleaned_data.get('DELETE', False) and
-            not is_form_empty(form)
+            form.is_valid() and not
+            form.cleaned_data.get('DELETE', False) and not
+            is_form_empty(form)
             for form in formset
         )
 
@@ -163,10 +166,10 @@ class OutflowsNewView(FormMessageMixin, CreateView):
 
         # Verifica se ao menos um formulário do formset está preenchido
         valid_form_found = any(
-            form.is_valid() and
-            not form.cleaned_data.get('DELETE', False) and
-            not is_form_empty(form)
-            for form in formset
+            form.is_valid() and not
+            form.cleaned_data.get('DELETE', False) and not
+            is_form_empty(form) for
+            form in formset
         )
 
         if valid_form_found and formset.is_valid():
@@ -218,7 +221,6 @@ class OrderListView(ListView):
         return Outflows.objects.filter(tipo_saida="V")
 
 
-
 class OrderCreateView(FormMessageMixin, CreateView):
     model = Outflows
     template_name = 'pedidos/novo_pedido.html'
@@ -228,20 +230,17 @@ class OrderCreateView(FormMessageMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         next_id = Outflows.objects.order_by('-dt_criacao').values('id').first()
-        context['proximo_pedido'] = next_id.get('id') + 1 if next_id else None
+        context['proximo_pedido'] = next_id.get('id') + 1 if next_id else 1
         return context
-
 
     def form_invalid(self, form):
         print(f'Erros ao criar pedido {form.errors}')
         return super().form_invalid(form)
 
-
     def form_valid(self, form):
         response = super().form_valid(form)
         print(f'Pedido Criado com sucesso: {self.object}')
         return response
-
 
     def get_success_url(self):
         return reverse('update_order', kwargs={'pk': self.object.pk})
@@ -256,7 +255,8 @@ class OrderEditDetailsView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-
+        preco = Price.objects.get(cliente=order.cliente.id)
+        conta_corrente = ContaCorrente.objects.filter(padrao=True, cnpj=preco.cnpj_faturamento)
         cliente = order.cliente
 
         # Conta o número de itens já existentes no pedido
@@ -264,15 +264,18 @@ class OrderEditDetailsView(UpdateView):
         next_item_index = num_itens_existentes + 1
         # Define o próximo índice do item
         item_form = OrderItemsForm(
-            initial=
-                {
-                    'item_pedido': next_item_index,
-                    'numero_pedido': order.pedido_interno_cliente,
-                    'vendedor_item': order.vendedor,
-                }
-            )
+            initial={
+                'item_pedido': next_item_index,
+                'numero_pedido': order.pedido_interno_cliente,
+                'vendedor_item': order.vendedor,
+                'preco': preco if preco else '',
+                'cnpj_faturamento': preco.cnpj_faturamento,
+                'conta_corrente': conta_corrente.descricao,
+            }
+        )
         context['item_form'] = item_form
         context['categories'] = Category.objects.all()
+        context['price'] = preco
 
         valid_tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
@@ -310,20 +313,18 @@ def adicionar_produto(request, order_id):
             key: field_types[key](
                 request.POST.get(key, "")
             ) or (
-                    0 if field_types[key] in [int, float] else ""
-                )
+                0 if field_types[key] in [int, float] else ""
+            )
             for key in field_types
         }
 
         # Verifica campos obrigatórios
-        if (
-                not data["produto"]
-                or not data["quantidade"]
-                or not data["preco"]
-                or not data["item_pedido"]
-                or not data["cnpj_faturamento"]
-                or not data["prazo"]
-            ):
+        if (not data["produto"] or not
+                data["quantidade"] or not
+                data["preco"] or not
+                data["item_pedido"] or not
+                data["cnpj_faturamento"] or not
+                data["prazo"]):
             return JsonResponse(
                 {
                     'error': 'Dados Obrigatórios Incompletos',
@@ -353,13 +354,13 @@ def adicionar_produto(request, order_id):
                     status=400
                 )
 
-            itens_estoque = Inventory.objects.filter(
-                entrada_items__produto=product,
-                status='ESTOQUE',
-            ).order_by('id')
+            # itens_estoque = Inventory.objects.filter(
+            #     entrada_items__produto=product,
+            #     status='ESTOQUE',
+            # ).order_by('id')
 
-            total_disponivel = itens_estoque.count()
-            quantidade_saida = int(data["quantidade"])
+            # total_disponivel = itens_estoque.count()
+            # quantidade_saida = int(data["quantidade"])
 
             # if total_disponivel < quantidade_saida:
             #     return JsonResponse({
@@ -419,6 +420,7 @@ def get_itens_pedido(request, order_id):
         return JsonResponse({'html': html})
     else:
         return JsonResponse({'html': ''})
+
 
 def edit_pedido(request, order_id):
     if request.method == 'POST':
@@ -504,7 +506,7 @@ def get_item_data(request, item_id):
                 "dados_adicionais_item": item.dados_adicionais_item,
                 "obs": item.obs,
                 "nome_produto": item.produto.nome_produto,
-                "vendedor" : item.vendedor_item.nome
+                "vendedor": item.vendedor_item.nome
             }
 
             # print(data)
@@ -580,7 +582,7 @@ def update_product_from_order(request, item_id):
         except Exception as e:
             return JsonResponse({
                 "success": False,
-                "error": 'Houve um erro ao tentar atualizar os dados {e}',
+                "error": f'Houve um erro ao tentar atualizar os dados {e}',
             }, status=500)
 
     else:

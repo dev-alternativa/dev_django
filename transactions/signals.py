@@ -1,9 +1,7 @@
 from django.db.models.signals import post_save
-from django.db import transaction
 from django.dispatch import receiver
 from transactions.models import InflowsItems, OutflowsItems
 from products.models import Inventory
-from django.contrib import messages
 
 
 @receiver(post_save, sender=InflowsItems)
@@ -50,4 +48,3 @@ def atualizar_estoque_inventario(sender, instance, created, **kwargs):
 
         #     # Reduz a quantidade restante a ser processada
         #     quantidade_saida -= 1
-

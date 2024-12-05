@@ -67,7 +67,7 @@ class Product(Base):
     nome_produto = models.CharField('Nome Produto', max_length=100)
     largura = models.CharField('Largura', max_length=20, null=True, blank=True)
     comprimento = models.CharField('Comprimento', max_length=10, null=True, blank=True)
-    m_quadrado = models.CharField('Metro Quadrado', max_length=10, null=True, blank=True) # campo calculado
+    m_quadrado = models.CharField('Metro Quadrado', max_length=10, null=True, blank=True)
     qtd_por_caixa = models.PositiveIntegerField('Quantidade por caixa', null=True, blank=True)
     peso_unitario = models.CharField('Peso Unitário', max_length=10, null=True, blank=True)
     peso_caixa = models.CharField('Peso da Caixa', max_length=10, null=True, blank=True)
@@ -104,14 +104,13 @@ class Inventory(Base):
     tipo_alteracao = models.CharField('Tipo de Alteração', choices=TIPO_ALTERACAO, max_length=100, null=True, blank=True)
     tipo_perda = models.CharField('Tipo de Perda', choices=TIPO_PERDA, max_length=100, null=True, blank=True)
 
-
     class Meta:
         verbose_name = 'Estoque'
         verbose_name_plural = 'Estoques'
         ordering = ['id']
 
     def __str__(self):
-        return  '{} - {} - {}'.format(self.entrada_items, self.saida_items, self.situacao_fiscal)
+        return '{} - {} - {}'.format(self.entrada_items, self.saida_items, self.situacao_fiscal)
 
 
 class Location(Base):

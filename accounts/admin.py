@@ -6,12 +6,12 @@ from .models import CustomUsuario
 
 @admin.register(CustomUsuario)
 class CustomUsuarioAdmin(UserAdmin):
-  add_form = CustomUsuarioCreateForm
-  form = CustomUsuarioChangeForm
-  model = CustomUsuario
-  
-  list_display = ('first_name','last_name','departamento','unidade', 'contato', 'is_staff')
-  fieldsets = (
+    add_form = CustomUsuarioCreateForm
+    form = CustomUsuarioChangeForm
+    model = CustomUsuario
+
+    list_display = ('first_name', 'last_name', 'departamento', 'unidade', 'contato', 'is_staff')
+    fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Informações Pessoais', {'fields': ('first_name', 'last_name', 'contato')}),
         ('Outras Informações', {'fields': ('departamento', 'unidade')}),

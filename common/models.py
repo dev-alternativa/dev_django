@@ -2,6 +2,7 @@ from django.db import models
 from core.models import Base
 import re
 
+
 CONDICAO_PRECO = (
     ('Normal', 'Normal'),
     ('Especial1', 'Especial 1'),
@@ -62,8 +63,8 @@ ESTADOS_BRASIL = (
 
 class ContaCorrente(models.Model):
     descricao = models.CharField('Descrição', max_length=50)
-    nCodCC = models.CharField('Código Conta Corrente', max_length=15)
-    cnpj = models.CharField('CNPJ', choices=CNPJ_FATURAMENTO, max_length=5)
+    nCodCC = models.CharField('Código da Conta Corrente', max_length=15)
+    cnpj = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, null=True, blank=True)
     padrao = models.BooleanField('Padrão', default=False)
 
     def __str__(self):
@@ -107,19 +108,19 @@ class CustomerSupplier(Base):
     nome_contato = models.CharField('Nome Contato', max_length=50, null=True, blank=True)
     tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100, default=TIPO_FRETE[5])
     taxa_frete = models.CharField('Taxa de frete', max_length=10, null=True, blank=True)
-    cliente_transportadora = models.ForeignKey('logistic.Carrier', verbose_name='Transportadora', on_delete=models.PROTECT, null=True, blank=True)
+    cliente_transportadora = models.ForeignKey('logistic.Carrier', verbose_name='Transportadora', on_delete=models.CASCADE, null=True, blank=True)
     categoria = models.ManyToManyField(Category, related_name='clientes')
-    inscricao_estadual = models.CharField('Inscrição Estadual',max_length=20, null=True, blank=True)
+    inscricao_estadual = models.CharField('Inscrição Estadual', max_length=20, null=True, blank=True)
     limite_credito = models.CharField('Limite de Crédito', max_length=20, null=True, blank=True)
     contribuinte = models.BooleanField('Contribuinte', default=True)
     tag_cliente = models.BooleanField('Cliente', default=False)
     tag_fornecedor = models.BooleanField('Fornecedor', default=False)
-    tag_cadastro_omie_com = models.CharField('OMIE COM',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_ind = models.CharField('OMIE IND',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_pre = models.CharField('OMIE PRE',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_mrx = models.CharField('OMIE MRX',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_flx = models.CharField('OMIE FLX',  max_length=20, null=True, blank=True)
-    tag_cadastro_omie_srv = models.CharField('OMIE SRV',  max_length=20, null=True, blank=True)
+    tag_cadastro_omie_com = models.CharField('OMIE COM', max_length=20, null=True, blank=True)
+    tag_cadastro_omie_ind = models.CharField('OMIE IND', max_length=20, null=True, blank=True)
+    tag_cadastro_omie_pre = models.CharField('OMIE PRE', max_length=20, null=True, blank=True)
+    tag_cadastro_omie_mrx = models.CharField('OMIE MRX', max_length=20, null=True, blank=True)
+    tag_cadastro_omie_flx = models.CharField('OMIE FLX', max_length=20, null=True, blank=True)
+    tag_cadastro_omie_srv = models.CharField('OMIE SRV', max_length=20, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
     is_international = models.BooleanField('Estrangeiro', default=False)
 
@@ -161,14 +162,14 @@ class CustomerSupplier(Base):
 
 
 class Price(Base):
-    produto = models.ForeignKey('products.Product', verbose_name='Produto', on_delete=models.PROTECT, related_name='precos')
-    cliente = models.ForeignKey(CustomerSupplier, verbose_name='Cliente', on_delete=models.PROTECT, related_name='precos')
+    produto = models.ForeignKey('products.Product', verbose_name='Produto', on_delete=models.CASCADE, related_name='precos')
+    cliente = models.ForeignKey(CustomerSupplier, verbose_name='Cliente', on_delete=models.CASCADE, related_name='precos')
     valor = models.DecimalField('Valor', max_digits=10, decimal_places=2)
     is_dolar = models.BooleanField('Dolar', default=False)
-    prazo = models.ForeignKey('logistic.LeadTime', verbose_name='Prazo', on_delete=models.PROTECT, null=True, blank=True, related_name='precos')
-    cnpj_faturamento = models.CharField('CNPJ do Faturamento', choices=CNPJ_FATURAMENTO, max_length=30, null=True, blank=True)
+    prazo = models.ForeignKey('logistic.LeadTime', verbose_name='Prazo', on_delete=models.CASCADE, null=True, blank=True, related_name='precos')
+    cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='precos')
     condicao = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100, null=True, blank=True)
-    vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.PROTECT,  related_name='precos')
+    vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.CASCADE, related_name='precos')
     frete = models.DecimalField('Frete', max_digits=10, decimal_places=2, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
 
