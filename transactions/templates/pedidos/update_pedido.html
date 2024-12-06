@@ -444,11 +444,13 @@ $(document).ready(function() {
     Calcula metragem no modal de adição de produtos SuperLam seguindo a fórmula:
     SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
   */
-  const quantidade = $('#id_quantidade');
-  const largura = $('#id_largura');
-  const comprimento = $('#id_comprimento');
-  const $inputs = [quantidade, largura, comprimento];
-  const metragem = $('#id_m2');
+  const $quantidade = $('#id_quantidade');
+  const $largura = $('#id_largura');
+  const $comprimento = $('#id_comprimento');
+  const $inputs = [$quantidade, $largura, $comprimento];
+  const $metragem = $('#id_m2');
+  const $preco = $('#id_preco');
+  const $total = $('#id_total_preco');
 
   $inputs.forEach(input => {
     input.on('change', function(){
@@ -456,8 +458,9 @@ $(document).ready(function() {
 
       if(valores.every(valor => valor > 0)){
         const area_metragem = (valores[0] * valores[1] * valores[2]) / 1000;
-        //console.log(area_metragem);
-        metragem.val(area_metragem);
+        const total_valor = $quantidade.val() * $preco.val();
+        $total.val(total_valor);
+        $metragem.val(area_metragem);
       }
     });
   });
@@ -516,25 +519,53 @@ $(document).ready(function() {
   // Selecionar qual produto será adicionado com base no filtro anterior de Categorias
   $('#selectProductOrder').click(function(e) {
     e.preventDefault();
+    clientSelect = $("#id_cliente").val();
     productSelect = $("#id_productSelect").val();
     nome_produto = $("#id_productSelect option:selected").text();
     condicao = $("#id_condicaoSelect").val();
     isValid = true;
+    $('#id_comprimento').prop('disabled', true);
+    $('#id_largura').prop('disabled', true);
 
     validateField('productSelect', productSelect);
     validateField('condicaoSelect', condicao);
     if(!isValid) {
       e.preventDefault();
     }else{
+      const url = "{% url 'get_price_data_filter_by_client_product' %}";
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data:{
+          order_id: {{ order.pk }},
+          client_id: {{ order.cliente.id}},
+          product_id: productSelect,
+          'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+          if(response.success){
+            data = response.data;
+            // Atualiza o título do modal com o nome do produto
+            console.log(response);
+            $('#id_preco').val(data.preco)
+            $('#id_conta_corrente').val(data.cc)
+            $('#id_cnpj_faturamento').val(data.cnpj_faturamento)
+            $('#id_prazo').val(data.prazo);
+            $('#id_largura').val(data.largura);
+            $('#id_comprimento').val(data.comprimento);
+           // $('#id_vendedor').val(data.vendedor);
+          }
+        },
+        error: function(xhr, status, error) {
+            console.log(xhr.responseJSON.error);
+        }
+      });
+
       $('#productOrderModal').modal('hide');
       $("#nome_produto").html(nome_produto);
       $("#div_id_preco label").append(`/ <b>Condição: ${condicao}</b>`);
       // Verifica se largura/comprimento/Metragem devem ser exibidos
-      if(listaCategoriasMetragem.includes(+categoriaSelect)){
-        $('.metric_field').prop('hidden', false);
-      }else{
-        $('.metric_field').prop('hidden', true);
-      }
+
       resetForm();
       $("#div_id_preco label").html('Preço')
       $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);

@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView, FormView
-from common.forms import CategoryForm, CustomerSupplierForm, SellerForm, PriceForms
-from common.models import Category, CustomerSupplier, Seller, Price, PriceFormCategory, PriceFormCustomer
+from common.forms import CategoryForm, CustomerSupplierForm, SellerForm, PriceForms, PriceFormCategory, PriceFormCustomer
+from common.models import Category, CustomerSupplier, Seller, Price
 from products.models import Product
 from django.db.models import Q
 from core.views import FormataDadosMixin, FormMessageMixin, DeleteSuccessMessageMixin

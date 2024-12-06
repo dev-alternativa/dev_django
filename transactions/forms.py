@@ -105,6 +105,7 @@ class OutflowsForm(forms.ModelForm):
                 },
                 format='%Y-%m-%d',
             ),
+
         }
         label = {
             'dt_previsao_faturamento': 'Previsão de Faturamento',
@@ -113,6 +114,7 @@ class OutflowsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(OutflowsForm, self).__init__(*args, **kwargs)
         self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
+        self.fields['vendedor'].widget.attrs['disabled'] = 'true'
         self.helper = FormHelper()
         self.helper.form_method = 'post'
 

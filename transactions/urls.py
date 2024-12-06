@@ -17,6 +17,7 @@ urlpatterns = [
     # AJAX
     path('get-products/', views.get_products_by_category, name='get_products_by_category'),
     path('pedidos/<int:order_id>/adicionar_produto/', views.adicionar_produto, name='add_product_to_order'),
+    path('get_price_data/', views.get_price_data_filter_by_client_product, name='get_price_data_filter_by_client_product'),
     path('get_itens_pedido/<int:order_id>/', views.get_itens_pedido, name='get_itens_pedido'),
     path('pedidos/editar/<int:order_id>/', views.edit_pedido, name='edit_order'),
     path('pedidos/<int:order_id>/remover_produto/', views.remove_product_from_order, name='remove_product_from_order'),
@@ -29,6 +30,6 @@ urlpatterns = [
     path('pedidos/', views.OrderListView.as_view(), name='order_list'),
     path('pedidos/new/', views.OrderCreateView.as_view(), name='order_new'),
     # path('pedidos/<int:pk>/detail/', views.PedidosDetailView.as_view(), name='order_detail'),
-    # path('pedidos/<int:order_id>/listar-items-pedido', views.OrderItemList.as_view(), name='order_item_list'),
+    # path('pedidos/<int:order_id>/', views.OrderItemList.as_view(), name='order_item_list'),
     path('pedidos/<int:pk>/atualizar_pedido/', views.OrderEditDetailsView.as_view(), name='update_order'),
 ]

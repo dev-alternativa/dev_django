@@ -255,8 +255,10 @@ class OrderEditDetailsView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-        preco = Price.objects.get(cliente=order.cliente.id)
-        conta_corrente = ContaCorrente.objects.filter(padrao=True, cnpj=preco.cnpj_faturamento)
+
+        # preco = Price.objects.get(cliente=order.cliente.id)
+
+        # conta_corrente = ContaCorrente.objects.filter(padrao=True, cnpj=preco.cnpj_faturamento)
         cliente = order.cliente
 
         # Conta o número de itens já existentes no pedido
@@ -268,14 +270,13 @@ class OrderEditDetailsView(UpdateView):
                 'item_pedido': next_item_index,
                 'numero_pedido': order.pedido_interno_cliente,
                 'vendedor_item': order.vendedor,
-                'preco': preco if preco else '',
-                'cnpj_faturamento': preco.cnpj_faturamento,
-                'conta_corrente': conta_corrente.descricao,
+                # 'cnpj_faturamento': preco.cnpj_faturamento,
+                # 'conta_corrente': conta_corrente,
             }
         )
         context['item_form'] = item_form
         context['categories'] = Category.objects.all()
-        context['price'] = preco
+        # context['price'] = preco
 
         valid_tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
@@ -384,8 +385,11 @@ def adicionar_produto(request, order_id):
                 obs=data["obs"],
                 vendedor_item=seller,
             )
-            outflows_item.save()  # Salva a instância no banco de dados
-            print('Não é pra Salvar')
+            outflows_item.save()
+            if not order.vendedor:
+                order.vendedor = seller
+                order.save()
+
 
             return JsonResponse({'message': 'Produto adicionado com sucesso!'}, status=200)
 
@@ -585,6 +589,63 @@ def update_product_from_order(request, item_id):
                 "error": f'Houve um erro ao tentar atualizar os dados {e}',
             }, status=500)
 
+    else:
+        return JsonResponse({
+            "success": False,
+            "error": "Método não permitido!",
+        }, status=405)
+
+
+def get_price_data_filter_by_client_product(request):
+    if request.method == 'POST':
+        try:
+
+            order_id = request.POST.get('order_id')
+            product_id = request.POST.get('product_id')
+            client_id = request.POST.get('client_id')
+
+            if not order_id or not product_id:
+                return JsonResponse({
+                    "success": False,
+                    "error": "Não foi possível encontrar os dados do pedido ou produto!",
+                }, status=400)
+
+            preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
+            cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento)
+            largura = Product.objects.get(pk=product_id).largura
+            comprimento = Product.objects.get(pk=product_id).comprimento
+
+            print(largura)
+            print(comprimento)
+
+            if not preco or not cc:
+                return JsonResponse({
+                    "success": False, "error": "Não há preço/conta corrente cadastrado para este produto!",
+                })
+
+            data = {
+                'id': order_id,
+                'preco': preco.valor,
+                'cc': cc.pk,
+                'cnpj_faturamento': preco.cnpj_faturamento.id,
+                'largura': largura,
+                'comprimento': comprimento,
+                'prazo': preco.prazo.id,
+                'vendedor': preco.vendedor.id,
+                'is_dolar': preco.is_dolar,
+            }
+            print(data)
+
+            return JsonResponse({
+                "success": True,
+                "action": "update",
+                "data": data,
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({
+                "success": False,
+                "error": str(e),
+            }, status=500)
     else:
         return JsonResponse({
             "success": False,

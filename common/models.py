@@ -64,7 +64,7 @@ ESTADOS_BRASIL = (
 class ContaCorrente(models.Model):
     descricao = models.CharField('Descrição', max_length=50)
     nCodCC = models.CharField('Código da Conta Corrente', max_length=15)
-    cnpj = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, null=True, blank=True)
+    cnpj = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, null=True, blank=True, related_name='conta_corrente')
     padrao = models.BooleanField('Padrão', default=False)
 
     def __str__(self):
