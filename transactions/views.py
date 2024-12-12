@@ -307,6 +307,9 @@ def adicionar_produto(request, order_id):
             'vendedor_item': int,
             'dados_adicionais_item': str,
             'obs': str,
+            'categoria': int,
+            'largura': float,
+            'comprimento': float,
             # 'cfop': str,
         }
 
@@ -347,6 +350,16 @@ def adicionar_produto(request, order_id):
             prazo = LeadTime.objects.get(pk=data["prazo"])
             conta_corrente = ContaCorrente.objects.get(pk=data["conta_corrente"])
 
+            # Verifica se é NYLOFLEX para salvar em quantidade ou m2
+            if data['categoria'] == 7:
+                quantidade = (
+                    data["quantidade"]
+                    if cnpj_faturamento not in [3, 5]
+                    else data["largura"] * data["comprimento"]
+                )
+            else:
+                quantidade = data["quantidade"]
+
             # Limita a quantidade de produtos que podem ser adicionados em apenas 2
             quantidade_items_pedido = OutflowsItems.objects.filter(saida=order_id).count()
             if quantidade_items_pedido > 2:
@@ -373,12 +386,14 @@ def adicionar_produto(request, order_id):
             outflows_item = OutflowsItems(
                 saida=order,
                 produto=product,
-                quantidade=data["quantidade"],
+                quantidade=quantidade,
                 preco=data["preco"],
                 dados_adicionais_item=data["dados_adicionais_item"],
                 numero_pedido=data["numero_pedido"],
-                item_pedido=data["item_pedido"],
+                item_pedido= data["item_pedido"],
                 condicao_preco=data["condicao_calculo"],
+                largura=data["largura"],
+                comprimento=data["comprimento"],
                 cnpj_faturamento=cnpj_faturamento,
                 prazo=prazo,
                 conta_corrente=conta_corrente,
@@ -386,7 +401,9 @@ def adicionar_produto(request, order_id):
                 vendedor_item=seller,
             )
             outflows_item.save()
-            if not order.vendedor:
+
+
+            if not order.vendedor and quantidade_items_pedido == 0:
                 order.vendedor = seller
                 order.save()
 
@@ -412,13 +429,36 @@ def get_itens_pedido(request, order_id):
     items = OutflowsItems.objects.filter(saida__id=order_id)
 
     if items:
+        item_list = []
+
+        for item in items:
+            if item.largura or item.comprimento:
+                m_quadrado = item.largura * item.comprimento / 1000
+            else:
+                m_quadrado = 0
+
+            item_data = {
+                'id': item.id,
+                'nome': item.produto.nome_produto,
+                'quantidade': item.quantidade,
+                'preco': item.preco,
+                'preco_total': item.quantidade * item.preco * m_quadrado
+                if item.produto.tipo_categoria_id == 3 else item.quantidade * item.preco,
+                'largura': item.largura,
+                'comprimento': item.comprimento,
+                'm_quadrado': m_quadrado
+            }
+            item_list.append(item_data)
+
         total_pedido = items.aggregate(total=Sum('preco'))['total']
         quantidade_total = items.aggregate(total=Sum('quantidade'))['total']
+        total_geral = quantidade_total * total_pedido
         html = render_to_string(
             'pedidos/_tabela_items.html', {
-                'itens_produtos': items,
+                'itens_produtos': item_list,
                 'total_pedido': total_pedido,
-                'quantidade_total': quantidade_total
+                'quantidade_total': quantidade_total,
+                'total_geral': total_geral
             }
         )
         return JsonResponse({'html': html})
@@ -497,6 +537,8 @@ def get_item_data(request, item_id):
     if request.method == 'GET':
         try:
             item = get_object_or_404(OutflowsItems, pk=item_id)
+            largura = Product.objects.get(pk=item.produto.pk).largura
+            comprimento = Product.objects.get(pk=item.produto.pk).comprimento
 
             data = {
                 "quantidade": item.quantidade,
@@ -506,6 +548,8 @@ def get_item_data(request, item_id):
                 "conta_corrente": item.conta_corrente.descricao,
                 "item_pedido": item.item_pedido,
                 "numero_pedido": item.numero_pedido,
+                "largura": largura,
+                "comprimento": comprimento,
                 "vendedor_item": item.vendedor_item.nome,
                 "dados_adicionais_item": item.dados_adicionais_item,
                 "obs": item.obs,
@@ -513,7 +557,7 @@ def get_item_data(request, item_id):
                 "vendedor": item.vendedor_item.nome
             }
 
-            # print(data)
+            print(data)
 
             return JsonResponse({
                 "success": True,
@@ -599,7 +643,6 @@ def update_product_from_order(request, item_id):
 def get_price_data_filter_by_client_product(request):
     if request.method == 'POST':
         try:
-
             order_id = request.POST.get('order_id')
             product_id = request.POST.get('product_id')
             client_id = request.POST.get('client_id')
@@ -611,30 +654,27 @@ def get_price_data_filter_by_client_product(request):
                 }, status=400)
 
             preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
-            cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento)
+            cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
             largura = Product.objects.get(pk=product_id).largura
             comprimento = Product.objects.get(pk=product_id).comprimento
-
-            print(largura)
-            print(comprimento)
-
-            if not preco or not cc:
-                return JsonResponse({
-                    "success": False, "error": "Não há preço/conta corrente cadastrado para este produto!",
-                })
+            m_quadrado = Product.objects.get(pk=product_id).m_quadrado
+            pedido = Outflows.objects.get(pk=order_id)
+            next_id = pedido.saida_items.count() + 1
 
             data = {
                 'id': order_id,
-                'preco': preco.valor,
-                'cc': cc.pk,
-                'cnpj_faturamento': preco.cnpj_faturamento.id,
+                'preco': preco.valor if preco else '',
+                'cc': cc.pk if cc else '',
+                'cnpj_faturamento': preco.cnpj_faturamento.id if preco else '',
                 'largura': largura,
                 'comprimento': comprimento,
-                'prazo': preco.prazo.id,
-                'vendedor': preco.vendedor.id,
-                'is_dolar': preco.is_dolar,
+                'prazo': preco.prazo.id if preco else '',
+                'vendedor': preco.vendedor.id if preco else '',
+                'is_dolar': preco.is_dolar if preco else '',
+                'id_numero_pedido': pedido.pedido_interno_cliente,
+                'item_pedido': next_id,
+                'm2': m_quadrado,
             }
-            print(data)
 
             return JsonResponse({
                 "success": True,

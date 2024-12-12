@@ -310,6 +310,8 @@ def validate_omie_code(obj, attr_prefix, app_type):
         return None
 
 
+
+
 def add_order_to_omie(request, order_id):
     OMIE_APPS = ['COM', 'IND', 'PRE', 'SRV', 'MRX', 'FLX']
 
@@ -330,12 +332,20 @@ def add_order_to_omie(request, order_id):
         app_omie = item.cnpj_faturamento.sigla
         for key in OMIE_APPS:
             if key in app_omie:
+                # Verifica se o produto é superlam, caso positivo, atribui quantidade o metro quadrado
+                if item.produto.tipo_categoria.id == 3:
+                    print(f'Item {item.id} pertence a categoria SUPERLAM')
+                    print(f'Largura: {item.produto.largura}')
+                    print(f'Comprimento: {item.produto.comprimento}')
+                    print(f'M2: {item.largura * item.comprimento}')
+
                 items_by_app[key].append(item)
                 break
 
     cliente = order.cliente
     transportadora = order.transportadora
     vendedor = order.vendedor
+
 
     # Cria os pedidos para cada app OMIE
     all_orders = []
@@ -345,6 +355,7 @@ def add_order_to_omie(request, order_id):
         client_code = validate_omie_code(cliente, 'tag_cadastro_omie', app_type)
         transp_code = validate_omie_code(transportadora, 'cod_omie', app_type)
         vend_code = validate_omie_code(vendedor, 'cod_omie', app_type)
+
 
         if not all([client_code, transp_code, vend_code]):
             missing = []
@@ -416,7 +427,7 @@ def add_order_to_omie(request, order_id):
             }
         ]
         all_orders.append(order_dict)
-
+    # print(all_orders)
     api_response = send_to_omie(all_orders)
 
     return JsonResponse({'api_response': api_response}, status=200)

@@ -115,7 +115,7 @@ class OutflowsItems(Base):
     cod_item_omie = models.PositiveBigIntegerField(null=True, blank=True)
     produto = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='saida_items')
     quantidade = models.PositiveIntegerField()
-    preco = models.DecimalField(verbose_name='Preço', max_digits=10, decimal_places=2, blank=True, null=True)
+    preco = models.DecimalField(verbose_name='Preço(R$)', max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(verbose_name='N° Interno cliente', max_length=50, blank=True, null=True)
     largura = models.DecimalField(verbose_name='Largura (mm)', max_digits=10, decimal_places=2, blank=True, null=True)

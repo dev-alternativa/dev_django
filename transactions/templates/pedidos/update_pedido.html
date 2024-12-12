@@ -16,7 +16,7 @@
       {% if order.cod_pedido_omie %}
         <h4 class="text-center">Código Pedido no OMIE #
           <strong>
-            {{ order.pk|default_if_none:"" }}</h4>
+            {{ order.num_pedido_omie|default_if_none:"" }}</h4>
           </strong>
 
       {% endif %}
@@ -286,6 +286,8 @@ function adicionar_produto() {
   const quantidade = getVal('quantidade');
   const preco = getVal('preco');
   const conta_corrente = getVal('conta_corrente');
+  const largura = getVal('largura');
+  const comprimento = getVal('comprimento');
   const itemPedido = getVal('item_pedido');
   const num_pedido_omie = getVal('num_pedido_omie');
   const vendedor_item = getVal('vendedor_item');
@@ -311,7 +313,7 @@ function adicionar_produto() {
   validateField('conta_corrente', conta_corrente);
   validateField('item_pedido', itemPedido);
 
-  // Se o formulário for válido, envie os dados via AJAX
+    // Se o formulário for válido, envie os dados via AJAX
   if (isValid) {
       // Aqui você pode fazer a chamada AJAX para enviar o formulário
       $.ajax({
@@ -324,10 +326,13 @@ function adicionar_produto() {
             prazo: prazo,
             quantidade: quantidade,
             preco: preco,
+            largura: largura,
+            comprimento: comprimento,
             conta_corrente: conta_corrente,
             item_pedido: itemPedido,
             num_pedido_omie: num_pedido_omie,
             vendedor_item: vendedor_item,
+            categoria: categoriaSelect,
             dados_adicionais_item: dados_adicionais_item,
             obs: obs,
             //cfop: cfop,
@@ -346,6 +351,8 @@ function adicionar_produto() {
               </div>`;
 
             $('#alertsPage').append(alertElement);
+            location.reload();
+
           },
           error: function(response) {
             // Erro
@@ -358,9 +365,11 @@ function adicionar_produto() {
 
             $('#alertsModal').append(alertElement);
             //alert(`Erro ao adicionar item: ${erro}`);
+            console.log(response);
           }
       });
   }
+
 }
 
 /*
@@ -422,8 +431,11 @@ $(document).ready(function() {
     const lista_items = $('#tbody-items');
     const qtd_items = lista_items.children().length;
     const categoryModal = new bootstrap.Modal('#categoryOrderModal');
+    categoryModal.show();
+    $(this).removeClass('disabled');
 
     // Desabilita o botão `Adicionar Item` caso a quantidade de items já cadastrados seja igual a que 2
+    /*
     if(qtd_items == 2){
       $(this).addClass('disabled');
       let erro = "Não é possível adicionar mais de 2 itens na mesma ordem.";
@@ -434,9 +446,7 @@ $(document).ready(function() {
       </div>`;
       $('#alertsPage').append(alertElement);
     }else{
-      categoryModal.show();
-      $(this).removeClass('disabled');
-    }
+    }*/
   });
 
 
@@ -447,20 +457,33 @@ $(document).ready(function() {
   const $quantidade = $('#id_quantidade');
   const $largura = $('#id_largura');
   const $comprimento = $('#id_comprimento');
-  const $inputs = [$quantidade, $largura, $comprimento];
-  const $metragem = $('#id_m2');
   const $preco = $('#id_preco');
+  const $inputs = [$quantidade, $largura, $comprimento, $preco];
+  const $metragem = $('#id_m2');
   const $total = $('#id_total_preco');
+  let area_metragem = 0;
 
   $inputs.forEach(input => {
     input.on('change', function(){
       const valores = $inputs.map(i => i.val());
+      let total_valor = 0;
 
       if(valores.every(valor => valor > 0)){
-        const area_metragem = (valores[0] * valores[1] * valores[2]) / 1000;
-        const total_valor = $quantidade.val() * $preco.val();
+        if (categoriaSelect == 3){
+          area_metragem = (valores[1] * valores[2] / 1000);
+          total_valor = $quantidade.val() * $preco.val() * area_metragem;
+
+        }else if(categoriaSelect == 7){
+          area_metragem = (valores[0] * valores[1] * valores[2]) / 1000000;
+          total_valor = $quantidade.val() * $preco.val();
+
+        }
+
         $total.val(total_valor);
         $metragem.val(area_metragem);
+        if(categoriaSelect == 3 || categoriaSelect == 4){
+
+        }
       }
     });
   });
@@ -519,13 +542,36 @@ $(document).ready(function() {
   // Selecionar qual produto será adicionado com base no filtro anterior de Categorias
   $('#selectProductOrder').click(function(e) {
     e.preventDefault();
+    const activeButton = document.getElementById('btn_editar');
+
+    // Ativa o botão `Adicionar` caso o botão `Editar` esteja ativo
+    if(activeButton){
+      activeButton.id = 'submitBtn';
+      activeButton.textContent = 'Adicionar';
+      activeButton.setAttribute('onclick', 'adicionar_produto()');
+    }
+
+    // Se Categoria for Nyloflex, área é mm x mm
+    if(categoriaSelect == 7 || categoriaSelect == 4){
+      $('#div_id_comprimento label').html('Comp. (mm)');
+    }else{
+      $('#div_id_comprimento label').html('Comp. (m)');
+    }
+
+    if(categoriaSelect == 3){
+      $('#id_largura').prop('disabled', false);
+      $('#id_comprimento').prop('disabled', false);
+    }else{
+      $('#id_comprimento').prop('disabled', true);
+      $('#id_largura').prop('disabled', true);
+    }
+
     clientSelect = $("#id_cliente").val();
     productSelect = $("#id_productSelect").val();
     nome_produto = $("#id_productSelect option:selected").text();
     condicao = $("#id_condicaoSelect").val();
     isValid = true;
-    $('#id_comprimento').prop('disabled', true);
-    $('#id_largura').prop('disabled', true);
+
 
     validateField('productSelect', productSelect);
     validateField('condicaoSelect', condicao);
@@ -546,18 +592,19 @@ $(document).ready(function() {
           if(response.success){
             data = response.data;
             // Atualiza o título do modal com o nome do produto
-            console.log(response);
             $('#id_preco').val(data.preco)
             $('#id_conta_corrente').val(data.cc)
             $('#id_cnpj_faturamento').val(data.cnpj_faturamento)
             $('#id_prazo').val(data.prazo);
             $('#id_largura').val(data.largura);
             $('#id_comprimento').val(data.comprimento);
-           // $('#id_vendedor').val(data.vendedor);
+            $('#id_item_pedido').val(data.item_pedido);
+            $('#id_vendedor_item').val(data.vendedor);
+            $('#id_m2').val(data.m2);
           }
         },
         error: function(xhr, status, error) {
-            console.log(xhr.responseJSON.error);
+            console.log(xhr.responseJSON);
         }
       });
 
@@ -567,10 +614,9 @@ $(document).ready(function() {
       // Verifica se largura/comprimento/Metragem devem ser exibidos
 
       resetForm();
-      $("#div_id_preco label").html('Preço')
+      $("#div_id_preco label").html('Preço(R$)')
       $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);
       $('#staticBackdrop').modal('show');
-
 
     }
   });
@@ -578,7 +624,7 @@ $(document).ready(function() {
   atualizarTabela({{ order.pk }})
 
   /*
-    Função executada ao clicar no botão `Editar`
+    Função executada ao clicar no botão `Editar Pedido`
   */
   var initialValues = {};
   $('#editButton').click(function(e) {
@@ -736,6 +782,9 @@ $(document).ready(function() {
 
           $('#nome_produto').text(nome_produto);
 
+          quantidade = parseFloat(response.data.quantidade);
+          preco =parseFloat(response.data.preco);
+          total_preco = preco * quantidade;
 
           // Preenche os campos do modal com os dados retornados
           selectOptionByText('#id_cnpj_faturamento', cnpj);
@@ -743,9 +792,12 @@ $(document).ready(function() {
           selectOptionByText('#id_conta_corrente', conta_corrente);
           selectOptionByText('#id_vendedor_item', vendedor);
 
-          $("#id_quantidade").val(response.data.quantidade);
-          $("#id_preco").val(response.data.preco);
-          $("#id_item_pedido").val(response.data.item_pedido);
+          $("#id_quantidade").val(quantidade);
+          $("#id_preco").val(preco);
+          $("#id_total_preco").val(total_preco);
+          $("#id_largura").val(response.data.largura);
+          $("#id_comprimento").val(response.data.comprimento);
+
           $("#id_numero_pedido").val(response.data.numero_pedido);
           $("#id_dados_adicionais_item").val(response.data.dados_adicionais_item);
           $("#id_obs").val(response.data.obs);
@@ -759,7 +811,7 @@ $(document).ready(function() {
           // Cria o botão novo `Salvar`
           const newButton = document.createElement('button');
           newButton.type = 'button';
-          newButton.id = 'btn-editar';
+          newButton.id = 'btn_editar';
           newButton.className = 'btn btn-primary';
           newButton.textContent = 'Salvar';
           newButton.setAttribute('onclick', 'atualizar_produto()');
@@ -804,10 +856,9 @@ $(document).ready(function() {
         location.reload();
       },
       error: function(xhr, status, error){
-        alert(`Ocorreu um erro: ${xhr.responseJSON.error}!` )
-        console.log(xhr);
-        console.log(status);
-        console.log(error);
+        //alert(`Ocorreu um erro: ${xhr.responseJSON.error}!` )
+        console.log(xhr.responseJSON);
+
       },
 
     }).always(function(){
