@@ -5,12 +5,12 @@
             <th>ID Item</th>
             <th>Produto</th>
             <th>Quantidade</th>
-            <th>Largura</th>
-            <th>Comprimento</th>
+            <th>Larg. (mm)</th>
+            <th>Comp. (m)</th>
             <th>m2</th>
-            <th>Preço</th>
+            <th>Preço Unitário</th>
             <th>Preço Total</th>
-            <th>CPNJ Fat.</th>
+            <th>CNPJ Fat.</th>
             {% comment %} <th>Vendedor</th> {% endcomment %}
             <th>Ações</th>
         </tr>
@@ -21,11 +21,11 @@
             <td>{{ item.id }}</td>
             <td>{{ item.nome }}</td>
             <td>{{ item.quantidade }}</td>
-            <td>{{ item.largura|default_if_none:"0" }}</td>
-            <td>{{ item.comprimento|floatformat:2 }}</td>
+            <td>{{ item.largura|floatformat:0 }}</td>
+            <td>{{ item.comprimento|floatformat:0 }}</td>
             <td>{{ item.m_quadrado|floatformat:2 }}</td>
             <td>R${{ item.preco }}</td>
-            <td>R${{ item.preco_total }}</td>
+            <td>R${{ item.preco_total|floatformat:2 }}</td>
             <td>{{ item.cnpj_faturamento }}</td>
             {% comment %} <td>{{ item.vendedor_item.nome }}</td> {% endcomment %}
             <td>
@@ -52,7 +52,7 @@
     </tbody>
     <div class="container">
         <legend>Total de Produtos: <strong>R$ {{ total_pedido|default_if_none:"0,00" }}</strong> </legend>
-        <legend>Quantidade de produtos: <strong>{{ quantidade_total|default_if_none:"0" }}</strong>
+        <!-- <legend>Quantidade de produtos: <strong>{{ quantidade_total|default_if_none:"0" }}</strong> -->
         <legend>Total do Pedido: <strong>R$ {{ total_geral }}</strong></legend>
     </div>
 </table>

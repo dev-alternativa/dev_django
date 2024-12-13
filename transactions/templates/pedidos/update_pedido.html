@@ -458,36 +458,50 @@ $(document).ready(function() {
   const $largura = $('#id_largura');
   const $comprimento = $('#id_comprimento');
   const $preco = $('#id_preco');
-  const $inputs = [$quantidade, $largura, $comprimento, $preco];
   const $metragem = $('#id_m2');
+  const $inputs = [$quantidade, $largura, $comprimento, $preco, $metragem];
+  const m2 = $metragem.val();
   const $total = $('#id_total_preco');
   let area_metragem = 0;
 
   $inputs.forEach(input => {
     input.on('change', function(){
+
       const valores = $inputs.map(i => i.val());
       let total_valor = 0;
 
       if(valores.every(valor => valor > 0)){
+        let quantidade = parseInt($quantidade.val());
         if (categoriaSelect == 3){
           area_metragem = (valores[1] * valores[2] / 1000);
           total_valor = $quantidade.val() * $preco.val() * area_metragem;
-
+          if(quantidade < 10){
+            dados_discritivo = `0${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
+          }else{
+            dados_discritivo = `${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
+          }
         }else if(categoriaSelect == 7){
-          area_metragem = (valores[0] * valores[1] * valores[2]) / 1000000;
-          total_valor = $quantidade.val() * $preco.val();
 
+          area_metragem = valores[0] * valores[4];
+          total_valor = $quantidade.val() * $preco.val();
+          if(quantidade < 10){
+            dados_discritivo = `0${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
+          }else{
+            dados_discritivo = `${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
+          }
+        }else{
+          area_metragem = valores[1] * valores[2];
         }
+        $("#id_dados_adicionais_item").val(dados_discritivo);
+        $("#id_obs").val(dados_discritivo);
 
         $total.val(total_valor);
         $metragem.val(area_metragem);
-        if(categoriaSelect == 3 || categoriaSelect == 4){
 
-        }
       }
+
     });
   });
-
 
   // Remove os dados de um formulário ao clicar no botão `X` do modal
   $('.btn-close').on('click', function(){
@@ -614,7 +628,7 @@ $(document).ready(function() {
       // Verifica se largura/comprimento/Metragem devem ser exibidos
 
       resetForm();
-      $("#div_id_preco label").html('Preço(R$)')
+      $("#div_id_preco label").html('Preço Unit. (R$)')
       $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);
       $('#staticBackdrop').modal('show');
 

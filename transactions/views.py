@@ -446,7 +446,8 @@ def get_itens_pedido(request, order_id):
                 if item.produto.tipo_categoria_id == 3 else item.quantidade * item.preco,
                 'largura': item.largura,
                 'comprimento': item.comprimento,
-                'm_quadrado': m_quadrado
+                'm_quadrado': m_quadrado,
+                'cnpj_faturamento': item.cnpj_faturamento,
             }
             item_list.append(item_data)
 
