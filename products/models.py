@@ -72,6 +72,7 @@ class Product(Base):
     peso_unitario = models.CharField('Peso Unitário', max_length=10, null=True, blank=True)
     peso_caixa = models.CharField('Peso da Caixa', max_length=10, null=True, blank=True)
     situacao = models.CharField('Estado do Produto', choices=SITUACAO_PRODUTO, max_length=50, null=True, blank=True)
+    ipi = models.DecimalField('IPI', max_digits=5, decimal_places=2, null=True, blank=True)
     cod_omie_com = models.CharField('Cód. OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_oculto_omie_com = models.CharField('Cód. oculto no OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_omie_ind = models.CharField('Cód. OMIE CNPJ IND', max_length=30, null=True, blank=True)

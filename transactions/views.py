@@ -24,6 +24,14 @@ def is_form_empty(form):
 
 
 def get_products_by_category(request):
+    """
+    Recupera uma lista de produtos, opcionalmente filtrados por categoria
+    Permite buscar produtos com base em um ID de categoria.
+    Se for fornecido um category_id, retorna apenas os produtos dessa categoria.
+    Se nenhum ID for fornecido, retorna todos os produtos.
+    :param request: Objeto request do Django
+    :return: JSON com uma lista de produtos (id, nome_produto, largura, comprimento)
+    """
     category_id = request.GET.get('category_id')
     if category_id:
         products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto', 'largura', 'comprimento')
@@ -36,11 +44,29 @@ def get_products_by_category(request):
 
 
 def filter_products(request):
+    """
+    Recupera produtos filtrados por categoria
+    Busca produtos de uma categoria específica e retorna ids e nomes em formato JSON
+    :param request: requisição HTTP
+    :return: JSON com lista de produtos filtrados
+    """
 
     category_id = request.GET.get('category_id')
     products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto')
 
     return JsonResponse({'products': list(products)})
+
+
+def verify_number_cnpj_order(cnpj_list, order_list):
+    """
+    Verifica se o número de CNPJs encontrados em uma lista de pedidos é maior que 2.
+    Validação necessária para impedir adição de itens com mais de 2 CNPJs diferentes.
+    :param cnpj_list: lista de CNPJs encontrados em pedidos ['COM', 'IND', 'PRE', 'SRV', 'MRX', 'FLX']
+    :param order_list: lista de CNPJs dos itens do pedido
+    :return: True se o número de CNPJs encontrados for maior que 2, False caso contrário
+    """
+    count = sum(1 for item in cnpj_list if item in order_list)
+    return count > 2
 
 
 # ********************************* ENTRADAS *********************************
@@ -349,6 +375,16 @@ def adicionar_produto(request, order_id):
             cnpj_faturamento = CNPJFaturamento.objects.get(pk=data["cnpj_faturamento"])
             prazo = LeadTime.objects.get(pk=data["prazo"])
             conta_corrente = ContaCorrente.objects.get(pk=data["conta_corrente"])
+
+            items_list = OutflowsItems.objects.filter(saida=order)
+            itens_cnpj_list = [item.cnpj_faturamento.sigla for item in items_list]
+            cnpj_list = CNPJFaturamento.objects.values_list('sigla', flat=True)
+
+            if verify_number_cnpj_order(list(cnpj_list), itens_cnpj_list):
+                return JsonResponse(
+                    {'error': 'Não é possível adicionar items de mais de 2 CNPJs na mesma ordem.'},
+                    status=400
+                )
 
             # Verifica se é NYLOFLEX para salvar em quantidade ou m2
             if data['categoria'] == 7:

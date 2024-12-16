@@ -208,13 +208,13 @@
 let categoriaSelect, productSelect, condicao, isValid, listaCategoriasMetragem = [3, 4];
 const maxItems = 2 ;
 
-/**
-* Seleciona uma opção de um <select> com base no texto da opção
-* @param {string} selectId - ID do <select>
-* @param {string} optionText - Texto da opção a ser selecionada
-
-*/
 function selectOptionByText(selectId, optionText){
+  /**
+  * Seleciona uma opção de um <select> com base no texto da opção
+  * @param {string} selectId - ID do <select>
+  * @param {string} optionText - Texto da opção a ser selecionada
+
+  */
   const select = $(selectId);
   if(!select){
     console.error(`Elemento com ID ${selectId} não encontrado!`);
@@ -233,18 +233,18 @@ function selectOptionByText(selectId, optionText){
   }
 }
 
-// Reinicia o formulário de adição de produtos
 const resetForm = () => {
+  // Reinicia o formulário de adição de produtos
   $('#itemForm')[0].reset();
   $('#itemForm').find('.is-invalid').removeClass('is-invalid');
   $('#staticBackdrop').modal('hide');
 }
 
-/*
-  Atualiza a lista de itens de produto no pedido
-  :=> orderID, ID do pedido como parâmetro
-*/
 const atualizarTabela = (orderID) => {
+  /**
+    Atualiza a lista de itens de produto no pedido
+    @param {int} orderID - ID do pedido como parâmetro
+  */
   $.ajax({
     url: `/get_itens_pedido/${orderID}/`,
     method: 'GET',
@@ -261,20 +261,20 @@ const atualizarTabela = (orderID) => {
   });
 }
 
-/*
-Valida os campos do formulário de adição de produtos
-:= fieldId, ID do campo a ser validado
-:= value, valor do campo a ser validado
-*/
 const validateField = (fieldId, value) => {
+  /**
+  Valida os campos do formulário de adição de produtos
+  @param {int} fieldId -  ID do campo a ser validado
+  @param {string} - valor do campo a ser validado
+  */
   const element = $(`#id_${fieldId}`);
   element.toggleClass('is-invalid', !value);
   if (!value) isValid = false;
 };
 
 
-// Salva produtos no pedido atual
 function adicionar_produto() {
+  // Salva produtos no pedido atual
 
   const getVal = id => $(`#id_${id}`).val() || '';
 
@@ -372,10 +372,11 @@ function adicionar_produto() {
 
 }
 
-/*
-  Chamada ao clicar no botão `Salvar` no modal de adição de produtos
-*/
 function atualizar_produto() {
+  /**
+    Atualiza um produto no pedido atual
+    Invocada ao clicar no botão `Salvar` no modal de adição de produtos
+  */
 
   const titleTextModal = $("#staticBackdropLabel").text();
   const match = titleTextModal.match(/#(\d+)/);
@@ -417,17 +418,33 @@ function atualizar_produto() {
         },
     });
   }
-/*
-  */
 }
 
-/*
-  Funções iniciadas ao carregar a página
-*/
-$(document).ready(function() {
+function calcularProduto(categoriaSelect, valores, nome_produto){
+  /**
+   * Calcula o preço do produto
+   * @param {int} categoriaSelect - Categoria do produto
+   * @param {object} valores - Objeto com os valores do produto
+   * @param {string} nome_produto - Nome do produto
+   */
+  const quantidade = parseInt(valores[0]);
+  // Validação inicial
+  if(!valores.every(valor => valor > 0)){
+    return {
+      area_metragem: 0,
+      total_valor: 0,
+      dados_discritivo: ''
+    };
+  }
+}
 
-  // Impede a adição de mais de 2 itens na mesma ordem de pedido
+$(document).ready(function() {
+  /**
+    Funções iniciadas ao carregar a página
+  */
+
   $('#add-item').on('click', function(){
+    // Impede a adição de mais de 2 itens na mesma ordem de pedido
     const lista_items = $('#tbody-items');
     const qtd_items = lista_items.children().length;
     const categoryModal = new bootstrap.Modal('#categoryOrderModal');
@@ -811,6 +828,7 @@ $(document).ready(function() {
           $("#id_total_preco").val(total_preco);
           $("#id_largura").val(response.data.largura);
           $("#id_comprimento").val(response.data.comprimento);
+          //$("#id_m2").val(response.data.largura )
 
           $("#id_numero_pedido").val(response.data.numero_pedido);
           $("#id_dados_adicionais_item").val(response.data.dados_adicionais_item);
