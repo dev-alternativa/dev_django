@@ -420,22 +420,70 @@ function atualizar_produto() {
   }
 }
 
-function calcularProduto(categoriaSelect, valores, nome_produto){
+function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicial){
   /**
-   * Calcula o preço do produto
+   * Calcula área e valor do produto
    * @param {int} categoriaSelect - Categoria do produto
    * @param {object} valores - Objeto com os valores do produto
    * @param {string} nome_produto - Nome do produto
+   * @return {object} area_metragem, total_valor e dados_descritivo
    */
   const quantidade = parseInt(valores[0]);
-  // Validação inicial
+
+  // Validação inicial/
+  /*
   if(!valores.every(valor => valor > 0)){
     return {
       area_metragem: 0,
       total_valor: 0,
-      dados_discritivo: ''
+      dados_descritivo: ''
     };
   }
+  */
+
+  // Formatação de descrição para quantidade
+  const formatarDescricao = (quantidade, unidade, parte1, parte2 = '') => {
+    const qtd = quantidade < 10 ? `0${quantidade}` : `${quantidade}`;
+    return parte2
+      ? `${qtd} ${unidade} ${parte1} x ${parte2}`
+      : `${qtd} ${unidade} ${parte1}x${parte2}`;
+  };
+
+  // Cálculos por categoria
+  switch(parseInt(categoriaSelect)){
+    case 3: // Rolos
+      return {
+        area_metragem: (valores[1] * valores[2] / 1000),
+        total_valor: valores[0] * valores[3] * (valores[1] * valores[2] / 1000),
+        dados_descritivo: formatarDescricao(
+          quantidade,
+          'rolo(s)',
+          valores[1],
+          valores[2]
+        )
+      };
+    case 7: // Chapas
+
+      return {
+        area_metragem: valores[0] * metragem_inicial,
+        total_valor: valores[0] * valores[3],
+
+        dados_descritivo: formatarDescricao(
+          quantidade,
+          'chapa(s)',
+          nome_produto,
+          'Revenda'
+        )
+      };
+    default:
+      return {
+        area_metragem: valores[1] * valores[2],
+        total_valor: valores[0] * valores[3] * (valores[1] * valores[2]),
+        dados_descritivo: ''
+      };
+
+  }
+
 }
 
 $(document).ready(function() {
@@ -467,58 +515,103 @@ $(document).ready(function() {
   });
 
 
-  /*
-    Calcula metragem no modal de adição de produtos SuperLam seguindo a fórmula:
-    SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
-  */
-  const $quantidade = $('#id_quantidade');
-  const $largura = $('#id_largura');
-  const $comprimento = $('#id_comprimento');
-  const $preco = $('#id_preco');
-  const $metragem = $('#id_m2');
-  const $inputs = [$quantidade, $largura, $comprimento, $preco, $metragem];
-  const m2 = $metragem.val();
-  const $total = $('#id_total_preco');
-  let area_metragem = 0;
+  function calculoMetragemProduto(){
+    /**
+      Calcula metragem no modal de adição de produtos dependendo da cartegoria
+      SuperLam seguindo a fórmula:
+      SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
+    */
+    const $quantidade = $('#id_quantidade');
+    const $largura = $('#id_largura');
+    const $comprimento = $('#id_comprimento');
+    const $preco = $('#id_preco');
+    const $metragem = $('#id_m2');
+    const $total = $('#id_total_preco');
+    const $inputs = [
+      $quantidade,
+      $largura,
+      $comprimento,
+      $preco,
+    ];
+    const $requiredInputs = [$quantidade, $largura, $comprimento, $preco];
 
-  $inputs.forEach(input => {
-    input.on('change', function(){
+    const metragem_inicial = parseFloat($metragem.val()) || 0;
 
-      const valores = $inputs.map(i => i.val());
-      let total_valor = 0;
+    $inputs.forEach(input => {
+      input.on('change', function(){
+        console.log(metragem_inicial);
 
-      if(valores.every(valor => valor > 0)){
-        let quantidade = parseInt($quantidade.val());
-        if (categoriaSelect == 3){
-          area_metragem = (valores[1] * valores[2] / 1000);
-          total_valor = $quantidade.val() * $preco.val() * area_metragem;
-          if(quantidade < 10){
-            dados_discritivo = `0${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
-          }else{
-            dados_discritivo = `${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
-          }
-        }else if(categoriaSelect == 7){
+        // Obtém os valores dos campos obrigatórios
+        const requiredValues = $requiredInputs.map(i => {
+          const value = parseFloat(i.val());
+          return !isNaN(value) && value > 0 ? value : null;
+        });
 
-          area_metragem = valores[0] * valores[4];
-          total_valor = $quantidade.val() * $preco.val();
-          if(quantidade < 10){
-            dados_discritivo = `0${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
-          }else{
-            dados_discritivo = `${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
-          }
-        }else{
-          area_metragem = valores[1] * valores[2];
+        console.log(requiredValues);
+        // Verifica se todos os calores são diferentes de 0
+        const allValid = requiredValues.every(value => value !== null);
+
+        if(!allValid){
+          console.log('INVALIDO');
+          return;
         }
-        $("#id_dados_adicionais_item").val(dados_discritivo);
-        $("#id_obs").val(dados_discritivo);
+        // Obtém todos os valores (inclusive os opcionais, como metragem)
+        const valores = $inputs.map(i => parseFloat(i.val()) || 0);
 
-        $total.val(total_valor);
-        $metragem.val(area_metragem);
+        // Executa o calculo
+        const resultado = calcularProduto(
+          parseInt(categoriaSelect),
+          valores,
+          nome_produto,
+          metragem_inicial
+        );
 
-      }
+        console.log(resultado);
+        // Atualiza campos do form
+        $("#id_dados_adicionais_item").val(resultado.dados_descritivo);
+        $("#id_obs").val(resultado.dados_descritivo);
+        $total.val(resultado.total_valor.toFixed(2));
+        $metragem.val(resultado.area_metragem.toFixed(2));
 
-    });
-  });
+        /**
+        const valores = $inputs.map(i => i.val());
+        let total_valor = 0;
+
+        if(valores.every(valor => valor > 0)){
+          let quantidade = parseInt($quantidade.val());
+          if (categoriaSelect == 3){
+            area_metragem = (valores[1] * valores[2] / 1000);
+            total_valor = $quantidade.val() * $preco.val() * area_metragem;
+            if(quantidade < 10){
+              dados_descritivo = `0${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
+            }else{
+              dados_descritivo = `${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
+            }
+          }else if(categoriaSelect == 7){
+
+            area_metragem = valores[0] * valores[4];
+            total_valor = $quantidade.val() * $preco.val();
+            if(quantidade < 10){
+              dados_descritivo = `0${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
+            }else{
+              dados_descritivo = `${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
+            }
+          }else{
+            area_metragem = valores[1] * valores[2];
+          }
+          $("#id_dados_adicionais_item").val(dados_descritivo);
+          $("#id_obs").val(dados_descritivo);
+
+          $total.val(total_valor);
+          $metragem.val(area_metragem);
+        **/
+
+        });
+
+      });
+
+  }
+
 
   // Remove os dados de um formulário ao clicar no botão `X` do modal
   $('.btn-close').on('click', function(){
@@ -622,6 +715,7 @@ $(document).ready(function() {
         success: function(response) {
           if(response.success){
             data = response.data;
+
             // Atualiza o título do modal com o nome do produto
             $('#id_preco').val(data.preco)
             $('#id_conta_corrente').val(data.cc)
@@ -631,7 +725,8 @@ $(document).ready(function() {
             $('#id_comprimento').val(data.comprimento);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
-            $('#id_m2').val(data.m2);
+            parseInt(categoriaSelect) !== 3 ? $('#id_m2').val(data.m2) : '';
+            calculoMetragemProduto();
           }
         },
         error: function(xhr, status, error) {
@@ -816,6 +911,23 @@ $(document).ready(function() {
           quantidade = parseFloat(response.data.quantidade);
           preco =parseFloat(response.data.preco);
           total_preco = preco * quantidade;
+          largura = response.data.largura;
+          comprimento = response.data.comprimento;
+          area_m2 = largura * comprimento;
+          categoria = parseInt(response.data.categoria);
+
+          if (categoria == 3){
+            console.log('TESTE')
+            area_m2 = largura * comprimento / 1000
+            $("#id_m2").val(area_m2);
+            $("#id_total_preco").val(quantidade * preco * area_m2);
+          }else if(categoria == 7){
+            area_m2 = quantidade * area_m2
+            $("#id_m2").val(area_m2);
+            $("#id_total_preco").val(quantidade * preco);
+          }else{
+            $("#id_m2").val(response.data.area);
+          }
 
           // Preenche os campos do modal com os dados retornados
           selectOptionByText('#id_cnpj_faturamento', cnpj);
@@ -825,7 +937,7 @@ $(document).ready(function() {
 
           $("#id_quantidade").val(quantidade);
           $("#id_preco").val(preco);
-          $("#id_total_preco").val(total_preco);
+          //$("#id_total_preco").val(total_preco);
           $("#id_largura").val(response.data.largura);
           $("#id_comprimento").val(response.data.comprimento);
           //$("#id_m2").val(response.data.largura )
@@ -835,7 +947,7 @@ $(document).ready(function() {
           $("#id_obs").val(response.data.obs);
 
           /*
-          Altera o button `Adicionar` para `Editar`
+          Altera o button `Adicionar` para `Editar` no modal de edição de produtos
           */
           // Seleciona elemento pai
           const modalFooter = document.getElementById('modal-footer-add-items');

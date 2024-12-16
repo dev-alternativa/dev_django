@@ -576,6 +576,8 @@ def get_item_data(request, item_id):
             item = get_object_or_404(OutflowsItems, pk=item_id)
             largura = Product.objects.get(pk=item.produto.pk).largura
             comprimento = Product.objects.get(pk=item.produto.pk).comprimento
+            categoria = Product.objects.get(pk=item.produto.pk).tipo_categoria.id
+            area = Product.objects.get(pk=item.produto.pk).m_quadrado
 
             data = {
                 "quantidade": item.quantidade,
@@ -591,10 +593,10 @@ def get_item_data(request, item_id):
                 "dados_adicionais_item": item.dados_adicionais_item,
                 "obs": item.obs,
                 "nome_produto": item.produto.nome_produto,
-                "vendedor": item.vendedor_item.nome
+                "vendedor": item.vendedor_item.nome,
+                "categoria": categoria,
+                "area": area,
             }
-
-            print(data)
 
             return JsonResponse({
                 "success": True,
