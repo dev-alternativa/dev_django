@@ -8,21 +8,21 @@ const consultarCNPJ = () => {
   let erroDivCNPJ = $('#id_cnpj-error');
   const btnConsultaCNPJ = $('#btn_consulta_cnpj');
 
-   // Adiciona div de erro se ela não existir
+  // Adiciona div de erro se ela não existir
   if (erroDivCNPJ.length === 0) {
     $('<div id="id_cnpj-error"></div>').insertAfter('.btn-primary');
     erroDivCNPJ = $('#id_cnpj-error');
   }
 
   // Verifica se foi digitado algum CNPJ
-  if(cnpj.length === 0){
+  if (cnpj.length === 0) {
     $('#id_cnpj').addClass('is-invalid');
     erroDivCNPJ.addClass('invalid-feedback show');
     erroDivCNPJ.text('Preencha um CNPJ');
   }
 
   // Verifica se o campo está validado para prosseguir com a request
-  if($('#id_cnpj').hasClass('is-invalid')){
+  if ($('#id_cnpj').hasClass('is-invalid')) {
     return false;
   }
 
@@ -32,7 +32,7 @@ const consultarCNPJ = () => {
     erroDivCNPJ.addClass('invalid-feedback show');
     erroDivCNPJ.text('Não é um CNPJ válido');
     return false;
-  }else{
+  } else {
     // desativa o botão de consultar até que a requisição termine
     btnConsultaCNPJ.html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> <span role="status">Aguarde...</span>');
     btnConsultaCNPJ.attr('disabled', true);
@@ -49,11 +49,11 @@ const consultarCNPJ = () => {
         erroDivCNPJ.text('')
         $('#id_cnpj').addClass('is-valid');
         messageBox("Preenchimento de Dados?", "CNPJ encontrado e validado. Deseja usar os dados consultados para preencher o formulário?")
-        .then((result) => {
-          if(result){
-            tratarJSONCNPJ(dataResponse);
-          }
-        });
+          .then((result) => {
+            if (result) {
+              tratarJSONCNPJ(dataResponse);
+            }
+          });
       },
       error: (err) => {
         $('id_cnpj').addClass('is-invalid');
@@ -66,22 +66,22 @@ const consultarCNPJ = () => {
 };
 
 
-/* Retorna o o endereço completo no formato:
-
-{
-  "cep": "65073120",
-  "state": "MA",
-  "city": "São Luís",
-  "neighborhood": "Parque Shalon",
-  "street": "Rua V-13",
-  "service": "open-cep",
-  "location": {
-      "type": "Point",
-      "coordinates": {}
-  }
-}
-  */
 const consultarCEP = () => {
+  /* Retorna o o endereço completo no formato:
+
+  {
+    "cep": "65073120",
+    "state": "MA",
+    "city": "São Luís",
+    "neighborhood": "Parque Shalon",
+    "street": "Rua V-13",
+    "service": "open-cep",
+    "location": {
+        "type": "Point",
+        "coordinates": {}
+    }
+  }
+    */
   let cep = $('#id_cep').val();
   let cleaned_cep = cep.replace(/[^\d]/g, '');
   const url = `/api/cep/${cleaned_cep}`;
@@ -94,11 +94,11 @@ const consultarCEP = () => {
     erroDivCEP = $('#id_cep-error');
   }
 
-  if(cleaned_cep.length != 8){
+  if (cleaned_cep.length != 8) {
     $('#id_cep').addClass('is-invalid');
     erroDivCEP.addClass('invalid-feedback show');
     erroDivCEP.text('Não é um CEP Válido')
-  }else{
+  } else {
     // Trava o botão de consulta com mensagem e muda texto do mesmo para 'Aguardando'
     btnConsultaCEP.html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> <span role="status">Aguarde...</span>')
     btnConsultaCEP.attr('disabled', true);
@@ -116,7 +116,7 @@ const consultarCEP = () => {
           $('#id_cep').addClass('is-invalid');
           erroDivCEP.addClass('invalid-feedback show');
           erroDivCEP.text('Não é um CEP Válido')
-        }else{
+        } else {
           // se for válido, remove a classe de erro do campo CEP
           $('#id_cep').removeClass('is-invalid');
           erroDivCEP.text('')
@@ -124,7 +124,7 @@ const consultarCEP = () => {
 
         }
       },
-      error: (errorThrown,  jqXHR, textStatus) => {
+      error: (errorThrown, jqXHR, textStatus) => {
         // Caso eu CEP inválido seja inserido, cairá aqui
         // avisará o erro, e habilitará novamente o botão de consulta
         $('#id_cep').addClass('is-invalid');
@@ -139,8 +139,11 @@ const consultarCEP = () => {
 
 
 const tratarJSONCNPJ = (jsonData) => {
-
-  // Parse do JSON com os dados que serão utilizados para preencher o formulário
+  /**
+   * Parse do JSON com os dados que serão utilizados para preencher o formulário
+   * @param {object} - jsonData - Dados em formato JSON
+   *
+   * */
   const razao_social = (jsonData.razao_social) ? jsonData.razao_social : "";
   const nome_fantasia = (jsonData.estabelecimento.nome_fantasia) ? jsonData.estabelecimento.nome_fantasia : "";
   const cep = (jsonData.estabelecimento.cep) ? jsonData.estabelecimento.cep : "";
@@ -152,13 +155,13 @@ const tratarJSONCNPJ = (jsonData) => {
   const telefone1 = (jsonData.estabelecimento.telefone1) ? jsonData.estabelecimento.telefone1 : "";
   const email = (jsonData.estabelecimento.email) ? jsonData.estabelecimento.email : "";
   const estado = (jsonData.estabelecimento.estado.sigla) ? jsonData.estabelecimento.estado.sigla : "";
-  const cidade = (jsonData.estabelecimento.cidade.nome)  ? jsonData.estabelecimento.cidade.nome : "";
+  const cidade = (jsonData.estabelecimento.cidade.nome) ? jsonData.estabelecimento.cidade.nome : "";
   const inscricoes_estaduais = (jsonData.estabelecimento.inscricoes_estaduais) ? jsonData.estabelecimento.inscricoes_estaduais : "";
 
   // Elimina inscrições não ativas e coleta apenas a primeira encontrada
   let inscricaoAtiva = "";
   if (inscricoes_estaduais.length > 0) {
-    let inscricoesAtivas = inscricoes_estaduais.filter( inscricao => inscricao.ativo )
+    let inscricoesAtivas = inscricoes_estaduais.filter(inscricao => inscricao.ativo)
     inscricaoAtiva = inscricoesAtivas[0].inscricao_estadual;
   }
 

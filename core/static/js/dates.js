@@ -1,6 +1,8 @@
-/*  VALIDA DATA */
-
 const validaData = (value) => {
+  /**
+   * Verifica se uma data está em formato válido
+   * @param {value} - value - string contendo uma data
+   * */
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   if (!value.match(regex)) {
     return false;
@@ -20,7 +22,7 @@ const validaData = (value) => {
   let tamanhoMeses = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
   // Ajusta ano bissexto
-  if (ano % 400 == 0 || (ano % 100 != 0 && ano % 4 ==0)) {
+  if (ano % 400 == 0 || (ano % 100 != 0 && ano % 4 == 0)) {
     tamanhoMeses[1] = 29;
   }
 
@@ -29,13 +31,16 @@ const validaData = (value) => {
 
 };
 
-// Verifica se foi informado uma data correta, é chamada quando o input perde o foco
 const validaCampoData = (input) => {
+  /**
+   * Verifica se foi informado uma data correta, é chamada quando o input perde o foco
+   * @param {HTMLInputElement} input - Input com o campo de data
+   */
   const inputData = document.getElementById('id_data_recebimento');
   const errorElement = document.getElementById(`${input.id}-error`);
   let dataValida = false;
 
-  
+
   if (inputData) {
     dataValida = validaData(inputData.value);
   }
@@ -44,16 +49,16 @@ const validaCampoData = (input) => {
     input.classList.add('is-invalid');
     if (!errorElement) {
       const newErrorElement = document.createElement('div');
-        newErrorElement.id = `${input.id}-error`;
-        newErrorElement.className = 'invalid-feedback show';
-        newErrorElement.innerText = 'Data inválida, digite uma Data válida';
-        input.parentNode.appendChild(newErrorElement);
-        input.focus();
-    }else{
+      newErrorElement.id = `${input.id}-error`;
+      newErrorElement.className = 'invalid-feedback show';
+      newErrorElement.innerText = 'Data inválida, digite uma Data válida';
+      input.parentNode.appendChild(newErrorElement);
+      input.focus();
+    } else {
       errorElement.innerText = 'Data inválida, digite uma Data válida.';
       errorElement.classList.add('show');
     }
-  }else {
+  } else {
     input.classList.remove('is-invalid')
     if (errorElement) {
       errorElement.classList.remove('show');
