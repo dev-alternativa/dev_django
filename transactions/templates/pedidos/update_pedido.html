@@ -428,7 +428,8 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
    * @param {string} nome_produto - Nome do produto
    * @return {object} area_metragem, total_valor e dados_descritivo
    */
-  const quantidade = parseInt(valores[0]);
+  let [quantidade, largura, comprimento, preco, id_cnpj_faturamento] = valores;
+  quantidade = parseInt(quantidade);
 
   // Validação inicial/
   /*
@@ -441,8 +442,16 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
   }
   */
 
-  // Formatação de descrição para quantidade
   const formatarDescricao = (quantidade, unidade, parte1, parte2 = '') => {
+    /**
+    Formatar uma descrição com base em parâmetros fornecidos, ajustando a quantidade para sempre ter dois dígitos,
+    concatenando a unidade de medida e combinando partes descritivas opcionais
+    @param {number} quantidade - quantidadede do produto, prefixada em `0` se for menor que 10
+    @param {string} unidade - unidade de medida do produto, aqui será `rolo` ou `chapa`
+    @param {string} parte1 - A primeira parte da descrição que será concatenada após a unidade.
+    @param {string} parte2 [parte2 = ''] - A segunda parte da descrição que será concatenada após um `x`.
+    @return {string} descrição formatada com base nos parâmetros fornecidos
+    */
     const qtd = quantidade < 10 ? `0${quantidade}` : `${quantidade}`;
     return parte2
       ? `${qtd} ${unidade} ${parte1} x ${parte2}`
@@ -451,22 +460,27 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
 
   // Cálculos por categoria
   switch(parseInt(categoriaSelect)){
-    case 3: // Rolos
+    case 3: // Rolos(SuperLam)
       return {
-        area_metragem: (valores[1] * valores[2] / 1000),
-        total_valor: valores[0] * valores[3] * (valores[1] * valores[2] / 1000),
+        area_metragem: (largura * comprimento / 1000),
+        total_valor: quantidade * preco * (largura * comprimento / 1000),
         dados_descritivo: formatarDescricao(
           quantidade,
           'rolo(s)',
-          valores[1],
-          valores[2]
+          largura,
+          comprimento
         )
       };
     case 7: // Chapas
 
+      const app_omie = [2, 5];
+      // Verifica se é IND, PRE ou COM
+      if(app_omie.includes(id_cnpj_faturamento)){
+
+      }
       return {
-        area_metragem: valores[0] * metragem_inicial,
-        total_valor: valores[0] * valores[3],
+        area_metragem: quantidade * metragem_inicial,
+        total_valor: quantidade * preco,
 
         dados_descritivo: formatarDescricao(
           quantidade,
@@ -475,10 +489,10 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
           'Revenda'
         )
       };
-    default:
+    default: // Outros produtos
       return {
-        area_metragem: valores[1] * valores[2],
-        total_valor: valores[0] * valores[3] * (valores[1] * valores[2]),
+        area_metragem: largura * comprimento,
+        total_valor: quantidade * preco * (largura * comprimento),
         dados_descritivo: ''
       };
 
@@ -492,7 +506,7 @@ $(document).ready(function() {
   */
 
   $('#add-item').on('click', function(){
-    // Impede a adição de mais de 2 itens na mesma ordem de pedido
+    // Abre modal de categoria para inicial adição de itens
     const lista_items = $('#tbody-items');
     const qtd_items = lista_items.children().length;
     const categoryModal = new bootstrap.Modal('#categoryOrderModal');
@@ -527,11 +541,13 @@ $(document).ready(function() {
     const $preco = $('#id_preco');
     const $metragem = $('#id_m2');
     const $total = $('#id_total_preco');
+    const $id_cnpj_faturamento = $('#id_cnpj_faturamento');
     const $inputs = [
       $quantidade,
       $largura,
       $comprimento,
       $preco,
+      $id_cnpj_faturamento
     ];
     const $requiredInputs = [$quantidade, $largura, $comprimento, $preco];
 
@@ -539,7 +555,7 @@ $(document).ready(function() {
 
     $inputs.forEach(input => {
       input.on('change', function(){
-        console.log(metragem_inicial);
+
 
         // Obtém os valores dos campos obrigatórios
         const requiredValues = $requiredInputs.map(i => {
@@ -547,7 +563,7 @@ $(document).ready(function() {
           return !isNaN(value) && value > 0 ? value : null;
         });
 
-        console.log(requiredValues);
+
         // Verifica se todos os calores são diferentes de 0
         const allValid = requiredValues.every(value => value !== null);
 
@@ -566,50 +582,15 @@ $(document).ready(function() {
           metragem_inicial
         );
 
-        console.log(resultado);
+        //console.log(resultado);
         // Atualiza campos do form
         $("#id_dados_adicionais_item").val(resultado.dados_descritivo);
         $("#id_obs").val(resultado.dados_descritivo);
         $total.val(resultado.total_valor.toFixed(2));
         $metragem.val(resultado.area_metragem.toFixed(2));
 
-        /**
-        const valores = $inputs.map(i => i.val());
-        let total_valor = 0;
-
-        if(valores.every(valor => valor > 0)){
-          let quantidade = parseInt($quantidade.val());
-          if (categoriaSelect == 3){
-            area_metragem = (valores[1] * valores[2] / 1000);
-            total_valor = $quantidade.val() * $preco.val() * area_metragem;
-            if(quantidade < 10){
-              dados_descritivo = `0${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
-            }else{
-              dados_descritivo = `${$quantidade.val()} rolo(s) ${$largura.val()}x${$comprimento.val()}`;
-            }
-          }else if(categoriaSelect == 7){
-
-            area_metragem = valores[0] * valores[4];
-            total_valor = $quantidade.val() * $preco.val();
-            if(quantidade < 10){
-              dados_descritivo = `0${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
-            }else{
-              dados_descritivo = `${$quantidade.val()} chapa(s) ${nome_produto} x Revenda`;
-            }
-          }else{
-            area_metragem = valores[1] * valores[2];
-          }
-          $("#id_dados_adicionais_item").val(dados_descritivo);
-          $("#id_obs").val(dados_descritivo);
-
-          $total.val(total_valor);
-          $metragem.val(area_metragem);
-        **/
-
-        });
-
       });
-
+    });
   }
 
 
@@ -917,7 +898,7 @@ $(document).ready(function() {
           categoria = parseInt(response.data.categoria);
 
           if (categoria == 3){
-            console.log('TESTE')
+
             area_m2 = largura * comprimento / 1000
             $("#id_m2").val(area_m2);
             $("#id_total_preco").val(quantidade * preco * area_m2);

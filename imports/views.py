@@ -420,7 +420,7 @@ class ImportProductView(FormView):
                         'peso_unitario': row['Peso Unitario'],
                         'peso_caixa': row['Peso/Caixa'],
                         'situacao': row['Situação'],
-                        # 'fornecedor': fornecedor_obj,
+                        #  'ipi': row['ipi'],
                         'cod_omie_com': row['Cod_COM'],
                         'cod_oculto_omie_com': row['Cod_Prod_COM'],
                         'cod_omie_flx': row['Cod_FLX'],
