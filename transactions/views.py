@@ -19,7 +19,7 @@ from django.db.models import Q
 
 # Utility
 def is_form_empty(form):
-    """Retorna True se todos os campos do formulário forem vazios"""
+    """Retorna True se todos os campos de um formulário forem vazios"""
     return all(field is None or field == '' for field in form.cleaned_data.values())
 
 
@@ -318,6 +318,21 @@ class OrderEditDetailsView(UpdateView):
 
 
 def adicionar_produto(request, order_id):
+    """
+    Adiciona um produto a uma ordem de saída.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        order_id (int): O ID da ordem de saída.
+
+    Returns:
+        JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
+
+    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    verifica campos obrigatórios, recupera instâncias de modelos relacionados,
+    e cria uma nova instância de OutflowsItems. Se houver algum erro durante o
+    processamento, uma resposta JSON com o erro é retornada.
+    """
 
     if request.method == 'POST':
         field_types = {
@@ -462,6 +477,19 @@ def adicionar_produto(request, order_id):
 
 
 def get_itens_pedido(request, order_id):
+    """
+    Recupera os itens de uma ordem de saída e renderiza um template com os dados.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        order_id (int): O ID da ordem de saída.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo o HTML renderizado com os itens da ordem de saída.
+
+    O método filtra os itens da ordem de saída pelo ID fornecido, calcula os valores necessários
+    e renderiza um template com os dados dos itens. Se não houver itens, retorna um JSON com HTML vazio.
+    """
     items = OutflowsItems.objects.filter(saida__id=order_id)
 
     if items:
@@ -504,6 +532,35 @@ def get_itens_pedido(request, order_id):
 
 
 def edit_pedido(request, order_id):
+    """
+    Edita uma ordem de saída com os dados fornecidos na requisição POST.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        order_id (int): O ID da ordem de saída a ser editada.
+
+    Returns:
+        JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
+
+    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    verifica e atualiza os campos da ordem de saída com os dados fornecidos.
+    Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
+
+    Campos esperados no POST:
+        - cliente (int): ID do cliente.
+        - num_pedido_omie (str): Número do pedido Omie.
+        - dolar_ptax (float): Valor do dólar PTAX.
+        - desconto (float): Valor do desconto.
+        - nf_saida (str): Nota fiscal de saída.
+        - transportadora (int): ID da transportadora.
+        - pedido_interno_cliente (int): Número do pedido interno do cliente.
+        - dt_previsao_faturamento (str): Data de previsão de faturamento.
+        - tipo_frete (str): Tipo de frete.
+        - dados_adicionais_nf (str): Dados adicionais da nota fiscal.
+        - cod_cenario_fiscal (int): ID do cenário fiscal.
+        - vendedor (int): ID do vendedor.
+        - item_pedido (str): Item do pedido.
+    """
     if request.method == 'POST':
 
         try:
@@ -558,7 +615,20 @@ def edit_pedido(request, order_id):
 
 
 def remove_product_from_order(request, order_id):
+    """
+    Remove um produto de uma ordem de saída.
 
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        order_id (int): O ID do item da ordem de saída a ser removido.
+
+    Returns:
+        JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
+
+    O método aceita apenas requisições POST. Ele tenta recuperar a instância de OutflowsItems
+    pelo ID fornecido e, se encontrado, remove o item da ordem de saída. Se houver algum erro
+    durante o processamento, uma resposta JSON com o erro é retornada.
+    """
     if request.method == 'POST':
         try:
             order = get_object_or_404(OutflowsItems, pk=order_id)
@@ -571,6 +641,20 @@ def remove_product_from_order(request, order_id):
 
 
 def get_item_data(request, item_id):
+    """
+    Recupera os dados de um item de uma ordem de saída.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        item_id (int): O ID do item da ordem de saída.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo os dados do item da ordem de saída.
+
+    O método aceita apenas requisições GET. Ele tenta recuperar a instância de OutflowsItems
+    pelo ID fornecido e, se encontrado, retorna os dados do item. Se houver algum erro
+    durante o processamento, uma resposta JSON com o erro é retornada.
+    """
     if request.method == 'GET':
         try:
             item = get_object_or_404(OutflowsItems, pk=item_id)
@@ -617,6 +701,32 @@ def get_item_data(request, item_id):
 
 
 def update_product_from_order(request, item_id):
+    """
+    Atualiza os dados de um produto em uma ordem de saída.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        item_id (int): O ID do item da ordem de saída a ser atualizado.
+
+    Returns:
+        JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
+
+    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    verifica e atualiza os campos do item da ordem de saída com os dados fornecidos.
+    Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
+
+    Campos esperados no POST:
+        - quantidade (int): Quantidade do produto.
+        - preco (float): Preço do produto.
+        - item_pedido (str): Item do pedido.
+        - numero_pedido (str): Número do pedido.
+        - dados_adicionais_item (str): Dados adicionais do item.
+        - obs (str): Observações.
+        - prazo (int): ID do prazo.
+        - cnpj_faturamento (int): ID do CNPJ de faturamento.
+        - conta_corrente (int): ID da conta corrente.
+        - vendedor_item (int): ID do vendedor.
+    """
     if request.method == 'POST':
 
         try:
@@ -680,6 +790,24 @@ def update_product_from_order(request, item_id):
 
 
 def get_price_data_filter_by_client_product(request):
+    """
+    Recupera os dados de preço filtrados por cliente e produto.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo os dados de preço filtrados ou uma mensagem de erro.
+
+    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    verifica os IDs do pedido, produto e cliente, e retorna os dados de preço filtrados.
+    Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
+
+    Campos esperados no POST:
+        - order_id (int): O ID do pedido.
+        - product_id (int): O ID do produto.
+        - client_id (int): O ID do cliente.
+    """
     if request.method == 'POST':
         try:
             order_id = request.POST.get('order_id')
