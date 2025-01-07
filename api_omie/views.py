@@ -288,10 +288,17 @@ def delete_seller_from_omie(cod_omie, app_omie):
 def validate_omie_code(obj, attr_prefix, app_type):
     """
     Valida o código OMIE para um objeto.
-    :param obj: Objeto a ser validado(Cliente, Transportadora, Vendedor, etc)
-    :param attr_prefix: Prefixo do atributo OMIE a ser buscado
-    :param app_type: Tipo de aplicação OMIE(COM, IND, PRE, SRV, MRX, FLX)
-    :return: Código validado ou None ser inválido
+
+    Args:
+        obj: Objeto a ser validado (Cliente, Transportadora, Vendedor, etc).
+        attr_prefix (str): Prefixo do atributo OMIE a ser buscado.
+        app_type (str): Tipo de aplicação OMIE (COM, IND, PRE, SRV, MRX, FLX).
+
+    Returns:
+        int or None: Código validado ou None se inválido.
+
+    Raises:
+        ValueError: Se o código OMIE não for encontrado ou for inválido.
     """
     try:
         attr_name = f'{attr_prefix}_{app_type.lower()}'
@@ -308,8 +315,6 @@ def validate_omie_code(obj, attr_prefix, app_type):
     except (TypeError, ValueError) as e:
         print(f'Erro ao validar o código OMIE: {e}')
         return None
-
-
 
 
 def add_order_to_omie(request, order_id):
@@ -512,7 +517,15 @@ def send_to_omie(all_orders):
 
 
 def update_local_order(response):
-    """Atualiza Pedido local com a responsa da API do OMIE"""
+    """
+    Atualiza o pedido local com a resposta da API do OMIE.
+
+    Args:
+        response (dict): A resposta da API do OMIE contendo os dados do pedido.
+
+    Returns:
+        bool: Retorna True se o pedido foi atualizado com sucesso, False caso contrário.
+    """
     if 'codigo_pedido' not in response:
         return False
     else:
@@ -525,7 +538,15 @@ def update_local_order(response):
 
 
 def get_omie_credentials(app_type):
-    """Retorna as credenciais OMIE para um determinado app"""
+    """
+    Retorna as credenciais OMIE para um determinado app.
+
+    Args:
+        app_type (str): Tipo de aplicação OMIE (COM, IND, PRE, SRV, MRX, FLX).
+
+    Returns:
+        dict: Um dicionário contendo 'app_key' e 'app_secret' obtidos das variáveis de ambiente.
+    """
     return {
         'app_key': os.getenv(f'{app_type}_OMIE_API_KEY'),
         'app_secret': os.getenv(f'{app_type}_OMIE_API_SECRET')

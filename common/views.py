@@ -97,6 +97,18 @@ class CategoryDeleteView(DeleteSuccessMessageMixin, DeleteView):
 
 
 def get_category_view(request):
+    """
+    Trata a solicitação para recuperar e exibir todas as categorias.
+
+    Essa visualização obtém todos os objetos de categoria do banco de dados e os renderiza no modelo
+    e os renderiza no modelo 'pedidos/_modal_categoria_pedido.html'.
+
+    Args:
+        request (HttpRequest): O objeto de solicitação HTTP.
+
+    Retorna:
+        HttpResponse: A resposta HTML renderizada com a lista de categorias.
+    """
     categories = Category.objects.all()
     return render(request, 'pedidos/_modal_categoria_pedido.html', {'categorias': categories})
 

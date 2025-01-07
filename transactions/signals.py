@@ -6,6 +6,18 @@ from products.models import Inventory
 
 @receiver(post_save, sender=InflowsItems)
 def adicionar_estoque_inventario(sender, instance, created, **kwargs):
+    """
+    Adiciona itens ao inventário quando um novo item de entrada é criado.
+
+    Args:
+        sender (type): O modelo que enviou o sinal (InflowsItems).
+        instance (InflowsItems): A instância do item de entrada que foi salva.
+        created (bool): Um booleano que indica se uma nova instância foi criada.
+        **kwargs: Argumentos adicionais.
+
+    O método cria novas instâncias de Inventory para cada quantidade do item de entrada
+    e define o status como 'ESTOQUE' e o tipo de alteração como 'E'.
+    """
     if created:
         for _ in range(instance.quantidade):
             Inventory.objects.create(

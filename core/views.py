@@ -91,11 +91,6 @@ class FormMessageMixin:
 
         return response
 
-    # def form_invalid(self, form):
-
-    #   messages.error(self.request, self.error_message)
-    #   return super().form_invalid(form)
-
 
 # Mensagens de exclusão de itens
 class DeleteSuccessMessageMixin(SuccessMessageMixin, DeleteView):
