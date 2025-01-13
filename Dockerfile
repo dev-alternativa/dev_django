@@ -1,19 +1,44 @@
-# Use uma imagem base oficial do Python
-FROM python:3.12.3
+# Use uma imagem base oficial do Python (versão slim)
+FROM python:3.12.3-slim
 
-# Define o diretório de trabalho dentro do contêiner
-WORKDIR /usr/src/app_alternativa
+# Define o diretório de trabalho
+WORKDIR /app_alternativa
 
-# Copie o arquivo de requisitos e instale as dependências
-COPY requirements.txt ./
+# Instala as dependências necessárias para build (compilação de pacotes)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        pkg-config \
+        python3-dev \
+        default-mysql-client \
+        build-essential \
+        default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependências do Python
+COPY requirements.txt /app_alternativa
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copie o código do projeto para o diretório de trabalho
-COPY . .
+# Copiar o código da aplicação
+COPY . /app_alternativa/
 
-# Instala o cliente MySQL (se necessário para testes)
-RUN apt-get update && apt-get install -y default-mysql-client
+# Configurar arquivos estáticos
+RUN python manage.py collectstatic --no-input
 
+# Criar usuário não-root e configurar como usuário padrão
+RUN adduser --disabled-password --gecos '' django_user && \
+    chown -R django_user:django_user /app_alternativa
 
-# Expõe a porta que o Django usa (por padrão é 8000)
-EXPOSE 8001
+# Trocar para o usuário não-root
+USER django_user
+
+# Expor porta para o Gunicorn
+EXPOSE 8080
+
+# Definir a porta padrão como 8000 se não estiver definida
+ENV PORT=8000
+
+# Criar um script de entrada
+RUN echo '#!/bin/bash\n\
+exec gunicorn --bind 0.0.0.0:${PORT:-8000} altflex.wsgi:application' > /app_alternativa/entrypoint.sh && \
+    chmod +x /app_alternativa/entrypoint.sh
+
+CMD ["/app_alternativa/entrypoint.sh"]
