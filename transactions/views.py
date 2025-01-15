@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from decimal import Decimal
 from django.template.loader import render_to_string
 from django.db import transaction
 from django.http import JsonResponse
@@ -17,7 +18,8 @@ from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 
 
-# Utility
+# Utilities
+
 def is_form_empty(form):
     """Retorna True se todos os campos de um formulário forem vazios"""
     return all(field is None or field == '' for field in form.cleaned_data.values())
@@ -67,6 +69,32 @@ def verify_number_cnpj_order(cnpj_list, order_list):
     """
     count = sum(1 for item in cnpj_list if item in order_list)
     return count > 2
+
+
+def price_calculation(item_id):
+    item = OutflowsItems.objects.get(pk=item_id)
+
+    category = item.produto.tipo_categoria.pk
+
+    if category == 3:
+        largura = item.largura
+        comprimento = item.comprimento
+        m_quadrado = largura * comprimento / 1000
+        total_valor = item.quantidade * item.preco * m_quadrado
+        print(f'largura: {largura}, comprimento: {comprimento}, m_quadrado: {m_quadrado}')
+    elif category == 7:
+        # m_quadrado = item.quantidade * item.produto.m_quadrado
+        m_quadrado = item.produto.m_quadrado
+        total_valor = item.quantidade * item.preco
+    else:
+        m_quadrado = item.produto.m_quadrado
+        total_valor = Decimal(item.quantidade) * Decimal(item.preco) * Decimal(m_quadrado)
+
+    return {
+        'id': item.id,
+        'm_quadrado': m_quadrado,
+        'total_valor': total_valor,
+    }
 
 
 # ********************************* ENTRADAS *********************************
@@ -315,6 +343,30 @@ class OrderEditDetailsView(UpdateView):
         context['cliente_tags'] = [tag for valor, tag in valid_tags if int(valor)]
 
         return context
+
+class OrderSummary(DetailView):
+    model = Outflows
+    template_name = 'pedidos/resumo_pedido.html'
+    context_object_name = 'order'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.get_object()
+        cliente = order.cliente.nome_fantasia
+        order_itens = OutflowsItems.objects.filter(saida=order.pk)
+
+
+        for item in order_itens:
+            price_data = price_calculation(item.pk)
+            item.m_quadrado = price_data['m_quadrado']
+            item.total_valor = price_data['total_valor']
+
+
+        context['order_itens'] = order_itens
+        context['cliente'] = cliente
+        context['order'] = order
+        return context
+
 
 
 def adicionar_produto(request, order_id):

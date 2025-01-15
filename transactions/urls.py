@@ -32,4 +32,5 @@ urlpatterns = [
     # path('pedidos/<int:pk>/detail/', views.PedidosDetailView.as_view(), name='order_detail'),
     # path('pedidos/<int:order_id>/', views.OrderItemList.as_view(), name='order_item_list'),
     path('pedidos/<int:pk>/atualizar_pedido/', views.OrderEditDetailsView.as_view(), name='update_order'),
+    path('pedidos/<int:pk>/resumo/', views.OrderSummary.as_view(), name='order_summary'),
 ]

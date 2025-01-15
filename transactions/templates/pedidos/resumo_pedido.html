@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %} Pedidos {% endblock %}
+
+{% block content %}
+    <div id="page-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class = "text-body-secondary text-center mb-3">Resumo do Pedido</h1>
+
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class='col-md-4'>
+                            <a href="{% url 'update_order' order.pk %}" class='btn btn-danger float-start'>
+                                <i class="bi bi-backspace"></i>
+                                Voltar para Pedido "{{ order.pk}}"
+                            </a>
+                        </div>
+                    </div>
+
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="order_id" class="form-label">ID do Pedido</label>
+                                <input type="text" class="form-control" id="order_id" value="{{ order.id }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="order_date" class="form-label">Data do Pedido</label>
+                                <input type="text" class="form-control" id="order_date" value="{{ order.dt_criacao }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="customer_name" class="form-label">Nome do Cliente</label>
+                                <input type="text" class="form-control" id="customer_name" value="{{ order.cliente.nome_fantasia }}" disabled>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="order_outflow_type" class="form-label">Tipo de Saída</label>
+                                <input type="text" class="form-control" id="order_outflow_type" value="{% if order.tipo_saida == 'V' %}Venda{% else %}Ajuste{% endif %}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="order_carrier" class="form-label">Transportadora</label>
+                                <input type="text" class="form-control" id="order_carrier" value="{{ order.transportadora }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="prev_date" class="form-label">Dt Previsão de Faturamento</label>
+                                <input type="text" class="form-control" id="prev_date" value="{{ order.dt_previsao_faturamento }}" disabled>
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="customer_email" class="form-label">Emails do Cliente</label>
+                                <input type="text" class="form-control" id="customer_email" value="{{ order.cliente.email }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="total_amount" class="form-label">Valor Total</label>
+                                <input type="text" class="form-control" id="total_amount" value="{{ order.total_amount }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Status</label>
+                                <input type="text" class="form-control" id="status" value="{{ order.status|default_if_none:"-" }}" disabled>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label for="additional_data" class="form-label">Dados Adicionais</label>
+                                <input type="text" class="form-control" id="additional_data" value="{{ order.dados_adicionais }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tax_scenario" class="form-label">Cenário Fiscal</label>
+                                <input type="text" class="form-control" id="tax_scenario" value="{{ order.cod_cenario_fiscal.cenario }}" disabled>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="freight_type" class="form-label">Tipo de Frete</label>
+                                <input type="text" class="form-control" id="freight_type" value="{{ order.tipo_frete }}" disabled>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr>
+                    <h2 class="text-body-secondary text-center mb-3">Itens</h2>
+
+                    <div class="row mb-3">
+                        {% for item in order_itens %}
+                            <div class="col-md-12">
+                                <div class="row mb-12">
+                                    <div class="col-md-1">
+                                        <label for="item_id_{{ item.id }}" class="form-label">ID</label>
+                                        <input type="text" class="form-control" id="item_id_{{ item.id }}" value="{{ item.pk }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_name_{{ item.id }}" class="form-label">Produto</label>
+                                        <input type="text" class="form-control" id="item_name_{{ item.id }}" value="{{ item.produto }}" disabled>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label for="item_quantity_{{ item.id }}" class="form-label">Quantidade</label>
+                                        <input type="text" class="form-control" id="item_quantity_{{ item.id }}" value="{{ item.quantidade }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_price_{{ item.id }}" class="form-label">Preço Unitário</label>
+                                        <input type="text" class="form-control" id="item_price_{{ item.id }}" value="{{ item.preco }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_quantity_{{ item.id }}" class="form-label">Preço Total</label>
+                                        <input type="text" class="form-control" id="item_quantity_{{ item.id }}" value="{{ item.total_valor|floatformat:2 }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_category_{{ item.id }}" class="form-label">Categoria</label>
+                                        <input type="text" class="form-control" id="item_category_{{ item.id }}" value="{{ item.produto.tipo_categoria }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_model_{{ item.id }}" class="form-label">Vendedor</label>
+                                        <input type="text" class="form-control" id="item_model_{{ item.id }}" value="{{ item.vendedor_item }}" disabled>
+                                    </div>
+                                </div>
+                                <div class="row mb-12">
+                                    <div class="col-md-1">
+                                        <label for="item_weight_{{ item.id }}" class="form-label">Larg.</label>
+                                        <input type="text" class="form-control" id="item_weight_{{ item.id }}" value="{{ item.largura }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_dimensions_{{ item.id }}" class="form-label">Comp.</label>
+                                        <input type="text" class="form-control" id="item_dimensions_{{ item.id }}" value="{{ item.comprimento }}" disabled>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label for="item_dimensions_{{ item.id }}" class="form-label">m²</label> Total
+                                        <input type="text" class="form-control" id="item_dimensions_{{ item.id }}" value="{{ item.m_quadrado|floatformat:2 }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_color_{{ item.id }}" class="form-label">Condição Cálculo</label>
+                                        <input type="text" class="form-control" id="item_color_{{ item.id }}" value="{{ item.condicao_preco }}" disabled>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label for="item_size_{{ item.id }}" class="form-label">CNPJ</label>
+                                        <input type="text" class="form-control" id="item_size_{{ item.id }}" value="{{ item.cnpj_faturamento }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_material_{{ item.id }}" class="form-label">Prazo</label>
+                                        <input type="text" class="form-control" id="item_material_{{ item.id }}" value="{{ item.prazo }}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="item_brand_{{ item.id }}" class="form-label">Conta Corrente</label>
+                                        <input type="text" class="form-control" id="item_brand_{{ item.id }}" value="{{ item.conta_corrente }}" disabled>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label for="item_serial_{{ item.id }}" class="form-label">CFOP</label>
+                                        <input type="text" class="form-control" id="item_serial_{{ item.id }}" value="{{ item.CFOP }}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <p></p>
+                            <hr>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content%}
