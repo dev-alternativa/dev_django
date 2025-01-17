@@ -139,7 +139,7 @@ class FetchSellersView(APIView):
             result = fetch_and_save_sellers(app_omie)
 
             if result['success']:
-                print(f'{result['total_created']} vendedores criados e {result["total_update"]} atualizados')
+                print(f"{result['total_created']} vendedores criados e {result['total_update']} atualizados")
 
                 return Response({
                     'message': 'Vendedores processados com sucesso!',
@@ -476,7 +476,7 @@ def send_to_omie(all_orders):
                 return {
                     'response': response_data,
                     'success': True,
-                    'message': f'Pedido {response_data.get('num_pedido_omie')} criado com sucesso no OMIE!'
+                    'message': f"Pedido {response_data.get('num_pedido_omie')} criado com sucesso no OMIE!"
                 }
         else:
             return {

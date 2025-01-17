@@ -335,12 +335,12 @@ class ImportCarrierView(FormView):
                 obj, created = Carrier.objects.get_or_create(
                     nome=row['Transportadora (Nome Fantasia)'],
                     cnpj=self.remover_nao_numericos(row['Transportadora (CNPJ/CPF)']),
-                    cod_omie_COM=row['codigo_cliente_omie_COM'],
-                    cod_omie_IND=row['codigo_cliente_omie_IND'],
-                    cod_omie_PRE=row['codigo_cliente_omie_PRE'],
-                    cod_omie_MRX=row['codigo_cliente_omie_MRX'],
-                    cod_omie_SRV=row['codigo_cliente_omie_SRV'],
-                    cod_omie_FLX=row['codigo_cliente_omie_FLX'],
+                    cod_omie_com=row['codigo_cliente_omie_COM'],
+                    cod_omie_ind=row['codigo_cliente_omie_IND'],
+                    cod_omie_pre=row['codigo_cliente_omie_PRE'],
+                    cod_omie_mrx=row['codigo_cliente_omie_MRX'],
+                    cod_omie_srv=row['codigo_cliente_omie_SRV'],
+                    cod_omie_flx=row['codigo_cliente_omie_FLX'],
                 )
 
                 if created:

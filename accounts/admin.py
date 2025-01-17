@@ -10,10 +10,10 @@ class CustomUsuarioAdmin(UserAdmin):
     form = CustomUsuarioChangeForm
     model = CustomUsuario
 
-    list_display = ('first_name', 'last_name', 'departamento', 'unidade', 'contato', 'is_staff')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'departamento', 'unidade', 'contato', 'is_staff')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Informações Pessoais', {'fields': ('first_name', 'last_name', 'contato')}),
+        (None, {'fields': ('username', 'password')}),
+        ('Informações Pessoais', {'fields': ('first_name', 'last_name', 'contato', 'email')}),
         ('Outras Informações', {'fields': ('departamento', 'unidade')}),
         ('Permissões', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Datas Importantes', {'fields': ('last_login', 'date_joined')}),
@@ -24,7 +24,7 @@ class CustomUsuarioAdmin(UserAdmin):
         (None,
             {
                 'classes': ('wide',),
-                'fields': ('email', 'password1', 'password2',
+                'fields': ('username', 'password1', 'password2', 'email',
                         'first_name', 'last_name', 'contato', 'departamento', 'unidade', 'is_staff')
             }
         ),

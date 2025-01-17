@@ -9,22 +9,13 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 class CustomUsuarioCreateForm(UserCreationForm):
     class Meta:
         model = CustomUsuario
-        fields = ('email', 'first_name', 'last_name', 'contato', 'departamento', 'unidade')
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password1'])
-        user.email = self.cleaned_data['email']
-        if commit:
-            user.save()
-        return user
-
+        fields = ('username', 'email', 'first_name', 'last_name', 'contato', 'departamento', 'unidade')
 
 # Atualiza usuario, usado apenas no admin
 class CustomUsuarioChangeForm(UserChangeForm):
     class Meta:
         model = CustomUsuario
-        fields = ('first_name', 'last_name', 'contato', 'departamento', 'unidade')
+        fields = ('username', 'email', 'first_name', 'last_name', 'contato', 'departamento', 'unidade')
 
 
 class LoginForm(AuthenticationForm):
