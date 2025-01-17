@@ -7,7 +7,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class = "text-body-secondary text-center mb-3">Resumo do Pedido</h1>
+                    <h1 class = "text-body-secondary text-center mb-3">Dados a serem enviados ao OMIE</h1>
 
                     {% if messages %}
                         <div class="messages">
@@ -29,144 +29,188 @@
                         </div>
                     </div>
 
-                    <form>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="order_id" class="form-label">ID do Pedido</label>
-                                <input type="text" class="form-control" id="order_id" value="{{ order.id }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="order_date" class="form-label">Data do Pedido</label>
-                                <input type="text" class="form-control" id="order_date" value="{{ order.dt_criacao }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="customer_name" class="form-label">Nome do Cliente</label>
-                                <input type="text" class="form-control" id="customer_name" value="{{ order.cliente.nome_fantasia }}" disabled>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="order_outflow_type" class="form-label">Tipo de Saída</label>
-                                <input type="text" class="form-control" id="order_outflow_type" value="{% if order.tipo_saida == 'V' %}Venda{% else %}Ajuste{% endif %}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="order_carrier" class="form-label">Transportadora</label>
-                                <input type="text" class="form-control" id="order_carrier" value="{{ order.transportadora }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="prev_date" class="form-label">Dt Previsão de Faturamento</label>
-                                <input type="text" class="form-control" id="prev_date" value="{{ order.dt_previsao_faturamento }}" disabled>
-                            </div>
-                        </div>
-
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="customer_email" class="form-label">Emails do Cliente</label>
-                                <input type="text" class="form-control" id="customer_email" value="{{ order.cliente.email }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="total_amount" class="form-label">Valor Total</label>
-                                <input type="text" class="form-control" id="total_amount" value="{{ order.total_amount }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="status" class="form-label">Status</label>
-                                <input type="text" class="form-control" id="status" value="{{ order.status|default_if_none:"-" }}" disabled>
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-4">
-                                <label for="additional_data" class="form-label">Dados Adicionais</label>
-                                <input type="text" class="form-control" id="additional_data" value="{{ order.dados_adicionais }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="tax_scenario" class="form-label">Cenário Fiscal</label>
-                                <input type="text" class="form-control" id="tax_scenario" value="{{ order.cod_cenario_fiscal.cenario }}" disabled>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="freight_type" class="form-label">Tipo de Frete</label>
-                                <input type="text" class="form-control" id="freight_type" value="{{ order.tipo_frete }}" disabled>
-                            </div>
-                        </div>
-                    </form>
-
-                    <hr>
-                    <h2 class="text-body-secondary text-center mb-3">Itens</h2>
-
+                    <div class="row mb-3">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th colspan="4" scope="col">Cabeçalho</th>
+                                </tr>
+                                <tr>
+                                    <th>Chave</th>
+                                    <th>Chave no OMIE</th>
+                                    <th>Valor que irá no JSON</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td  class="text-center">Código do cliente</td>
+                                    <td  class="text-center">codigo_cliente</td>
+                                    <td  class="text-center text-danger">{{ order.cliente.pk }}</td>
+                                    <td  class="text-center">Cliente: {{ order.cliente.nome_fantasia }}</td>
+                                </tr>
+                                <tr>
+                                    <td  class="text-center">Código do pedido</td>
+                                    <td  class="text-center">codigo_pedido_integracao</td>
+                                    <td  class="text-center text-danger">{{ order.pk }}</td>
+                                    <td  class="text-center">Código do pedido local</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">Dt Previsão de Faturamento</td>
+                                    <td class="text-center">data_previsao</td>
+                                    <td class="text-center text-danger">{{ order.dt_previsao_faturamento|date:'d/m/Y' }}</td>
+                                    <td class="text-center">Data de previsão de faturamento</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">Prazo</td>
+                                    <td class="text-center">codigo_parcela</td>
+                                    <td class="text-center">Verificar</td>
+                                    <td class="text-center">Código da parcela no OMIE</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th colspan="4" scope="col">Frete</th>
+                                </tr>
+                                <tr>
+                                    <th>Chave</th>
+                                    <th>Chave no OMIE</th>
+                                    <th>Valor que irá no JSON</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">Frete</td>
+                                    <td class="text-center">modalidade</td>
+                                    <td class="text-center text-danger">{{ order.tipo_frete }}</td>
+                                    <td class="text-center">Tipo de frete</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">Transportadora</td>
+                                    <td class="text-center text-danger">codigo_transportadora</td>
+                                    {% if order.transportadora.cod_omie_com != "0" %} <td>{{ order.transportadora.cod_omie_com }}(COM)</td> {% endif %}
+                                    {% if order.transportadora.cod_omie_ind != "0" %} <td>{{ order.transportadora.cod_omie_ind }}(IND)</td> {% endif %}
+                                    {% if order.transportadora.cod_omie_flx != "0" %} <td>{{ order.transportadora.cod_omie_flx }}(FLX)</td> {% endif %}
+                                    {% if order.transportadora.cod_omie_srv != "0" %} <td>{{ order.transportadora.cod_omie_srv }}(SRV)</td> {% endif %}
+                                    {% if order.transportadora.cod_omie_mrx != "0" %} <td>{{ order.transportadora.cod_omie_mrx }}(MRX)</td> {% endif %}
+                                    {% if order.transportadora.cod_omie_pre != "0" %} <td>{{ order.transportadora.cod_omie_pre }}(PRE)</td> {% endif %}
+                                    <td class="text-center">Tipo de TRANSPORTADORA</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="row mb-3">
                         {% for item in order_itens %}
-                            <div class="col-md-12">
-                                <div class="row mb-12">
-                                    <div class="col-md-1">
-                                        <label for="item_id_{{ item.id }}" class="form-label">ID</label>
-                                        <input type="text" class="form-control" id="item_id_{{ item.id }}" value="{{ item.pk }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_name_{{ item.id }}" class="form-label">Produto</label>
-                                        <input type="text" class="form-control" id="item_name_{{ item.id }}" value="{{ item.produto }}" disabled>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <label for="item_quantity_{{ item.id }}" class="form-label">Quantidade</label>
-                                        <input type="text" class="form-control" id="item_quantity_{{ item.id }}" value="{{ item.quantidade }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_price_{{ item.id }}" class="form-label">Preço Unitário</label>
-                                        <input type="text" class="form-control" id="item_price_{{ item.id }}" value="{{ item.preco }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_quantity_{{ item.id }}" class="form-label">Preço Total</label>
-                                        <input type="text" class="form-control" id="item_quantity_{{ item.id }}" value="{{ item.total_valor|floatformat:2 }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_category_{{ item.id }}" class="form-label">Categoria</label>
-                                        <input type="text" class="form-control" id="item_category_{{ item.id }}" value="{{ item.produto.tipo_categoria }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_model_{{ item.id }}" class="form-label">Vendedor</label>
-                                        <input type="text" class="form-control" id="item_model_{{ item.id }}" value="{{ item.vendedor_item }}" disabled>
-                                    </div>
-                                </div>
-                                <div class="row mb-12">
-                                    <div class="col-md-1">
-                                        <label for="item_weight_{{ item.id }}" class="form-label">Larg.</label>
-                                        <input type="text" class="form-control" id="item_weight_{{ item.id }}" value="{{ item.largura }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_dimensions_{{ item.id }}" class="form-label">Comp.</label>
-                                        <input type="text" class="form-control" id="item_dimensions_{{ item.id }}" value="{{ item.comprimento }}" disabled>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <label for="item_dimensions_{{ item.id }}" class="form-label">m²</label> Total
-                                        <input type="text" class="form-control" id="item_dimensions_{{ item.id }}" value="{{ item.m_quadrado|floatformat:2 }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_color_{{ item.id }}" class="form-label">Condição Cálculo</label>
-                                        <input type="text" class="form-control" id="item_color_{{ item.id }}" value="{{ item.condicao_preco }}" disabled>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <label for="item_size_{{ item.id }}" class="form-label">CNPJ</label>
-                                        <input type="text" class="form-control" id="item_size_{{ item.id }}" value="{{ item.cnpj_faturamento }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_material_{{ item.id }}" class="form-label">Prazo</label>
-                                        <input type="text" class="form-control" id="item_material_{{ item.id }}" value="{{ item.prazo }}" disabled>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="item_brand_{{ item.id }}" class="form-label">Conta Corrente</label>
-                                        <input type="text" class="form-control" id="item_brand_{{ item.id }}" value="{{ item.conta_corrente }}" disabled>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <label for="item_serial_{{ item.id }}" class="form-label">CFOP</label>
-                                        <input type="text" class="form-control" id="item_serial_{{ item.id }}" value="{{ item.CFOP }}" disabled>
-                                    </div>
-                                </div>
-                            </div>
-                            <p></p>
-                            <hr>
+                            <table class="table table-bordered table-striped caption-top">
+                                <caption>Item #{{ item.item_pedido }}</caption>
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" scope="col">Det</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Chave</th>
+                                        <th>Chave no OMIE</th>
+                                        <th>Valor que irá no JSON</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center">Código do Item</td>
+                                        <td class="text-center">codigo_item_integracao</td>
+                                        <td class="text-center text-danger">{{ item.pk }}</td>
+                                        <td class="text-center">Código da parcela no OMIE</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">Dados Adicionais</td>
+                                        <td class="text-center">dados_adicionais_item</td>
+                                        <td class="text-center text-danger">{{ item.dados_adicionais_item }}</td>
+                                        <td class="text-center">Dados adicionais que vão para NF</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">Produto</td>
+                                        <td class="text-center">codigo_produto</td>
+                                        {% if item.cnpj_faturamento.sigla == "COM" and item.produto.cod_oculto_omie_com != "0" %}
+                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_com }}("COM")</td>
+                                        {% elif item.cnpj_faturamento.sigla == "IND" and item.produto.cod_oculto_omie_ind != "0" %}
+                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_ind }}("IND")</td>
+                                        {% elif item.cnpj_faturamento.sigla == "FLX" and item.produto.cod_oculto_omie_flx != "0" %}
+                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_flx }}("FLX")</td>
+                                        {% elif item.cnpj_faturamento.sigla == "SRV" and item.produto.cod_oculto_omie_srv != "0" %}
+                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_srv }}("SRV")</td>
+                                        {% elif item.cnpj_faturamento.sigla == "MRX" and item.produto.cod_oculto_omie_mrx != "0" %}
+                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_mrx }}("MRX")</td>
+                                        {% elif item.cnpj_faturamento.sigla == "PRE" and item.produto.cod_oculto_omie_pre != "0" %}
+                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_pre }}("PRE")</td>
+                                        {% else %}
+                                            <td></td>
+                                        {% endif %}
+
+
+                                        <td class="text-center">Código Oculto do OMIE que muda dependendo do APP OMIE a ser usado</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">Quantidade</td>
+                                        <td class="text-center">quantidade</td>
+                                        <td class="text-center text-danger">{{ item.quantidade }}</td>
+                                        <td class="text-center">Quantidade do produto</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">Preço Unitário</td>
+                                        <td class="text-center">valor_unitario</td>
+                                        <td class="text-center text-danger">{{ item.preco }}</td>
+                                        <td class="text-center">Preço Unitário</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">Frete</td>
+                                        <td class="text-center">modalidade</td>
+                                        <td class="text-center text-danger">{{ item.tipo_frete }}</td>
+
+                                    </tr>
+                                    <tr>
+                                    </tr>
+                                </tbody>
+                            </table>
                         {% endfor %}
                     </div>
+
+                    {% comment %} <div class="row mb-3">
+                        <div class="col-md-12">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Produto</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Unitário</th>
+                                        <th>Preço Total</th>
+                                        <th>Categoria</th>
+                                        <th>Vendedor</th>
+                                        <th>Largura</th>
+                                        <th>Comprimento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order_itens %}
+                                        <tr>
+                                            <td>{{ item.pk }}</td>
+                                            <td>{{ item.produto }}</td>
+                                            <td>{{ item.quantidade }}</td>
+                                            <td>{{ item.preco }}</td>
+                                            <td>{{ item.total_valor|floatformat:2 }}</td>
+                                            <td>{{ item.produto.tipo_categoria }}</td>
+                                            <td>{{ item.vendedor_item }}</td>
+                                            <td>{{ item.largura }}</td>
+                                            <td>{{ item.comprimento }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div> {% endcomment %}
 
                 </div>
             </div>
