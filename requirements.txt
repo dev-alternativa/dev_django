@@ -3,7 +3,7 @@ certifi==2024.6.2
 charset-normalizer==3.3.2
 crispy-bootstrap5==2024.2
 diff-match-patch==20230430
-Django==5.1.2
+Django==5.1.5
 django-appconf==1.0.6
 django-bootstrap5==24.2
 django-crispy-forms==2.1
