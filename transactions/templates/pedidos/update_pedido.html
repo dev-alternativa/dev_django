@@ -170,7 +170,9 @@
       <div class='row float-end' id="edit">
         <div class="col-md-12" style="margin-top: 10px;">
           <div class="form-inline buttons">
-            <button class="btn btn-success btn-lg" value="OMIE" id="sendOMIEButton">
+            <button class="btn btn-success btn-lg"
+              value="OMIE" id="sendOMIEButton"
+              onclick="location.href='{% url 'order_summary' order.pk %}'">
               <i class="bi bi-send-arrow-up"></i>
               Enviar OMIE
             </button>
@@ -960,7 +962,7 @@ $(document).ready(function() {
     });
   });
 
-
+  /*
   $("#sendOMIEButton").click(function(){
     $('#loading').show();
     $('#overlay').show();
@@ -990,7 +992,7 @@ $(document).ready(function() {
       $('#loading').hide();
       $('#overlay').hide();
     });
-  });
+  });*/
 });
 
 

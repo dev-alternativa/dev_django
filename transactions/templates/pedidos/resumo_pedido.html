@@ -90,13 +90,10 @@
                                 </tr>
                                 <tr>
                                     <td class="text-center">Transportadora</td>
-                                    <td class="text-center text-danger">codigo_transportadora</td>
-                                    {% if order.transportadora.cod_omie_com != "0" %} <td>{{ order.transportadora.cod_omie_com }}(COM)</td> {% endif %}
-                                    {% if order.transportadora.cod_omie_ind != "0" %} <td>{{ order.transportadora.cod_omie_ind }}(IND)</td> {% endif %}
-                                    {% if order.transportadora.cod_omie_flx != "0" %} <td>{{ order.transportadora.cod_omie_flx }}(FLX)</td> {% endif %}
-                                    {% if order.transportadora.cod_omie_srv != "0" %} <td>{{ order.transportadora.cod_omie_srv }}(SRV)</td> {% endif %}
-                                    {% if order.transportadora.cod_omie_mrx != "0" %} <td>{{ order.transportadora.cod_omie_mrx }}(MRX)</td> {% endif %}
-                                    {% if order.transportadora.cod_omie_pre != "0" %} <td>{{ order.transportadora.cod_omie_pre }}(PRE)</td> {% endif %}
+                                    <td class="text-center">codigo_transportadora</td>
+
+                                        <td class="text-center text-danger">{{ codigo_transportadora }}</td>
+
                                     <td class="text-center">Tipo de TRANSPORTADORA</td>
                                 </tr>
                             </tbody>
@@ -176,41 +173,6 @@
                             </table>
                         {% endfor %}
                     </div>
-
-                    {% comment %} <div class="row mb-3">
-                        <div class="col-md-12">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Produto</th>
-                                        <th>Quantidade</th>
-                                        <th>Preço Unitário</th>
-                                        <th>Preço Total</th>
-                                        <th>Categoria</th>
-                                        <th>Vendedor</th>
-                                        <th>Largura</th>
-                                        <th>Comprimento</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in order_itens %}
-                                        <tr>
-                                            <td>{{ item.pk }}</td>
-                                            <td>{{ item.produto }}</td>
-                                            <td>{{ item.quantidade }}</td>
-                                            <td>{{ item.preco }}</td>
-                                            <td>{{ item.total_valor|floatformat:2 }}</td>
-                                            <td>{{ item.produto.tipo_categoria }}</td>
-                                            <td>{{ item.vendedor_item }}</td>
-                                            <td>{{ item.largura }}</td>
-                                            <td>{{ item.comprimento }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div> {% endcomment %}
 
                 </div>
             </div>

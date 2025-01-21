@@ -354,12 +354,23 @@ class OrderSummary(DetailView):
         order = self.get_object()
         cliente = order.cliente.nome_fantasia
         order_itens = OutflowsItems.objects.filter(saida=order.pk)
+        transportadora = order_itens.first().saida.transportadora
 
-
-        for item in order_itens:
-            price_data = price_calculation(item.pk)
-            item.m_quadrado = price_data['m_quadrado']
-            item.total_valor = price_data['total_valor']
+        mapa_sigla_para_campo = {
+            'COM': transportadora.cod_omie_com,
+            'IND': transportadora.cod_omie_ind,
+            'PRE': transportadora.cod_omie_pre,
+            'MRX': transportadora.cod_omie_mrx,
+            'SRV': transportadora.cod_omie_srv,
+            'FLX': transportadora.cod_omie_flx,
+        }
+        for sigla, codigo in mapa_sigla_para_campo.items():
+            if sigla == order_itens.first().cnpj_faturamento.sigla:
+                context['codigo_transportadora'] = codigo
+        # for item in order_itens:
+        #     price_data = price_calculation(item.pk)
+        #     item.m_quadrado = price_data['m_quadrado']
+        #     item.total_valor = price_data['total_valor']
 
 
         context['order_itens'] = order_itens
