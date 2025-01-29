@@ -24,7 +24,6 @@ local_settings.py
 media/
 staticfiles/
 
-
 # Arquivos de migrations
 */migrations/*
 !*/migrations/__init__.py
@@ -71,3 +70,4 @@ exemplo*
 
 # Código antigo
 cadastro/
+BKP*

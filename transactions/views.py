@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Sum
+from django.db.models import Sum, F
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
 from products.models import Product
@@ -96,6 +96,42 @@ def price_calculation(item_id):
         'total_valor': total_valor,
     }
 
+def calcular_totals_pedido(items):
+    """
+    Calcula os totais de um pedido: preço total, IPI e valor final da nota fiscal
+    para serem enviados ao OMIE.
+    :param items: queryset de OutflowsItems com os itens do pedido
+    :return: tupla com os valores calculados (total_pedido, total_ipi, total_nota)
+    """
+    item_list = []
+
+    for item in items:
+        m_quadrado = (item.largura * item.comprimento / 1000) if (item.largura or item.comprimento) else 0
+        preco_total = (
+            item.quantidade * item.preco * m_quadrado
+            if item.produto.tipo_categoria_id == 3
+            else item.quantidade * item.preco
+        )
+
+        item_data = {
+            'id': item.id,
+            'nome': item.produto.nome_produto,
+            'quantidade': item.quantidade,
+            'preco': item.preco,
+            'preco_total': preco_total,
+            'largura': item.largura,
+            'comprimento': item.comprimento,
+            'm_quadrado': m_quadrado,
+            'cnpj_faturamento': item.cnpj_faturamento,
+            'ipi': item.produto.ipi,
+        }
+        item_list.append(item_data)
+
+    total_pedido = sum(item['preco_total'] for item in item_list)
+    total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list)
+    total_nota = total_pedido + total_ipi
+
+    return total_pedido, total_ipi, total_nota, item_list
 
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
@@ -355,27 +391,59 @@ class OrderSummary(DetailView):
         cliente = order.cliente.nome_fantasia
         order_itens = OutflowsItems.objects.filter(saida=order.pk)
         transportadora = order_itens.first().saida.transportadora
+        quantidade_itens = len(order_itens)
+        vendedor = order.vendedor
+        prazo = order_itens.first().prazo.codigo
+
+        conta_corrente = ContaCorrente.objects.filter(
+            cnpj=order_itens.first().cnpj_faturamento,
+            padrao=True
+        )
 
         mapa_sigla_para_campo = {
-            'COM': transportadora.cod_omie_com,
-            'IND': transportadora.cod_omie_ind,
-            'PRE': transportadora.cod_omie_pre,
-            'MRX': transportadora.cod_omie_mrx,
-            'SRV': transportadora.cod_omie_srv,
-            'FLX': transportadora.cod_omie_flx,
+            'COM': {
+                'transportadora': transportadora.cod_omie_com,
+                'vendedor': vendedor.cod_omie_com,
+                'cod_cliente': order.cliente.tag_cadastro_omie_com,
+            },
+            'IND': {
+                'transportadora': transportadora.cod_omie_ind,
+                'vendedor': vendedor.cod_omie_ind,
+                'cod_cliente': order.cliente.tag_cadastro_omie_ind,
+            },
+            'PRE': {
+                'transportadora': transportadora.cod_omie_pre,
+                'vendedor': vendedor.cod_omie_pre,
+                'cod_cliente': order.cliente.tag_cadastro_omie_pre,
+            },
+            'MRX': {
+                'transportadora': transportadora.cod_omie_mrx,
+                'vendedor': vendedor.cod_omie_mrx,
+                'cod_cliente': order.cliente.tag_cadastro_omie_mrx,
+            },
+            'SRV': {
+                'transportadora': transportadora.cod_omie_srv,
+                'vendedor': vendedor.cod_omie_srv,
+                'cod_cliente': order.cliente.tag_cadastro_omie_srv,
+            },
+            'FLX': {
+                'transportadora': transportadora.cod_omie_flx,
+                'vendedor': vendedor.cod_omie_flx,
+                'cod_cliente': order.cliente.tag_cadastro_omie_flx,
+            },
         }
         for sigla, codigo in mapa_sigla_para_campo.items():
             if sigla == order_itens.first().cnpj_faturamento.sigla:
-                context['codigo_transportadora'] = codigo
-        # for item in order_itens:
-        #     price_data = price_calculation(item.pk)
-        #     item.m_quadrado = price_data['m_quadrado']
-        #     item.total_valor = price_data['total_valor']
+                context['codigo_transportadora'] = codigo['transportadora']
+                context['codigo_vendedor'] = codigo['vendedor']
+                context['codigo_cliente'] = codigo['cod_cliente']
 
-
+        context['quantidade_itens'] = quantidade_itens
+        context['prazo'] = prazo
         context['order_itens'] = order_itens
         context['cliente'] = cliente
         context['order'] = order
+        context['conta_corrente'] = conta_corrente
         return context
 
 
@@ -554,39 +622,49 @@ def get_itens_pedido(request, order_id):
     e renderiza um template com os dados dos itens. Se não houver itens, retorna um JSON com HTML vazio.
     """
     items = OutflowsItems.objects.filter(saida__id=order_id)
+    total_produtos = len(items)
+    total_ipi = 0
 
     if items:
-        item_list = []
 
-        for item in items:
-            if item.largura or item.comprimento:
-                m_quadrado = item.largura * item.comprimento / 1000
-            else:
-                m_quadrado = 0
+        print(calcular_totals_pedido(items))
+        total_pedido, total_ipi, total_nota, item_list = calcular_totals_pedido(items)
+        # item_list = []
 
-            item_data = {
-                'id': item.id,
-                'nome': item.produto.nome_produto,
-                'quantidade': item.quantidade,
-                'preco': item.preco,
-                'preco_total': item.quantidade * item.preco * m_quadrado
-                if item.produto.tipo_categoria_id == 3 else item.quantidade * item.preco,
-                'largura': item.largura,
-                'comprimento': item.comprimento,
-                'm_quadrado': m_quadrado,
-                'cnpj_faturamento': item.cnpj_faturamento,
-            }
-            item_list.append(item_data)
+        # for item in items:
+        #     if item.largura or item.comprimento:
+        #         m_quadrado = item.largura * item.comprimento / 1000
+        #     else:
+        #         m_quadrado = 0
 
-        total_pedido = items.aggregate(total=Sum('preco'))['total']
-        quantidade_total = items.aggregate(total=Sum('quantidade'))['total']
-        total_geral = quantidade_total * total_pedido
+        #     item_data = {
+        #         'id': item.id,
+        #         'nome': item.produto.nome_produto,
+        #         'quantidade': item.quantidade,
+        #         'preco': item.preco,
+        #         'preco_total': item.quantidade * item.preco * m_quadrado
+        #             if item.produto.tipo_categoria_id == 3 else item.quantidade * item.preco,
+        #         'largura': item.largura,
+        #         'comprimento': item.comprimento,
+        #         'm_quadrado': m_quadrado,
+        #         'cnpj_faturamento': item.cnpj_faturamento,
+        #         'ipi': item.produto.ipi,
+        #     }
+        #     item_list.append(item_data)
+
+
+        # total_pedido = sum(item['preco_total'] for item in item_list)
+        # total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list)
+        # total_nota = total_pedido + total_ipi
+
+
         html = render_to_string(
             'pedidos/_tabela_items.html', {
                 'itens_produtos': item_list,
+                'total_produtos': total_produtos,
+                'total_nota': total_nota,
                 'total_pedido': total_pedido,
-                'quantidade_total': quantidade_total,
-                'total_geral': total_geral
+                'total_ipi': total_ipi,
             }
         )
         return JsonResponse({'html': html})
@@ -791,7 +869,6 @@ def update_product_from_order(request, item_id):
         - vendedor_item (int): ID do vendedor.
     """
     if request.method == 'POST':
-
         try:
 
             item = get_object_or_404(OutflowsItems, pk=item_id)
@@ -809,7 +886,7 @@ def update_product_from_order(request, item_id):
                 item.preco = preco
             if item_pedido:
                 item.item_pedido = item_pedido
-            if item.dados_adicionais_item:
+            if dados_adicionais_item:
                 item.dados_adicionais_item = dados_adicionais_item
             if numero_pedido:
                 item.numero_pedido = numero_pedido

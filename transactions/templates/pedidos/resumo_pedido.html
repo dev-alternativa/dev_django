@@ -46,8 +46,8 @@
                                 <tr>
                                     <td  class="text-center">Código do cliente</td>
                                     <td  class="text-center">codigo_cliente</td>
-                                    <td  class="text-center text-danger">{{ order.cliente.pk }}</td>
-                                    <td  class="text-center">Cliente: {{ order.cliente.nome_fantasia }}</td>
+                                    <td  class="text-center text-danger">{{ codigo_cliente }}</td>
+                                    <td  class="text-center"> Cod. Cliente: {{ order.cliente.nome_fantasia }} no OMIE</td>
                                 </tr>
                                 <tr>
                                     <td  class="text-center">Código do pedido</td>
@@ -64,9 +64,29 @@
                                 <tr>
                                     <td class="text-center">Prazo</td>
                                     <td class="text-center">codigo_parcela</td>
-                                    <td class="text-center">Verificar</td>
+                                    <td class="text-center text-danger">{{ prazo }}</td>
                                     <td class="text-center">Código da parcela no OMIE</td>
                                 </tr>
+                                <tr>
+                                    <td class="text-center">Nº Interno cliente</td>
+                                    <td class="text-center">pedido_interno_cliente</td>
+                                    <td class="text-center text-danger">{{ order.pedido_interno_cliente }}</td>
+                                    <td class="text-center">Código interno fornecido pelo cliente</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">Vendedor</td>
+                                    <td class="text-center">codVend</td>
+                                    <td class="text-center text-danger">{{ codigo_vendedor }}</td>
+                                    <td class="text-center">Código do vendedor no OMIE</td>
+                                </tr>
+
+                                <tr>
+                                    <td class="text-center">Quantidade de itens</td>
+                                    <td class="text-center">quantidade_itens</td>
+                                    <td class="text-center text-danger">{{ quantidade_itens }}</td>
+                                    <td class="text-center">Quantidade de itens no pedido (no máximo 2)</td>
+                                </tr>
+
                             </tbody>
                         </table>
                         <table class="table table-bordered table-striped">
@@ -86,15 +106,13 @@
                                     <td class="text-center">Frete</td>
                                     <td class="text-center">modalidade</td>
                                     <td class="text-center text-danger">{{ order.tipo_frete }}</td>
-                                    <td class="text-center">Tipo de frete</td>
+                                    <td class="text-center">Tipo de frete no OMIE</td>
                                 </tr>
                                 <tr>
                                     <td class="text-center">Transportadora</td>
                                     <td class="text-center">codigo_transportadora</td>
-
-                                        <td class="text-center text-danger">{{ codigo_transportadora }}</td>
-
-                                    <td class="text-center">Tipo de TRANSPORTADORA</td>
+                                    <td class="text-center text-danger">{{ codigo_transportadora }}</td>
+                                    <td class="text-center">Cod da Transportadora no OMIE</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -102,7 +120,7 @@
                     <div class="row mb-3">
                         {% for item in order_itens %}
                             <table class="table table-bordered table-striped caption-top">
-                                <caption>Item #{{ item.item_pedido }}</caption>
+                                <caption>Item #{{ item.item_pedido }} - Categoria: {{ item.produto.tipo_categoria }}</caption>
                                 <thead>
                                     <tr>
                                         <th colspan="4" scope="col">Det</th>
@@ -131,17 +149,17 @@
                                         <td class="text-center">Produto</td>
                                         <td class="text-center">codigo_produto</td>
                                         {% if item.cnpj_faturamento.sigla == "COM" and item.produto.cod_oculto_omie_com != "0" %}
-                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_com }}("COM")</td>
+                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_com }}</strong> ("COM")</td>
                                         {% elif item.cnpj_faturamento.sigla == "IND" and item.produto.cod_oculto_omie_ind != "0" %}
-                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_ind }}("IND")</td>
+                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_ind }}</strong> ("IND")</td>
                                         {% elif item.cnpj_faturamento.sigla == "FLX" and item.produto.cod_oculto_omie_flx != "0" %}
-                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_flx }}("FLX")</td>
+                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_flx }}</strong> ("FLX")</td>
                                         {% elif item.cnpj_faturamento.sigla == "SRV" and item.produto.cod_oculto_omie_srv != "0" %}
-                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_srv }}("SRV")</td>
+                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_srv }}</strong> ("SRV")</td>
                                         {% elif item.cnpj_faturamento.sigla == "MRX" and item.produto.cod_oculto_omie_mrx != "0" %}
-                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_mrx }}("MRX")</td>
+                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_mrx }}</strong> ("MRX")</td>
                                         {% elif item.cnpj_faturamento.sigla == "PRE" and item.produto.cod_oculto_omie_pre != "0" %}
-                                            <td class="text-danger">{{ item.produto.cod_oculto_omie_pre }}("PRE")</td>
+                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_pre }}</strong> ("PRE")</td>
                                         {% else %}
                                             <td></td>
                                         {% endif %}
@@ -152,7 +170,17 @@
                                     <tr>
                                         <td class="text-center">Quantidade</td>
                                         <td class="text-center">quantidade</td>
-                                        <td class="text-center text-danger">{{ item.quantidade }}</td>
+                                        <td class="text-center text-danger">
+                                            {% if item.produto.tipo_categoria_id == 3 %}
+                                                {{ item.produto.m_quadrado}}
+                                            {% elif item.produto.tipo_categoria_id == 7 %}
+                                                {% if item.cnpj_faturamento.sigla == 'IND' or item.cnpj_faturamento.sigla == 'PRE' %}
+                                                    {{ item.produto.m_quadrado}}
+                                                {% endif %}
+                                                    {{ item.quantidade }}
+                                                {% else %}
+                                            {% endif %}
+                                        </td>
                                         <td class="text-center">Quantidade do produto</td>
                                     </tr>
                                     <tr>
@@ -162,13 +190,18 @@
                                         <td class="text-center">Preço Unitário</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-center">Frete</td>
-                                        <td class="text-center">modalidade</td>
-                                        <td class="text-center text-danger">{{ item.tipo_frete }}</td>
-
+                                        <td class="text-center">N Pedido Compra</td>
+                                        <td class="text-center">numero_pedido_compra</td>
+                                        <td class="text-center text-danger">{{ item.numero_pedido }}</td>
+                                        <td	class="text-center">Número Interno que pode ser informado caso Cliente tenha</td>
                                     </tr>
                                     <tr>
+                                        <td class="text-center">Conta Corrente</td>
+                                        <td class="text-center">conta_corrente</td>
+                                        <td class="text-center text-danger">{{ item.conta_corrente.nCodCC }}</td>
+                                        <td class="text-center">Código da CC cadastrado no OMIE</td>
                                     </tr>
+
                                 </tbody>
                             </table>
                         {% endfor %}

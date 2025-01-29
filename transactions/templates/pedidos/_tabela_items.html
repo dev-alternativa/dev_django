@@ -51,8 +51,21 @@
         {% endfor %}
     </tbody>
     <div class="container">
-        <legend>Total de Produtos: <strong>R$ {{ total_pedido|default_if_none:"0,00" }}</strong> </legend>
-        <!-- <legend>Quantidade de produtos: <strong>{{ quantidade_total|default_if_none:"0" }}</strong> -->
-        <legend>Total da Nota: <strong>R$ {{ total_geral }}</strong></legend>
+        <div class="row">
+            <div class="col-md-6">
+                <legend>Total de Produtos: <strong>{{ total_produtos|default_if_none:"0,00" }}</strong></legend>
+            </div>
+            <div class="col-md-6">
+                <legend>Total do Pedido: <strong>R$ {{ total_pedido|floatformat:2 }}</strong></legend>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <legend>Total de IPI sobre os produtos: <strong>R$ {{ total_ipi|floatformat:2 }}</strong></legend>
+            </div>
+            <div class="col-md-6">
+                <legend>Total da Nota: <strong>R$ {{ total_nota|floatformat:2 }}</strong></legend>
+            </div>
+        </div>
     </div>
 </table>
