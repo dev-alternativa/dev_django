@@ -7,7 +7,8 @@
             <th>Quantidade</th>
             <th>Larg. (mm)</th>
             <th>Comp. (m)</th>
-            <th>m2</th>
+            <th>m2 Unit.</th>
+            <th>m2 Total.</th>
             <th>Preço Unitário</th>
             <th>Preço Total</th>
             <th>CNPJ Fat.</th>
@@ -22,9 +23,10 @@
             <td>{{ item.nome }}</td>
             <td>{{ item.quantidade }}</td>
             <td>{{ item.largura|floatformat:0 }}</td>
-            <td>{{ item.comprimento|floatformat:0 }}</td>
-            <td>{{ item.m_quadrado|floatformat:2 }}</td>
-            <td>R${{ item.preco }}</td>
+            <td>{{ item.comprimento }}</td>
+            <td>{{ item.m_quadrado_unitario|floatformat:2 }}</td>
+            <td>{{ item.m_quadrado_total|floatformat:2 }}</td>
+            <td>R${{ item.preco_unitario|floatformat:2 }}</td>
             <td>R${{ item.preco_total|floatformat:2 }}</td>
             <td>{{ item.cnpj_faturamento }}</td>
             {% comment %} <td>{{ item.vendedor_item.nome }}</td> {% endcomment %}

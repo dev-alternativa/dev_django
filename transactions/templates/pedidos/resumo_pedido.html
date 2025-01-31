@@ -176,9 +176,11 @@
                                             {% elif item.produto.tipo_categoria_id == 7 %}
                                                 {% if item.cnpj_faturamento.sigla == 'IND' or item.cnpj_faturamento.sigla == 'PRE' %}
                                                     {{ item.produto.m_quadrado}}
-                                                {% endif %}
-                                                    {{ item.quantidade }}
                                                 {% else %}
+                                                    {{ item.quantidade }}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ item.quantidade }}
                                             {% endif %}
                                         </td>
                                         <td class="text-center">Quantidade do produto</td>
@@ -186,7 +188,14 @@
                                     <tr>
                                         <td class="text-center">Preço Unitário</td>
                                         <td class="text-center">valor_unitario</td>
-                                        <td class="text-center text-danger">{{ item.preco }}</td>
+                                        <td class="text-center text-danger">
+                                            {% for dict_item in item_list  %}
+                                                {% if dict_item.id == item.id %}
+                                                    {{ dict_item.preco|floatformat:2 }}
+                                                {% endif %}
+                                            {% endfor %}
+
+                                        </td>
                                         <td class="text-center">Preço Unitário</td>
                                     </tr>
                                     <tr>

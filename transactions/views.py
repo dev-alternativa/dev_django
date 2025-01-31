@@ -96,7 +96,7 @@ def price_calculation(item_id):
         'total_valor': total_valor,
     }
 
-def calcular_totals_pedido(items):
+def calcular_totais_pedido(items):
     """
     Calcula os totais de um pedido: preço total, IPI e valor final da nota fiscal
     para serem enviados ao OMIE.
@@ -106,24 +106,55 @@ def calcular_totals_pedido(items):
     item_list = []
 
     for item in items:
-        m_quadrado = (item.largura * item.comprimento / 1000) if (item.largura or item.comprimento) else 0
-        preco_total = (
-            item.quantidade * item.preco * m_quadrado
-            if item.produto.tipo_categoria_id == 3
-            else item.quantidade * item.preco
-        )
 
+        # Se for categoria Superlam
+        if item.produto.tipo_categoria_id == 3:
+            m_quadrado_unitario = item.produto.m_quadrado
+            m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+            preco_unitario = item.preco
+            preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
+            quantidade = item.quantidade
+        # Se form categoria Nyloflex
+        elif item.produto.tipo_categoria_id == 7:
+            if item.cnpj_faturamento.sigla == 'COM':
+                quantidade = item.quantidade
+                m_quadrado_unitario = item.produto.m_quadrado
+                m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+                preco_unitario = item.preco
+                preco_total = preco_unitario * item.quantidade
+                quantidade = item.quantidade
+            else:
+                m_quadrado_unitario = item.produto.m_quadrado
+                m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+                preco_unitario = Decimal(item.preco) / Decimal(item.produto.m_quadrado)
+                preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
+                quantidade = item.quantidade
+        # Qualquer outra categoria
+        else:
+            m_quadrado_unitario = item.produto.m_quadrado
+            m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+            preco_unitario = item.preco
+            preco_total =  Decimal(preco_unitario) * item.quantidade
+            quantidade = item.quantidade
+
+        # m_quadrado = (item.largura * item.comprimento / 1000) if (item.largura or item.comprimento) else 0
+        # preco_total = (
+        #     item.quantidade * item.preco * m_quadrado
+        #     if item.produto.tipo_categoria_id == 3
+        #     else item.quantidade * item.preco
+        # )
         item_data = {
             'id': item.id,
             'nome': item.produto.nome_produto,
-            'quantidade': item.quantidade,
-            'preco': item.preco,
+            'quantidade': quantidade,
+            'preco_unitario': preco_unitario,
             'preco_total': preco_total,
             'largura': item.largura,
             'comprimento': item.comprimento,
-            'm_quadrado': m_quadrado,
+            'm_quadrado_unitario': m_quadrado_unitario,
+            'm_quadrado_total': m_quadrado_total,
             'cnpj_faturamento': item.cnpj_faturamento,
-            'ipi': item.produto.ipi,
+            'ipi': item.produto.ipi if item.produto.ipi else 0,
         }
         item_list.append(item_data)
 
@@ -394,6 +425,8 @@ class OrderSummary(DetailView):
         quantidade_itens = len(order_itens)
         vendedor = order.vendedor
         prazo = order_itens.first().prazo.codigo
+        *_, item_list = calcular_totais_pedido(order_itens)
+
 
         conta_corrente = ContaCorrente.objects.filter(
             cnpj=order_itens.first().cnpj_faturamento,
@@ -438,6 +471,9 @@ class OrderSummary(DetailView):
                 context['codigo_vendedor'] = codigo['vendedor']
                 context['codigo_cliente'] = codigo['cod_cliente']
 
+        print(item_list)
+        print(order_itens)
+        context['item_list'] = item_list
         context['quantidade_itens'] = quantidade_itens
         context['prazo'] = prazo
         context['order_itens'] = order_itens
@@ -627,8 +663,8 @@ def get_itens_pedido(request, order_id):
 
     if items:
 
-        print(calcular_totals_pedido(items))
-        total_pedido, total_ipi, total_nota, item_list = calcular_totals_pedido(items)
+
+        total_pedido, total_ipi, total_nota, item_list = calcular_totais_pedido(items)
         # item_list = []
 
         # for item in items:
@@ -802,7 +838,9 @@ def get_item_data(request, item_id):
             largura = Product.objects.get(pk=item.produto.pk).largura
             comprimento = Product.objects.get(pk=item.produto.pk).comprimento
             categoria = Product.objects.get(pk=item.produto.pk).tipo_categoria.id
-            area = Product.objects.get(pk=item.produto.pk).m_quadrado
+            # area = Product.objects.get(pk=item.produto.pk).m_quadrado
+
+            total_pedido, *_, item_list = calcular_totais_pedido([item])
 
             data = {
                 "quantidade": item.quantidade,
@@ -820,7 +858,8 @@ def get_item_data(request, item_id):
                 "nome_produto": item.produto.nome_produto,
                 "vendedor": item.vendedor_item.nome,
                 "categoria": categoria,
-                "area": area,
+                "area": item_list[0]['m_quadrado_total'],
+                "total_pedido": total_pedido,
             }
 
             return JsonResponse({
@@ -878,7 +917,13 @@ def update_product_from_order(request, item_id):
             item_pedido = request.POST.get('item_pedido')
             numero_pedido = request.POST.get('numero_pedido')
             dados_adicionais_item = request.POST.get('dados_adicionais_item')
+            largura = request.POST.get('largura')
+            comprimento = request.POST.get('comprimento')
             obs = request.POST.get('obs')
+
+
+            item.largura = largura
+            item.comprimento = comprimento
 
             if quantidade:
                 item.quantidade = quantidade
