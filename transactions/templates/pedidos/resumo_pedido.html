@@ -129,7 +129,7 @@
                                         <th>Chave</th>
                                         <th>Chave no OMIE</th>
                                         <th>Valor que irá no JSON</th>
-                                        <th>Descrição</th>
+                                        <th class="col-5">Descrição</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,22 +148,23 @@
                                     <tr>
                                         <td class="text-center">Produto</td>
                                         <td class="text-center">codigo_produto</td>
-                                        {% if item.cnpj_faturamento.sigla == "COM" and item.produto.cod_oculto_omie_com != "0" %}
-                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_com }}</strong> ("COM")</td>
-                                        {% elif item.cnpj_faturamento.sigla == "IND" and item.produto.cod_oculto_omie_ind != "0" %}
-                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_ind }}</strong> ("IND")</td>
-                                        {% elif item.cnpj_faturamento.sigla == "FLX" and item.produto.cod_oculto_omie_flx != "0" %}
-                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_flx }}</strong> ("FLX")</td>
-                                        {% elif item.cnpj_faturamento.sigla == "SRV" and item.produto.cod_oculto_omie_srv != "0" %}
-                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_srv }}</strong> ("SRV")</td>
-                                        {% elif item.cnpj_faturamento.sigla == "MRX" and item.produto.cod_oculto_omie_mrx != "0" %}
-                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_mrx }}</strong> ("MRX")</td>
-                                        {% elif item.cnpj_faturamento.sigla == "PRE" and item.produto.cod_oculto_omie_pre != "0" %}
-                                            <td><strong class="text-danger">{{ item.produto.cod_oculto_omie_pre }}</strong> ("PRE")</td>
-                                        {% else %}
-                                            <td></td>
-                                        {% endif %}
-
+                                            <td class="text-center"><strong class="text-danger">
+                                                {% if item.cnpj_faturamento.sigla == "COM" and item.produto.cod_oculto_omie_com != "0" %}
+                                                    {{ item.produto.cod_oculto_omie_com }}</strong> ("COM")
+                                                {% elif item.cnpj_faturamento.sigla == "IND" and item.produto.cod_oculto_omie_ind != "0" %}
+                                                    {{ item.produto.cod_oculto_omie_ind }}</strong> ("IND")
+                                                {% elif item.cnpj_faturamento.sigla == "FLX" and item.produto.cod_oculto_omie_flx != "0" %}
+                                                    {{ item.produto.cod_oculto_omie_flx }}</strong> ("FLX")
+                                                {% elif item.cnpj_faturamento.sigla == "SRV" and item.produto.cod_oculto_omie_srv != "0" %}
+                                                    {{ item.produto.cod_oculto_omie_srv }}</strong> ("SRV")
+                                                {% elif item.cnpj_faturamento.sigla == "MRX" and item.produto.cod_oculto_omie_mrx != "0" %}
+                                                    {{ item.produto.cod_oculto_omie_mrx }}</strong> ("MRX")
+                                                {% elif item.cnpj_faturamento.sigla == "PRE" and item.produto.cod_oculto_omie_pre != "0" %}
+                                                    {{ item.produto.cod_oculto_omie_pre }}</strong> ("PRE")
+                                                {% else %}
+                                                    Produto sem Cód OMIE cadastrado para faturamento no CNPJ '{{ item.cnpj_faturamento.sigla }}'</strong>
+                                                {% endif %}
+                                            </td>
 
                                         <td class="text-center">Código Oculto do OMIE que muda dependendo do APP OMIE a ser usado</td>
                                     </tr>
@@ -171,19 +172,24 @@
                                         <td class="text-center">Quantidade</td>
                                         <td class="text-center">quantidade</td>
                                         <td class="text-center text-danger">
-                                            {% if item.produto.tipo_categoria_id == 3 %}
-                                                {{ item.produto.m_quadrado}}
-                                            {% elif item.produto.tipo_categoria_id == 7 %}
-                                                {% if item.cnpj_faturamento.sigla == 'IND' or item.cnpj_faturamento.sigla == 'PRE' %}
-                                                    {{ item.produto.m_quadrado}}
-                                                {% else %}
-                                                    {{ item.quantidade }}
+                                            {% for dict_item in item_list %}
+                                                {% if dict_item.id == item.id %}
+                                                    {% if item.produto.tipo_categoria_id == 3 %}
+                                                        {{ dict_item.m_quadrado_total}}
+                                                    {% elif item.produto.tipo_categoria_id == 7 %}
+                                                        {% if item.cnpj_faturamento.sigla == 'IND' or item.cnpj_faturamento.sigla == 'PRE' %}
+                                                            {{ dict_item.m_quadrado_total}}
+                                                        {% else %}
+                                                            {{ item.quantidade }}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {{ item.quantidade }}
+                                                    {% endif %}
                                                 {% endif %}
-                                            {% else %}
-                                                {{ item.quantidade }}
-                                            {% endif %}
+                                            {% endfor %}
+
                                         </td>
-                                        <td class="text-center">Quantidade do produto</td>
+                                        <td class="text-center text-break">Quantidade do produto. Se Superlam/Nyloflex(IND/PRE), m² total. Se Nyloflex(COM) e outros, unidade</td>
                                     </tr>
                                     <tr>
                                         <td class="text-center">Preço Unitário</td>
@@ -191,7 +197,7 @@
                                         <td class="text-center text-danger">
                                             {% for dict_item in item_list  %}
                                                 {% if dict_item.id == item.id %}
-                                                    {{ dict_item.preco|floatformat:2 }}
+                                                    {{ dict_item.preco_unitario|floatformat:2 }}
                                                 {% endif %}
                                             {% endfor %}
 

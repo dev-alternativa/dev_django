@@ -472,7 +472,7 @@ class OrderSummary(DetailView):
                 context['codigo_cliente'] = codigo['cod_cliente']
 
         print(item_list)
-        print(order_itens)
+
         context['item_list'] = item_list
         context['quantidade_itens'] = quantidade_itens
         context['prazo'] = prazo
@@ -861,6 +861,7 @@ def get_item_data(request, item_id):
                 "area": item_list[0]['m_quadrado_total'],
                 "total_pedido": total_pedido,
             }
+            print(data)
 
             return JsonResponse({
                 "success": True,
@@ -1011,7 +1012,8 @@ def get_price_data_filter_by_client_product(request):
             comprimento = Product.objects.get(pk=product_id).comprimento
             m_quadrado = Product.objects.get(pk=product_id).m_quadrado
             pedido = Outflows.objects.get(pk=order_id)
-            next_id = pedido.saida_items.count() + 1
+            items = OutflowsItems.objects.filter(saida=pedido).count()
+            proximo_pedido_id = pedido.saida_items.count() + 1
 
             data = {
                 'id': order_id,
@@ -1024,7 +1026,8 @@ def get_price_data_filter_by_client_product(request):
                 'vendedor': preco.vendedor.id if preco else '',
                 'is_dolar': preco.is_dolar if preco else '',
                 'id_numero_pedido': pedido.pedido_interno_cliente,
-                'item_pedido': next_id,
+                'item_pedido': items + 1,
+                'proximo_pedido': proximo_pedido_id,
                 'm2': m_quadrado,
             }
 
