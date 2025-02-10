@@ -21,18 +21,38 @@ from django.db.models import Q
 # Utilities
 
 def is_form_empty(form):
-    """Retorna True se todos os campos de um formulário forem vazios"""
+    """
+    Retorna True se todos os campos de um formulário forem vazios
+
+    Esta função verifica se todos os campos de um formulário são vazios.
+
+    Args:
+        form (Form): Um formulário Django.
+
+    Returns:
+        bool: True se todos os campos forem vazios, False caso contrário.
+
+    """
     return all(field is None or field == '' for field in form.cleaned_data.values())
 
 
 def get_products_by_category(request):
     """
     Recupera uma lista de produtos, opcionalmente filtrados por categoria
-    Permite buscar produtos com base em um ID de categoria.
+
+    Esta função permite buscar produtos com base em um ID de categoria
     Se for fornecido um category_id, retorna apenas os produtos dessa categoria.
     Se nenhum ID for fornecido, retorna todos os produtos.
-    :param request: Objeto request do Django
-    :return: JSON com uma lista de produtos (id, nome_produto, largura, comprimento)
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo uma lista de produtos filtrados
+
+    A função espera que o ID da categoria seja fornecido como um parâmetro de consulta na URL.
+    Se o ID da categoria for fornecido, a função filtra os produtos por essa categoria e retorna
+    uma lista de dicionários contendo os IDs, nomes, larguras e comprimentos dos produtos.
     """
     category_id = request.GET.get('category_id')
     if category_id:
@@ -45,12 +65,21 @@ def get_products_by_category(request):
     return JsonResponse(products_list, safe=False)
 
 
-def filter_products(request):
+def filter_products_category(request):
     """
-    Recupera produtos filtrados por categoria
-    Busca produtos de uma categoria específica e retorna ids e nomes em formato JSON
-    :param request: requisição HTTP
-    :return: JSON com lista de produtos filtrados
+    Recupera produtos filtrados por categoria.
+
+    Esta função busca produtos de uma categoria específica e retorna seus IDs e nomes em formato JSON.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo uma lista de produtos filtrados.
+
+    A função espera que o ID da categoria seja fornecido como um parâmetro de consulta na URL.
+    Se o ID da categoria for fornecido, a função filtra os produtos por essa categoria e retorna
+    uma lista de dicionários contendo os IDs e nomes dos produtos.
     """
 
     category_id = request.GET.get('category_id')
@@ -59,49 +88,88 @@ def filter_products(request):
     return JsonResponse({'products': list(products)})
 
 
-def verify_number_cnpj_order(cnpj_list, order_list):
+def verify_cnpj_order(cnpj_list, order_list):
     """
     Verifica se o número de CNPJs encontrados em uma lista de pedidos é maior que 2.
-    Validação necessária para impedir adição de itens com mais de 2 CNPJs diferentes.
-    :param cnpj_list: lista de CNPJs encontrados em pedidos ['COM', 'IND', 'PRE', 'SRV', 'MRX', 'FLX']
-    :param order_list: lista de CNPJs dos itens do pedido
-    :return: True se o número de CNPJs encontrados for maior que 2, False caso contrário
+
+    Esta função é usada para validar se há mais de 2 CNPJs diferentes em uma lista de pedidos,
+    o que não é permitido.
+
+    Args:
+        cnpj_list (list): Lista de CNPJs válidos ['COM', 'IND', 'PRE', 'SRV', 'MRX', 'FLX'].
+        order_list (list): Lista de CNPJs dos itens do pedido.
+
+    Returns:
+        bool: True se o número de CNPJs encontrados for maior que 2, False caso contrário.
     """
     count = sum(1 for item in cnpj_list if item in order_list)
     return count > 2
 
 
-def price_calculation(item_id):
-    item = OutflowsItems.objects.get(pk=item_id)
+# def price_calculation(item_id):
+#     """
+#     Calcula o preço total e a metragem quadrada de um item com base na categoria do produto.
 
-    category = item.produto.tipo_categoria.pk
+#     Args:
+#         item_id (int): O ID do item de saída (OutflowsItems).
 
-    if category == 3:
-        largura = item.largura
-        comprimento = item.comprimento
-        m_quadrado = largura * comprimento / 1000
-        total_valor = item.quantidade * item.preco * m_quadrado
-        print(f'largura: {largura}, comprimento: {comprimento}, m_quadrado: {m_quadrado}')
-    elif category == 7:
-        # m_quadrado = item.quantidade * item.produto.m_quadrado
-        m_quadrado = item.produto.m_quadrado
-        total_valor = item.quantidade * item.preco
-    else:
-        m_quadrado = item.produto.m_quadrado
-        total_valor = Decimal(item.quantidade) * Decimal(item.preco) * Decimal(m_quadrado)
+#     Returns:
+#         dict: Um dicionário contendo o ID do item, a metragem quadrada e o valor total calculado.
 
-    return {
-        'id': item.id,
-        'm_quadrado': m_quadrado,
-        'total_valor': total_valor,
-    }
+#     A função recupera o item de saída com base no ID fornecido e calcula a metragem quadrada
+#     e o valor total do item com base na categoria do produto. As categorias são tratadas da
+#     seguinte forma:
+#     - Categoria 3: Calcula a metragem quadrada multiplicando a largura pelo comprimento e
+#         divide por 1000. O valor total é calculado multiplicando a quantidade, o preço e a
+#         metragem quadrada.
+#     - Categoria 7: Usa a metragem quadrada do produto e calcula o valor total multiplicando
+#         a quantidade pelo preço.
+#     - Outras categorias: Usa a metragem quadrada do produto e calcula o valor total
+#         multiplicando a quantidade, o preço e a metragem quadrada.
 
-def calcular_totais_pedido(items):
+#     Raises:
+#         OutflowsItems.DoesNotExist: Se o item de saída com o ID fornecido não for encontrado.
+#     """
+#     item = OutflowsItems.objects.get(pk=item_id)
+
+#     category = item.produto.tipo_categoria.pk
+
+#     if category == 3:
+#         largura = item.largura
+#         comprimento = item.comprimento
+#         m_quadrado = largura * comprimento / 1000
+#         total_valor = item.quantidade * item.preco * m_quadrado
+#         print(f'largura: {largura}, comprimento: {comprimento}, m_quadrado: {m_quadrado}')
+#     elif category == 7:
+#         # m_quadrado = item.quantidade * item.produto.m_quadrado
+#         m_quadrado = item.produto.m_quadrado
+#         total_valor = item.quantidade * item.preco
+#     else:
+#         m_quadrado = item.produto.m_quadrado
+#         total_valor = Decimal(item.quantidade) * Decimal(item.preco) * Decimal(m_quadrado)
+
+#     return {
+#         'id': item.id,
+#         'm_quadrado': m_quadrado,
+#         'total_valor': total_valor,
+#     }
+
+def calculate_order_total(items):
     """
-    Calcula os totais de um pedido: preço total, IPI e valor final da nota fiscal
-    para serem enviados ao OMIE.
-    :param items: queryset de OutflowsItems com os itens do pedido
-    :return: tupla com os valores calculados (total_pedido, total_ipi, total_nota)
+    Calcula os totais de um pedido: preço total, IPI e valor final da nota fiscal.
+
+    Esta função calcula o preço total, o IPI e o valor final da nota fiscal para um conjunto de itens de pedido.
+    Os cálculos são feitos com base na categoria do produto e nas quantidades fornecidas.
+
+    Args:
+        items (QuerySet): QuerySet de OutflowsItems com os itens do pedido.
+
+    Returns:
+        tuple: Uma tupla contendo os valores calculados (total_pedido, total_ipi, total_nota, item_list).
+
+    A função percorre cada item no QuerySet, calcula a metragem quadrada e o preço total com base na categoria do produto,
+    e acumula esses valores para calcular os totais do pedido, IPI e nota fiscal.
+
     """
     item_list = []
 
@@ -116,6 +184,7 @@ def calcular_totais_pedido(items):
             quantidade = item.quantidade
         # Se form categoria Nyloflex
         elif item.produto.tipo_categoria_id == 7:
+
             if item.cnpj_faturamento.sigla == 'COM':
                 quantidade = item.quantidade
                 m_quadrado_unitario = item.produto.m_quadrado
@@ -143,6 +212,7 @@ def calcular_totais_pedido(items):
         #     if item.produto.tipo_categoria_id == 3
         #     else item.quantidade * item.preco
         # )
+
         item_data = {
             'id': item.id,
             'nome': item.produto.nome_produto,
@@ -164,8 +234,10 @@ def calcular_totais_pedido(items):
 
     return total_pedido, total_ipi, total_nota, item_list
 
+
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
+
     model = Inflows
     template_name = 'entrada/lista_entrada.html'
     context_object_name = 'inflows'
@@ -173,6 +245,7 @@ class InflowsListView(ListView):
     ordering = '-id'
 
     def get_queryset(self):
+
         queryset = super().get_queryset()
         search = self.request.GET.get('search')
         if search:
@@ -186,6 +259,7 @@ class InflowsListView(ListView):
 
 
 class InflowsNewView(LoginRequiredMixin, FormMessageMixin, CreateView):
+
     model = Inflows
     form_class = InflowsForm
     template_name = 'entrada/adicionar_entrada.html'
@@ -193,6 +267,7 @@ class InflowsNewView(LoginRequiredMixin, FormMessageMixin, CreateView):
     success_message = 'Entrada registrada com sucesso!'
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context['formset'] = InflowsItemsFormSet(self.request.POST, instance=self.object)
@@ -201,6 +276,7 @@ class InflowsNewView(LoginRequiredMixin, FormMessageMixin, CreateView):
         return context
 
     def form_valid(self, form):
+
         context = self.get_context_data()
         formset = context['formset']
         form.instance.operador = self.request.user
@@ -230,16 +306,19 @@ class InflowsNewView(LoginRequiredMixin, FormMessageMixin, CreateView):
             return super().form_invalid(form)
 
     def form_invalid(self, form):
+
         messages.error(self.request, 'Erro ao registrar a entrada!')
         return super().form_invalid(form)
 
 
 class InflowsDetailView(DetailView):
+
     model = Inflows
     template_name = 'entrada/detalhes_entrada.html'
     context_object_name = 'inflow'
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         context["inflow_items"] = InflowsItems.objects.filter(entrada=self.object)
         return context
@@ -247,6 +326,7 @@ class InflowsDetailView(DetailView):
 
 # ********************************* SAÍDAS *********************************
 class OutflowsListView(ListView):
+
     model = Outflows
     template_name = 'saida/lista_saida.html'
     context_object_name = 'outflows'
@@ -254,6 +334,7 @@ class OutflowsListView(ListView):
     ordering = '-id'
 
     def get_queryset(self):
+
         queryset = super().get_queryset()
         search = self.request.GET.get('search')
         if search:
@@ -267,6 +348,7 @@ class OutflowsListView(ListView):
 
 
 class OutflowsNewView(FormMessageMixin, CreateView):
+
     model = Outflows
     form_class = OutflowsForm
     template_name = 'saida/adicionar_saida.html'
@@ -425,7 +507,7 @@ class OrderSummary(DetailView):
         quantidade_itens = len(order_itens)
         vendedor = order.vendedor
         prazo = order_itens.first().prazo.codigo
-        *_, item_list = calcular_totais_pedido(order_itens)
+        *_, item_list = calculate_order_total(order_itens)
 
 
         conta_corrente = ContaCorrente.objects.filter(
@@ -493,7 +575,7 @@ def adicionar_produto(request, order_id):
     Returns:
         JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
 
-    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    A view aceita apenas requisições POST. Ela processa os dados do formulário,
     verifica campos obrigatórios, recupera instâncias de modelos relacionados,
     e cria uma nova instância de OutflowsItems. Se houver algum erro durante o
     processamento, uma resposta JSON com o erro é retornada.
@@ -560,7 +642,7 @@ def adicionar_produto(request, order_id):
             itens_cnpj_list = [item.cnpj_faturamento.sigla for item in items_list]
             cnpj_list = CNPJFaturamento.objects.values_list('sigla', flat=True)
 
-            if verify_number_cnpj_order(list(cnpj_list), itens_cnpj_list):
+            if verify_cnpj_order(list(cnpj_list), itens_cnpj_list):
                 return JsonResponse(
                     {'error': 'Não é possível adicionar items de mais de 2 CNPJs na mesma ordem.'},
                     status=400
@@ -652,7 +734,7 @@ def get_itens_pedido(request, order_id):
     Returns:
         JsonResponse: Uma resposta JSON contendo o HTML renderizado com os itens da ordem de saída.
 
-    O método filtra os itens da ordem de saída pelo ID fornecido, calcula os valores necessários
+    A view filtra os itens da ordem de saída pelo ID fornecido, calcula os valores necessários
     e renderiza um template com os dados dos itens. Se não houver itens, retorna um JSON com HTML vazio.
     """
     items = OutflowsItems.objects.filter(saida__id=order_id)
@@ -661,8 +743,7 @@ def get_itens_pedido(request, order_id):
 
     if items:
 
-
-        total_pedido, total_ipi, total_nota, item_list = calcular_totais_pedido(items)
+        total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
         # item_list = []
 
         # for item in items:
@@ -717,7 +798,7 @@ def edit_pedido(request, order_id):
     Returns:
         JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
 
-    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    A View aceita apenas requisições POST. Ela processa os dados do formulário,
     verifica e atualiza os campos da ordem de saída com os dados fornecidos.
     Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
 
@@ -802,7 +883,7 @@ def remove_product_from_order(request, order_id):
     Returns:
         JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
 
-    O método aceita apenas requisições POST. Ele tenta recuperar a instância de OutflowsItems
+    A View aceita apenas requisições POST. Ela tenta recuperar a instância de OutflowsItems
     pelo ID fornecido e, se encontrado, remove o item da ordem de saída. Se houver algum erro
     durante o processamento, uma resposta JSON com o erro é retornada.
     """
@@ -828,7 +909,7 @@ def get_item_data(request, item_id):
     Returns:
         JsonResponse: Uma resposta JSON contendo os dados do item da ordem de saída.
 
-    O método aceita apenas requisições GET. Ele tenta recuperar a instância de OutflowsItems
+    A View aceita apenas requisições GET. Ela tenta recuperar a instância de OutflowsItems
     pelo ID fornecido e, se encontrado, retorna os dados do item. Se houver algum erro
     durante o processamento, uma resposta JSON com o erro é retornada.
     """
@@ -840,7 +921,7 @@ def get_item_data(request, item_id):
             categoria = Product.objects.get(pk=item.produto.pk).tipo_categoria.id
             # area = Product.objects.get(pk=item.produto.pk).m_quadrado
 
-            total_pedido, *_, item_list = calcular_totais_pedido([item])
+            total_pedido, *_, item_list = calculate_order_total([item])
 
             data = {
                 "quantidade": item.quantidade,
@@ -893,7 +974,7 @@ def update_product_from_order(request, item_id):
     Returns:
         JsonResponse: Uma resposta JSON com uma mensagem de sucesso ou erro.
 
-    O método aceita apenas requisições POST. Ele processa os dados do formulário,
+    A View aceita apenas requisições POST. Ela processa os dados do formulário,
     verifica e atualiza os campos do item da ordem de saída com os dados fornecidos.
     Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
 
@@ -919,10 +1000,13 @@ def update_product_from_order(request, item_id):
             item_pedido = request.POST.get('item_pedido')
             numero_pedido = request.POST.get('numero_pedido')
             dados_adicionais_item = request.POST.get('dados_adicionais_item')
+            obs = request.POST.get('obs')
             largura = request.POST.get('largura')
             comprimento = request.POST.get('comprimento')
-            obs = request.POST.get('obs')
 
+            if item.produto.tipo_categoria_id == 7:
+                largura = item.produto.largura
+                comprimento = item.produto.comprimento
 
             item.largura = largura
             item.comprimento = comprimento
@@ -976,7 +1060,7 @@ def update_product_from_order(request, item_id):
         }, status=405)
 
 
-def get_price_data_filter_by_client_product(request):
+def get_filtered_products(request):
     """
     Recupera os dados de preço filtrados por cliente e produto.
 

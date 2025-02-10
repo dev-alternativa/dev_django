@@ -237,8 +237,8 @@ function selectOptionByText(selectId, optionText){
 
 const resetForm = () => {
   // Apaga os valores dos campos hidden
-  $('#hidden_m2_id').val('');
-  $('#hidden_categoria_id').val('');
+  $('#hidden_m2_id').val(0);
+  $('#hidden_categoria_id').val(0);
   // Move o foco para um elemento fora do modal
   document.getElementById('button-back').focus();
   // Reinicia o formulário de adição de produtos
@@ -455,6 +455,7 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
       ? `${qtd} ${unidade} ${parte1} x ${parte2}`
       : `${qtd} ${unidade} ${parte1}x${parte2}`;
   };
+  console.log(`Categoria: ${categoriaSelect}`);
 
   let area_m2 = (largura * comprimento ) / 1000 * quantidade;
   // Cálculos por categoria
@@ -595,7 +596,8 @@ $(document).ready(function() {
       SuperLam seguindo a fórmula:
       SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
     */
-    categoriaSelect = !categoriaSelect ? $("#hidden_categoria_id").val() : categoriaSelect;
+    categoriaSelect = $("#hidden_categoria_id").val();
+    console.log(`Categoria: ${categoriaSelect}`);
     const $quantidade = $('#id_quantidade');
     const $largura = $('#id_largura');
     const $comprimento = $('#id_comprimento');
@@ -622,7 +624,6 @@ $(document).ready(function() {
           const value = parseFloat(i.val());
           return !isNaN(value) && value > 0 ? value : null;
         });
-
 
         // Verifica se todos os calores são diferentes de 0
         const allValid = requiredValues.every(value => value !== null);
@@ -728,7 +729,7 @@ $(document).ready(function() {
     if(!isValid) {
       e.preventDefault();
     }else{
-      const url = "{% url 'get_price_data_filter_by_client_product' %}";
+      const url = "{% url 'get_filtered_products' %}";
       $.ajax({
         type: 'POST',
         url: url,

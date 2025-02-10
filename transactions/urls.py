@@ -17,12 +17,12 @@ urlpatterns = [
     # AJAX
     path('get-products/', views.get_products_by_category, name='get_products_by_category'),
     path('pedidos/<int:order_id>/adicionar_produto/', views.adicionar_produto, name='add_product_to_order'),
-    path('get_price_data/', views.get_price_data_filter_by_client_product, name='get_price_data_filter_by_client_product'),
+    path('get_filtered_products/', views.get_filtered_products, name='get_filtered_products'),
     path('get_itens_pedido/<int:order_id>/', views.get_itens_pedido, name='get_itens_pedido'),
     path('pedidos/editar/<int:order_id>/', views.edit_pedido, name='edit_order'),
     path('pedidos/<int:order_id>/remover_produto/', views.remove_product_from_order, name='remove_product_from_order'),
     path('get-category/', get_category_view, name="get_categories"),
-    path('product_filter_category/', views.filter_products, name="product_filter_category"),
+    path('product_filter_category/', views.filter_products_category, name="product_filter_category"),
     path('pedidos/<int:item_id>/', views.get_item_data, name='get_item_data'),
     path('pedidos/<int:item_id>/editar/', views.update_product_from_order, name='update_product_from_order'),
 
