@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" >
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,7 +10,7 @@
                         <span id="nome_produto"></span>
                     </strong>
                 </h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id='alertsModal'></div>
@@ -20,6 +20,9 @@
                             <div id="new-item" class="row line-to-remove">
                                 <form id='itemForm' method="post">
                                     {% csrf_token %}
+                                    <!-- ID da Categoria -->
+                                    <input type="hidden" name="hidden_categoria_id" id="hidden_categoria_id" value="">
+                                    <input type="hidden" name="hidden_m2" id="hidden_m2_id" value="">
 
                                     <!-- Primeira linha -->
                                     <div class="row">
@@ -91,7 +94,7 @@
                 </div>
             </div>
             <div class="modal-footer" id='modal-footer-add-items'>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-secondary close" data-bs-dismiss="modal">Fechar</button>
                 <button type="button" id="submitBtn" class="btn btn-primary" onclick="adicionar_produto()">Adicionar</button>
             </div>
         </div>

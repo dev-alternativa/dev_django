@@ -28,7 +28,7 @@
 
     <div class="row" style="margin-bottom: 1rem;">
       <div class='d-flex justify-content-between'>
-        <a href="{% url 'order_list' %}" class='btn btn-danger btn-lg'>
+        <a href="{% url 'order_list' %}" class='btn btn-danger btn-lg' id="button-back">
           <i class="bi bi-backspace space_from_margin"></i>
           Voltar
         </a>
@@ -236,6 +236,11 @@ function selectOptionByText(selectId, optionText){
 }
 
 const resetForm = () => {
+  // Apaga os valores dos campos hidden
+  $('#hidden_m2_id').val('');
+  $('#hidden_categoria_id').val('');
+  // Move o foco para um elemento fora do modal
+  document.getElementById('button-back').focus();
   // Reinicia o formulário de adição de produtos
   $('#itemForm')[0].reset();
   $('#itemForm').find('.is-invalid').removeClass('is-invalid');
@@ -404,6 +409,7 @@ function atualizar_produto() {
             );
             console.log("Dados atualizados:", response);
             $("#editItemModal").modal("hide"); // Fecha o modal
+            document.getElementById('button-back').focus();
             location.reload();
         },
         error: function (xhr) {
@@ -434,22 +440,11 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
   let [quantidade, largura, comprimento, preco, id_cnpj_faturamento] = valores;
   quantidade = parseInt(quantidade);
 
-  // Validação inicial/
-  /*
-  if(!valores.every(valor => valor > 0)){
-    return {
-      area_metragem: 0,
-      total_valor: 0,
-      dados_descritivo: ''
-    };
-  }
-  */
-
   const formatarDescricao = (quantidade, unidade, parte1, parte2 = '') => {
     /**
-    Formatar uma descrição com base em parâmetros fornecidos, ajustando a quantidade para sempre ter dois dígitos,
+    Formata uma descrição com base em parâmetros fornecidos, ajustando a quantidade para sempre ter dois dígitos,
     concatenando a unidade de medida e combinando partes descritivas opcionais
-    @param {number} quantidade - quantidadede do produto, prefixada em `0` se for menor que 10
+    @param {number} quantidade - quantidade do produto, prefixada em `0` se for menor que 10
     @param {string} unidade - unidade de medida do produto, aqui será `rolo` ou `chapa`
     @param {string} parte1 - A primeira parte da descrição que será concatenada após a unidade.
     @param {string} parte2 [parte2 = ''] - A segunda parte da descrição que será concatenada após um `x`.
@@ -461,12 +456,14 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
       : `${qtd} ${unidade} ${parte1}x${parte2}`;
   };
 
+  let area_m2 = (largura * comprimento ) / 1000 * quantidade;
   // Cálculos por categoria
   switch(parseInt(categoriaSelect)){
     case 3: // Rolos(SuperLam)
+    console.log('SUPERLAM')
       return {
-        area_metragem: (largura * comprimento / 1000),
-        total_valor: quantidade * preco * (largura * comprimento / 1000),
+        area_total: area_m2,
+        total_valor: (preco * area_m2).toFixed(2),
         dados_descritivo: formatarDescricao(
           quantidade,
           'rolo(s)',
@@ -474,16 +471,25 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
           comprimento
         )
       };
-    case 7: // Chapas
+    case 6: // Nyloprint
+    console.log('Nyloprint')
 
-      const app_omie = [2, 5];
-      // Verifica se é IND, PRE ou COM
-      if(app_omie.includes(id_cnpj_faturamento)){
-
-      }
       return {
-        area_metragem: quantidade * metragem_inicial,
-        total_valor: quantidade * preco,
+        area_total: (quantidade * metragem_inicial).toFixed(2),
+        total_valor: (quantidade * preco).toFixed(2),
+
+        dados_descritivo: formatarDescricao(
+          quantidade,
+          'chapa(s)',
+          nome_produto,
+          'Revenda'
+        )
+      };
+    case 7: // Chapas
+    console.log('Nyloflex')
+      return {
+        area_total: (quantidade * metragem_inicial).toFixed(2),
+        total_valor: (quantidade * preco).toFixed(2),
 
         dados_descritivo: formatarDescricao(
           quantidade,
@@ -493,9 +499,11 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
         )
       };
     default: // Outros produtos
+    console.log('OUTROS')
+      area_2 = largura * comprimento / 1000;
       return {
-        area_metragem: largura * comprimento,
-        total_valor: quantidade * preco * (largura * comprimento),
+        area_total: (area_2 * quantidade).toFixed(2),
+        total_valor: (quantidade * preco).toFixed(2),
         dados_descritivo: ''
       };
 
@@ -508,6 +516,56 @@ $(document).ready(function() {
     Funções iniciadas ao carregar a página
   */
 
+  // Chama os eventos de cálculo de metragem e valor total
+  $('#id_largura').on('input', () => {
+    const m2 = $('#hidden_m2_id').val();
+    calculoMetragemProduto(m2);
+  });
+  $('#id_comprimento').on('input',  () => {
+    const m2 = $('#hidden_m2_id').val();
+    calculoMetragemProduto(m2);
+  });
+  $('#id_quantidade').on('input',  () => {
+    const m2 = $('#hidden_m2_id').val();
+      calculoMetragemProduto(m2);
+  });
+  $('#id_preco').on('input',  () => {
+    const m2 = $('#hidden_m2_id').val();
+    calculoMetragemProduto(m2);
+  });
+
+
+  // ################### Lida com os botões que fecham modais ###################
+  const acertaFoco = (button) => {
+    // Move o foco para um elemento fora do modal
+    button.focus();
+  }
+
+  $(".close").on('click', function() {
+    acertaFoco(document.getElementById('button-back'));
+  });
+
+  // ################### Configuração dos campos do produto ###################
+
+  const configura_campos_produto = (categoriaSelect) => {
+
+    // Se Categoria for Nyloflex ou Novos, área é mm x mm
+    if(categoriaSelect == 7 || categoriaSelect == 4 || categoriaSelect == 6){
+      $('#div_id_comprimento label').html('Comp. (mm)');
+    }else{
+      $('#div_id_comprimento label').html('Comp. (m)');
+    }
+
+    if(categoriaSelect == 7 || categoriaSelect == 6){
+      $('#id_largura').prop('disabled', true);
+      $('#id_comprimento').prop('disabled', true);
+    }else{
+      $('#id_comprimento').prop('disabled', false);
+      $('#id_largura').prop('disabled', false);
+    }
+  }
+
+  // ################### Adiciona um item ao pedido ###################
   $('#add-item').on('click', function(){
     // Abre modal de categoria para inicial adição de itens
     const lista_items = $('#tbody-items');
@@ -531,18 +589,19 @@ $(document).ready(function() {
     }*/
   });
 
-
-  function calculoMetragemProduto(){
+  function calculoMetragemProduto(m2){
     /**
-      Calcula metragem no modal de adição de produtos dependendo da cartegoria
+      Calcula metragem no modal de adição de produtos dependendo da categoria
       SuperLam seguindo a fórmula:
       SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
     */
+    categoriaSelect = !categoriaSelect ? $("#hidden_categoria_id").val() : categoriaSelect;
     const $quantidade = $('#id_quantidade');
     const $largura = $('#id_largura');
     const $comprimento = $('#id_comprimento');
     const $preco = $('#id_preco');
-    const $metragem = $('#id_m2');
+    const $m2_total = $('#id_m2');
+    const metragem_inicial = m2 ? parseFloat(m2) : 0;
     const $total = $('#id_total_preco');
     const $id_cnpj_faturamento = $('#id_cnpj_faturamento');
     const $inputs = [
@@ -553,12 +612,10 @@ $(document).ready(function() {
       $id_cnpj_faturamento
     ];
     const $requiredInputs = [$quantidade, $largura, $comprimento, $preco];
-
-    const metragem_inicial = parseFloat($metragem.val()) || 0;
+    nome_produto = $('#nome_produto').text();
 
     $inputs.forEach(input => {
       input.on('change', function(){
-
 
         // Obtém os valores dos campos obrigatórios
         const requiredValues = $requiredInputs.map(i => {
@@ -585,12 +642,11 @@ $(document).ready(function() {
           metragem_inicial
         );
 
-        //console.log(resultado);
         // Atualiza campos do form
         $("#id_dados_adicionais_item").val(resultado.dados_descritivo);
         $("#id_obs").val(resultado.dados_descritivo);
-        $total.val(resultado.total_valor.toFixed(2));
-        $metragem.val(resultado.area_metragem.toFixed(2));
+        $total.val(resultado.total_valor);
+        $m2_total.val(resultado.area_total);
 
       });
     });
@@ -605,7 +661,7 @@ $(document).ready(function() {
   // Desabilita todos os campos do formulário
   $('#orderForm :input').prop('disabled', true);
 
-  // Executa requisição AJAX para filtrar os produtos por categoria
+  // Executa requisição para filtrar os produtos por categoria ao adicionar novo item
   $('#selectCategoryOrder').click(function(e) {
     e.preventDefault();
     categoriaSelect = $("#id_categoriaSelect").val();
@@ -625,6 +681,7 @@ $(document).ready(function() {
           $("#id_categoriaSelect").removeClass('is-invalid');
           $("#id_categoriaSelect").val('');
           $('#categoryOrderModal').modal('hide');
+          document.getElementById('selectProductOrder').focus();
           $('#productOrderModal').modal('show');
           $productSelect.empty();
 
@@ -657,21 +714,6 @@ $(document).ready(function() {
       activeButton.id = 'submitBtn';
       activeButton.textContent = 'Adicionar';
       activeButton.setAttribute('onclick', 'adicionar_produto()');
-    }
-
-    // Se Categoria for Nyloflex, área é mm x mm
-    if(categoriaSelect == 7 || categoriaSelect == 4){
-      $('#div_id_comprimento label').html('Comp. (mm)');
-    }else{
-      $('#div_id_comprimento label').html('Comp. (m)');
-    }
-
-    if(categoriaSelect == 3){
-      $('#id_largura').prop('disabled', false);
-      $('#id_comprimento').prop('disabled', false);
-    }else{
-      $('#id_comprimento').prop('disabled', true);
-      $('#id_largura').prop('disabled', true);
     }
 
     clientSelect = $("#id_cliente").val();
@@ -709,8 +751,10 @@ $(document).ready(function() {
             $('#id_comprimento').val(data.comprimento);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
-            parseInt(categoriaSelect) !== 3 ? $('#id_m2').val(data.m2) : '';
-            calculoMetragemProduto();
+            $('#id_m2').val(data.m2);
+            $('#hidden_m2_id').val(data.m2);
+            configura_campos_produto(data.categoria);
+            calculoMetragemProduto(data.m2);
           }
         },
         error: function(xhr, status, error) {
@@ -725,6 +769,8 @@ $(document).ready(function() {
 
       resetForm();
       $("#div_id_preco label").html('Preço Unit. (R$)')
+      $('#hidden_m2_id').val(0);
+      $('hidden_categoria_id').val(0);
       $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);
       $('#staticBackdrop').modal('show');
 
@@ -869,8 +915,9 @@ $(document).ready(function() {
     });
   });
 
-  // Botão de editar produto da lista de items
+  // Evento ao clicar no botão de "editar" na lista de produtos
   $(document).on('click', '#btn-edit-product', function(e){
+
     const itemID = $(this).data('id');
     const updateURL = "{% url 'get_item_data' 0 %}".replace("0", itemID);
 
@@ -886,7 +933,8 @@ $(document).ready(function() {
           const prazo = response.data.prazo;
           const conta_corrente = response.data.conta_corrente;
           const vendedor = response.data.vendedor;
-          console.log(response.data);
+
+
           // Atualiza o título do modal com o nome do produto
           $('#staticBackdropLabel').contents().first().replaceWith(`Editar Produto - #${itemID}: `);
 
@@ -896,10 +944,15 @@ $(document).ready(function() {
           preco =parseFloat(response.data.preco);
           largura = response.data.largura;
           comprimento = response.data.comprimento;
-          area_m2 = response.data.area;
+          area_m2 = response.data.area_unitario;
+          area_total = response.data.area_total;
           categoria = parseInt(response.data.categoria);
+          configura_campos_produto(categoria);
 
-          // Preenche os campos do modal com os dados retornados
+          // Preenche os campos do modal com os dados retornados, inclusive os ocultos
+          $("#hidden_m2_id").val(area_m2);
+          $("#hidden_categoria_id").val(categoria);
+
           selectOptionByText('#id_cnpj_faturamento', cnpj);
           selectOptionByText('#id_prazo', prazo);
           selectOptionByText('#id_conta_corrente', conta_corrente);
@@ -910,8 +963,7 @@ $(document).ready(function() {
           $("#id_total_preco").val(response.data.total_pedido);
           $("#id_largura").val(response.data.largura);
           $("#id_comprimento").val(response.data.comprimento);
-          $("#id_m2").val(area_m2)
-
+          $("#id_m2").val(area_total)
           $("#id_numero_pedido").val(response.data.numero_pedido);
           $("#id_dados_adicionais_item").val(response.data.dados_adicionais_item);
           $("#id_obs").val(response.data.obs);
@@ -933,7 +985,7 @@ $(document).ready(function() {
           // Seleciona o botão que será substituído
           const oldButton = document.querySelector('#submitBtn');
 
-          // Substitui o botão
+          // Substitui o botão `Adicionar` por `Salvar`
           if(oldButton){
             modalFooter.replaceChild(newButton, oldButton);
           }

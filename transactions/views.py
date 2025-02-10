@@ -471,8 +471,6 @@ class OrderSummary(DetailView):
                 context['codigo_vendedor'] = codigo['vendedor']
                 context['codigo_cliente'] = codigo['cod_cliente']
 
-        print(item_list)
-
         context['item_list'] = item_list
         context['quantidade_itens'] = quantidade_itens
         context['prazo'] = prazo
@@ -744,6 +742,9 @@ def edit_pedido(request, order_id):
             order = get_object_or_404(Outflows, pk=order_id)
             dados_modificados = request.POST
 
+
+            print(dados_modificados)
+
             if 'cliente' in dados_modificados:
                 cliente_id = dados_modificados.get('cliente')
                 cliente = get_object_or_404(CustomerSupplier, id=cliente_id)
@@ -774,7 +775,6 @@ def edit_pedido(request, order_id):
                 order.cod_cenario_fiscal = cod_cenario_fiscal
             if 'vendedor' in dados_modificados:
                 vendedor_id = dados_modificados.get('vendedor')
-                # print(vendedor_id)
                 vendedor = get_object_or_404(Seller, id=vendedor_id)
                 order.vendedor = vendedor
             if 'item_pedido' in dados_modificados:
@@ -819,7 +819,7 @@ def remove_product_from_order(request, order_id):
 
 def get_item_data(request, item_id):
     """
-    Recupera os dados de um item de uma ordem de saída.
+    Recupera os dados de um item de uma ordem de saída Para Edição.
 
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
@@ -835,8 +835,8 @@ def get_item_data(request, item_id):
     if request.method == 'GET':
         try:
             item = get_object_or_404(OutflowsItems, pk=item_id)
-            largura = Product.objects.get(pk=item.produto.pk).largura
-            comprimento = Product.objects.get(pk=item.produto.pk).comprimento
+            # largura = Product.objects.get(pk=item.produto.pk).largura
+            # comprimento = Product.objects.get(pk=item.produto.pk).comprimento
             categoria = Product.objects.get(pk=item.produto.pk).tipo_categoria.id
             # area = Product.objects.get(pk=item.produto.pk).m_quadrado
 
@@ -850,18 +850,19 @@ def get_item_data(request, item_id):
                 "conta_corrente": item.conta_corrente.descricao,
                 "item_pedido": item.item_pedido,
                 "numero_pedido": item.numero_pedido,
-                "largura": largura,
-                "comprimento": comprimento,
+                "largura": item.largura,
+                "comprimento": item.comprimento,
                 "vendedor_item": item.vendedor_item.nome,
                 "dados_adicionais_item": item.dados_adicionais_item,
                 "obs": item.obs,
                 "nome_produto": item.produto.nome_produto,
                 "vendedor": item.vendedor_item.nome,
                 "categoria": categoria,
-                "area": item_list[0]['m_quadrado_total'],
+                "area_total": item_list[0]['m_quadrado_total'],
+                "area_unitario": item_list[0]['m_quadrado_unitario'],
                 "total_pedido": total_pedido,
             }
-            print(data)
+            # print(data)
 
             return JsonResponse({
                 "success": True,
@@ -1014,6 +1015,8 @@ def get_price_data_filter_by_client_product(request):
             pedido = Outflows.objects.get(pk=order_id)
             items = OutflowsItems.objects.filter(saida=pedido).count()
             proximo_pedido_id = pedido.saida_items.count() + 1
+            categoria = Product.objects.get(pk=product_id).tipo_categoria.id
+            print(m_quadrado)
 
             data = {
                 'id': order_id,
@@ -1029,6 +1032,7 @@ def get_price_data_filter_by_client_product(request):
                 'item_pedido': items + 1,
                 'proximo_pedido': proximo_pedido_id,
                 'm2': m_quadrado,
+                'categoria': categoria,
             }
 
             return JsonResponse({
