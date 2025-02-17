@@ -668,6 +668,7 @@ $(document).ready(function() {
     categoriaSelect = $("#id_categoriaSelect").val();
     isValid = true;
 
+
     validateField('categoriaSelect', categoriaSelect);
 
     if(isValid) {
@@ -678,11 +679,19 @@ $(document).ready(function() {
           category_id: categoriaSelect
         },
         success: function(data){
+
+          console.log(typeof(data.products.length));
+          if(data.products.length === 0){
+            console.log(`Nada encontrado: ${data.length}`);
+            alert('Nenhum produto encontrado para esta categoria!');
+            return;
+          }
           const $productSelect = $("#id_productSelect");
           $("#id_categoriaSelect").removeClass('is-invalid');
           $("#id_categoriaSelect").val('');
+
           $('#categoryOrderModal').modal('hide');
-          document.getElementById('selectProductOrder').focus();
+
           $('#productOrderModal').modal('show');
           $productSelect.empty();
 
@@ -723,7 +732,6 @@ $(document).ready(function() {
     condicao = $("#id_condicaoSelect").val();
     isValid = true;
 
-
     validateField('productSelect', productSelect);
     validateField('condicaoSelect', condicao);
     if(!isValid) {
@@ -744,9 +752,9 @@ $(document).ready(function() {
             data = response.data;
 
             // Atualiza o título do modal com o nome do produto
-            $('#id_preco').val(data.preco)
-            $('#id_conta_corrente').val(data.cc)
-            $('#id_cnpj_faturamento').val(data.cnpj_faturamento)
+            $('#id_preco').val(data.preco);
+            $('#id_conta_corrente').val(data.cc);
+            $('#id_cnpj_faturamento').val(data.cnpj_faturamento);
             $('#id_prazo').val(data.prazo);
             $('#id_largura').val(data.largura);
             $('#id_comprimento').val(data.comprimento);
@@ -766,10 +774,10 @@ $(document).ready(function() {
       $('#productOrderModal').modal('hide');
       $("#nome_produto").html(nome_produto);
       $("#div_id_preco label").append(`/ <b>Condição: ${condicao}</b>`);
-      // Verifica se largura/comprimento/Metragem devem ser exibidos
 
+      // Verifica se largura/comprimento/Metragem devem ser exibidos
       resetForm();
-      $("#div_id_preco label").html('Preço Unit. (R$)')
+      $("#div_id_preco label").html('Preço Unit. (R$)');
       $('#hidden_m2_id').val(0);
       $('hidden_categoria_id').val(0);
       $('#staticBackdropLabel').contents().first().replaceWith(`Adicionar Produto - `);
@@ -778,7 +786,7 @@ $(document).ready(function() {
     }
   });
 
-  atualizarTabela({{ order.pk }})
+  atualizarTabela({{ order.pk }});
 
   /*
     Função executada ao clicar no botão `Editar Pedido`
@@ -819,7 +827,7 @@ $(document).ready(function() {
 
    // Atualiza os dados do Pedido ao clicar em `Salvar`
   $(document).on('click', '#saveButton button', function(e){
-    e.preventDefault()
+    e.preventDefault();
 
     var modifiedData = {};
 
@@ -873,7 +881,7 @@ $(document).ready(function() {
       });
 
     }else{
-      let message = "Nenhum campo alterado, nada salvo..."
+      let message = "Nenhum campo alterado, nada salvo...";
 
       let alertElement = `
         <div class="alert alert-warning alert-dismissible fade show" role="alert">

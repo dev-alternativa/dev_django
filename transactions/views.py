@@ -509,11 +509,14 @@ class OrderSummary(DetailView):
         prazo = order_itens.first().prazo.codigo
         *_, item_list = calculate_order_total(order_itens)
 
-
         conta_corrente = ContaCorrente.objects.filter(
             cnpj=order_itens.first().cnpj_faturamento,
             padrao=True
         )
+
+        for index, item in enumerate(order_itens, start=1):
+            item.indice = index
+
 
         mapa_sigla_para_campo = {
             'COM': {
@@ -660,11 +663,11 @@ def adicionar_produto(request, order_id):
 
             # Limita a quantidade de produtos que podem ser adicionados em apenas 2
             quantidade_items_pedido = OutflowsItems.objects.filter(saida=order_id).count()
-            if quantidade_items_pedido > 2:
-                return JsonResponse(
-                    {'error': 'Não é possível adicionar mais de 2 itens na mesma ordem.'},
-                    status=400
-                )
+            # if quantidade_items_pedido > 2:
+            #     return JsonResponse(
+            #         {'error': 'Não é possível adicionar mais de 2 itens na mesma ordem.'},
+            #         status=400
+            #     )
 
             # itens_estoque = Inventory.objects.filter(
             #     entrada_items__produto=product,
