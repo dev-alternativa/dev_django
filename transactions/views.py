@@ -567,7 +567,7 @@ class OrderSummary(DetailView):
 
 
 
-def adicionar_produto(request, order_id):
+def add_product_to_order(request, order_id):
     """
     Adiciona um produto a uma ordem de saída.
 
@@ -661,7 +661,6 @@ def adicionar_produto(request, order_id):
             else:
                 quantidade = data["quantidade"]
 
-            # Limita a quantidade de produtos que podem ser adicionados em apenas 2
             quantidade_items_pedido = OutflowsItems.objects.filter(saida=order_id).count()
             # if quantidade_items_pedido > 2:
             #     return JsonResponse(
@@ -790,7 +789,7 @@ def get_itens_pedido(request, order_id):
         return JsonResponse({'html': ''})
 
 
-def edit_pedido(request, order_id):
+def edit_order(request, order_id):
     """
     Edita uma ordem de saída com os dados fornecidos na requisição POST.
 
@@ -825,7 +824,6 @@ def edit_pedido(request, order_id):
         try:
             order = get_object_or_404(Outflows, pk=order_id)
             dados_modificados = request.POST
-
 
             print(dados_modificados)
 
@@ -1065,16 +1063,16 @@ def update_product_from_order(request, item_id):
 
 def get_filtered_products(request):
     """
-    Recupera os dados de preço filtrados por cliente e produto.
+    Recupera os dados de um produtos.
 
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
 
     Returns:
-        JsonResponse: Uma resposta JSON contendo os dados de preço filtrados ou uma mensagem de erro.
+        JsonResponse: Uma resposta JSON contendo os dados do produto ou uma mensagem de erro.
 
     O método aceita apenas requisições POST. Ele processa os dados do formulário,
-    verifica os IDs do pedido, produto e cliente, e retorna os dados de preço filtrados.
+    verifica os IDs do pedido, produto e cliente, e retorna os dados do produto
     Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
 
     Campos esperados no POST:
@@ -1103,7 +1101,6 @@ def get_filtered_products(request):
             items = OutflowsItems.objects.filter(saida=pedido).count()
             proximo_pedido_id = pedido.saida_items.count() + 1
             categoria = Product.objects.get(pk=product_id).tipo_categoria.id
-            print(m_quadrado)
 
             data = {
                 'id': order_id,
@@ -1127,6 +1124,7 @@ def get_filtered_products(request):
                 "action": "update",
                 "data": data,
             }, status=200)
+
         except Exception as e:
             return JsonResponse({
                 "success": False,

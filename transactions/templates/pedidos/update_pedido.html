@@ -281,11 +281,11 @@ const validateField = (fieldId, value) => {
 
 
 function adicionar_produto() {
-  // Salva produtos no pedido atual
+  // Salva um novo produto no pedido atual
 
   const getVal = id => $(`#id_${id}`).val() || '';
 
-  // Pega os valores dos campos
+  // Valores dos campos
   const produto = productSelect;
   const cnpj_faturamento = getVal('cnpj_faturamento');
   const condicao_preco = condicao;
@@ -303,7 +303,7 @@ function adicionar_produto() {
   const obs = getVal('obs');
   //const cfop = getVal('cfop');
 
-  // Variável para controlar se o formulário é válido
+  // Contraola se o formulário é válido
   let isValid = true;
 
   const validateField = (fieldId, value) => {
@@ -321,11 +321,10 @@ function adicionar_produto() {
   validateField('conta_corrente', conta_corrente);
   validateField('item_pedido', itemPedido);
 
-    // Se o formulário for válido, envie os dados via AJAX
   if (isValid) {
-      // Aqui você pode fazer a chamada AJAX para enviar o formulário
+
       $.ajax({
-          url: "{% url 'add_product_to_order' order.pk %}",  // URL do servidor
+          url: "{% url 'add_product_to_order' order.pk %}",
           method: 'POST',
           data: {
             produto: produto,
@@ -549,6 +548,7 @@ $(document).ready(function() {
   // ################### Configuração dos campos do produto ###################
 
   const configura_campos_produto = (categoriaSelect) => {
+    console.log(`Função configura campos, Categoria: ${categoriaSelect}`);
 
     // Se Categoria for Nyloflex ou Novos, área é mm x mm
     if(categoriaSelect == 7 || categoriaSelect == 4 || categoriaSelect == 6){
@@ -670,17 +670,18 @@ $(document).ready(function() {
 
 
     validateField('categoriaSelect', categoriaSelect);
+    $('#hidden_categoria_id').val(categoriaSelect);
+    console.log($('#hidden_categoria_id').val());
 
     if(isValid) {
       $.ajax({
-        url: "{% url 'product_filter_category' %}",
+        url: "{% url 'filter_products_category' %}",
         method: "GET",
         data: {
           category_id: categoriaSelect
         },
         success: function(data){
 
-          console.log(typeof(data.products.length));
           if(data.products.length === 0){
             console.log(`Nada encontrado: ${data.length}`);
             alert('Nenhum produto encontrado para esta categoria!');
@@ -762,6 +763,7 @@ $(document).ready(function() {
             $('#id_vendedor_item').val(data.vendedor);
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
+            $('#hidden_categoria_id').val(data.categoria);
             configura_campos_produto(data.categoria);
             calculoMetragemProduto(data.m2);
           }
