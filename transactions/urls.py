@@ -15,14 +15,14 @@ urlpatterns = [
     path('outflows/<int:pk>/detail/', views.OutflowsDetailView.as_view(), name='outflow_detail'),
 
     # AJAX
-    path('get-products/', views.get_products_by_category, name='get_products_by_category'),
+    path('get_filtered_products_category/', views.get_filtered_products_category, name='get_filtered_products_category'),
     path('pedidos/<int:order_id>/adicionar_produto/', views.add_product_to_order, name='add_product_to_order'),
     path('get_filtered_products/', views.get_filtered_products, name='get_filtered_products'),
     path('get_itens_pedido/<int:order_id>/', views.get_itens_pedido, name='get_itens_pedido'),
     path('pedidos/editar/<int:order_id>/', views.edit_order, name='edit_order'),
     path('pedidos/<int:order_id>/remover_produto/', views.remove_product_from_order, name='remove_product_from_order'),
     path('get-category/', get_category_view, name="get_categories"),
-    path('filter_products_category/', views.filter_products_category, name="filter_products_category"),
+    # path('filter_products_category/', views.filter_products_category, name="filter_products_category"),
     path('pedidos/<int:item_id>/', views.get_item_data, name='get_item_data'),
     path('pedidos/<int:item_id>/editar/', views.update_product_from_order, name='update_product_from_order'),
 

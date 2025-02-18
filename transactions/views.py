@@ -3,10 +3,12 @@ from decimal import Decimal
 from django.template.loader import render_to_string
 from django.db import transaction
 from django.http import JsonResponse
+from django.http import HttpResponseNotAllowed
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Sum, F
+# from django.db.models import Sum, F
+from django.views.decorators.http import require_http_methods
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
 from products.models import Product
@@ -35,8 +37,37 @@ def is_form_empty(form):
     """
     return all(field is None or field == '' for field in form.cleaned_data.values())
 
+@require_http_methods(['GET'])
+def get_filtered_products_category(request):
+    """
+    Recupera uma lista de produtos, opcionalmente filtrados por categoria.
 
-def get_products_by_category(request):
+    Esta função permite buscar produtos com base em um ID de categoria.
+    Se for forneceido um category_id, retorna apenas os produtos dessa categoria.
+    Se nenhum ID for fornecido, retorna todos os produtos.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo uma lista de produtos filtrados.
+    """
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    category_id = request.GET.get('category_id')
+    fields = request.GET.getlist('fields', ['id', 'nome_produto'])
+    if category_id:
+        products = Product.objects.filter(tipo_categoria_id=category_id).values(*fields)
+    else:
+        products = Product.objects.values(*fields)
+
+    products_list = list(products)
+
+    return JsonResponse(products_list, safe=False)
+
+
+# def get_products_by_category(request):
     """
     Recupera uma lista de produtos, opcionalmente filtrados por categoria
 
@@ -53,19 +84,19 @@ def get_products_by_category(request):
     A função espera que o ID da categoria seja fornecido como um parâmetro de consulta na URL.
     Se o ID da categoria for fornecido, a função filtra os produtos por essa categoria e retorna
     uma lista de dicionários contendo os IDs, nomes, larguras e comprimentos dos produtos.
-    """
-    category_id = request.GET.get('category_id')
-    if category_id:
-        products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto', 'largura', 'comprimento')
-    else:
-        products = Product.objects.values('id', 'nome_produto', 'largura', 'comprimento')
+    # """
+    # category_id = request.GET.get('category_id')
+    # if category_id:
+    #     products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto', 'largura', 'comprimento')
+    # else:
+    #     products = Product.objects.values('id', 'nome_produto', 'largura', 'comprimento')
 
-    products_list = list(products)
+    # products_list = list(products)
 
-    return JsonResponse(products_list, safe=False)
+    # return JsonResponse(products_list, safe=False)
 
 
-def filter_products_category(request):
+# def filter_products_category(request):
     """
     Recupera produtos filtrados por categoria.
 
@@ -82,10 +113,10 @@ def filter_products_category(request):
     uma lista de dicionários contendo os IDs e nomes dos produtos.
     """
 
-    category_id = request.GET.get('category_id')
-    products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto')
+    # category_id = request.GET.get('category_id')
+    # products = Product.objects.filter(tipo_categoria_id=category_id).values('id', 'nome_produto')
 
-    return JsonResponse({'products': list(products)})
+    # return JsonResponse({'products': list(products)})
 
 
 def verify_cnpj_order(cnpj_list, order_list):

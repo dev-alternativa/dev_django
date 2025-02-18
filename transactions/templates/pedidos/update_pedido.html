@@ -548,7 +548,6 @@ $(document).ready(function() {
   // ################### Configuração dos campos do produto ###################
 
   const configura_campos_produto = (categoriaSelect) => {
-    console.log(`Função configura campos, Categoria: ${categoriaSelect}`);
 
     // Se Categoria for Nyloflex ou Novos, área é mm x mm
     if(categoriaSelect == 7 || categoriaSelect == 4 || categoriaSelect == 6){
@@ -597,7 +596,6 @@ $(document).ready(function() {
       SE(qtd, largura e comprimento > 0 então metragem = l * c * q / 1000)
     */
     categoriaSelect = $("#hidden_categoria_id").val();
-    console.log(`Categoria: ${categoriaSelect}`);
     const $quantidade = $('#id_quantidade');
     const $largura = $('#id_largura');
     const $comprimento = $('#id_comprimento');
@@ -671,18 +669,17 @@ $(document).ready(function() {
 
     validateField('categoriaSelect', categoriaSelect);
     $('#hidden_categoria_id').val(categoriaSelect);
-    console.log($('#hidden_categoria_id').val());
 
     if(isValid) {
       $.ajax({
-        url: "{% url 'filter_products_category' %}",
+        url: "{% url 'get_filtered_products_category' %}",
         method: "GET",
         data: {
           category_id: categoriaSelect
         },
         success: function(data){
 
-          if(data.products.length === 0){
+          if(data.length === 0){
             console.log(`Nada encontrado: ${data.length}`);
             alert('Nenhum produto encontrado para esta categoria!');
             return;
@@ -696,7 +693,7 @@ $(document).ready(function() {
           $('#productOrderModal').modal('show');
           $productSelect.empty();
 
-          $.each(data.products, function(index, product){
+          $.each(data, function(index, product){
             $productSelect.append(
               $('<option>', {
                 value: product.id,

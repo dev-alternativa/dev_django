@@ -201,7 +201,7 @@
     const loadProductsForCategory = (categoryId, target) => {
 
         $.ajax({
-          url: '{% url "get_products_by_category" %}',
+          url: '{% url "get_filtered_products" %}',
           data: {
             'category_id': categoryId
           },
