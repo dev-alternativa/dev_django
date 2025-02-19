@@ -1,24 +1,37 @@
 /* ****************************** Funções de chamadas de APIs ****************************** */
 
-// Consulta o CNPJ numa API pública
-const consultarCNPJ = () => {
+/**
+ * Verifica a validade de um CNPJ e consulta seus dados em uma API pública.
+ *
+ * Esta função realiza as seguintes etapas:
+ * 1. Limpa o CNPJ removendo caracteres não numéricos.
+ * 2. Verifica se o CNPJ foi digitado.
+ * 3. Verifica se o CNPJ tem 14 caracteres.
+ * 4. Realiza uma requisição AJAX para consultar os dados do CNPJ.
+ * 5. Atualiza o formulário com os dados retornados pela API.
+ *
+ * @function
+ * @name checkCNPJ
+ * @returns {boolean} Retorna false se o CNPJ for inválido ou se a requisição não puder ser realizada.
+ */
+const checkCNPJ = () => {
   let cnpj = $('#id_cnpj').val();
-  let cleaned_cnpj = cnpj.replace(/[^\d]/g, '');
-  const url = `/api/cnpj/${cleaned_cnpj}`;
-  let erroDivCNPJ = $('#id_cnpj-error');
+  let cleanedCNPJ = cnpj.replace(/[^\d]/g, '');
+  const url = `/api/cnpj/${cleanedCNPJ}`;
+  let errorDivCNPJ = $('#id_cnpj-error');
   const btnConsultaCNPJ = $('#btn_consulta_cnpj');
 
   // Adiciona div de erro se ela não existir
-  if (erroDivCNPJ.length === 0) {
+  if (errorDivCNPJ.length === 0) {
     $('<div id="id_cnpj-error"></div>').insertAfter('.btn-primary');
-    erroDivCNPJ = $('#id_cnpj-error');
+    errorDivCNPJ = $('#id_cnpj-error');
   }
 
   // Verifica se foi digitado algum CNPJ
   if (cnpj.length === 0) {
     $('#id_cnpj').addClass('is-invalid');
-    erroDivCNPJ.addClass('invalid-feedback show');
-    erroDivCNPJ.text('Preencha um CNPJ');
+    errorDivCNPJ.addClass('invalid-feedback show');
+    errorDivCNPJ.text('Preencha um CNPJ');
   }
 
   // Verifica se o campo está validado para prosseguir com a request
@@ -27,10 +40,10 @@ const consultarCNPJ = () => {
   }
 
   // Se campo for menor que 14 caracteres não executa a request
-  if (cleaned_cnpj.length < 14) {
+  if (cleanedCNPJ.length < 14) {
     $('#id_cnpj').addClass('is-invalid');
-    erroDivCNPJ.addClass('invalid-feedback show');
-    erroDivCNPJ.text('Não é um CNPJ válido');
+    errorDivCNPJ.addClass('invalid-feedback show');
+    errorDivCNPJ.text('Não é um CNPJ válido');
     return false;
   } else {
     // desativa o botão de consultar até que a requisição termine
@@ -46,18 +59,18 @@ const consultarCNPJ = () => {
         btnConsultaCNPJ.html('Consultar CNPJ');
         btnConsultaCNPJ.attr('disabled', false);
         $('#id_cnpj').removeClass('is-invalid');
-        erroDivCNPJ.text('')
+        errorDivCNPJ.text('')
         $('#id_cnpj').addClass('is-valid');
         messageBox("Preenchimento de Dados?", "CNPJ encontrado e validado. Deseja usar os dados consultados para preencher o formulário?")
           .then((result) => {
             if (result) {
-              tratarJSONCNPJ(dataResponse);
+              handleJSONCNPJ(dataResponse);
             }
           });
       },
       error: (err) => {
         $('id_cnpj').addClass('is-invalid');
-        erroDivCNPJ.addClass('invalid-feedback show');
+        errorDivCNPJ.addClass('invalid-feedback show');
         btnConsultaCNPJ.html('Consultar CNPJ');
         btnConsultaCNPJ.attr('disabled', false);
       }
@@ -65,39 +78,37 @@ const consultarCNPJ = () => {
   }
 };
 
+/**
+ * Verifica a validade de um CEP e consulta seus dados em uma API pública.
+ *
+ * Esta função realiza as seguintes etapas:
+ * 1. Limpa o CEP removendo caracteres não numéricos.
+ * 2. Verifica se o CEP tem 8 caracteres.
+ * 3. Realiza uma requisição AJAX para consultar os dados do CEP.
+ * 4. Atualiza o formulário com os dados retornados pela API.
+ *
+ * @function
+ * @name checkCEP
+ * @returns {boolean} Retorna false se o CEP for inválido ou se a requisição não puder ser realizada.
+ */
+const checkCEP = () => {
 
-const consultarCEP = () => {
-  /* Retorna o o endereço completo no formato:
-
-  {
-    "cep": "65073120",
-    "state": "MA",
-    "city": "São Luís",
-    "neighborhood": "Parque Shalon",
-    "street": "Rua V-13",
-    "service": "open-cep",
-    "location": {
-        "type": "Point",
-        "coordinates": {}
-    }
-  }
-    */
   let cep = $('#id_cep').val();
   let cleaned_cep = cep.replace(/[^\d]/g, '');
   const url = `/api/cep/${cleaned_cep}`;
-  let erroDivCEP = $('#id_cep-error');
+  let errorDivCEP = $('#id_cep-error');
   const btnConsultaCEP = $('#btn_consulta_cep');
 
   // Adiciona div que conterá mensagem de erro, se ela não existir
-  if (erroDivCEP.length === 0) {
+  if (errorDivCEP.length === 0) {
     $('<div id="id_cep-error"></div>').insertAfter('.btn-warning');
-    erroDivCEP = $('#id_cep-error');
+    errorDivCEP = $('#id_cep-error');
   }
 
   if (cleaned_cep.length != 8) {
     $('#id_cep').addClass('is-invalid');
-    erroDivCEP.addClass('invalid-feedback show');
-    erroDivCEP.text('Não é um CEP Válido')
+    errorDivCEP.addClass('invalid-feedback show');
+    errorDivCEP.text('Não é um CEP Válido')
   } else {
     // Trava o botão de consulta com mensagem e muda texto do mesmo para 'Aguardando'
     btnConsultaCEP.html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> <span role="status">Aguarde...</span>')
@@ -114,12 +125,12 @@ const consultarCEP = () => {
         // caso não venha um status 200, gera erro e marca o campo CEP
         if (textStatus.status != 200) {
           $('#id_cep').addClass('is-invalid');
-          erroDivCEP.addClass('invalid-feedback show');
-          erroDivCEP.text('Não é um CEP Válido')
+          errorDivCEP.addClass('invalid-feedback show');
+          errorDivCEP.text('Não é um CEP Válido')
         } else {
           // se for válido, remove a classe de erro do campo CEP
           $('#id_cep').removeClass('is-invalid');
-          erroDivCEP.text('')
+          errorDivCEP.text('')
           $('#id_cep').addClass('is-valid');
 
         }
@@ -128,8 +139,8 @@ const consultarCEP = () => {
         // Caso eu CEP inválido seja inserido, cairá aqui
         // avisará o erro, e habilitará novamente o botão de consulta
         $('#id_cep').addClass('is-invalid');
-        erroDivCEP.addClass('invalid-feedback show');
-        erroDivCEP.text(`${errorThrown.responseJSON.message}`)
+        errorDivCEP.addClass('invalid-feedback show');
+        errorDivCEP.text(`${errorThrown.responseJSON.message}`)
         btnConsultaCEP.html('Consultar CEP');
         btnConsultaCEP.attr('disabled', false);
       }
@@ -137,13 +148,19 @@ const consultarCEP = () => {
   }
 };
 
+/**
+ * Parse do JSON com os dados que serão utilizados para preencher o formulário.
+ *
+ * Esta função realiza as seguintes etapas:
+ * 1. Extrai os dados relevantes do JSON retornado pela API.
+ * 2. Popula os campos do formulário com os dados extraídos.
+ *
+ * @function
+ * @name handleJSONCNPJ
+ * @param {object} jsonData - Dados em formato JSON retornados pela API.
+ */
+const handleJSONCNPJ = (jsonData) => {
 
-const tratarJSONCNPJ = (jsonData) => {
-  /**
-   * Parse do JSON com os dados que serão utilizados para preencher o formulário
-   * @param {object} - jsonData - Dados em formato JSON
-   *
-   * */
   const razao_social = (jsonData.razao_social) ? jsonData.razao_social : "";
   const nome_fantasia = (jsonData.estabelecimento.nome_fantasia) ? jsonData.estabelecimento.nome_fantasia : "";
   const cep = (jsonData.estabelecimento.cep) ? jsonData.estabelecimento.cep : "";
