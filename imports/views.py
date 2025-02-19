@@ -406,7 +406,7 @@ class ImportProductView(FormView):
                 # except CustomerSupplier.DoesNotExist:
                 #     messages.error(self.request, f"Erro na linha {index + 1}: Fornecedor '{fornecedor_nome}' não encontrado. Cadastre o fornecedor primeiro.")
                 #     return self.form_invalid(form)
-
+                print(type(row['Qtd/Caixa2']))
                 # Cria ou atualiza o produto
                 Product.objects.update_or_create(
                     nome_produto=row['Produto'],
@@ -416,11 +416,10 @@ class ImportProductView(FormView):
                         'largura': row['Larg.'],
                         'comprimento': row['Compr.'],
                         'm_quadrado': row['Metragem (m²)'],
-                        'qtd_por_caixa': row['Qtd/Caixa2'],
+                        'qtd_por_caixa': (row['Qtd/Caixa2']),
                         'peso_unitario': row['Peso Unitario'],
                         'peso_caixa': row['Peso/Caixa'],
                         'situacao': row['Situação'],
-                        #  'ipi': row['ipi'],
                         'cod_omie_com': row['Cod_COM'],
                         'cod_oculto_omie_com': row['Cod_Prod_COM'],
                         'cod_omie_flx': row['Cod_FLX'],
@@ -433,11 +432,17 @@ class ImportProductView(FormView):
                         'cod_oculto_omie_mrx': row['Cod_Prod_MRX'],
                         'cod_omie_srv': row['Cod_SRV'],
                         'cod_oculto_omie_srv': row['Cod_Prod_SRV'],
+                        'aliq_ipi_com': row['AliqIPI_COM'],
+                        'aliq_ipi_ind': row['AliqIPI_IND'],
+                        'aliq_ipi_flx': row['AliqIPI_FLX'],
+                        'aliq_ipi_pre': row['AliqIPI_PRE'],
+                        'aliq_ipi_mrx': row['AliqIPI_MRX'],
                     }
                 )
 
             except Exception as e:
                 messages.error(self.request, f'Erro ao processar a linha {index + 1}: {e}')
+                print(f'Erro ao processar a linha {index + 1}: {e}')
                 return self.form_invalid(form)
 
         messages.success(self.request, 'Arquivo importado e processado com sucesso!')

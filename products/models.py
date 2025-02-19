@@ -68,11 +68,10 @@ class Product(Base):
     largura = models.CharField('Largura', max_length=20, null=True, blank=True)
     comprimento = models.CharField('Comprimento', max_length=10, null=True, blank=True)
     m_quadrado = models.CharField('Metro Quadrado', max_length=10, null=True, blank=True)
-    qtd_por_caixa = models.PositiveIntegerField('Quantidade por caixa', null=True, blank=True)
+    qtd_por_caixa = models.CharField('Quantidade por caixa', max_length=5, null=True, blank=True)
     peso_unitario = models.CharField('Peso Unitário', max_length=10, null=True, blank=True)
     peso_caixa = models.CharField('Peso da Caixa', max_length=10, null=True, blank=True)
     situacao = models.CharField('Estado do Produto', choices=SITUACAO_PRODUTO, max_length=50, null=True, blank=True)
-    ipi = models.DecimalField('IPI', max_digits=5, decimal_places=2, null=True, blank=True)
     cod_omie_com = models.CharField('Cód. OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_oculto_omie_com = models.CharField('Cód. oculto no OMIE CNPJ COM', max_length=30, null=True, blank=True)
     cod_omie_ind = models.CharField('Cód. OMIE CNPJ IND', max_length=30, null=True, blank=True)
@@ -85,6 +84,11 @@ class Product(Base):
     cod_oculto_omie_mrx = models.CharField('Cód. oculto no OMIE CNPJ MRX', max_length=30, null=True, blank=True)
     cod_omie_srv = models.CharField('Cód. OMIE CNPJ SRV', max_length=30, null=True, blank=True)
     cod_oculto_omie_srv = models.CharField('Cód. oculto no OMIE CNPJ SRV', max_length=30, null=True, blank=True)
+    aliq_ipi_com = models.DecimalField('Alíquota IPI COM', max_digits=5, decimal_places=2, null=True, blank=True)
+    aliq_ipi_ind = models.DecimalField('Alíquota IPI IND', max_digits=5, decimal_places=2, null=True, blank=True)
+    aliq_ipi_flx = models.DecimalField('Alíquota IPI FLX', max_digits=5, decimal_places=2, null=True, blank=True)
+    aliq_ipi_pre = models.DecimalField('Alíquota IPI PRE', max_digits=5, decimal_places=2, null=True, blank=True)
+    aliq_ipi_mrx = models.DecimalField('Alíquota IPI MRX', max_digits=5, decimal_places=2, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Produto'

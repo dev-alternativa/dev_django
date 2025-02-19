@@ -247,7 +247,7 @@ const resetForm = () => {
   $('#staticBackdrop').modal('hide');
 }
 
-const atualizarTabela = (orderID) => {
+const updateItemsTable = (orderID) => {
   /**
     Atualiza a lista de itens de produto no pedido
     @param {int} orderID - ID do pedido como parâmetro
@@ -268,7 +268,7 @@ const atualizarTabela = (orderID) => {
   });
 }
 
-const validateField = (fieldId, value) => {
+const validateFormField = (fieldId, value) => {
   /**
   Valida os campos do formulário de adição de produtos
   @param {int} fieldId -  ID do campo a ser validado
@@ -280,7 +280,7 @@ const validateField = (fieldId, value) => {
 };
 
 
-function adicionar_produto() {
+function addProduct() {
   // Salva um novo produto no pedido atual
 
   const getVal = id => $(`#id_${id}`).val() || '';
@@ -306,20 +306,20 @@ function adicionar_produto() {
   // Contraola se o formulário é válido
   let isValid = true;
 
-  const validateField = (fieldId, value) => {
+  const validateFormField = (fieldId, value) => {
     const element = $(`#id_${fieldId}`);
     element.toggleClass('is-invalid', !value);
     if (!value) isValid = false;
   };
 
-  validateField('produto', produto);
-  validateField('cnpj_faturamento', cnpj_faturamento);
-  validateField('condicao_calculo', condicao_preco);
-  validateField('prazo', prazo);
-  validateField('quantidade', quantidade);
-  validateField('preco', preco);
-  validateField('conta_corrente', conta_corrente);
-  validateField('item_pedido', itemPedido);
+  validateFormField('produto', produto);
+  validateFormField('cnpj_faturamento', cnpj_faturamento);
+  validateFormField('condicao_calculo', condicao_preco);
+  validateFormField('prazo', prazo);
+  validateFormField('quantidade', quantidade);
+  validateFormField('preco', preco);
+  validateFormField('conta_corrente', conta_corrente);
+  validateFormField('item_pedido', itemPedido);
 
   if (isValid) {
 
@@ -350,7 +350,7 @@ function adicionar_produto() {
             let message = "Item adicionado com sucesso!";
 
             resetForm();
-            atualizarTabela({{ order.pk }});
+            updateItemsTable({{ order.pk }});
             let alertElement = `
               <div class="alert alert-success alert-dismissible fade show" role="alert">
                 ${message}
@@ -379,7 +379,7 @@ function adicionar_produto() {
 
 }
 
-function atualizar_produto() {
+function updateProduct() {
   /**
     Atualiza um produto no pedido atual
     Invocada ao clicar no botão `Salvar` no modal de adição de produtos
@@ -428,7 +428,7 @@ function atualizar_produto() {
   }
 }
 
-function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicial){
+function calculateProductValuesByCategory(categoriaSelect, valores, nome_produto, metragem_inicial){
   /**
    * Calcula área e valor do produto
    * @param {int} categoriaSelect - Categoria do produto
@@ -439,7 +439,7 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
   let [quantidade, largura, comprimento, preco, id_cnpj_faturamento] = valores;
   quantidade = parseInt(quantidade);
 
-  const formatarDescricao = (quantidade, unidade, parte1, parte2 = '') => {
+  const formatProductDescription = (quantidade, unidade, parte1, parte2 = '') => {
     /**
     Formata uma descrição com base em parâmetros fornecidos, ajustando a quantidade para sempre ter dois dígitos,
     concatenando a unidade de medida e combinando partes descritivas opcionais
@@ -454,17 +454,21 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
       ? `${qtd} ${unidade} ${parte1} x ${parte2}`
       : `${qtd} ${unidade} ${parte1}x${parte2}`;
   };
-  console.log(`Categoria: ${categoriaSelect}`);
 
   let area_m2 = (largura * comprimento ) / 1000 * quantidade;
+
+
+
   // Cálculos por categoria
   switch(parseInt(categoriaSelect)){
     case 3: // Rolos(SuperLam)
+    case 4: // Novos
+    case 10: // Gravação
     console.log('SUPERLAM')
       return {
         area_total: area_m2,
         total_valor: (preco * area_m2).toFixed(2),
-        dados_descritivo: formatarDescricao(
+        dados_descritivo: formatProductDescription(
           quantidade,
           'rolo(s)',
           largura,
@@ -478,7 +482,7 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
         area_total: (quantidade * metragem_inicial).toFixed(2),
         total_valor: (quantidade * preco).toFixed(2),
 
-        dados_descritivo: formatarDescricao(
+        dados_descritivo: formatProductDescription(
           quantidade,
           'chapa(s)',
           nome_produto,
@@ -491,7 +495,7 @@ function calcularProduto(categoriaSelect, valores, nome_produto, metragem_inicia
         area_total: (quantidade * metragem_inicial).toFixed(2),
         total_valor: (quantidade * preco).toFixed(2),
 
-        dados_descritivo: formatarDescricao(
+        dados_descritivo: formatProductDescription(
           quantidade,
           'chapa(s)',
           nome_produto,
@@ -519,35 +523,35 @@ $(document).ready(function() {
   // Chama os eventos de cálculo de metragem e valor total
   $('#id_largura').on('input', () => {
     const m2 = $('#hidden_m2_id').val();
-    calculoMetragemProduto(m2);
+    calcProductFieldsArea(m2);
   });
   $('#id_comprimento').on('input',  () => {
     const m2 = $('#hidden_m2_id').val();
-    calculoMetragemProduto(m2);
+    calcProductFieldsArea(m2);
   });
   $('#id_quantidade').on('input',  () => {
     const m2 = $('#hidden_m2_id').val();
-      calculoMetragemProduto(m2);
+      calcProductFieldsArea(m2);
   });
   $('#id_preco').on('input',  () => {
     const m2 = $('#hidden_m2_id').val();
-    calculoMetragemProduto(m2);
+    calcProductFieldsArea(m2);
   });
 
 
   // ################### Lida com os botões que fecham modais ###################
-  const acertaFoco = (button) => {
+  const handleCloseButtonFocus = (button) => {
     // Move o foco para um elemento fora do modal
     button.focus();
   }
 
   $(".close").on('click', function() {
-    acertaFoco(document.getElementById('button-back'));
+    handleCloseButtonFocus(document.getElementById('button-back'));
   });
 
   // ################### Configuração dos campos do produto ###################
 
-  const configura_campos_produto = (categoriaSelect) => {
+  const configProductFormLabels = (categoriaSelect) => {
 
     // Se Categoria for Nyloflex ou Novos, área é mm x mm
     if(categoriaSelect == 7 || categoriaSelect == 4 || categoriaSelect == 6){
@@ -589,7 +593,7 @@ $(document).ready(function() {
     }*/
   });
 
-  function calculoMetragemProduto(m2){
+  function calcProductFieldsArea(m2){
     /**
       Calcula metragem no modal de adição de produtos dependendo da categoria
       SuperLam seguindo a fórmula:
@@ -634,7 +638,7 @@ $(document).ready(function() {
         const valores = $inputs.map(i => parseFloat(i.val()) || 0);
 
         // Executa o calculo
-        const resultado = calcularProduto(
+        const resultado = calculateProductValuesByCategory(
           parseInt(categoriaSelect),
           valores,
           nome_produto,
@@ -667,7 +671,7 @@ $(document).ready(function() {
     isValid = true;
 
 
-    validateField('categoriaSelect', categoriaSelect);
+    validateFormField('categoriaSelect', categoriaSelect);
     $('#hidden_categoria_id').val(categoriaSelect);
 
     if(isValid) {
@@ -721,7 +725,7 @@ $(document).ready(function() {
     if(activeButton){
       activeButton.id = 'submitBtn';
       activeButton.textContent = 'Adicionar';
-      activeButton.setAttribute('onclick', 'adicionar_produto()');
+      activeButton.setAttribute('onclick', 'addProduct()');
     }
 
     clientSelect = $("#id_cliente").val();
@@ -730,8 +734,8 @@ $(document).ready(function() {
     condicao = $("#id_condicaoSelect").val();
     isValid = true;
 
-    validateField('productSelect', productSelect);
-    validateField('condicaoSelect', condicao);
+    validateFormField('productSelect', productSelect);
+    validateFormField('condicaoSelect', condicao);
     if(!isValid) {
       e.preventDefault();
     }else{
@@ -761,8 +765,8 @@ $(document).ready(function() {
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
             $('#hidden_categoria_id').val(data.categoria);
-            configura_campos_produto(data.categoria);
-            calculoMetragemProduto(data.m2);
+            configProductFormLabels(data.categoria);
+            calcProductFieldsArea(data.m2);
           }
         },
         error: function(xhr, status, error) {
@@ -785,7 +789,7 @@ $(document).ready(function() {
     }
   });
 
-  atualizarTabela({{ order.pk }});
+  updateItemsTable({{ order.pk }});
 
   /*
     Função executada ao clicar no botão `Editar Pedido`
@@ -914,7 +918,7 @@ $(document).ready(function() {
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`;
           $('#alertsPage').append(alertElement);
-          atualizarTabela({{ order.pk }});
+          updateItemsTable({{ order.pk }});
           location.reload();
       },
       error: function(xhr, status, error) {
@@ -955,7 +959,7 @@ $(document).ready(function() {
           area_m2 = response.data.area_unitario;
           area_total = response.data.area_total;
           categoria = parseInt(response.data.categoria);
-          configura_campos_produto(categoria);
+          configProductFormLabels(categoria);
 
           // Preenche os campos do modal com os dados retornados, inclusive os ocultos
           $("#hidden_m2_id").val(area_m2);
@@ -988,7 +992,7 @@ $(document).ready(function() {
           newButton.id = 'btn_editar';
           newButton.className = 'btn btn-primary';
           newButton.textContent = 'Salvar';
-          newButton.setAttribute('onclick', 'atualizar_produto()');
+          newButton.setAttribute('onclick', 'updateProduct()');
 
           // Seleciona o botão que será substituído
           const oldButton = document.querySelector('#submitBtn');

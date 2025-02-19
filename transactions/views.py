@@ -237,12 +237,17 @@ def calculate_order_total(items):
             preco_total =  Decimal(preco_unitario) * item.quantidade
             quantidade = item.quantidade
 
-        # m_quadrado = (item.largura * item.comprimento / 1000) if (item.largura or item.comprimento) else 0
-        # preco_total = (
-        #     item.quantidade * item.preco * m_quadrado
-        #     if item.produto.tipo_categoria_id == 3
-        #     else item.quantidade * item.preco
-        # )
+        # verifica qual tag de cadastro está ativa para o cliente
+        aliq_siglas = [
+            (item.produto.aliq_ipi_com, 'COM'),
+            (item.produto.aliq_ipi_ind, 'IND'),
+            (item.produto.aliq_ipi_pre, 'PRE'),
+            (item.produto.aliq_ipi_flx, 'FLX'),
+            (item.produto.aliq_ipi_mrx, 'MRX'),
+        ]
+        ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
+
+        print(ipi)
 
         item_data = {
             'id': item.id,
@@ -255,7 +260,7 @@ def calculate_order_total(items):
             'm_quadrado_unitario': m_quadrado_unitario,
             'm_quadrado_total': m_quadrado_total,
             'cnpj_faturamento': item.cnpj_faturamento,
-            'ipi': item.produto.ipi if item.produto.ipi else 0,
+            'ipi': ipi,
         }
         item_list.append(item_data)
 
@@ -512,6 +517,7 @@ class OrderEditDetailsView(UpdateView):
         context['categories'] = Category.objects.all()
         # context['price'] = preco
 
+        # verifica qual tag de cadastro está ativa para o cliente
         valid_tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
             (cliente.tag_cadastro_omie_ind, 'IND'),
