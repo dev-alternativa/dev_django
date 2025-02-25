@@ -203,6 +203,7 @@
     </div>
 </div>
 
+
 <script>
 /* ######################################################## SCRIPTS ########################################################### */
 
@@ -287,7 +288,6 @@ function addProduct() {
   // Valores dos campos
   const produto = productID;
   const billingCNPJ = getVal('cnpj_faturamento');
-  const paymentTerms = paymentTerms;
   const prazo = getVal('prazo');
   const quantidade = getVal('quantidade');
   const preco = getVal('preco');
@@ -427,7 +427,9 @@ function updateProduct() {
   }
 }
 
-function calculateProductValuesByCategory(categoryID, productValues, productName, initialArea){
+function calculateProductValuesByCategory(
+  categoryID, productValues, productName, initialArea
+  ){
   /**
    * Calcula área e valor do produto
    * @param {int} categoryID - Categoria do produto
@@ -436,6 +438,9 @@ function calculateProductValuesByCategory(categoryID, productValues, productName
    * @return {object} area_metragem, total_valor e dados_descritivo
    */
   let [quantidade, largura, comprimento, preco, cnpjFaturamento] = productValues;
+  largura = !largura ? 0 : largura;
+  comprimento = !comprimento ? 0 : comprimento;
+
   quantidade = parseInt(quantidade);
   categoryID = parseInt(categoryID);
 
@@ -447,12 +452,15 @@ function calculateProductValuesByCategory(categoryID, productValues, productName
     return `${qtd} ${unidade} ${parte1} x ${parte2}`;
   };
 
-  const area_m2 = (largura * comprimento ) / 1000 * quantidade;
+  const area_m2 = largura && comprimento ? (largura * comprimento ) / 1000 * quantidade: 0;
 
   // Categorias que usam rolos
   // SuperLAM, Novos e Gravação
-  const categoriaRolo = [3, 4, 10];
+  const categoriaRolo = [3, 4];
   if(categoriaRolo.includes(categoryID)){
+    console.log('Categoria Rolo calculada');
+    console.log('Preço:', preco);
+    console.log('valor:', preco * area_m2);
     return {
       area_total: (area_m2).toFixed(2),
       total_valor: (preco * area_m2).toFixed(2),
@@ -466,7 +474,8 @@ function calculateProductValuesByCategory(categoryID, productValues, productName
   }
   // Categorias que usam chapas
   // Nyloprint, Nyloflex, Tesa, Máquinas, Lâminas, Diversos
-  const categoriaChapa = [2, 5, 6, 7, 8, 9];
+  const categoriaChapa = [6, 7];
+  console.log('Categoria Chapa calculada');
   if(categoriaChapa.includes(categoryID)){
     return {
       area_total: (quantidade * initialArea).toFixed(2),
@@ -494,23 +503,24 @@ $(document).ready(function() {
     Funções iniciadas ao carregar a página
   */
 
+  $('#id_largura, #id_comprimento, #id_preco').on('blur', function() {
+    const value = $(this).val();
+    if (value && !isNaN(parseFloat(value))) {
+        $(this).val(parseFloat(value).toFixed(2));
+    }
+});
+
+
+  const calculateFields = () => {
+    const m2 = $('#hidden_m2_id').val();
+    calcProductFieldsArea(m2);
+  }
+
   // Chama os eventos de cálculo de metragem e valor total
-  $('#id_largura').on('input', () => {
-    const m2 = $('#hidden_m2_id').val();
-    calcProductFieldsArea(m2);
-  });
-  $('#id_comprimento').on('input',  () => {
-    const m2 = $('#hidden_m2_id').val();
-    calcProductFieldsArea(m2);
-  });
-  $('#id_quantidade').on('input',  () => {
-    const m2 = $('#hidden_m2_id').val();
-      calcProductFieldsArea(m2);
-  });
-  $('#id_preco').on('input',  () => {
-    const m2 = $('#hidden_m2_id').val();
-    calcProductFieldsArea(m2);
-  });
+  $('#id_largura').on('input', calculateFields);
+  $('#id_comprimento').on('input',  calculateFields);
+  $('#id_quantidade').on('input',  calculateFields);
+  $('#id_preco').on('input',  calculateFields);
 
 
   // ################### Lida com os botões que fecham modais ###################
@@ -526,22 +536,30 @@ $(document).ready(function() {
   // ################### Configuração dos campos do produto ###################
 
   const configProductFormLabels = (categoryID) => {
-    // Se Categoria não for TESA, Superlam ou Novos
-    const categoriaMMporM = [2, 3, 4];
+    /**
+      Configura os campos do formulário de adição de produtos
+      @param {int} categoryID - ID da categoria do produto
+    */
+    const categoriesByPiece = [2, 5, 6, 7, 8, 9];
+    const categoriaMMporM = [2, 3, 4, 8];
+
+    const rollDescription = [3, 4];
+    const plateDescription = [6, 7];
+
+    const enabledFields = [3, 4, 10]
     const isMMporM = categoriaMMporM.includes(categoryID);
+    const isRoll = rollDescription.includes(categoryID);
+    const isPiece = categoriesByPiece.includes(categoryID);
+    const isEnabled = enabledFields.includes(categoryID);
 
+    // Configura se label é `Comp. (m)` ou `Comp. (mm)`
     $("#div_id_comprimento label").html(isMMporM ? 'Comp. (m)' : 'Comp. (mm)');
+    // Configura se label é `Preço / m² (R$)` ou `Preço pç (R$)`
+    $("#div_id_preco label").html(isPiece ? 'Preço pç (R$)' : 'Preço / m² (R$)');
+    // Configura se input text é habilitado
+    $('#id_comprimento').prop('disabled', !isEnabled);
+    $('#id_largura').prop('disabled', !isEnabled);
 
-    if(categoryID == 8){
-      console.log('Categoria Laminas');
-      $('#id_comprimento').prop('disabled', false);
-      $('#id_largura').prop('disabled', true);
-      $('#id_comprimento label').html('Comp. (m)');
-    }else{
-      const disableFields = !isMMporM;
-      $('#id_largura').prop('disabled', disableFields);
-      $('#id_comprimento').prop('disabled', disableFields);
-    }
   }
 
 
@@ -580,9 +598,18 @@ $(document).ready(function() {
     const $comprimento = $('#id_comprimento');
     const $preco = $('#id_preco');
     const $m2_total = $('#id_m2');
-    const initialArea = m2 ? parseFloat(m2) : 0;
+    const initialArea = m2 && m2 != 0 ? parseFloat(m2) : 1;
     const $total = $('#id_total_preco');
     const $cnpjFaturamento = $('#id_cnpj_faturamento');
+
+    /*
+    [$largura, $comprimento, $preco].forEach(field => {
+      const value = field.val();
+      if(value && !isNaN(parseFloat(value))){
+        field.val(parseFloat(value).toFixed(2));
+      }
+    });
+    */
     const $inputs = [
       $quantidade,
       $largura,
@@ -599,41 +626,35 @@ $(document).ready(function() {
 
     productName = $('#nome_produto').text();
 
-    $inputs.forEach(input => {
-      input.on('change', function(){
-
-        // Obtém os valores dos campos obrigatórios
-        const requiredValues = $requiredInputs.map(i => {
-          const value = parseFloat(i.val());
-          return !isNaN(value) && value > 0 ? value : null;
-        });
-
-        // Verifica se todos os calores são diferentes de 0
-        const allValid = requiredValues.every(value => value !== null);
-
-        if(!allValid){
-          console.log('INVALIDO');
-          return;
-        }
-        // Obtém todos os valores (inclusive os opcionais, como metragem)
-        const valores = $inputs.map(i => parseFloat(i.val()) || 0);
-
-        // Executa o calculo
-        const result = calculateProductValuesByCategory(
-          parseInt(categoryID),
-          valores,
-          productName,
-          initialArea
-        );
-
-        // Atualiza campos do form
-        $("#id_dados_adicionais_item").val(result.dados_descritivo);
-        $("#id_obs").val(result.dados_descritivo);
-        $total.val(result.total_valor);
-        $m2_total.val(result.area_total);
-
-      });
+    // Obtém os valores dos campos obrigatórios
+    const requiredValues = $requiredInputs.map(i => {
+      const value = parseFloat(i.val());
+      return !isNaN(value) && value > 0 ? value : null;
     });
+    // Verifica se todos os calores são diferentes de 0
+    const allValid = requiredValues.every(value => value !== null);
+
+    if(!allValid){
+      console.log('INVALIDO');
+      return;
+    }
+
+    // Obtém todos os valores (inclusive os opcionais, como metragem)
+    const valores = $inputs.map(i => parseFloat(i.val()) || 0);
+    // Executa o calculo
+    const result = calculateProductValuesByCategory(
+      parseInt(categoryID),
+      valores,
+      productName,
+      initialArea,
+    );
+
+    // Atualiza campos do form
+    $("#id_dados_adicionais_item").val(result.dados_descritivo);
+    $("#id_obs").val(result.dados_descritivo);
+    $total.val(result.total_valor);
+    $m2_total.val(result.area_total);
+
   }
 
 
@@ -760,7 +781,7 @@ $(document).ready(function() {
 
       // Verifica se largura/comprimento/Metragem devem ser exibidos
       resetForm();
-      $("#div_id_preco label").html('Preço Unit. (R$)');
+      $("#div_id_preco label").html('Preço pç (R$)');
       $('#hidden_m2_id').val(0);
       $('hidden_categoria_id').val(0);
       $('#itemsModalLabel').contents().first().replaceWith(`Adicionar Produto - `);
@@ -1033,5 +1054,6 @@ $(document).ready(function() {
 {% endblock content %}
 {% block extra_scripts %}
   <script src="{% static 'js/select2.min.js' %}"></script>
+  <script src="{% static 'js/mask.js' %}"></script>
 {% endblock %}
 

@@ -14,9 +14,9 @@
             </div>
             <div class="modal-body">
                 <div id='alertsModal'></div>
-                <div class="row">
+                <div class="row d-flex justify-content-center align-items-center">
                     <div class="row mb-3">
-                        <div id="pedidos" class="row g-2" data-form-count="1">
+                        <div id="pedidos" class="row g-2 d-flex justify-content-center align-items-center" data-form-count="1">
                             <div id="new-item" class="row line-to-remove">
                                 <form id='itemForm' method="post">
                                     {% csrf_token %}
@@ -26,28 +26,28 @@
 
                                     <!-- Primeira linha -->
                                     <div class="row">
-                                        <div class="col">
+                                        <div class="col-md-1">
                                             {{ item_form.item_pedido|as_crispy_field }}
                                         </div>
-                                        <div class="col">
+                                        <div class="col-md-1">
                                             {{ item_form.quantidade|as_crispy_field }}
                                         </div>
-                                        <div class="col">
+                                        <div class="col-md-2">
                                             {{ item_form.preco|as_crispy_field }}
                                         </div>
-                                        <div class="col">
+                                        <div class="col-md-2">
                                             <label for="id_total_preco" class="form-label">
                                                 Total Prod.(R$)
                                             </label>
-                                            <input type="number" class="number input form-control" id="id_total_preco" disabled="true">
+                                            <input type="number" class="number input form-control text-align-right" id="id_total_preco" disabled="true">
                                         </div>
-                                        <div class="col metric_field">
+                                        <div class="col-md-2 metric_field">
                                             {{ item_form.largura|as_crispy_field }}
                                         </div>
-                                        <div class="col metric_field">
+                                        <div class="col-md-2 metric_field">
                                             {{ item_form.comprimento|as_crispy_field }}
                                         </div>
-                                        <div class="col metric_field">
+                                        <div class="col-md-2 metric_field">
                                             <label for="id_m2" class="form-label">
                                                 m² total
                                             </label>
@@ -95,7 +95,7 @@
             </div>
             <div class="modal-footer" id='modal-footer-add-items'>
                 <button type="button" class="btn btn-secondary close" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" id="submitBtn" class="btn btn-primary" onclick="adicionar_produto()">Adicionar</button>
+                <button type="button" id="submitBtn" class="btn btn-primary" onclick="addProduct()">Adicionar</button>
             </div>
         </div>
     </div>

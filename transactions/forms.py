@@ -163,4 +163,10 @@ class OrderItemsForm(forms.ModelForm):
             ),
             'dados_adicionais_item': forms.Textarea(attrs={'rows': 3}),
             'obs': forms.Textarea(attrs={'rows': 3}),
+            'preco': forms.NumberInput(
+                attrs={
+                    'class': 'form-control text-align-right',
+                }
+            )
         }
+

@@ -47,3 +47,7 @@
   background-color: #f8d7da;
   border-color: #f5c6cb;
 }
+/* Alinha textos à direita */
+.text-align-right {
+  text-align: right;
+}

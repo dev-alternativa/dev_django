@@ -247,7 +247,6 @@ def calculate_order_total(items):
         ]
         ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
 
-        print(ipi)
 
         item_data = {
             'id': item.id,
@@ -675,8 +674,8 @@ def add_product_to_order(request, order_id):
             product = Product.objects.get(pk=data["produto"])
             seller = Seller.objects.get(pk=data["vendedor_item"])
             cnpj_faturamento = CNPJFaturamento.objects.get(pk=data["cnpj_faturamento"])
-            prazo = LeadTime.objects.get(pk=data["prazo"])
-            conta_corrente = ContaCorrente.objects.get(pk=data["conta_corrente"])
+            delivery_time = LeadTime.objects.get(pk=data["prazo"])
+            checking_account  = ContaCorrente.objects.get(pk=data["conta_corrente"])
 
             items_list = OutflowsItems.objects.filter(saida=order)
             itens_cnpj_list = [item.cnpj_faturamento.sigla for item in items_list]
@@ -690,15 +689,15 @@ def add_product_to_order(request, order_id):
 
             # Verifica se é NYLOFLEX para salvar em quantidade ou m2
             if data['categoria'] == 7:
-                quantidade = (
+                quantity = (
                     data["quantidade"]
                     if cnpj_faturamento not in [3, 5]
                     else data["largura"] * data["comprimento"]
                 )
             else:
-                quantidade = data["quantidade"]
+                quantity = data["quantidade"]
 
-            quantidade_items_pedido = OutflowsItems.objects.filter(saida=order_id).count()
+            order_items_quantity = OutflowsItems.objects.filter(saida=order_id).count()
             # if quantidade_items_pedido > 2:
             #     return JsonResponse(
             #         {'error': 'Não é possível adicionar mais de 2 itens na mesma ordem.'},
@@ -723,7 +722,7 @@ def add_product_to_order(request, order_id):
             outflows_item = OutflowsItems(
                 saida=order,
                 produto=product,
-                quantidade=quantidade,
+                quantidade=quantity,
                 preco=data["preco"],
                 dados_adicionais_item=data["dados_adicionais_item"],
                 numero_pedido=data["numero_pedido"],
@@ -732,15 +731,15 @@ def add_product_to_order(request, order_id):
                 largura=data["largura"],
                 comprimento=data["comprimento"],
                 cnpj_faturamento=cnpj_faturamento,
-                prazo=prazo,
-                conta_corrente=conta_corrente,
+                prazo=delivery_time,
+                conta_corrente=checking_account,
                 obs=data["obs"],
                 vendedor_item=seller,
             )
             outflows_item.save()
 
 
-            if not order.vendedor and quantidade_items_pedido == 0:
+            if not order.vendedor and order_items_quantity == 0:
                 order.vendedor = seller
                 order.save()
 
@@ -1154,6 +1153,7 @@ def get_filtered_products(request):
                 'proximo_pedido': proximo_pedido_id,
                 'm2': m_quadrado,
                 'categoria': categoria,
+                'sub_categoria': Product.objects.get(pk=product_id).sub_categoria,
             }
 
             return JsonResponse({
