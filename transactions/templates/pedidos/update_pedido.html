@@ -649,6 +649,9 @@ $(document).ready(function() {
       initialArea,
     );
 
+    // Quando lâmina, comprimento sempre é igual à quantidade
+    $comprimento.val(categoryID == 8 ? $quantidade.val(): $quantidade.val());
+
     // Atualiza campos do form
     $("#id_dados_adicionais_item").val(result.dados_descritivo);
     $("#id_obs").val(result.dados_descritivo);
