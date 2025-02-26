@@ -236,6 +236,8 @@ function selectOptionByText(selectId, optionText){
 }
 
 const resetForm = () => {
+  // Remove alerts do DOM
+  $('#alertsModal .alert').alert('close');
   // Apaga os valores dos campos hidden
   $('#hidden_m2_id').val(0);
   $('#hidden_categoria_id').val(0);
@@ -475,7 +477,7 @@ function calculateProductValuesByCategory(
   // Categorias que usam chapas
   // Nyloprint, Nyloflex, Tesa, Máquinas, Lâminas, Diversos
   const categoriaChapa = [6, 7];
-  console.log('Categoria Chapa calculada');
+
   if(categoriaChapa.includes(categoryID)){
     return {
       area_total: (quantidade * initialArea).toFixed(2),
@@ -508,9 +510,9 @@ $(document).ready(function() {
     if (value && !isNaN(parseFloat(value))) {
         $(this).val(parseFloat(value).toFixed(2));
     }
-});
+  });
 
-
+  // Captura o valor do campo oculto de área e chama a função de cálculo
   const calculateFields = () => {
     const m2 = $('#hidden_m2_id').val();
     calcProductFieldsArea(m2);
@@ -522,6 +524,12 @@ $(document).ready(function() {
   $('#id_quantidade').on('input',  calculateFields);
   $('#id_preco').on('input',  calculateFields);
 
+  // Ao mudar de CNPJ
+  $('#id_cnpj_faturamento').on('change', function() {
+    const categoyID = $('#hidden_categoria_id').val();
+    const valorSelecionado = $(this).val();
+
+  });
 
   // ################### Lida com os botões que fecham modais ###################
   const handleCloseButtonFocus = (button) => {
@@ -546,16 +554,16 @@ $(document).ready(function() {
     const rollDescription = [3, 4];
     const plateDescription = [6, 7];
 
-    const enabledFields = [3, 4, 10]
+    const enabledFields = [3, 4, 9, 10]
     const isMMporM = categoriaMMporM.includes(categoryID);
     const isRoll = rollDescription.includes(categoryID);
     const isPiece = categoriesByPiece.includes(categoryID);
     const isEnabled = enabledFields.includes(categoryID);
 
     // Configura se label é `Comp. (m)` ou `Comp. (mm)`
-    $("#div_id_comprimento label").html(isMMporM ? 'Comp. (m)' : 'Comp. (mm)');
+    $("#div_id_comprimento label").text(isMMporM ? 'Comp. (m)' : 'Comp. (mm)');
     // Configura se label é `Preço / m² (R$)` ou `Preço pç (R$)`
-    $("#div_id_preco label").html(isPiece ? 'Preço pç (R$)' : 'Preço / m² (R$)');
+    $("#div_id_preco label").text(isPiece ? 'Preço pç (R$)' : 'Preço / m² (R$)');
     // Configura se input text é habilitado
     $('#id_comprimento').prop('disabled', !isEnabled);
     $('#id_largura').prop('disabled', !isEnabled);
@@ -650,7 +658,7 @@ $(document).ready(function() {
     );
 
     // Quando lâmina, comprimento sempre é igual à quantidade
-    $comprimento.val(categoryID == 8 ? $quantidade.val(): $quantidade.val());
+    $comprimento.val(categoryID == 8 ? $quantidade.val(): $comprimento.val());
 
     // Atualiza campos do form
     $("#id_dados_adicionais_item").val(result.dados_descritivo);
@@ -757,7 +765,7 @@ $(document).ready(function() {
           if(response.success){
             data = response.data;
 
-            // Atualiza o título do modal com o nome do produto
+            // Atualiza o valores do modal de adição de produto
             $('#id_preco').val(data.preco);
             $('#id_conta_corrente').val(data.cc);
             $('#id_cnpj_faturamento').val(data.cnpj_faturamento);
@@ -769,6 +777,7 @@ $(document).ready(function() {
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
             $('#hidden_categoria_id').val(data.categoria);
+            $("#nome_produto").text(`${productName} (${data.unidade})`);
             configProductFormLabels(data.categoria);
             calcProductFieldsArea(data.m2);
           }
@@ -779,11 +788,12 @@ $(document).ready(function() {
       });
 
       $('#productOrderModal').modal('hide');
-      $("#nome_produto").html(productName);
+
       $("#div_id_preco label").append(`/ <b>Condição: ${paymentTerms}</b>`);
 
       // Verifica se largura/comprimento/Metragem devem ser exibidos
       resetForm();
+
       $("#div_id_preco label").html('Preço pç (R$)');
       $('#hidden_m2_id').val(0);
       $('hidden_categoria_id').val(0);
@@ -949,12 +959,12 @@ $(document).ready(function() {
           const prazo = response.data.prazo;
           const currentAccount = response.data.conta_corrente;
           const vendedor = response.data.vendedor;
-
+          const unidade = response.data.unidade;
 
           // Atualiza o título do modal com o nome do produto
           $('#itemsModalLabel').contents().first().replaceWith(`Editar Produto - #${itemID}: `);
 
-          $('#nome_produto').text(productName);
+          $('#nome_produto').text(`${productName} (${unidade})` );
 
           quantidade = parseFloat(response.data.quantidade);
           preco =parseFloat(response.data.preco);

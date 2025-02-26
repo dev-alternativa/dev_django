@@ -57,6 +57,7 @@ def get_filtered_products_category(request):
 
     category_id = request.GET.get('category_id')
     fields = request.GET.getlist('fields', ['id', 'nome_produto'])
+
     if category_id:
         products = Product.objects.filter(tipo_categoria_id=category_id).values(*fields)
     else:
@@ -119,7 +120,7 @@ def get_filtered_products_category(request):
     # return JsonResponse({'products': list(products)})
 
 
-def verify_cnpj_order(cnpj_list, order_list):
+def verify_cnpj_order(cnpj_list, cnpj_list_in_database):
     """
     Verifica se o número de CNPJs encontrados em uma lista de pedidos é maior que 2.
 
@@ -133,7 +134,7 @@ def verify_cnpj_order(cnpj_list, order_list):
     Returns:
         bool: True se o número de CNPJs encontrados for maior que 2, False caso contrário.
     """
-    count = sum(1 for item in cnpj_list if item in order_list)
+    count = sum(1 for item in cnpj_list if item in cnpj_list_in_database)
     return count > 2
 
 
@@ -678,12 +679,14 @@ def add_product_to_order(request, order_id):
             checking_account  = ContaCorrente.objects.get(pk=data["conta_corrente"])
 
             items_list = OutflowsItems.objects.filter(saida=order)
-            itens_cnpj_list = [item.cnpj_faturamento.sigla for item in items_list]
+            cnpj_list_in_database = [item.cnpj_faturamento.sigla for item in items_list]
             cnpj_list = CNPJFaturamento.objects.values_list('sigla', flat=True)
 
-            if verify_cnpj_order(list(cnpj_list), itens_cnpj_list):
+            cnpj_list_in_database.append(cnpj_faturamento.sigla)
+
+            if verify_cnpj_order(list(cnpj_list), cnpj_list_in_database):
                 return JsonResponse(
-                    {'error': 'Não é possível adicionar items de mais de 2 CNPJs na mesma ordem.'},
+                    {'error': 'Não é possível adicionar items de mais de 2 CNPJs para faturamento na mesma ordem.'},
                     status=400
                 )
 
@@ -979,6 +982,7 @@ def get_item_data(request, item_id):
                 "area_total": item_list[0]['m_quadrado_total'],
                 "area_unitario": item_list[0]['m_quadrado_unitario'],
                 "total_pedido": total_pedido,
+                "unidade": item.produto.unidade,
             }
             # print(data)
 
@@ -1099,7 +1103,7 @@ def update_product_from_order(request, item_id):
 
 def get_filtered_products(request):
     """
-    Recupera os dados de um produtos.
+    Recupera os dados de um produto.
 
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
@@ -1140,6 +1144,7 @@ def get_filtered_products(request):
 
             data = {
                 'id': order_id,
+                'nome': Product.objects.get(pk=product_id).nome_produto,
                 'preco': preco.valor if preco else '',
                 'cc': cc.pk if cc else '',
                 'cnpj_faturamento': preco.cnpj_faturamento.id if preco else '',
@@ -1154,6 +1159,7 @@ def get_filtered_products(request):
                 'm2': m_quadrado,
                 'categoria': categoria,
                 'sub_categoria': Product.objects.get(pk=product_id).sub_categoria,
+                'unidade': Product.objects.get(pk=product_id).unidade,
             }
 
             return JsonResponse({
