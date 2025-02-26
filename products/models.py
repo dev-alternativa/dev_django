@@ -89,6 +89,7 @@ class Product(Base):
     aliq_ipi_flx = models.DecimalField('Alíquota IPI FLX', max_digits=5, decimal_places=2, null=True, blank=True)
     aliq_ipi_pre = models.DecimalField('Alíquota IPI PRE', max_digits=5, decimal_places=2, null=True, blank=True)
     aliq_ipi_mrx = models.DecimalField('Alíquota IPI MRX', max_digits=5, decimal_places=2, null=True, blank=True)
+    unidade = models.CharField('Unidade', max_length=2)
 
     class Meta:
         verbose_name = 'Produto'

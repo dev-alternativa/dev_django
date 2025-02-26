@@ -437,6 +437,7 @@ class ImportProductView(FormView):
                         'aliq_ipi_flx': row['AliqIPI_FLX'],
                         'aliq_ipi_pre': row['AliqIPI_PRE'],
                         'aliq_ipi_mrx': row['AliqIPI_MRX'],
+                        'unidade': row['Unidade'],
                     }
                 )
 
