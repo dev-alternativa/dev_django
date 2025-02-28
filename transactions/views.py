@@ -864,8 +864,6 @@ def edit_order(request, order_id):
             order = get_object_or_404(Outflows, pk=order_id)
             dados_modificados = request.POST
 
-            print(dados_modificados)
-
             if 'cliente' in dados_modificados:
                 cliente_id = dados_modificados.get('cliente')
                 cliente = get_object_or_404(CustomerSupplier, id=cliente_id)

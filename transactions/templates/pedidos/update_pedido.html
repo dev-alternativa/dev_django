@@ -460,9 +460,6 @@ function calculateProductValuesByCategory(
   // SuperLAM, Novos e Gravação
   const categoriaRolo = [3, 4];
   if(categoriaRolo.includes(categoryID)){
-    console.log('Categoria Rolo calculada');
-    console.log('Preço:', preco);
-    console.log('valor:', preco * area_m2);
     return {
       area_total: (area_m2).toFixed(2),
       total_valor: (preco * area_m2).toFixed(2),
@@ -485,7 +482,7 @@ function calculateProductValuesByCategory(
       dados_descritivo: formatProductDescription(
         quantidade,
         'chapa(s)',
-        productName,
+        productName.replace(/\s*\(\w+\)$/, ""),
         'Revenda'
       )
     };
