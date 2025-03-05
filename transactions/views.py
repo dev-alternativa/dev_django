@@ -494,7 +494,6 @@ class OrderEditDetailsView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-
         # preco = Price.objects.get(cliente=order.cliente.id)
 
         # conta_corrente = ContaCorrente.objects.filter(padrao=True, cnpj=preco.cnpj_faturamento)

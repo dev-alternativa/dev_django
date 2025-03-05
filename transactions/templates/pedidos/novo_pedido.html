@@ -55,26 +55,30 @@
                 {{ form.dolar_ptax|as_crispy_field }}
             </div>
           </div>
+
+        </div>
+        <!-- Linha 2 -->
+        <div class='row'>
+          <div class='col'>
+            <div class="form-group">
+                {{ form.taxa_frete_display|as_crispy_field }}
+            </div>
+          </div>
           <div class='col'>
             <div class="form-group">
                 {{ form.tipo_frete|as_crispy_field }}
             </div>
           </div>
-          <div class='col'>
-            <div class="form-group">
-                {{ form.dt_previsao_faturamento|as_crispy_field }}
-            </div>
-          </div>
-        </div>
-        <!-- Linha 2 -->
-        <div class='row'>
-
           <div class="col">
             <div class="form-group">
-              {{ form.desconto|as_crispy_field }}
+              {{ form.dt_previsao_faturamento|as_crispy_field }}
             </div>
           </div>
-
+          <div class='col'>
+            <div class="form-group">
+                {{ form.desconto|as_crispy_field }}
+            </div>
+          </div>
           <div class='col'>
             <div class="form-group">
                 {{ form.cod_cenario_fiscal|as_crispy_field }}
@@ -85,6 +89,10 @@
               {{ form.nf_saida|as_crispy_field }}
             </div>
           </div>
+
+        </div>
+        <!-- Linha 3 -->
+        <div class='row'>
           <div class='col'>
             <div class="form-group">
               {{ form.transportadora|as_crispy_field }}
@@ -95,9 +103,6 @@
               {{ form.vendedor|as_crispy_field }}
             </div>
           </div>
-        </div>
-        <!-- Linha 3 -->
-        <div class='row'>
           <div class="col">
             <div class="form-group">
               {{ form.dados_adicionais_nf|as_crispy_field }}

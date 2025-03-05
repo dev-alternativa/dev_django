@@ -22,31 +22,21 @@
 
       <thead>
           <tr>
+            <th>ID#</th>
             <th>Categoria</th>
             <th>Sub-Categoria</th>
             <th>Nome Produto</th>
-            <th>Comprimento</th>
-            <th>Largura</th>
-            <th>M²</th>
-            <th>Qtde por Caixa</th>
-            <th>Situação</th>
-            <th>Fornecedor</th>
             <th class="action_size_column">Ações</th>
           </tr>
       </thead>
       <tbody class="table-group-divider">
         {% for produto in itens_produto %}
           <tr>
+            <td>{{ produto.id }}</td>
             <td>{{ produto.tipo_categoria }}</td>
             <td>{{ produto.sub_categoria }}</td>
             <td>{{ produto.nome_produto }}</td>
-            <td>{{ produto.comprimento }}</td>
-            <td>{{ produto.largura }}</td>
-            <td>{{ produto.m_quadrado }}</td>
-            <td>{{ produto.qtd_por_caixa }}</td>
-            <td>{{ produto.situacao }}</td>
-            <td>{{ produto.fornecedor }}</td>
-            <td class="action_size_column">
+            <td class="action_size_column d-flex justify-content-start">
               <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                 <!-- Visualizar -->
                 <a href="{% url 'detail_product' produto.pk %}" class="btn btn-secondary btn-view">

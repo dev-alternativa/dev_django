@@ -53,6 +53,7 @@
     <form method="POST" autocomplete="off" novalidate id='orderForm'>
       {% csrf_token %}
       <!-- Formulário Superior -->
+      <!-- Primeira linha -->
       <div class="row justify-content-center">
         <div class="col">
           <div class="form-group">
@@ -79,14 +80,20 @@
               {{ form.dolar_ptax|as_crispy_field }}
           </div>
         </div>
+
+      </div>
+      <!-- Segunda linha -->
+      <div class='row'>
+        <div class='col'>
+          <div class="form-group">
+              {{ form.taxa_frete|as_crispy_field }}
+          </div>
+        </div>
         <div class='col'>
           <div class="form-group">
               {{ form.tipo_frete|as_crispy_field }}
           </div>
         </div>
-      </div>
-      <div class='row'>
-
         <div class='col'>
           <div class="form-group">
               {{ form.dt_previsao_faturamento|as_crispy_field }}
@@ -108,6 +115,11 @@
             {{ form.nf_saida|as_crispy_field }}
           </div>
         </div>
+
+
+      </div>
+      <!-- Terceira linha -->
+      <div class='row'>
         <div class='col'>
           <div class="form-group">
             {{ form.transportadora|as_crispy_field }}
@@ -118,8 +130,6 @@
             {{ form.vendedor|as_crispy_field }}
           </div>
         </div>
-      </div>
-      <div class='row'>
         <div class="col">
           <div class="form-group">
             {{ form.dados_adicionais_nf|as_crispy_field }}
@@ -556,6 +566,15 @@ $(document).ready(function() {
     const isRoll = rollDescription.includes(categoryID);
     const isPiece = categoriesByPiece.includes(categoryID);
     const isEnabled = enabledFields.includes(categoryID);
+
+    // Oculta campo m2 se categoria for lâminas
+    const $parentId_m2 = $("#id_m2").parent();
+    if(categoryID === 8){
+      $parentId_m2.addClass("d-none");
+    }else{
+      $parentId_m2.removeClass("d-none");
+    }
+
 
     // Configura se label é `Comp. (m)` ou `Comp. (mm)`
     $("#div_id_comprimento label").text(isMMporM ? 'Comp. (m)' : 'Comp. (mm)');

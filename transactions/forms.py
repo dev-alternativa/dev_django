@@ -86,6 +86,7 @@ class OutflowsForm(forms.ModelForm):
         model = Outflows
         exclude = ['dt_criacao', 'dt_modificado']
         widgets = {
+
             'cliente': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
@@ -115,8 +116,16 @@ class OutflowsForm(forms.ModelForm):
         super(OutflowsForm, self).__init__(*args, **kwargs)
         self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
         self.fields['vendedor'].widget.attrs['disabled'] = 'true'
+
+        if self.instance.pk:
+            cliente = self.instance.cliente
+            if cliente:
+                print(type(cliente.taxa_frete))
+                self.initial['taxa_frete'] = f'{float(cliente.taxa_frete):.2f}'.replace('.', ',')
+
         self.helper = FormHelper()
         self.helper.form_method = 'post'
+
 
 
 class OutflowsItemsForm(forms.ModelForm):
