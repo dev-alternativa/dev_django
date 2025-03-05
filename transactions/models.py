@@ -21,8 +21,8 @@ TIPO_FRETE = (
     ('0', '0 - (CIF)'),
     ('1', '1 - (FOB)'),
     ('2', '2 - Frete por conta de Terceiros'),
-    ('3', '3 - Transporte Próprio por conta do Remetente'),
-    ('4', '4 - Transporte Próprio por conta do Destinatário'),
+    ('3', '3 - Por conta do Remetente'),
+    ('4', '4 - Por conta do Destinatário'),
     ('9', '9 - Sem Ocorrência de Transporte'),
 )
 
@@ -96,7 +96,7 @@ class Outflows(Base):
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_nf = models.TextField('Dados Adicionais NF', max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.CASCADE, null=True, blank=True, related_name='saidas', default=1)
-    tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default=TIPO_FRETE[5])
+    tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
     taxa_frete =models.CharField(verbose_name='Tx Frete', null=True, blank=True, max_length=50)
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_previsao_faturamento = models.DateField('Previsão de Faturamento', blank=True, null=True)
@@ -123,6 +123,8 @@ class OutflowsItems(Base):
     comprimento = models.DecimalField(verbose_name='Comp. (m)', max_digits=10, decimal_places=2, blank=True, null=True)
     item_pedido = models.CharField(verbose_name='Item #', max_length=50, null=True, blank=True)
     condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
+    tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
+    taxa_frete_item = models.CharField(verbose_name='Tx Frete', null=True, blank=True, max_length=50)
     cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='saida_items')
     prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.CASCADE, null=True, blank=True, related_name='saida_items')
     conta_corrente = models.ForeignKey('common.ContaCorrente', on_delete=models.CASCADE, related_name='saida_items')

@@ -684,7 +684,6 @@ $(document).ready(function() {
 
   }
 
-
   // Remove os dados de um formulário ao clicar no botão `X` do modal
   $('.btn-close').on('click', function(){
     resetForm();
@@ -790,6 +789,7 @@ $(document).ready(function() {
             $('#id_comprimento').val(data.comprimento);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
+            $('#id_taxa_frete_item').val(data.taxa_frete_item);
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
             $('#hidden_categoria_id').val(data.categoria);

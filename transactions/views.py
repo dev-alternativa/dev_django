@@ -1167,6 +1167,7 @@ def get_filtered_products(request):
                 }, status=400)
 
             preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
+            cliente = CustomerSupplier.objects.get(pk=client_id)
             cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
             largura = Product.objects.get(pk=product_id).largura
             comprimento = Product.objects.get(pk=product_id).comprimento
@@ -1186,6 +1187,8 @@ def get_filtered_products(request):
                 'comprimento': comprimento,
                 'prazo': preco.prazo.id if preco else '',
                 'vendedor': preco.vendedor.id if preco else '',
+                'tipo_frete': cliente.tipo_frete if cliente else '',
+                'taxa_frete_item': cliente.taxa_frete if cliente else '',
                 'is_dolar': preco.is_dolar if preco else '',
                 'id_numero_pedido': pedido.pedido_interno_cliente,
                 'item_pedido': items + 1,
