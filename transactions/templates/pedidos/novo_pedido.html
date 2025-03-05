@@ -61,7 +61,7 @@
         <div class='row'>
           <div class='col'>
             <div class="form-group">
-                {{ form.taxa_frete_display|as_crispy_field }}
+                {{ form.taxa_frete|as_crispy_field }}
             </div>
           </div>
           <div class='col'>
@@ -135,6 +135,6 @@
 
 {% block extra_scripts %}
 <script src="{% static 'js/select2.min.js' %}"></script>
-
+<script src="{% static 'js/new_order.js' %}"></script>
 
 {% endblock %}

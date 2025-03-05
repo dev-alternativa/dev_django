@@ -512,6 +512,7 @@ $(document).ready(function() {
     Funções iniciadas ao carregar a página
   */
 
+  // Torna os campos de largura, comprimento e preço com 2 casa decimais
   $('#id_largura, #id_comprimento, #id_preco').on('blur', function() {
     const value = $(this).val();
     if (value && !isNaN(parseFloat(value))) {
@@ -585,7 +586,6 @@ $(document).ready(function() {
     $('#id_largura').prop('disabled', !isEnabled);
 
   }
-
 
   // ################### Adiciona um item ao pedido ###################
   $('#add-item').on('click', function(){

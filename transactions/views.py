@@ -935,6 +935,43 @@ def remove_product_from_order(request, order_id):
             return JsonResponse({'ERRO:': str(e)}, status=500)
 
 
+def get_shippment_tax(request, client_id):
+    """
+    Recupera a taxa de frete de um cliente.
+    Esta função busca a taxa de frete associada a um cliente específico. Se a taxa de frete não estiver cadastrada ou ocorrer um erro durante a busca, uma mensagem de erro é retornada.
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        client_id (int): O ID do cliente.
+    Returns:
+        JsonResponse: Uma resposta JSON contendo a taxa de frete ou uma mensagem de erro.
+
+    """
+    try:
+        customer = CustomerSupplier.objects.get(pk=client_id)
+        taxa_frete = customer.taxa_frete
+        if not float(taxa_frete):
+            return JsonResponse(
+            {
+                'error': 'Cliente sem taxa de frete cadastrada!',
+            },
+            status=404)
+    except Exception as e:
+        print(f'Erro ao obter taxa de frete: {e}')
+        return JsonResponse({
+                "success": False,
+                "error": str(e),
+            }, status=500)
+
+    return JsonResponse(
+        {
+            'message': 'Taxa de frete recuperada com sucesso!',
+            'data': {
+                'taxa_frete': taxa_frete,
+            }
+        },
+        status=200)
+
+
 def get_item_data(request, item_id):
     """
     Recupera os dados de um item de uma ordem de saída Para Edição.
