@@ -637,6 +637,8 @@ def add_product_to_order(request, order_id):
             'categoria': int,
             'largura': float,
             'comprimento': float,
+            'taxa_frete_item': str,
+            'tipo_frete': str,
             # 'cfop': str,
         }
 
@@ -735,6 +737,8 @@ def add_product_to_order(request, order_id):
                 cnpj_faturamento=cnpj_faturamento,
                 prazo=delivery_time,
                 conta_corrente=checking_account,
+                tipo_frete=data['tipo_frete'],
+                taxa_frete_item=data['taxa_frete_item'],
                 obs=data["obs"],
                 vendedor_item=seller,
             )
@@ -1078,6 +1082,11 @@ def update_product_from_order(request, item_id):
             obs = request.POST.get('obs')
             largura = request.POST.get('largura')
             comprimento = request.POST.get('comprimento')
+            taxa_frete_item = request.POST.get('taxa_frete_item')
+            tipo_frete = request.POST.get('tipo_frete')
+
+            item.taxa_frete_item = taxa_frete_item if taxa_frete_item else '0,00'
+            item.tipo_frete = tipo_frete if tipo_frete else '9'
 
             if item.produto.tipo_categoria_id == 7:
                 largura = item.produto.largura

@@ -307,10 +307,11 @@ function addProduct() {
   const largura = getVal('largura');
   const comprimento = getVal('comprimento');
   const itemPedido = getVal('item_pedido');
-  const proximo_pedido = getVal('proximo_pedido');
   const num_pedido_omie = getVal('num_pedido_omie');
   const vendedor_item = getVal('vendedor_item');
   const dados_adicionais_item = getVal('dados_adicionais_item');
+  const tipo_frete = getVal('tipo_frete');
+  const taxa_frete_item = getVal('taxa_frete_item');
   const obs = getVal('obs');
   //const cfop = getVal('cfop');
 
@@ -350,6 +351,8 @@ function addProduct() {
             item_pedido: itemPedido,
             num_pedido_omie: num_pedido_omie,
             vendedor_item: vendedor_item,
+            tipo_frete: tipo_frete,
+            taxa_frete_item: taxa_frete_item,
             categoria: categoryID,
             dados_adicionais_item: dados_adicionais_item,
             obs: obs,
