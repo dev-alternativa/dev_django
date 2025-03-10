@@ -2,6 +2,7 @@ from rest_framework import views
 from rest_framework.response import Response
 import requests
 import os
+from datetime import date, timedelta
 
 
 class ConsultaCNPJAPIView(views.APIView):
@@ -37,3 +38,30 @@ class ConsultaCEPAPIVIew(views.APIView):
 
         data = response.json()
         return Response(data)
+
+class ConsultaDolarPTAX(views.APIView):
+    def get(self, request):
+        try:
+
+            endpoint = os.getenv('DOLAR_API_ENDPOINT')
+            today = date.today()
+            yesterday = today - timedelta(days=1)
+
+            # Se for Sábado
+            if yesterday.weekday() == 5:
+                yesterday = today - timedelta(days=1 + 1)
+            elif yesterday.weekday() == 6:
+                yesterday = today - timedelta(days=1 + 2)
+
+
+            url = f'{endpoint.replace('<data_cotacao>', yesterday.strftime("%m-%d-%Y"))}'
+            print(url)
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                data = response.json()
+                return Response(data)
+            else:
+                return Response({'message': 'Erro ao consultar a cotação do dólar'}, status=500)
+        except Exception as e:
+            return Response({'message': f'Erro ao consultar a cotação do dólar: {e}'}, status=500)

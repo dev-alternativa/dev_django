@@ -1,3 +1,27 @@
+
+const requestDolarPTAX = (event) => {
+    /**
+     * Recupera o dólar PTAX do dia e preenche o campo id_dolar_ptax
+     *
+     */
+    event.preventDefault();
+    console.log('Consultando Dolar PTAX');
+    $.ajax({
+        url: '/api/dolar_hoje/',
+        method: 'GET',
+        success: (data) => {
+            const dolar = data.value[0].cotacaoVenda.toFixed(2);
+            console.log(dolar);
+            $('#id_dolar_ptax').val(dolar);
+        },
+        error: (err) => {
+            console.log(err);
+        }
+    });
+
+};
+
+
 $(document).ready(function () {
     /**
      * Funções para Novo Pedido
@@ -21,7 +45,7 @@ $(document).ready(function () {
                 console.log(response);
                 let erro = response.responseJSON.error;
                 $("#id_taxa_frete").val('0,00');
-                alert(erro);
+
             }
         });
     });

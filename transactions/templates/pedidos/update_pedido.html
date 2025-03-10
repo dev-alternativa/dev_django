@@ -54,7 +54,7 @@
       {% csrf_token %}
       <!-- Formulário Superior -->
       <!-- Primeira linha -->
-      <div class="row justify-content-center">
+      <div class="row align-items-center">
         <div class="col">
           <div class="form-group">
             {{ form.cliente|as_crispy_field }}
@@ -78,6 +78,19 @@
         <div class='col'>
           <div class="form-group">
               {{ form.dolar_ptax|as_crispy_field }}
+          </div>
+        </div>
+        <div class='col-auto'>
+          <div class="d-grid">
+            <button
+              id="btnRequestPTAXDolar"
+              type="button"
+              class="btn btn-success"
+              style="margin-top: 15px"
+              onclick="requestDolarPTAX(event);"
+              >
+                Verificar Dólar PTAX
+            </button>
           </div>
         </div>
 
@@ -212,7 +225,7 @@
       {% include "pedidos/_tabela_items.html" %}
     </div>
 </div>
-
+<script src="{% static 'js/new_order.js' %}"></script>
 
 <script>
 /* ######################################################## SCRIPTS ########################################################### */
@@ -511,6 +524,7 @@ function calculateProductValuesByCategory(
 }
 
 $(document).ready(function() {
+
   /**
     Funções iniciadas ao carregar a página
   */
@@ -579,6 +593,8 @@ $(document).ready(function() {
       $parentId_m2.removeClass("d-none");
     }
 
+    // Desativa edição do campo Item #
+    $("#id_item_pedido").prop('disabled', true);
 
     // Configura se label é `Comp. (m)` ou `Comp. (mm)`
     $("#div_id_comprimento label").text(isMMporM ? 'Comp. (m)' : 'Comp. (mm)');
@@ -788,11 +804,11 @@ $(document).ready(function() {
             $('#id_conta_corrente').val(data.cc);
             $('#id_cnpj_faturamento').val(data.cnpj_faturamento);
             $('#id_prazo').val(data.prazo);
-            $('#id_largura').val(data.largura);
-            $('#id_comprimento').val(data.comprimento);
+            // $('#id_largura').val(data.largura);
+            // $('#id_comprimento').val(data.comprimento);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
-            $('#id_taxa_frete_item').val(data.taxa_frete_item);
+            // $('#id_taxa_frete_item').val(data.taxa_frete_item);
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
             $('#hidden_categoria_id').val(data.categoria);
@@ -840,6 +856,7 @@ $(document).ready(function() {
 
     // Habilita os campos do formulário
     $('form :input').prop('disabled', false);
+    $('#btnRequestPTAXDolar').removeAttr('disabled');
 
     // Esconde o botão Editar
     $('#edit').hide();

@@ -34,7 +34,7 @@
         {% csrf_token %}
         <!-- Formulário Superior -->
         <!-- Linha 1 -->
-        <div class="row justify-content-center">
+        <div class="row align-items-center">
           <div class="col">
             <div class="form-group">
               {{ form.cliente|as_crispy_field }}
@@ -52,11 +52,24 @@
           </div>
           <div class='col'>
             <div class="form-group">
-                {{ form.dolar_ptax|as_crispy_field }}
+              {{ form.dolar_ptax|as_crispy_field }}
+            </div>
+          </div>
+          <div class='col-auto'>
+            <div class="d-grid">
+              <button
+                type="button"
+                class="btn btn-success"
+                style="margin-top: 15px"
+                onclick="requestDolarPTAX(event);"
+                >
+                  Verificar Dólar PTAX
+              </button>
             </div>
           </div>
 
         </div>
+        <hr>
         <!-- Linha 2 -->
         <div class='row'>
           <div class='col'>

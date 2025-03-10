@@ -109,21 +109,13 @@ class OutflowsForm(forms.ModelForm):
 
         }
         label = {
-            'dt_previsao_faturamento': 'Previsão de Faturamento',
+            'dt_previsao_faturamento': 'Prev. de Fat.',
         }
 
     def __init__(self, *args, **kwargs):
         super(OutflowsForm, self).__init__(*args, **kwargs)
         self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
         self.fields['vendedor'].widget.attrs['disabled'] = 'true'
-
-        # if self.instance.pk:
-        #     cliente = self.instance.cliente
-        #     if cliente:
-        #         print(cliente.taxa_frete)
-        #         if cliente.taxa_frete != '0,00':
-        #             self.initial['taxa_frete'] = f'{float(cliente.taxa_frete):.2f}'.replace('.', ',')
-
         self.helper = FormHelper()
         self.helper.form_method = 'post'
 

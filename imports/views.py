@@ -381,7 +381,7 @@ class ImportProductView(FormView):
             messages.error(self.request, 'A planilha está vazia')
             return self.form_invalid(form)
 
-        # Veriica colunas obrigatórias
+        # Verifica colunas obrigatórias
         required_columns = ['Categoria', 'Subcategoria', 'Produto', 'Fornecedor']
         missing_columns = [col for col in required_columns if col not in df.columns]
         if missing_columns:

@@ -171,6 +171,7 @@ class Price(Base):
     condicao = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100, null=True, blank=True)
     vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.CASCADE, related_name='precos')
     frete = models.DecimalField('Frete', max_digits=10, decimal_places=2, null=True, blank=True)
+    tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=30, null=True, blank=True)
     obs = models.TextField('Observações', null=True, blank=True)
 
     class Meta:
