@@ -1,6 +1,7 @@
 from django.db import models
 from core.models import Base
 from accounts.models import CustomUsuario
+from logistic.models import Freight
 
 
 STATUS = (
@@ -96,7 +97,7 @@ class Outflows(Base):
     dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     dados_adicionais_nf = models.TextField('Dados Adicionais NF', max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.CASCADE, null=True, blank=True, related_name='saidas', default=1)
-    tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=20, default='9')
+    tipo_frete = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='frete')
     taxa_frete =models.CharField(verbose_name='Tx Frete', null=True, blank=True, max_length=50)
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_previsao_faturamento = models.DateField('Prev. Fat.', blank=True, null=True)
@@ -124,7 +125,7 @@ class OutflowsItems(Base):
     item_pedido = models.CharField(verbose_name='Item #', max_length=50, null=True, blank=True)
     condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
     tipo_frete = models.CharField('Tipo de Frete', choices=TIPO_FRETE, max_length=20, default='9')
-    taxa_frete_item = models.CharField(verbose_name='Tx Frete', null=True, blank=True, max_length=50)
+    tipo_frete_item = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='frete_item')
     cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='saida_items')
     prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.CASCADE, null=True, blank=True, related_name='saida_items')
     conta_corrente = models.ForeignKey('common.ContaCorrente', on_delete=models.CASCADE, related_name='saida_items')

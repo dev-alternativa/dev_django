@@ -11,7 +11,6 @@ const requestDolarPTAX = (event) => {
         method: 'GET',
         success: (data) => {
             const dolar = data.value[0].cotacaoVenda.toFixed(2);
-            console.log(dolar);
             $('#id_dolar_ptax').val(dolar);
         },
         error: (err) => {

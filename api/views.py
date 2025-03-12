@@ -55,7 +55,7 @@ class ConsultaDolarPTAX(views.APIView):
 
 
             url = f'{endpoint.replace('<data_cotacao>', yesterday.strftime("%m-%d-%Y"))}'
-            print(url)
+
             response = requests.get(url)
 
             if response.status_code == 200:

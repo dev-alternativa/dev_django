@@ -36,3 +36,14 @@ class Carrier(Base):
 
     def __str__(self):
         return self.nome
+
+
+class Freight(models.Model):
+    tipo_frete = models.CharField('Tipo de Frete', max_length=60)
+
+    class Meta:
+        verbose_name = 'Frete'
+        verbose_name_plural = 'Fretes'
+
+    def __str__(self):
+        return self.tipo_frete
