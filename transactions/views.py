@@ -13,7 +13,7 @@ from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
 from products.models import Product
 from transactions.models import TaxScenario
-from logistic.models import Carrier, LeadTime
+from logistic.models import Carrier, LeadTime, Freight
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from core.views import FormMessageMixin
 from django.urls import reverse_lazy, reverse
@@ -495,7 +495,6 @@ class OrderEditDetailsView(UpdateView):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
         # preco = Price.objects.get(cliente=order.cliente.id)
-
         # conta_corrente = ContaCorrente.objects.filter(padrao=True, cnpj=preco.cnpj_faturamento)
         cliente = order.cliente
 
@@ -638,7 +637,7 @@ def add_product_to_order(request, order_id):
             'largura': float,
             'comprimento': float,
             'taxa_frete_item': str,
-            'tipo_frete': str,
+            'tipo_frete_item': str,
             # 'cfop': str,
         }
 
@@ -678,7 +677,7 @@ def add_product_to_order(request, order_id):
             cnpj_faturamento = CNPJFaturamento.objects.get(pk=data["cnpj_faturamento"])
             delivery_time = LeadTime.objects.get(pk=data["prazo"])
             checking_account  = ContaCorrente.objects.get(pk=data["conta_corrente"])
-
+            freight_type = Freight.objects.get(pk=data["tipo_frete_item"])
             items_list = OutflowsItems.objects.filter(saida=order)
             cnpj_list_in_database = [item.cnpj_faturamento.sigla for item in items_list]
             cnpj_list = CNPJFaturamento.objects.values_list('sigla', flat=True)
@@ -737,7 +736,7 @@ def add_product_to_order(request, order_id):
                 cnpj_faturamento=cnpj_faturamento,
                 prazo=delivery_time,
                 conta_corrente=checking_account,
-                tipo_frete=data['tipo_frete'],
+                tipo_frete_item=freight_type,
                 taxa_frete_item=data['taxa_frete_item'],
                 obs=data["obs"],
                 vendedor_item=seller,
@@ -833,7 +832,7 @@ def get_itens_pedido(request, order_id):
 
 def edit_order(request, order_id):
     """
-    Edita uma ordem de saída com os dados fornecidos na requisição POST.
+    Edita um PEDIDO através da requisição POST recebida.
 
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
@@ -888,7 +887,11 @@ def edit_order(request, order_id):
             if 'dt_previsao_faturamento' in dados_modificados:
                 order.dt_previsao_faturamento = dados_modificados.get('dt_previsao_faturamento')
             if 'tipo_frete' in dados_modificados:
-                order.tipo_frete = dados_modificados.get('tipo_frete')
+                tipo_frete_id = dados_modificados.get('tipo_frete')
+                tipo_frete = get_object_or_404(Freight, id=tipo_frete_id)
+                order.tipo_frete = tipo_frete
+            if 'taxa_frete' in dados_modificados:
+                order.taxa_frete = dados_modificados.get('taxa_frete')
             if 'dados_adicionais_nf' in dados_modificados:
                 order.dados_adicionais_nf = dados_modificados.get('dados_adicionais_nf')
             if 'cod_cenario_fiscal' in dados_modificados:
@@ -998,6 +1001,7 @@ def get_item_data(request, item_id):
             # comprimento = Product.objects.get(pk=item.produto.pk).comprimento
             categoria = Product.objects.get(pk=item.produto.pk).tipo_categoria.id
             # area = Product.objects.get(pk=item.produto.pk).m_quadrado
+            tipo_frete_item = item.tipo_frete_item.tipo_frete if item.tipo_frete_item else 0
 
             total_pedido, *_, item_list = calculate_order_total([item])
 
@@ -1021,6 +1025,8 @@ def get_item_data(request, item_id):
                 "area_unitario": item_list[0]['m_quadrado_unitario'],
                 "total_pedido": total_pedido,
                 "unidade": item.produto.unidade,
+                "taxa_frete_item": item.taxa_frete_item,
+                "tipo_frete_item": tipo_frete_item,
             }
             # print(data)
 
@@ -1083,10 +1089,8 @@ def update_product_from_order(request, item_id):
             largura = request.POST.get('largura')
             comprimento = request.POST.get('comprimento')
             taxa_frete_item = request.POST.get('taxa_frete_item')
-            tipo_frete = request.POST.get('tipo_frete')
 
             item.taxa_frete_item = taxa_frete_item if taxa_frete_item else '0,00'
-            item.tipo_frete = tipo_frete if tipo_frete else '9'
 
             if item.produto.tipo_categoria_id == 7:
                 largura = item.produto.largura
@@ -1113,6 +1117,8 @@ def update_product_from_order(request, item_id):
             cnpj_faturamento_id = request.POST.get('cnpj_faturamento')
             conta_corrente_id = request.POST.get('conta_corrente')
             vendedor_item_id = request.POST.get('vendedor_item')
+            tipo_frete_item_id = request.POST.get('tipo_frete_item')
+            print(f'ID TIPO FRETE: {tipo_frete_item_id}')
 
             if prazo:
                 item.prazo = get_object_or_404(LeadTime, pk=prazo)
@@ -1122,6 +1128,8 @@ def update_product_from_order(request, item_id):
                 item.conta_corrente = get_object_or_404(ContaCorrente, pk=conta_corrente_id)
             if vendedor_item_id:
                 item.vendedor_item = get_object_or_404(Seller, pk=vendedor_item_id)
+            if tipo_frete_item_id:
+                item.tipo_frete_item = get_object_or_404(Freight, pk=tipo_frete_item_id)
 
             item.save()
 

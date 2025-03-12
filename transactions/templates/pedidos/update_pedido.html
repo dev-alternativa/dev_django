@@ -254,7 +254,13 @@ function selectOptionByText(selectId, optionText){
     select.val(matchingOption.val()).change();
   }
   else{
-    console.error(`Opção com texto ${optionText} não encontrada no select com id ${selectId}`);
+    const firstOption = select.find("option:first");
+    if(firstOption.length){
+      select.val(firstOption.val()).change();
+      console.log(`Opção "${optionText}" não encontrada no select, selecionado padrão`);
+    }else{
+      console.error(`O select de id ${selectId} não conteém nenhuma opção!`);
+    }
   }
 }
 
@@ -813,6 +819,7 @@ $(document).ready(function() {
             $('#hidden_m2_id').val(data.m2);
             $('#hidden_categoria_id').val(data.categoria);
             $("#nome_produto").text(`${productName} (${data.unidade})`);
+
             configProductFormLabels(data.categoria);
             calcProductFieldsArea(data.m2);
           }
@@ -898,6 +905,7 @@ $(document).ready(function() {
 
     // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
     if(Object.keys(modifiedData).length > 0){
+      console.log(modifiedData);
 
       $.ajax({
         type: 'POST',
@@ -943,7 +951,7 @@ $(document).ready(function() {
         </div>`;
       $('#alertsPage').append(alertElement);
       $('#saveButton').remove();
-      $('#edit').show();
+      setTimeout( () => location.reload(), 1000);
     }
   });
 
@@ -977,7 +985,7 @@ $(document).ready(function() {
     });
   });
 
-  // Evento ao clicar no botão de "editar" na lista de produtos
+  // Evento ao clicar para EDITAR PRODUTO
   $(document).on('click', '#btn-edit-product', function(e){
 
     const itemID = $(this).data('id');
@@ -996,6 +1004,8 @@ $(document).ready(function() {
           const currentAccount = response.data.conta_corrente;
           const vendedor = response.data.vendedor;
           const unidade = response.data.unidade;
+          const taxa_frete_item = response.data.taxa_frete_item;
+          const tipo_frete_item = response.data.tipo_frete_item;
 
           // Atualiza o título do modal com o nome do produto
           $('#itemsModalLabel').contents().first().replaceWith(`Editar Produto - #${itemID}: `);
@@ -1019,7 +1029,9 @@ $(document).ready(function() {
           selectOptionByText('#id_prazo', prazo);
           selectOptionByText('#id_conta_corrente', currentAccount);
           selectOptionByText('#id_vendedor_item', vendedor);
+          selectOptionByText('#id_tipo_frete_item', tipo_frete_item);
 
+          $('#id_taxa_frete_item').val(taxa_frete_item);
           $("#id_quantidade").val(quantidade);
           $("#id_preco").val(preco);
           $("#id_total_preco").val(response.data.total_pedido);
