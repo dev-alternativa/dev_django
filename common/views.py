@@ -16,45 +16,63 @@ from api_omie.views import add_seller_to_omie, delete_seller_from_omie
 # *************** AJAX REQUESTS ************ #
 class GetPricesByClient(View):
     def get(self, request, *args, **kwargs):
-        client = request.GET.get('client')
+        client_name = request.GET.get('client')
 
-        if client:
-            precos = Price.objects.filter(cliente__nome_fantasia=client).values('produto__nome_produto', 'valor', 'is_dolar', 'prazo__parcelas', 'cnpj_faturamento', 'condicao', 'vendedor__nome', 'dt_criacao')
+        if not client_name:
+            return JsonResponse({'message': 'Parâmetro "client" não informado'}, status=400 )
 
-            return JsonResponse(list(precos), safe=False)
-        else:
-            return JsonResponse([], safe=False)
+        try:
+            precos = Price.objects.filter(cliente__nome_fantasia=client_name).values(
+                'produto__nome_produto', 'valor', 'is_dolar', 'prazo__parcelas',
+                'cnpj_faturamento', 'condicao', 'vendedor__nome', 'dt_criacao'
+            )
+            price_list = list(precos)
+
+            return JsonResponse(price_list, safe=False)
+        except Exception as e:
+            return JsonResponse({'message': 'Erro interno do servidor'}, status=500)
 
 
 class GetCategoryProducts(View):
 
     def get(self, request, *args, **kwargs):
-        categories = request.GET.get('categoria')
-        if categories:
-            categoria = categories.upper()
-            if categoria == 'MAQUINAS':
-                categoria = 'MÁQUINAS'
-            if categoria == 'SUPERLAN':
-                categoria = 'SuperLam'
+        category_name = request.GET.get('categoria')
 
-            produtos_diversos = Product.objects.filter(tipo_categoria__nome=categoria)
+        if not category_name:
+            return JsonResponse({'message': 'Parâmetro "categoria" não informado'}, status=400)
 
-            produtos_data_diversos = [{'id': produto.id, "nome_produto": produto.nome_produto, } for produto in produtos_diversos]
+        # Normaliza o nome da categoria
+        _normalized_category_name = self.normalize_category_name(category_name)
 
-            return JsonResponse(produtos_data_diversos, safe=False)
-        else:
-            return JsonResponse([], safe=False)
+        try:
+            products = Product.objects.filter(tipo_categoria__nome=_normalized_category_name).values('id', 'nome_produto')
+            products_list = list(products)
+            return JsonResponse(products_list, safe=False)
+        except Exception:
+            return JsonResponse({'message': 'Erro interno do servidor'}, status=500)
+
+    def _normalized_category_name(self, category_name):
+        '''
+        Normaliza o nome da categoria para corresponder aos nomes no banco de dados.
+        '''
+        category_name = category_name.upper()
+        if category_name == 'MAQUINAS':
+            return 'MÁQUINAS'
+        elif category_name == 'SUPERLAN':
+            return 'Superlan'
+
+        return category_name
 
 
 class GetLeadTimes(View):
 
     def get(self, request, *args, **kwargs):
-        leadtimes = LeadTime.objects.all()
-
-        prazos = [{'id': leadtime.id, 'parcelas': leadtime.descricao} for leadtime in leadtimes]
-
-        return JsonResponse(prazos, safe=False)
-
+        try:
+            lead_times = LeadTime.objects.all()
+            lead_times_list =[{'id': lead_time.id, 'parcelas': lead_time.descricao} for lead_time in lead_times]
+            return JsonResponse(lead_times_list, safe=False)
+        except Exception:
+            return JsonResponse({'message': 'Erro interno do servidor'}, status=500)
 
 # ********************************* CATEGORIA *********************************
 class CategoryListView(ListView):

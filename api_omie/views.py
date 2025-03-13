@@ -1,15 +1,15 @@
-from collections import defaultdict
+import os
 import requests
+from collections import defaultdict
+from common.models import Seller
+from dotenv import load_dotenv
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import JsonResponse
-from common.models import Seller
 from transactions.models import OutflowsItems, Outflows
-from dotenv import load_dotenv
-import os
+
 
 load_dotenv()
-
 
 # *********************************** VENDEDORES  **************************************
 

@@ -9,6 +9,9 @@ class ConsultaCNPJAPIView(views.APIView):
 
     def get(self, request, cnpj):
         endpoint = os.getenv('CNPJ_API_ENDPOINT')
+        if not endpoint:
+            return Response({'message': 'Erro Interno do servidor, falha de configuração'}, status=500)
+
         url = f'{endpoint}{cnpj}'
 
         # tenta fazer a requisição, se não conseguir gera erro.
@@ -26,6 +29,9 @@ class ConsultaCNPJAPIView(views.APIView):
 class ConsultaCEPAPIVIew(views.APIView):
     def get(self, request, cep):
         endpoint = os.getenv('CEP_API_ENDPOINT')
+        if not endpoint:
+            return Response({'message': 'Erro Interno do servidor, falha de configuração'}, status=500)
+
         url = f'{endpoint}{cep}'
 
         # tenta a fazer a requisição, senão gera um erro
@@ -42,8 +48,10 @@ class ConsultaCEPAPIVIew(views.APIView):
 class ConsultaDolarPTAX(views.APIView):
     def get(self, request):
         try:
-
             endpoint = os.getenv('DOLAR_API_ENDPOINT')
+            if not endpoint:
+                return Response({'message': 'Erro Interno do servidor, falha de configuração'}, status=500)
+
             today = date.today()
             yesterday = today - timedelta(days=1)
 
