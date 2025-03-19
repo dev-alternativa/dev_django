@@ -71,3 +71,8 @@ exemplo*
 # Código antigo
 cadastro/
 BKP*
+
+# Banco de dados
+*.sql
+*.sqlite3
+*.db

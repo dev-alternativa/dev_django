@@ -81,6 +81,16 @@ InflowsItemsFormSet = inlineformset_factory(
 
 
 class OutflowsForm(forms.ModelForm):
+    dolar_ptax = forms.DecimalField(
+        decimal_places=4,
+        required=False,
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-control',
+                'readonly': 'readonly',
+            }
+        )
+    )
 
     class Meta:
         model = Outflows

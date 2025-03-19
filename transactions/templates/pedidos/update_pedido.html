@@ -89,7 +89,7 @@
               style="margin-top: 15px"
               onclick="requestDolarPTAX(event);"
               >
-                Verificar Dólar PTAX
+                Verificar Novamente PTAX
             </button>
           </div>
         </div>
@@ -405,7 +405,6 @@ function addProduct() {
 
             $('#alertsModal').append(alertElement);
             //alert(`Erro ao adicionar item: ${erro}`);
-            console.log(response);
           }
       });
   }
@@ -814,7 +813,8 @@ $(document).ready(function() {
             // $('#id_comprimento').val(data.comprimento);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
-            // $('#id_taxa_frete_item').val(data.taxa_frete_item);
+            $('#id_taxa_frete_item').val(data.taxa_frete_item);
+            $('#id_tipo_frete_item').val(data.tipo_frete);
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
             $('#hidden_categoria_id').val(data.categoria);

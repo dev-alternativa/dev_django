@@ -1,23 +1,25 @@
-from django.shortcuts import render, get_object_or_404
+from api.views import ConsultaDolarPTAX
+from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
+from core.views import FormMessageMixin
 from decimal import Decimal
-from django.template.loader import render_to_string
-from django.db import transaction
-from django.http import JsonResponse
-from django.http import HttpResponseNotAllowed
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-# from django.db.models import Sum, F
-from django.views.decorators.http import require_http_methods
-from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
-from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
-from products.models import Product
-from transactions.models import TaxScenario
-from logistic.models import Carrier, LeadTime, Freight
-from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
-from core.views import FormMessageMixin
-from django.urls import reverse_lazy, reverse
+from django.db import transaction
 from django.db.models import Q
+from django.http import HttpResponseNotAllowed
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_http_methods
+from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.urls import reverse_lazy, reverse
+# from django.db.models import Sum, F
+from logistic.models import Carrier, LeadTime, Freight
+from products.models import Product
+from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
+from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
+from transactions.models import TaxScenario
+import requests
 
 
 # Utilities
@@ -466,6 +468,26 @@ class OrderCreateView(FormMessageMixin, CreateView):
     success_message = 'Novo Pedido Gerado com sucesso!'
     form_class = OutflowsForm
 
+    def get_dolar_ptax(self):
+        api_url = self.request.build_absolute_uri('/api/dolar_hoje/')
+        response = requests.get(api_url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+
+    def get_initial(self):
+        initial = super().get_initial()
+        dolar_ptax = self.get_dolar_ptax()
+        if dolar_ptax:
+            try:
+                value = dolar_ptax.get('value')[0]['cotacaoVenda']
+                initial['dolar_ptax'] = value
+            except(IndexError, KeyError, TypeError) as e:
+                print(f'Erro ao recuperar valor do dolar: {e}')
+                initial['dolar_ptax'] = None
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         next_id = Outflows.objects.order_by('-dt_criacao').values('id').first()
@@ -783,11 +805,13 @@ def get_itens_pedido(request, order_id):
     items = OutflowsItems.objects.filter(saida__id=order_id)
     total_produtos = len(items)
     total_ipi = 0
+    total_pedido = 0
+    total_nota = 0
+    item_list = []
 
-    if items:
-
-        total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
+    total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
         # item_list = []
+
 
         # for item in items:
         #     if item.largura or item.comprimento:
@@ -816,18 +840,16 @@ def get_itens_pedido(request, order_id):
         # total_nota = total_pedido + total_ipi
 
 
-        html = render_to_string(
-            'pedidos/_tabela_items.html', {
-                'itens_produtos': item_list,
-                'total_produtos': total_produtos,
-                'total_nota': total_nota,
-                'total_pedido': total_pedido,
-                'total_ipi': total_ipi,
-            }
-        )
-        return JsonResponse({'html': html})
-    else:
-        return JsonResponse({'html': ''})
+    html = render_to_string(
+        'pedidos/_tabela_items.html', {
+            'itens_produtos': item_list,
+            'total_produtos': total_produtos,
+            'total_nota': total_nota,
+            'total_pedido': total_pedido,
+            'total_ipi': total_ipi,
+        }
+    )
+    return JsonResponse({'html': html})
 
 
 def edit_order(request, order_id):
@@ -942,20 +964,22 @@ def remove_product_from_order(request, order_id):
             return JsonResponse({'ERRO:': str(e)}, status=500)
 
 
-def get_shippment_tax(request, client_id):
+def get_customer_customized_values(request, client_id):
     """
-    Recupera a taxa de frete de um cliente.
-    Esta função busca a taxa de frete associada a um cliente específico. Se a taxa de frete não estiver cadastrada ou ocorrer um erro durante a busca, uma mensagem de erro é retornada.
+    Recupera dados financeiros do cliente.
+    Se não não existir valores customizados para o cliente, usa os padrões.
+
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
         client_id (int): O ID do cliente.
     Returns:
-        JsonResponse: Uma resposta JSON contendo a taxa de frete ou uma mensagem de erro.
+        JsonResponse: Uma resposta JSON contendo os dados financeiros ou uma mensagem de erro.
 
     """
     try:
         customer = CustomerSupplier.objects.get(pk=client_id)
         taxa_frete = customer.taxa_frete
+        # tipo_frete = customer.tipo_frete
         if not float(taxa_frete):
             return JsonResponse(
             {
@@ -1194,6 +1218,18 @@ def get_filtered_products(request):
             proximo_pedido_id = pedido.saida_items.count() + 1
             categoria = Product.objects.get(pk=product_id).tipo_categoria.id
 
+            taxa_frete = (
+                preco.taxa_frete if preco and preco.taxa_frete else
+                cliente.taxa_frete if cliente and hasattr(cliente, 'taxa_frete') else
+                None
+            )
+
+            tipo_frete = (
+                preco.tipo_frete.id if preco and preco.tipo_frete else
+                cliente.tipo_frete.id if cliente and hasattr(cliente, 'tipo_frete') else
+                None
+            )
+
             data = {
                 'id': order_id,
                 'nome': Product.objects.get(pk=product_id).nome_produto,
@@ -1204,8 +1240,8 @@ def get_filtered_products(request):
                 'comprimento': comprimento,
                 'prazo': preco.prazo.id if preco else '',
                 'vendedor': preco.vendedor.id if preco else '',
-                'tipo_frete': cliente.tipo_frete if cliente else '',
-                'taxa_frete_item': cliente.taxa_frete if cliente else '',
+                'tipo_frete': tipo_frete if tipo_frete is not None else '',
+                'taxa_frete_item': taxa_frete if taxa_frete is not None else '',
                 'is_dolar': preco.is_dolar if preco else '',
                 'id_numero_pedido': pedido.pedido_interno_cliente,
                 'item_pedido': items + 1,

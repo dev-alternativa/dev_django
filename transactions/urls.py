@@ -25,7 +25,7 @@ urlpatterns = [
     # path('filter_products_category/', views.filter_products_category, name="filter_products_category"),
     path('pedidos/<int:item_id>/', views.get_item_data, name='get_item_data'),
     path('pedidos/<int:item_id>/editar/', views.update_product_from_order, name='update_product_from_order'),
-    path('cliente/<int:client_id>/taxa_frete/', views.get_shippment_tax, name='get_shippment_tax'),
+    # path('cliente/<int:client_id>/taxa_frete/', views.get_shippment_tax, name='get_shippment_tax'),
 
     # Pedidos
     path('pedidos/', views.OrderListView.as_view(), name='order_list'),

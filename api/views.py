@@ -7,7 +7,7 @@ from datetime import date, timedelta
 
 class ConsultaCNPJAPIView(views.APIView):
 
-    def get(self, request, cnpj):
+    def get(self, cnpj):
         endpoint = os.getenv('CNPJ_API_ENDPOINT')
         if not endpoint:
             return Response({'message': 'Erro Interno do servidor, falha de configuração'}, status=500)

@@ -323,18 +323,19 @@ class PriceForms(ModelForm):
                     Field('produto', css_class='form-control col-md-4 mb-0'),
                     Field('vendedor', css_class='form-control col-md-4 mb-0'),
                     PrependedText(
-                        'frete', 'R$',
+                        'taxa_frete', 'R$',
                         css_class='form-control col-md-4 mb-0 numericValorOnly mask-money'
                     ),
                 ),
                 Column(
                     Field('condicao', css_class='form-control col-md-4 mb-0'),
                     Field('valor', css_class='form-control col-md-4 mb-0'),
-                    Switch('is_dolar', css_class='form-control col-md-4 mb-0'),
+                    Field('tipo_frete', css_class='form-control col-md-4 mb-0')
                 ),
                 Column(
                     Field('prazo', css_class='form-control col-md-6 mb-0'),
                     Field('cnpj_faturamento', css_class='form-control col-md-6 mb-0'),
+                    Switch('is_dolar', css_class='form-control col-md-4 mb-0'),
                     # Submit('btnAddClientPrice', '+', css_class='btn btn-info float-end'),
                 ),
             ),

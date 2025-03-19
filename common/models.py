@@ -1,5 +1,6 @@
 from django.db import models
 from core.models import Base
+from logistic.models import Freight
 import re
 
 
@@ -106,7 +107,7 @@ class CustomerSupplier(Base):
     cep = models.CharField('CEP', max_length=12, null=True, blank=True)
     email = models.CharField('E-mail', max_length=300)
     nome_contato = models.CharField('Nome Contato', max_length=50, null=True, blank=True)
-    tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=100, default=TIPO_FRETE[5])
+    tipo_frete = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='clientes')
     taxa_frete = models.CharField('Taxa de frete', max_length=10, null=True, blank=True)
     cliente_transportadora = models.ForeignKey('logistic.Carrier', verbose_name='Transportadora', on_delete=models.CASCADE, null=True, blank=True)
     categoria = models.ManyToManyField(Category, related_name='clientes')
@@ -170,8 +171,8 @@ class Price(Base):
     cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='precos')
     condicao = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100, null=True, blank=True)
     vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.CASCADE, related_name='precos')
-    frete = models.DecimalField('Frete', max_digits=10, decimal_places=2, null=True, blank=True)
-    tipo_frete = models.CharField('Tipo Frete', choices=TIPO_FRETE, max_length=50, null=True, blank=True)
+    taxa_frete = models.DecimalField('Taxa Frete', max_digits=10, decimal_places=2, null=True, blank=True)
+    tipo_frete = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='precos')
     obs = models.TextField('Observações', null=True, blank=True)
 
     class Meta:
