@@ -464,7 +464,7 @@ function calculateProductValuesByCategory(
   categoryID, productValues, productName, initialArea
   ){
   /**
-   * Calcula área e valor do produto
+   * Calcula área e valor do produto, caso exista dolar, também multiplica
    * @param {int} categoryID - Categoria do produto
    * @param {object} productValues - Objeto com os valores do produto
    * @param {string} productName - Nome do produto
@@ -476,6 +476,8 @@ function calculateProductValuesByCategory(
 
   quantidade = parseInt(quantidade);
   categoryID = parseInt(categoryID);
+  dolar_ptax = parseFloat($('#id_dolar_ptax').val());
+  dolar_ptax = dolar_ptax ? dolar_ptax : 1;
 
   const formatProductDescription = (quantidade, unidade, parte1, parte2 = '') => {
     const qtd = quantidade < 10 ? `0${quantidade}` : `${quantidade}`;
@@ -493,7 +495,7 @@ function calculateProductValuesByCategory(
   if(categoriaRolo.includes(categoryID)){
     return {
       area_total: (area_m2).toFixed(2),
-      total_valor: (preco * area_m2).toFixed(2),
+      total_valor: (preco * area_m2 * dolar_ptax).toFixed(2),
       dados_descritivo: formatProductDescription(
         quantidade,
         'rolo(s)',
@@ -520,6 +522,7 @@ function calculateProductValuesByCategory(
   }
   // Qualquer outra categoria
   const area_default = largura * comprimento / 1000;
+
     return {
       area_total: (area_default * quantidade).toFixed(2),
       total_valor: (quantidade * preco).toFixed(2),
@@ -635,12 +638,12 @@ $(document).ready(function() {
     }*/
   });
 
-  function calcProductFieldsArea(m2){
+  function calcProductFieldsArea(m2, isDolar = false){
     /**
       Calcula metragem no modal de adição de produtos dependendo da categoria
     */
     categoryID = $("#hidden_categoria_id").val();
-
+    console.log(isDolar);
     const $quantidade = $('#id_quantidade');
     const $largura = $('#id_largura');
     const $comprimento = $('#id_comprimento');
@@ -665,7 +668,7 @@ $(document).ready(function() {
       $preco,
       $cnpjFaturamento
     ];
-    const requiredCategories = [2, 3, 4];
+    const requiredCategories = [3, 4];
     let $requiredInputs = [$quantidade, $preco];
 
     if(requiredCategories.includes(parseInt(categoryID))){
@@ -679,6 +682,7 @@ $(document).ready(function() {
       const value = parseFloat(i.val());
       return !isNaN(value) && value > 0 ? value : null;
     });
+
     // Verifica se todos os calores são diferentes de 0
     const allValid = requiredValues.every(value => value !== null);
 
@@ -803,13 +807,19 @@ $(document).ready(function() {
         success: function(response) {
           if(response.success){
             data = response.data;
-
+            is_dolar = data.is_dolar;
             // Atualiza o valores do modal de adição de produto
             $('#id_preco').val(data.preco);
             $('#id_conta_corrente').val(data.cc);
             $('#id_cnpj_faturamento').val(data.cnpj_faturamento);
             $('#id_prazo').val(data.prazo);
-            // $('#id_largura').val(data.largura);
+
+            if(data.origem_frete == 'tabela_preco'){
+              $('#info_preco').html('*Taxa do Produto');
+            }else{
+              $('#info_preco').html('*Taxa original do Cliente');
+
+            }
             // $('#id_comprimento').val(data.comprimento);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
@@ -821,7 +831,7 @@ $(document).ready(function() {
             $("#nome_produto").text(`${productName} (${data.unidade})`);
 
             configProductFormLabels(data.categoria);
-            calcProductFieldsArea(data.m2);
+            calcProductFieldsArea(data.m2, is_dolar);
           }
         },
         error: function(xhr, status, error) {

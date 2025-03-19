@@ -118,7 +118,7 @@ class OutflowsForm(forms.ModelForm):
             ),
 
         }
-        label = {
+        labels = {
             'dt_previsao_faturamento': 'Prev. de Fat.',
         }
 
@@ -136,7 +136,7 @@ class OutflowsItemsForm(forms.ModelForm):
     class Meta:
         model = OutflowsItems
         exclude = ['dt_criacao', 'dt_modificado', 'ativo']
-        widget = {
+        widgets = {
             'produto': Select2Widget(
                 attrs={
                     'data-placeholder': 'Diferencia maiúsculas de minúsculas',
@@ -149,6 +149,9 @@ class OutflowsItemsForm(forms.ModelForm):
                 }
             ),
             'dados_adicionais_item': Textarea(attrs={'rows': 3}),
+        }
+        labels = {
+            'taxa_frete_item': 'Tx Frete*',
         }
 
 

@@ -1,4 +1,16 @@
 {% load crispy_forms_tags %}
+
+{% block extra_css %}
+
+<style>
+    #info_preco {
+        font-size: 14px;
+        color: red;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
 <!-- Modal -->
 <div class="modal fade" id="itemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="itemsModalLabel">
     <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -90,6 +102,7 @@
                                         <div class="col">
                                             {{ item_form.obs|as_crispy_field }}
                                         </div>
+                                        <label id="info_preco"></label>
                                     </div>
                                 </form>
                             </div>
