@@ -1218,6 +1218,11 @@ def get_filtered_products(request):
             proximo_pedido_id = pedido.saida_items.count() + 1
             categoria = Product.objects.get(pk=product_id).tipo_categoria.id
 
+            if preco and preco.taxa_frete:
+                origem_frete = 'tabela_preco'
+            else:
+                origem_frete = 'tabela_cliente'
+
             taxa_frete = (
                 preco.taxa_frete if preco and preco.taxa_frete else
                 cliente.taxa_frete if cliente and hasattr(cliente, 'taxa_frete') else
@@ -1242,7 +1247,8 @@ def get_filtered_products(request):
                 'vendedor': preco.vendedor.id if preco else '',
                 'tipo_frete': tipo_frete if tipo_frete is not None else '',
                 'taxa_frete_item': taxa_frete if taxa_frete is not None else '',
-                'is_dolar': preco.is_dolar if preco else '',
+                'origem_frete': origem_frete,
+                'is_dolar': preco.is_dolar if preco else False,
                 'id_numero_pedido': pedido.pedido_interno_cliente,
                 'item_pedido': items + 1,
                 'proximo_pedido': proximo_pedido_id,
