@@ -1,0 +1,85 @@
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.client-section {
+    font-size: 0.8rem;
+    margin-bottom: 2rem
+}
+
+.alternativa-section {
+    font-size: 0.8rem;
+}
+
+.logo_pdf {
+    width: 6rem;
+}
+
+.order-separation {
+    margin-bottom: 3rem;
+}
+
+.client-info {
+    margin-bottom: 2rem;
+}
+
+.tabela {
+    font-size: 0.7rem;
+    background-color: #fff4e8;
+    border-color: #ffffff;
+
+}
+
+.table-head {
+    background-color: #ffa435;
+    color: #ffffff;
+}
+
+.totais {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 0
+}
+
+.total_strong_width {
+    width: 82px;
+    text-align: right;
+    background-color: #ffffff;
+    font-weight: bold;
+}
+
+.total_value_width {
+    width: 106px;
+    text-align: right;
+}
+
+.other-info {
+    font-size: 0.8rem;
+}
+
+.footer-info {
+    list-style-type: none;
+    font-size: 0.7rem;
+}
+
+.footer-info li::marker {
+    content: "- ";
+}
+
+.info-bottom {
+    font-size: 0.8rem;
+}
+
+.transp-info {
+    font-size: 0.8rem;
+    border-color: #ffffff
+}
+
+.transp-info tr th {
+    background-color: #f8f8f8;
+}

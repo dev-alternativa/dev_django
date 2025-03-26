@@ -22,6 +22,7 @@
     <link href="{% static '/css/utils.css' %}" rel="stylesheet">
     <link href="{% static '/css/sidebars.css' %}" rel="stylesheet">
     <link href="{% static '/css/elementos_cadastro.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
 
     <style>
         {% if ENVIRONMENT_DEV %}

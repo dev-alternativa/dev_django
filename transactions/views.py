@@ -624,7 +624,9 @@ class OrderSummary(DetailView):
 
 
 class OrderPicking(DetailView):
-    pass
+    model = Outflows
+    template_name = '_pedido_proposta/pedido_separacao.html'
+    context_object_name = 'order_picking'
 
 
 def add_product_to_order(request, order_id):
