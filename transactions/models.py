@@ -84,8 +84,8 @@ class InflowsItems(Base):
 
 
 class Outflows(Base):
-    num_pedido_omie = models.CharField(verbose_name='N° Pedido no OMIE', max_length=100, null=True, blank=True)
-    num_pedido_omie_secundario = models.CharField(verbose_name='N° Pedido Secundário', max_length=100, null=True, blank=True)
+    num_pedido_omie = models.CharField(verbose_name='Pedido OMIE', max_length=100, null=True, blank=True)
+    num_pedido_omie_secundario = models.CharField(verbose_name='Pedido Secundário', max_length=100, null=True, blank=True)
     tipo_saida = models.CharField(choices=TIPO_SAIDA, max_length=50, blank=True, null=True, default='V')
     cod_pedido_omie = models.CharField(max_length=100, null=True, blank=True)
     cod_pedido_omie_secundario = models.CharField(max_length=100, null=True, blank=True)
@@ -99,6 +99,7 @@ class Outflows(Base):
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.CASCADE, null=True, blank=True, related_name='saidas', default=1)
     tipo_frete = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='frete')
     taxa_frete =models.CharField(verbose_name='Tx Frete', null=True, blank=True, max_length=50)
+    prazo = models.ForeignKey('logistic.LeadTime', on_delete=models.SET_NULL, null=True, blank=True)
     desconto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     dt_previsao_faturamento = models.DateField('Prev. Fat.', blank=True, null=True)
     operador = models.ForeignKey(CustomUsuario, on_delete=models.SET_NULL, null=True, blank=True)
