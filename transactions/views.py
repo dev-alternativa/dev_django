@@ -623,6 +623,9 @@ class OrderSummary(DetailView):
         return context
 
 
+class OrderPicking(DetailView):
+    pass
+
 
 def add_product_to_order(request, order_id):
     """
@@ -640,6 +643,39 @@ def add_product_to_order(request, order_id):
     e cria uma nova instância de OutflowsItems. Se houver algum erro durante o
     processamento, uma resposta JSON com o erro é retornada.
     """
+
+    def handle_diferent_freights(order_instance, freight_type, freight_tax):
+        first_item = OutflowsItems.objects.first()
+        if not first_item:
+            return False
+
+        dict_frete = {
+            'tipo_frete_pedido': order_instance.tipo_frete.id,
+            'taxa_frete_pedido': order_instance.taxa_frete,
+            'tipo_frete_item': freight_type,
+            'taxa_frete_item': freight_tax,
+        }
+
+        if dict_frete['taxa_frete_item'] != first_item.taxa_frete_item:
+            return False
+
+        if dict_frete['tipo_frete_item'] != first_item.tipo_frete_item:
+            return False
+
+
+        if freight_tax:
+            if order_instance.taxa_frete:
+                if float(order_instance.taxa_frete) > float(freight_tax):
+                    freight_tax = order_instance.taxa_frete
+                else:
+                    freight_tax = freight_tax
+
+
+
+
+        return not OutflowsItems.objects.exclude(tipo_frete_item=first_item.tipo_frete_item).exists()
+
+
 
     if request.method == 'POST':
         field_types = {
@@ -663,14 +699,32 @@ def add_product_to_order(request, order_id):
             # 'cfop': str,
         }
 
-        data = {
-            key: field_types[key](
-                request.POST.get(key, "")
-            ) or (
-                0 if field_types[key] in [int, float] else ""
+        # Validate that product ID is not empty and is a valid integer
+        produto_id = request.POST.get('produto', '')
+        if not produto_id or not produto_id.isdigit():
+            return JsonResponse(
+                {
+                    'error': 'ID do produto é obrigatório e deve ser um número inteiro válido',
+                    'produto': produto_id
+                },
+                status=400
             )
-            for key in field_types
-        }
+
+        # Process and validate other form data
+        data = {}
+        for key in field_types:
+            value = request.POST.get(key, "")
+            # Skip empty values for required integer/float fields
+            if field_types[key] in [int, float] and not value:
+                data[key] = 0
+            else:
+                try:
+                    data[key] = field_types[key](value) if value else (0 if field_types[key] in [int, float] else "")
+                except (ValueError, TypeError):
+                    # Handle conversion errors
+                    if key == 'produto':
+                        return JsonResponse({'error': f'ID do produto inválido: {value}'}, status=400)
+                    data[key] = 0 if field_types[key] in [int, float] else ""
 
         # Verifica campos obrigatórios
         if (not data["produto"] or not
@@ -692,8 +746,14 @@ def add_product_to_order(request, order_id):
             )
 
         try:
+
+            # Additional validation for required foreign keys
+            if not data["produto"]:
+                return JsonResponse({'error': 'ID do produto é obrigatório'}, status=400)
+
             # Recupera instâncias de cada chave estrangeira
             order = Outflows.objects.get(pk=order_id)
+
             product = Product.objects.get(pk=data["produto"])
             seller = Seller.objects.get(pk=data["vendedor_item"])
             cnpj_faturamento = CNPJFaturamento.objects.get(pk=data["cnpj_faturamento"])
@@ -703,8 +763,16 @@ def add_product_to_order(request, order_id):
             items_list = OutflowsItems.objects.filter(saida=order)
             cnpj_list_in_database = [item.cnpj_faturamento.sigla for item in items_list]
             cnpj_list = CNPJFaturamento.objects.values_list('sigla', flat=True)
-
             cnpj_list_in_database.append(cnpj_faturamento.sigla)
+
+            freight_tax = data['taxa_frete_item']
+
+            if not handle_diferent_freights(order, freight_type, freight_tax):
+                return JsonResponse(
+                    {'error': 'Fretes Diferentes'},
+                    status=400
+                )
+
 
             if verify_cnpj_order(list(cnpj_list), cnpj_list_in_database):
                 return JsonResponse(
@@ -773,6 +841,18 @@ def add_product_to_order(request, order_id):
 
             return JsonResponse({'message': 'Produto adicionado com sucesso!'}, status=200)
 
+        except Product.DoesNotExist:
+            return JsonResponse({'error': f'Produto com ID {data["produto"]} não encontrado'}, status=404)
+        except Seller.DoesNotExist:
+            return JsonResponse({'error': f'Vendedor com ID {data["vendedor_item"]} não encontrado'}, status=404)
+        except CNPJFaturamento.DoesNotExist:
+            return JsonResponse({'error': f'CNPJ de faturamento com ID {data["cnpj_faturamento"]} não encontrado'}, status=404)
+        except LeadTime.DoesNotExist:
+            return JsonResponse({'error': f'Prazo com ID {data["prazo"]} não encontrado'}, status=404)
+        except ContaCorrente.DoesNotExist:
+            return JsonResponse({'error': f'Conta corrente com ID {data["conta_corrente"]} não encontrado'}, status=404)
+        except Freight.DoesNotExist:
+            return JsonResponse({'error': f'Tipo de frete com ID {data["tipo_frete_item"]} não encontrado'}, status=404)
         except Exception as e:
             print(f'ERRO: {e}')
             return JsonResponse({'error': str(e)}, status=500)
@@ -912,6 +992,10 @@ def edit_order(request, order_id):
                 tipo_frete_id = dados_modificados.get('tipo_frete')
                 tipo_frete = get_object_or_404(Freight, id=tipo_frete_id)
                 order.tipo_frete = tipo_frete
+            if  'prazo' in dados_modificados:
+                prazo_id = dados_modificados.get('prazo')
+                prazo = get_object_or_404(LeadTime, id=prazo_id)
+                order.prazo = prazo
             if 'taxa_frete' in dados_modificados:
                 order.taxa_frete = dados_modificados.get('taxa_frete')
             if 'dados_adicionais_nf' in dados_modificados:
@@ -1245,7 +1329,7 @@ def get_filtered_products(request):
                 'comprimento': comprimento,
                 'prazo': preco.prazo.id if preco else '',
                 'vendedor': preco.vendedor.id if preco else '',
-                'tipo_frete': tipo_frete if tipo_frete is not None else '',
+                'tipo_frete_item': tipo_frete if tipo_frete is not None else '',
                 'taxa_frete_item': taxa_frete if taxa_frete is not None else '',
                 'origem_frete': origem_frete,
                 'is_dolar': preco.is_dolar if preco else False,
