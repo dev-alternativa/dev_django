@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from transactions.models import OutflowsItems, Outflows
+from common.models import CNPJFaturamento
 
 
 load_dotenv()
@@ -318,7 +319,8 @@ def validate_omie_code(obj, attr_prefix, app_type):
 
 
 def add_order_to_omie(request, order_id):
-    OMIE_APPS = ['COM', 'IND', 'PRE', 'SRV', 'MRX', 'FLX']
+    # OMIE_APPS = ['COM', 'IND', 'PRE', 'SRV', 'MRX', 'FLX']
+    OMIE_APPS = list(set(CNPJFaturamento.objects.values_list('sigla', flat=True)))
 
     if not request.method == 'POST':
         return JsonResponse({'error': 'Método não permitido!'}, status=405)

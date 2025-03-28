@@ -21,10 +21,14 @@
                     {% endif %}
 
                     <div class="row mb-3">
-                        <div class='col-md-4'>
+                        <div class='d-flex justify-content-between'>
                             <a href="{% url 'update_order' order.pk %}" class='btn btn-danger float-start'>
                                 <i class="bi bi-backspace"></i>
                                 Voltar para Pedido "{{ order.pk}}"
+                            </a>
+                            <a href="{% url 'create_omie_order' order.pk %}" class='btn btn-info btn-lg'>
+                                <i class="bi bi-arrow-right-square space_from_margin"></i>
+                                Registrar OMIE
                             </a>
                         </div>
                     </div>
@@ -64,7 +68,7 @@
                                 <tr>
                                     <td class="text-center">Prazo</td>
                                     <td class="text-center">codigo_parcela</td>
-                                    <td class="text-center text-danger">{{ prazo }}</td>
+                                    <td class="text-center text-danger">{{ prazo_item }}</td>
                                     <td class="text-center">Código da parcela no OMIE</td>
                                 </tr>
                                 <tr>
@@ -149,17 +153,17 @@
                                         <td class="text-center">Produto</td>
                                         <td class="text-center">codigo_produto</td>
                                             <td class="text-center"><strong class="text-danger">
-                                                {% if item.cnpj_faturamento.sigla == "COM" and item.produto.cod_oculto_omie_com != "0" %}
+                                                {% if item.cnpj_faturamento.sigla == "COM" and item.produto.cod_oculto_omie_com != "0" and item.produto.cod_oculto_omie_com != '-' %}
                                                     {{ item.produto.cod_oculto_omie_com }}</strong> ("COM")
-                                                {% elif item.cnpj_faturamento.sigla == "IND" and item.produto.cod_oculto_omie_ind != "0" %}
+                                                {% elif item.cnpj_faturamento.sigla == "IND" and item.produto.cod_oculto_omie_ind != "0" and item.produto.cod_oculto_omie_ind != '-' %}
                                                     {{ item.produto.cod_oculto_omie_ind }}</strong> ("IND")
-                                                {% elif item.cnpj_faturamento.sigla == "FLX" and item.produto.cod_oculto_omie_flx != "0" %}
+                                                {% elif item.cnpj_faturamento.sigla == "FLX" and item.produto.cod_oculto_omie_flx != "0" and item.produto.cod_oculto_omie_flx != '-' %}
                                                     {{ item.produto.cod_oculto_omie_flx }}</strong> ("FLX")
-                                                {% elif item.cnpj_faturamento.sigla == "SRV" and item.produto.cod_oculto_omie_srv != "0" %}
+                                                {% elif item.cnpj_faturamento.sigla == "SRV" and item.produto.cod_oculto_omie_srv != "0" and item.produto.cod_oculto_omie_srv != '-' %}
                                                     {{ item.produto.cod_oculto_omie_srv }}</strong> ("SRV")
-                                                {% elif item.cnpj_faturamento.sigla == "MRX" and item.produto.cod_oculto_omie_mrx != "0" %}
+                                                {% elif item.cnpj_faturamento.sigla == "MRX" and item.produto.cod_oculto_omie_mrx != "0" and item.produto.cod_oculto_omie_mrx != '-' %}
                                                     {{ item.produto.cod_oculto_omie_mrx }}</strong> ("MRX")
-                                                {% elif item.cnpj_faturamento.sigla == "PRE" and item.produto.cod_oculto_omie_pre != "0" %}
+                                                {% elif item.cnpj_faturamento.sigla == "PRE" and item.produto.cod_oculto_omie_pre != "0" and item.produto.cod_oculto_omie_pre != '-'%}
                                                     {{ item.produto.cod_oculto_omie_pre }}</strong> ("PRE")
                                                 {% else %}
                                                     Produto sem Cód OMIE cadastrado para faturamento no CNPJ '{{ item.cnpj_faturamento.sigla }}'</strong>

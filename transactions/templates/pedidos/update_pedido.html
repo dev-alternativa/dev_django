@@ -200,7 +200,7 @@
           <div class="form-inline buttons">
             <button class="btn btn-success btn-lg"
               value="OMIE" id="sendOMIEButton"
-              onclick="location.href='{% url 'order_picking' order.pk %}'">
+              onclick="location.href='{% url 'order_summary' order.pk %}'">
               <i class="bi bi-send-arrow-up"></i>
               Enviar OMIE
             </button>
@@ -325,7 +325,7 @@ function addProduct() {
   // Valores dos campos
   const produto = productID;
   const billingCNPJ = getVal('cnpj_faturamento');
-  const prazo = getVal('prazo');
+  const prazo_item = getVal('prazo');
   const quantidade = getVal('quantidade');
   const preco = getVal('preco');
   const currentAccount = getVal('conta_corrente');
@@ -342,7 +342,6 @@ function addProduct() {
 
   // Controla se o formulário é válido
   let isValid = true;
-
   const validateFormField = (fieldId, value) => {
     const element = $(`#id_${fieldId}`);
     element.toggleClass('is-invalid', !value);
@@ -352,14 +351,13 @@ function addProduct() {
   validateFormField('produto', produto);
   validateFormField('cnpj_faturamento', billingCNPJ);
   validateFormField('condicao_calculo', paymentTerms);
-  validateFormField('prazo', prazo);
+  validateFormField('prazo_item', prazo_item);
   validateFormField('quantidade', quantidade);
   validateFormField('preco', preco);
   validateFormField('conta_corrente', billingCNPJ);
   validateFormField('item_pedido', itemPedido);
 
   if (isValid) {
-
       $.ajax({
           url: "{% url 'add_product_to_order' order.pk %}",
           method: 'POST',
@@ -367,7 +365,7 @@ function addProduct() {
             produto: produto,
             cnpj_faturamento: billingCNPJ,
             condicao_preco: paymentTerms,
-            prazo: prazo,
+            prazo_item: prazo_item,
             quantidade: quantidade,
             preco: preco,
             largura: largura,
@@ -387,7 +385,6 @@ function addProduct() {
           success: function(response) {
             // Sucesso
             let message = "Item adicionado com sucesso!";
-
             resetForm();
             updateItemsTable({{ order.pk }});
             let alertElement = `
@@ -549,13 +546,21 @@ $(document).ready(function() {
     Funções iniciadas ao carregar a página
   */
 
-  // Torna os campos de largura, comprimento e preço com 2 casa decimais
+  // Formata os campos de largura, comprimento e preço com 2 casa decimais
   $('#id_largura, #id_comprimento, #id_preco').on('blur', function() {
     const value = $(this).val();
     if (value && !isNaN(parseFloat(value))) {
         $(this).val(parseFloat(value).toFixed(2));
     }
   });
+  // Formata campo Taxa Frete do item
+  $('#id_taxa_frete_item').on('blur', function() {
+    const value = $(this).val();
+    if (value && !isNaN(parseFloat(value))){
+      $(this).val(Number(value).toFixed(2).replace('.', ','));
+    }
+  });
+
 
   // Captura o valor do campo oculto de área e chama a função de cálculo
   const calculateFields = () => {
@@ -821,6 +826,7 @@ $(document).ready(function() {
             data = response.data;
             isDolar = data.is_dolar;
             let preco = data.preco;
+            let taxa_frete_item = data.taxa_frete_item
 
             // Atualiza o valores do modal de adição de produto
             /** Caso o preço seja cadastrado como dolar, já verificar e multiplica corretamente,
@@ -833,7 +839,7 @@ $(document).ready(function() {
             $('#id_preco').val(preco);
             $('#id_conta_corrente').val(data.cc);
             $('#id_cnpj_faturamento').val(data.cnpj_faturamento);
-            $('#id_prazo').val(data.prazo);
+            $('#id_prazo_item').val(data.prazo_item);
 
 
             if(data.origem_frete == 'tabela_preco'){
@@ -846,7 +852,7 @@ $(document).ready(function() {
             $("#hidden_dolar_id").val(isDolar);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
-            $('#id_taxa_frete_item').val(data.taxa_frete_item.replace('.', ','));
+            $('#id_taxa_frete_item').val(Number(taxa_frete_item).toFixed(2).replace('.', ','));
             $('#id_tipo_frete_item').val(data.tipo_frete_item);
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
@@ -938,7 +944,6 @@ $(document).ready(function() {
 
     // Faz uma requisição AJAX para a view 'edit_pedido' se houver modificações nos valores
     if(Object.keys(modifiedData).length > 0){
-      console.log(modifiedData);
 
       $.ajax({
         type: 'POST',
@@ -1033,7 +1038,7 @@ $(document).ready(function() {
           // Atualiza o título do modal com o nome do produto
           const productName = response.data.nome_produto;
           const cnpj = response.data.cnpj_faturamento;
-          const prazo = response.data.prazo;
+          const prazo_item = response.data.prazo_item;
           const currentAccount = response.data.conta_corrente;
           const vendedor = response.data.vendedor;
           const unidade = response.data.unidade;
@@ -1060,7 +1065,7 @@ $(document).ready(function() {
           $("#hidden_categoria_id").val(categoria);
 
           selectOptionByText('#id_cnpj_faturamento', cnpj);
-          selectOptionByText('#id_prazo', prazo);
+          selectOptionByText('#id_prazo_item', prazo_item);
           selectOptionByText('#id_conta_corrente', currentAccount);
           selectOptionByText('#id_vendedor_item', vendedor);
           selectOptionByText('#id_tipo_frete_item', tipo_frete_item);
