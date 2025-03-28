@@ -38,6 +38,6 @@ class OutflowItemsAdmin(admin.ModelAdmin):
         'cfop',
         'saida',
         'cnpj_faturamento',
-        'prazo',
+        'prazo_item',
         'obs'
     )
