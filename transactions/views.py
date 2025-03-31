@@ -207,6 +207,9 @@ def calculate_order_total(items):
     """
     item_list = []
 
+    order = Outflows.objects.filter(id__in=items.values_list('saida', flat=True,)).distinct()
+    is_donate = True if order[0].cod_cenario_fiscal.id == 3 else False
+
     for item in items:
 
         # Se for categoria Superlam
@@ -267,7 +270,8 @@ def calculate_order_total(items):
         item_list.append(item_data)
 
     total_pedido = sum(item['preco_total'] for item in item_list)
-    total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list)
+    total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
+    print(total_ipi)
     total_nota = total_pedido + total_ipi
 
     return total_pedido, total_ipi, total_nota, item_list
@@ -1010,6 +1014,9 @@ def edit_order(request, order_id):
             if 'item_pedido' in dados_modificados:
                 order.item_pedido = dados_modificados.get('item_pedido')
 
+            if 'status' in dados_modificados:
+                order.status = dados_modificados.get('status')
+
             order.save()
             return JsonResponse({'message': 'Pedido atualizado com sucesso!'}, status=200)
 
@@ -1225,7 +1232,6 @@ def update_product_from_order(request, item_id):
             conta_corrente_id = request.POST.get('conta_corrente')
             vendedor_item_id = request.POST.get('vendedor_item')
             tipo_frete_item_id = request.POST.get('tipo_frete_item')
-            print(f'ID TIPO FRETE: {tipo_frete_item_id}')
 
             if prazo_item:
                 item.prazo_item = get_object_or_404(LeadTime, pk=prazo_item)

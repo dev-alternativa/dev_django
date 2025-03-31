@@ -144,6 +144,11 @@
           </div>
         </div>
         <div class='col'>
+          <div class='form-group'>
+            {{ form.status|as_crispy_field }}
+          </div>
+        </div>
+        <div class='col'>
           <div class="form-group">
             {{ form.vendedor|as_crispy_field }}
           </div>
@@ -534,7 +539,7 @@ function calculateProductValuesByCategory(
 
     return {
       area_total: (area_default * quantidade).toFixed(2),
-      total_valor: (quantidade * preco).toFixed(2),
+      total_valor: (quantidade * preco).toFixed(4),
       dados_descritivo: ''
   };
 
@@ -955,6 +960,7 @@ $(document).ready(function() {
         success: function(response) {
             // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
             let message = "Campos alterados com sucesso."
+            console.log(response);
 
             let alertElement = `
               <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -1052,7 +1058,7 @@ $(document).ready(function() {
           $('#nome_produto').text(`${productName} (${unidade})` );
 
           quantidade = parseFloat(response.data.quantidade);
-          preco =parseFloat(response.data.preco);
+          preco =parseFloat(response.data.preco).toFixed(4);
           largura = response.data.largura;
           comprimento = response.data.comprimento;
           area_m2 = response.data.area_unitario;

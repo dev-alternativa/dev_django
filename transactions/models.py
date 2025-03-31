@@ -6,8 +6,8 @@ from logistic.models import Freight
 
 STATUS = (
     ('A', 'Aberto'),
-    ('F', 'Faturado'),
-    ('AF', 'Aguardando Faturamento'),
+    ('ANF', 'Aguardando NF'),
+    ('C', 'Concluído'),
 )
 
 CONDICAO_PRECO = (

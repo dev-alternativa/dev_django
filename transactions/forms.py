@@ -91,6 +91,11 @@ class OutflowsForm(forms.ModelForm):
             }
         )
     )
+    def clean(self):
+        cleaned_data = super().clean()
+        print("Cleaned data:", cleaned_data)
+        print("Status em cleaned_data:", cleaned_data.get('status'))
+        return cleaned_data
 
     class Meta:
         model = Outflows
