@@ -1,4 +1,3 @@
-from api.views import ConsultaDolarPTAX
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
 from core.views import FormMessageMixin
 from decimal import Decimal
@@ -13,7 +12,7 @@ from django.template.loader import render_to_string
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy, reverse
-# from django.db.models import Sum, F
+from django.db.models import QuerySet
 from logistic.models import Carrier, LeadTime, Freight
 from products.models import Product
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
@@ -207,10 +206,24 @@ def calculate_order_total(items):
     """
     item_list = []
 
-    order = Outflows.objects.filter(id__in=items.values_list('saida', flat=True,)).distinct()
+    if isinstance(items, QuerySet):
+        order = Outflows.objects.filter(id__in=items.values_list('saida', flat=True,)).distinct()
+        items_to_process = items
+    elif isinstance(items, list):
+        if items:
+            single_item = items[0]  # Pegar o primeiro item da lista
+            order = Outflows.objects.filter(id=single_item.saida.id).distinct()
+            items_to_process = items
+        else:
+            return Decimal('0.0'), Decimal('0.0'), Decimal('0.0'), []
+    else:
+        single_item = items
+        order = Outflows.objects.filter(id=single_item.saida.id).distinct()
+        items_to_process = [single_item]
+
     is_donate = True if order[0].cod_cenario_fiscal.id == 3 else False
 
-    for item in items:
+    for item in items_to_process:
 
         # Se for categoria Superlam
         if item.produto.tipo_categoria_id == 3:
@@ -251,7 +264,14 @@ def calculate_order_total(items):
             (item.produto.aliq_ipi_flx, 'FLX'),
             (item.produto.aliq_ipi_mrx, 'MRX'),
         ]
-        ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
+
+        # Caso não encontre nenhum IPI, assume valor padrão de `0.0`
+        try:
+
+            ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
+        except IndexError:
+            ipi = Decimal('0.0')
+            print(f'Não foi encontrado alíquota de IPI para o APP {item.cnpj_faturamento.sigla}')
 
 
         item_data = {
@@ -271,7 +291,6 @@ def calculate_order_total(items):
 
     total_pedido = sum(item['preco_total'] for item in item_list)
     total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
-    print(total_ipi)
     total_nota = total_pedido + total_ipi
 
     return total_pedido, total_ipi, total_nota, item_list

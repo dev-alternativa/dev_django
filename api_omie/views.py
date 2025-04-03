@@ -1,4 +1,6 @@
+from decimal import Decimal
 import os
+import re
 import requests
 from collections import defaultdict
 from common.models import Seller
@@ -339,10 +341,20 @@ def add_order_to_omie(request, order_id):
         app_omie = item.cnpj_faturamento.sigla
         for key in OMIE_APPS:
             if key in app_omie:
-                # Verifica se o produto é superlam, caso positivo, atribui quantidade o metro quadrado
+                # Se superlam, calcula quantidade do metro quadrado
                 if item.produto.tipo_categoria.id == 3:
-                    item.m2 = item.largura * item.comprimento
-                    item.categoria = 3
+                    m_2_unit = item.produto.m_quadrado
+                    m2_total = float(m_2_unit * item.quantidade)
+                    price_unit = float(item.preco)
+                    item.preco = price_unit
+                # Se nyloflex, usa o m2 da tabela de produto
+                elif item.produto.tipo_categoria.id == 7:
+                    m2_total = item.produto.m_quadrado
+                    price_unit = float(item.preco) / float(item.produto.m_quadrado)
+
+                if item.produto.tipo_categoria.id in [3, 7]:
+                    item.quantidade = m2_total
+                    item.preco = price_unit
 
                 items_by_app[key].append(item)
                 break
@@ -395,7 +407,7 @@ def add_order_to_omie(request, order_id):
                     "codigo_pedido_integracao": str(order.pk),
                     "data_previsao": order.dt_previsao_faturamento.strftime("%d/%m/%Y"),
                     "etapa": "10",
-                    "codigo_parcela": app_items[0].prazo.codigo,
+                    "codigo_parcela": app_items[0].prazo_item.codigo,
                     "quantidade_itens": len(app_items),
                 },
                 "det": [
@@ -418,12 +430,12 @@ def add_order_to_omie(request, order_id):
                     } for item in app_items
                 ],
                 "frete": {
-                    "modalidade": "9",
+                    "modalidade": str(order.tipo_frete.id),
                     "codigo_transportadora": transp_code,
                 },
                 "informacoes_adicionais": {
                     "codigo_categoria": "1.01.01",
-                    "codigo_conta_corrente": int(item.conta_corrente.nCodCC),
+                    "codigo_conta_corrente": int(app_items[0].conta_corrente.nCodCC),
                     "consumidor_final": "N",
                     "utilizar_emails": "N",
                     "numero_pedido_cliente": order.pedido_interno_cliente or "",
@@ -432,14 +444,14 @@ def add_order_to_omie(request, order_id):
             }
         ]
         all_orders.append(order_dict)
-    print(all_orders)
+        # print(all_orders)
     api_response = send_to_omie(all_orders)
 
     return JsonResponse({'api_response': api_response}, status=200)
 
 
 def send_to_omie(all_orders):
-    return False
+    # return False
     """Faz a chamada para o OMIE"""
     for order in all_orders:
 
@@ -458,8 +470,6 @@ def send_to_omie(all_orders):
         }
         url = "https://app.omie.com.br/api/v1/produtos/pedido/"
         print(data)
-
-    # return True
 
     try:
         print('Preparando chamada para o OMIE')
@@ -487,13 +497,14 @@ def send_to_omie(all_orders):
                 'message': 'Erro ao criar Pedido ao OMIE'
             }
     except requests.exceptions.RequestException as e:
-        if e.response is not None and e.response.headers.get('Content-Type') == 'application/json':
-            error_data = None
-            try:
-                error_data = e.response.json()
-                print("mensagem de erro capturada:", error_data.get("faultstring"))
-            except ValueError:
-                print("Erro HTTP", e.response.text)
+        error_data = {}
+        try:
+            error_data = e.response.json() if hasattr(e, 'response') else {}
+            print("mensagem de erro capturada:", error_data.get("faultstring"))
+
+        except ValueError:
+            error_data = e.response.text
+            print("Erro HTTP", e.response.text)
         else:
             print(f'Erro ao dicionar pedido ao OMIE: {e}')
 
@@ -534,7 +545,8 @@ def update_local_order(response):
         id = int(response['codigo_pedido_integracao'])
         order = Outflows.objects.get(pk=id)
         order.cod_pedido_omie = response['codigo_pedido']
-        order.num_pedido_omie = response['numero_pedido'].replace('0', '')
+        numero_pedido = re.sub(r"^0+", "", response['numero_pedido'])
+        order.num_pedido_omie = numero_pedido
         order.save()
         return True
 
