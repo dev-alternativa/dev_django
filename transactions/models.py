@@ -125,7 +125,7 @@ class OutflowsItems(Base):
     comprimento = models.DecimalField(verbose_name='Comp. (m)', max_digits=10, decimal_places=2, blank=True, null=True)
     item_pedido = models.CharField(verbose_name='Item #', max_length=50, null=True, blank=True)
     condicao_preco = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100)
-    taxa_frete_item = models.CharField('Tx Frete*', max_length=50, blank=True, null=True)
+    taxa_frete_item = models.CharField('Tx Frete', max_length=50, blank=True, null=True)
     tipo_frete_item = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='frete_item')
     cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='saida_items')
     prazo_item = models.ForeignKey('logistic.LeadTime', on_delete=models.CASCADE, null=True, blank=True, related_name='saida_items')

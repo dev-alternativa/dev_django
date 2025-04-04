@@ -18,30 +18,30 @@ load_dotenv()
 
 # Processa request e salva no banco dependendo do tipo de App  do OMIE `COM, IND, FLX, etc`
 def fetch_and_save_sellers(app_omie):
-    url = 'https://app.omie.com.br/api/v1/geral/vendedores/'
+    url = os.getenv('URL_ENDPOINT_SELLER')
 
     if app_omie == 'IND':
-        app_key = '4727951232'
-        app_secret = 'f60cacf6e25606b9a789ba6b9cfada4f'
+        app_key = os.getenv('IND_OMIE_API_KEY')
+        app_secret = os.getenv('IND_OMIE_API_SECRET')
     elif app_omie == 'COM':
-        app_key = '2865978297'
-        app_secret = '917ebeb82e4740f75adddf0fdbd60466'
+        app_key = os.getenv('COM_OMIE_API_KEY')
+        app_secret = os.getenv('COM_OMIE_API_SECRET')
     elif app_omie == 'PRE':
-        app_key = '505562494437'
-        app_secret = '298e398d984793f27e81c034af21a27c'
+        app_key = os.getenv('PRE_OMIE_API_KEY')
+        app_secret = os.getenv('PRE_OMIE_API_SECRET')
     elif app_omie == 'SRV':
-        app_key = '3377304736'
-        app_secret = '3fd52240e166b1b7892e018f30f1b388'
+        app_key = os.getenv('SRV_OMIE_API_KEY')
+        app_secret = os.getenv('SRV_OMIE_API_SECRET')
     elif app_omie == 'MRX':
-        app_key = '1060766605899'
-        app_secret = 'c6d224114583e968b10d8bdcea58bc71'
+        app_key = os.getenv('MRX_OMIE_API_KEY')
+        app_secret = os.getenv('MRX_OMIE_API_SECRET')
     elif app_omie == 'FLX':
-        app_key = '2067419953'
-        app_secret = 'be523b28e97c3c5a035680b619e3e374'
+        app_key = os.getenv('FLX_OMIE_API_KEY')
+        app_secret = os.getenv('FLX_OMIE_API_SECRET')
 
     # Payload
     payload = {
-        "call": "ListarVendedores",
+        "call": os.getenv('LIST_SELLERS'),
         "app_key": app_key,  # Substitua com sua chave real
         "app_secret": app_secret,  # Substitua com seu secret real
         "param": [
@@ -160,6 +160,8 @@ class FetchSellersView(APIView):
 
 
 def add_seller_to_omie(seller, app_omie):
+    url = os.getenv('URL_ENDPOINT_SELLER')
+
     if 'COM' in app_omie:
         app_key = os.getenv('COM_OMIE_API_KEY')
         app_secret = os.getenv('COM_OMIE_API_SECRET')
@@ -182,7 +184,7 @@ def add_seller_to_omie(seller, app_omie):
         return {'error': 'App omie não encontrada'}
 
     data = {
-        "call": "UpsertVendedor",
+        "call": os.getenv('INCLUDE_UPDATE_SELLER'),
         "app_key": app_key,
         "app_secret": app_secret,
         "param": [
@@ -197,8 +199,6 @@ def add_seller_to_omie(seller, app_omie):
             }
         ]
     }
-
-    url = "https://app.omie.com.br/api/v1/geral/vendedores/"
 
     # print(f'{data},')
     # return {
@@ -235,7 +235,7 @@ def add_seller_to_omie(seller, app_omie):
 
 
 def delete_seller_from_omie(cod_omie, app_omie):
-    url = 'https://app.omie.com.br/api/v1/geral/vendedores/'
+    url = os.getenv('URL_ENDPOINT_SELLER')
 
     if 'COM' in app_omie:
         app_key = os.getenv('COM_OMIE_API_KEY')
@@ -259,7 +259,7 @@ def delete_seller_from_omie(cod_omie, app_omie):
         return {'error': 'App omie não encontrada'}
 
     data = {
-        "call": "ExcluirVendedor",
+        "call": os.getenv('DELETE_SELLER'),
         "app_key": app_key,
         "app_secret": app_secret,
         "param": [
@@ -463,12 +463,12 @@ def send_to_omie(all_orders):
         credentials = get_omie_credentials(app_type)
 
         data = {
-            'call': 'IncluirPedido',
+            'call': os.getenv('INCLUDE_ORDER'),
             'app_key': credentials['app_key'],
             'app_secret': credentials['app_secret'],
             'param': order
         }
-        url = "https://app.omie.com.br/api/v1/produtos/pedido/"
+        url = os.getenv('URL_ENDPOINT_ORDER')
         print(data)
 
     try:

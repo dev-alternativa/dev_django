@@ -131,6 +131,7 @@ class OutflowsForm(forms.ModelForm):
         super(OutflowsForm, self).__init__(*args, **kwargs)
         self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
         self.fields['vendedor'].widget.attrs['disabled'] = 'true'
+        self.fields['tipo_frete'].empty_label = None
         self.helper = FormHelper()
         self.helper.form_method = 'post'
 
@@ -189,4 +190,8 @@ class OrderItemsForm(forms.ModelForm):
                 }
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tipo_frete_item'].empty_label = None
 
