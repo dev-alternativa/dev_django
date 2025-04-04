@@ -1,15 +1,15 @@
-from decimal import Decimal
 import os
 import re
-import requests
 from collections import defaultdict
+from common.models import CNPJFaturamento
 from common.models import Seller
-from dotenv import load_dotenv
 from django.http import JsonResponse
+from django.shortcuts import redirect
+from dotenv import load_dotenv
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from transactions.models import OutflowsItems, Outflows
-from common.models import CNPJFaturamento
+import requests
 
 
 load_dotenv()
@@ -446,8 +446,9 @@ def add_order_to_omie(request, order_id):
         all_orders.append(order_dict)
         # print(all_orders)
     api_response = send_to_omie(all_orders)
+    request.session['api_response'] = api_response
 
-    return JsonResponse({'api_response': api_response}, status=200)
+    return redirect('order_summary')
 
 
 def send_to_omie(all_orders):

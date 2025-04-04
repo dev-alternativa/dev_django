@@ -1,0 +1,58 @@
+<!-- Button trigger modal -->
+{% comment %} <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Launch static backdrop modal
+</button> {% endcomment %}
+{% block modals %}
+
+<!-- Modal -->
+<div class="modal fade" id="messageBox" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="messageBoxLabel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="messageBoxLabel">{{ title|default:"Aviso" }}</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="messageBoxBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnCancel" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+        {% comment %} <button type="button" id="btnOK" class="btn btn-success">{{ ok_text|default: "OK" }}</button> {% endcomment %}
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Verificar se há uma resposta da API na sessão
+      const apiResponse = {{ request.session.api_response|default:"null"|safe }};
+
+      if (apiResponse) {
+          const messageBox = new bootstrap.Modal(document.getElementById('messageBox'));
+          const messageTitle = document.getElementById('messageBoxLabel');
+          const messageBody = document.getElementById('messageBoxBody');
+          const btnOK = document.getElementById('btnOK');
+
+          // Configurar o modal com base na resposta
+          messageTitle.textContent = apiResponse.success ? "Sucesso" : "Erro";
+          messageBody.textContent = apiResponse.message;
+
+          if (!apiResponse.success && apiResponse.error) {
+              const errorDetails = document.createElement('div');
+              errorDetails.classList.add('mt-3', 'text-danger');
+              errorDetails.textContent = `Detalhes: ${apiResponse.error}`;
+              messageBody.appendChild(errorDetails);
+          }
+
+          // Mostrar o modal
+          messageBox.show();
+
+          // Limpar a resposta da sessão após exibir o modal
+          {% if request.session.api_response %}
+              {% session.pop('api_response', None) %}
+          {% endif %}
+      }
+  });
+</script>
+
+{% endblock modals %}

@@ -173,13 +173,13 @@
     {% endif %}
 
     <!-- Modal de Categorias -->
-{% include "pedidos/_modal_categoria_pedido.html" %}
+{% include "includes/_modal_categoria_pedido.html" %}
 
 <!-- Modal de Produtos -->
-{% include "pedidos/_modal_produto_pedido.html" %}
+{% include "includes/_modal_produto_pedido.html" %}
 
 <!-- Modal de adição de produtos -->
-{% include "pedidos/_modal_item_pedido.html" %}
+{% include "includes/_modal_item_pedido.html" %}
 
 
     <!-- Botão de salvar -->
@@ -232,7 +232,7 @@
   </div>
     <!-- Tabela dinâmica de itens do carrinho -->
     <div class="row" id="dinamic-table">
-      {% include "pedidos/_tabela_items.html" %}
+      {% include "includes/_tabela_items.html" %}
     </div>
 </div>
 <script src="{% static 'js/new_order.js' %}"></script>
@@ -333,7 +333,7 @@ function addProduct() {
   const prazo_item = getVal('prazo');
   const quantidade = getVal('quantidade');
   const preco = getVal('preco');
-  const currentAccount = getVal('conta_corrente');
+  const contaCorrente = getVal('conta_corrente');
   const largura = getVal('largura');
   const comprimento = getVal('comprimento');
   const itemPedido = getVal('item_pedido');
@@ -359,7 +359,7 @@ function addProduct() {
   validateFormField('prazo_item', prazo_item);
   validateFormField('quantidade', quantidade);
   validateFormField('preco', preco);
-  validateFormField('conta_corrente', billingCNPJ);
+  validateFormField('conta_corrente', contaCorrente);
   validateFormField('item_pedido', itemPedido);
 
   if (isValid) {
@@ -375,7 +375,7 @@ function addProduct() {
             preco: preco,
             largura: largura,
             comprimento: comprimento,
-            conta_corrente: billingCNPJ,
+            conta_corrente: contaCorrente,
             item_pedido: itemPedido,
             num_pedido_omie: num_pedido_omie,
             vendedor_item: vendedor_item,

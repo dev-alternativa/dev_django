@@ -2,6 +2,8 @@
 
 {% block title %} Pedidos {% endblock %}
 
+{% include "includes/modalAlertBox.html" with title="ATENÇÃO" message="Mensagem personalizada" %}
+
 {% block content %}
     <div id="page-wrapper">
         <div class="container">
@@ -20,10 +22,10 @@
                         </div>
                     {% endif %}
 
-                    <div class="row mb-3">
+                    <div class="row " style="margin-bottom: 1rem;">
                         <div class='d-flex justify-content-between'>
                             <a href="{% url 'update_order' order.pk %}" class='btn btn-danger float-start'>
-                                <i class="bi bi-backspace"></i>
+                                <i class="bi bi-backspace space_from_margin"></i>
                                 Voltar para Pedido "{{ order.pk}}"
                             </a>
                             <form method="POST" action="{% url 'create_omie_order' order.pk %}" style="display: inline;">

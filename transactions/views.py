@@ -579,6 +579,7 @@ class OrderSummary(DetailView):
     context_object_name = 'order'
 
     def get_context_data(self, **kwargs):
+        api_response = self.request.session.pop('api_response', None)
         context = super().get_context_data(**kwargs)
         order = self.get_object()
         cliente = order.cliente.nome_fantasia
@@ -643,6 +644,7 @@ class OrderSummary(DetailView):
         context['cliente'] = cliente
         context['order'] = order
         context['conta_corrente'] = conta_corrente
+        context['api_response'] = api_response
         return context
 
 
@@ -681,7 +683,8 @@ def add_product_to_order(request, order_id):
     """
     def handle_diferent_freights(order_instance, freight_type, freight_tax):
         first_item = OutflowsItems.objects.filter(saida=order_instance).first()
-        if not first_item:
+
+        if not first_item :
             return True
 
         if freight_tax != first_item.taxa_frete_item:
@@ -689,6 +692,11 @@ def add_product_to_order(request, order_id):
 
         if freight_type != first_item.tipo_frete_item.id:
             return False
+        # print(first_item.taxa_frete_item)
+        # print(freight_tax)
+        # print(freight_type)
+        # print(first_item.tipo_frete_item.id)
+
 
         # if freight_tax:
         #     if order_instance.taxa_frete:
@@ -788,6 +796,7 @@ def add_product_to_order(request, order_id):
             cnpj_list_in_database.append(cnpj_faturamento.sigla)
 
             freight_tax = data['taxa_frete_item']
+
 
             if not handle_diferent_freights(order, freight_type.id, freight_tax):
                 return JsonResponse(
@@ -911,7 +920,8 @@ def get_itens_pedido(request, order_id):
     total_nota = 0
     item_list = []
 
-    total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
+    if items.exists():
+        total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
         # item_list = []
 
 
@@ -943,7 +953,7 @@ def get_itens_pedido(request, order_id):
 
 
     html = render_to_string(
-        'pedidos/_tabela_items.html', {
+        'includes/_tabela_items.html', {
             'itens_produtos': item_list,
             'total_produtos': total_produtos,
             'total_nota': total_nota,
