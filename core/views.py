@@ -119,3 +119,11 @@ class DeleteSuccessMessageMixin(SuccessMessageMixin, DeleteView):
             print(f'Erro Exception: {e}')
             messages.error(self.request, self.delete_error_message)
             return redirect(self.success_url)
+
+def clean_cnpj_cpf(cnpj_cpf):
+    """
+    Remove caracteres especiais de um CNPJ ou CPF.
+    :param cnpj_cpf: CNPJ ou CPF a ser limpo.
+    :return: CNPJ ou CPF sem caracteres especiais.
+    """
+    return ''.join(filter(str.isdigit, cnpj_cpf))

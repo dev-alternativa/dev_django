@@ -33,4 +33,6 @@ urlpatterns = [
     path('pedidos/<int:pk>/atualizar_pedido/', views.OrderEditDetailsView.as_view(), name='update_order'),
     path('pedidos/<int:pk>/resumo/', views.OrderSummary.as_view(), name='order_summary'),
     path('pedidos/<int:pk>/sale_proposal/', views.OrderPicking.as_view(), name='order_picking'),
+    path('pedidos/<int:pk>/pendencias/', views.OrderPendingDetail.as_view(), name='order_pending'),
+
 ]

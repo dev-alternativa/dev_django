@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from transactions.models import OutflowsItems, Outflows
 import requests
 
+from core.views import clean_cnpj_cpf
 
 load_dotenv()
 
@@ -445,13 +446,13 @@ def add_order_to_omie(request, order_id):
         ]
         all_orders.append(order_dict)
         # print(all_orders)
-    api_response = send_to_omie(all_orders)
+    api_response = sync_orders_with_omie(all_orders)
     request.session['api_response'] = api_response
 
     return redirect('order_summary')
 
 
-def send_to_omie(all_orders):
+def sync_orders_with_omie(all_orders):
     # return False
     """Faz a chamada para o OMIE"""
     for order in all_orders:
@@ -474,9 +475,7 @@ def send_to_omie(all_orders):
 
     try:
         print('Preparando chamada para o OMIE')
-        response = requests.post(url, json=data)
-        response.raise_for_status()
-        response_data = response.json()
+        response_data, response = execute_omie_request(data, url)
 
         print('Chamada efetuada, tratando.')
         print(f'Retorno cru da API: {response}')
@@ -566,3 +565,123 @@ def get_omie_credentials(app_type):
         'app_key': os.getenv(f'{app_type}_OMIE_API_KEY'),
         'app_secret': os.getenv(f'{app_type}_OMIE_API_SECRET')
     }
+
+
+# **************************** FINANCEIRO ********************************
+def get_financial_data_from_omie(cnpj_cpf, app_type):
+    """
+    Obtém dados financeiros de um cliente do OMIE com base no CNPJ/CPF.
+
+    Args:
+        cnpj_cpf (str): O CNPJ ou CPF do cliente.
+        app_type (str): Tipo de aplicação OMIE (COM, IND, PRE, SRV, MRX, FLX).
+
+    Returns:
+        dict: Um dicionário contendo os dados financeiros do cliente.
+    """
+    credentials = get_omie_credentials(app_type)
+    url = os.getenv('URL_ENDPOINT_ACCOUNTS_RECEIVABLE')
+    request_data = {
+        "call": os.getenv('LIST_ACCOUNTS_RECEIVABLE'),
+        "app_key": credentials['app_key'],
+        "app_secret": credentials['app_secret'],
+        "param": [
+            {
+                "pagina": 1,
+                "registros_por_pagina": 20,
+                "apenas_importado_api": "N",
+                "filtrar_por_cpf_cnpj": clean_cnpj_cpf(cnpj_cpf),
+                "filtrar_apenas_titulos_em_aberto": "S",
+            }
+        ]
+    }
+    try:
+        response_data, response = execute_omie_request(request_data, url)
+        print(response_data)
+        print(response)
+
+    except:
+        pass
+
+
+# ****************************** CLIENTE **********************************
+
+def get_client_from_omie(cnpj_cpf, app_type):
+    """
+    Obtém dados de um cliente do OMIE com base no CNPJ/CPF.
+
+    Args:
+        cnpj_cpf (str): O CNPJ ou CPF do cliente.
+        app_type (str): Tipo de aplicação OMIE (COM, IND, PRE, SRV, MRX, FLX).
+
+    Returns:
+        dict: Um dicionário contendo os dados do cliente.
+    """
+    credentials = get_omie_credentials(app_type)
+
+    url = os.getenv('URL_ENDPOINT_CUSTOMER')
+    request_data = {
+        "call": os.getenv('LIST_CUSTOMER'),
+        "app_key": credentials['app_key'],
+        "app_secret": credentials['app_secret'],
+        "param": [
+            {
+                "pagina": 1,
+                "registros_por_pagina": 50,
+                "apenas_importado_api": "N",
+                "clientesFiltro": {
+                    "cnpj_cpf": clean_cnpj_cpf(cnpj_cpf),
+                }
+            }
+        ]
+    }
+    try:
+
+        response_data, response = execute_omie_request(request_data, url)
+
+        if response_data.get('status') == "0":
+            if not len(response_data['clientes_cadastro']):
+                return {
+                    'success': False,
+                    'message': f'Dados do cliente {cnpj_cpf} não encontrado no OMIE!'
+                }
+
+        else:
+            return {
+                'success': True,
+                'message': 'Cliente encontrado no OMIE!',
+                'data': response_data['clientes_cadastro'],
+            }
+
+    except requests.exceptions.RequestException as e:
+        error_data = {}
+        try:
+            error_data = e.response.json() if hasattr(e, 'response') else {}
+            print("mensagem de erro capturada:", error_data.get("faultstring"))
+        except ValueError:
+            error_data = e.response.text
+            print("Erro HTTP", e.response.text)
+            return {
+                'success': False,
+                'error': str(e) if not error_data or not error_data.get('faultstring') else error_data.get("faultstring"),
+                'message': 'Erro ao buscar cliente no OMIE'
+            }
+
+
+def execute_omie_request(data, url):
+    """
+    Executa uma requisição para a API do OMIE.
+
+    Args:
+        data (dict): Dados a serem enviados na requisição.
+        url (str): URL da API do OMIE.
+    Returns:
+        tuple: Resposta da API e o objeto de resposta HTTP.
+    """
+    print('Preparando chamada para o OMIE')
+    response = requests.post(url, json=data)
+    response.raise_for_status()
+    response_data = response.json()
+    print('Chamada efetuada, tratando.')
+
+    return response_data, response

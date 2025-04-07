@@ -1,3 +1,4 @@
+from api_omie.views import get_client_from_omie
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
 from core.views import FormMessageMixin
 from decimal import Decimal
@@ -584,73 +585,74 @@ class OrderSummary(DetailView):
         order = self.get_object()
         cliente = order.cliente.nome_fantasia
         order_itens = OutflowsItems.objects.filter(saida=order.pk)
-        transportadora = order_itens.first().saida.transportadora
-        quantidade_itens = len(order_itens)
-        vendedor = order.vendedor
-        prazo = order_itens.first().prazo_item.codigo
-        *_, item_list = calculate_order_total(order_itens)
+        if order_itens.exists():
+            transportadora = order_itens.first().saida.transportadora
+            quantidade_itens = len(order_itens)
+            vendedor = order.vendedor
+            prazo = order_itens.first().prazo_item.codigo
+            *_, item_list = calculate_order_total(order_itens)
 
-        conta_corrente = ContaCorrente.objects.filter(
-            cnpj=order_itens.first().cnpj_faturamento,
-            padrao=True
-        )
+            conta_corrente = ContaCorrente.objects.filter(
+                cnpj=order_itens.first().cnpj_faturamento,
+                padrao=True
+            )
 
-        for index, item in enumerate(order_itens, start=1):
-            item.indice = index
+            for index, item in enumerate(order_itens, start=1):
+                item.indice = index
 
 
-        mapa_sigla_para_campo = {
-            'COM': {
-                'transportadora': transportadora.cod_omie_com,
-                'vendedor': vendedor.cod_omie_com,
-                'cod_cliente': order.cliente.tag_cadastro_omie_com,
-            },
-            'IND': {
-                'transportadora': transportadora.cod_omie_ind,
-                'vendedor': vendedor.cod_omie_ind,
-                'cod_cliente': order.cliente.tag_cadastro_omie_ind,
-            },
-            'PRE': {
-                'transportadora': transportadora.cod_omie_pre,
-                'vendedor': vendedor.cod_omie_pre,
-                'cod_cliente': order.cliente.tag_cadastro_omie_pre,
-            },
-            'MRX': {
-                'transportadora': transportadora.cod_omie_mrx,
-                'vendedor': vendedor.cod_omie_mrx,
-                'cod_cliente': order.cliente.tag_cadastro_omie_mrx,
-            },
-            'SRV': {
-                'transportadora': transportadora.cod_omie_srv,
-                'vendedor': vendedor.cod_omie_srv,
-                'cod_cliente': order.cliente.tag_cadastro_omie_srv,
-            },
-            'FLX': {
-                'transportadora': transportadora.cod_omie_flx,
-                'vendedor': vendedor.cod_omie_flx,
-                'cod_cliente': order.cliente.tag_cadastro_omie_flx,
-            },
-        }
-        for sigla, codigo in mapa_sigla_para_campo.items():
-            if sigla == order_itens.first().cnpj_faturamento.sigla:
-                context['codigo_transportadora'] = codigo['transportadora']
-                context['codigo_vendedor'] = codigo['vendedor']
-                context['codigo_cliente'] = codigo['cod_cliente']
+            mapa_sigla_para_campo = {
+                'COM': {
+                    'transportadora': transportadora.cod_omie_com,
+                    'vendedor': vendedor.cod_omie_com,
+                    'cod_cliente': order.cliente.tag_cadastro_omie_com,
+                },
+                'IND': {
+                    'transportadora': transportadora.cod_omie_ind,
+                    'vendedor': vendedor.cod_omie_ind,
+                    'cod_cliente': order.cliente.tag_cadastro_omie_ind,
+                },
+                'PRE': {
+                    'transportadora': transportadora.cod_omie_pre,
+                    'vendedor': vendedor.cod_omie_pre,
+                    'cod_cliente': order.cliente.tag_cadastro_omie_pre,
+                },
+                'MRX': {
+                    'transportadora': transportadora.cod_omie_mrx,
+                    'vendedor': vendedor.cod_omie_mrx,
+                    'cod_cliente': order.cliente.tag_cadastro_omie_mrx,
+                },
+                'SRV': {
+                    'transportadora': transportadora.cod_omie_srv,
+                    'vendedor': vendedor.cod_omie_srv,
+                    'cod_cliente': order.cliente.tag_cadastro_omie_srv,
+                },
+                'FLX': {
+                    'transportadora': transportadora.cod_omie_flx,
+                    'vendedor': vendedor.cod_omie_flx,
+                    'cod_cliente': order.cliente.tag_cadastro_omie_flx,
+                },
+            }
+            for sigla, codigo in mapa_sigla_para_campo.items():
+                if sigla == order_itens.first().cnpj_faturamento.sigla:
+                    context['codigo_transportadora'] = codigo['transportadora']
+                    context['codigo_vendedor'] = codigo['vendedor']
+                    context['codigo_cliente'] = codigo['cod_cliente']
 
-        context['item_list'] = item_list
-        context['quantidade_itens'] = quantidade_itens
-        context['prazo'] = prazo
-        context['order_itens'] = order_itens
-        context['cliente'] = cliente
-        context['order'] = order
-        context['conta_corrente'] = conta_corrente
-        context['api_response'] = api_response
+            context['item_list'] = item_list
+            context['quantidade_itens'] = quantidade_itens
+            context['prazo'] = prazo
+            context['order_itens'] = order_itens
+            context['cliente'] = cliente
+            context['order'] = order
+            context['conta_corrente'] = conta_corrente
+            context['api_response'] = api_response
         return context
 
 
 class OrderPicking(DetailView):
     model = Outflows
-    template_name = '_pedido_proposta/pedido_separacao.html'
+    template_name = 'includes/pedido_separacao.html'
     context_object_name = 'order_picking'
 
     def get_context_data(self, **kwargs):
@@ -664,6 +666,93 @@ class OrderPicking(DetailView):
         prazo_parcelas = order.prazo
         return context
 
+
+class OrderPendingDetail(DetailView):
+    template_name = 'includes/_pendencias.html'
+    model = Outflows
+    context_object_name = 'order_pending'
+    errors = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            order = self.get_object()
+            client = order.cliente
+            order_itens = OutflowsItems.objects.filter(saida=order.pk)
+            if order_itens.exists():
+                transportadora = order_itens.first().saida.transportadora
+                quantidade_itens = len(order_itens)
+                vendedor = order.vendedor
+                prazo = order_itens.first().prazo_item.codigo
+                *_, item_list = calculate_order_total(order_itens)
+
+                conta_corrente = ContaCorrente.objects.filter(
+                    cnpj=order_itens.first().cnpj_faturamento,
+                    padrao=True
+                )
+
+                mapa_sigla_para_campo = {
+                    'COM': {
+                        'transportadora': transportadora.cod_omie_com,
+                        'vendedor': vendedor.cod_omie_com,
+                        'cod_cliente': order.cliente.tag_cadastro_omie_com,
+                    },
+                    'IND': {
+                        'transportadora': transportadora.cod_omie_ind,
+                        'vendedor': vendedor.cod_omie_ind,
+                        'cod_cliente': order.cliente.tag_cadastro_omie_ind,
+                    },
+                    'PRE': {
+                        'transportadora': transportadora.cod_omie_pre,
+                        'vendedor': vendedor.cod_omie_pre,
+                        'cod_cliente': order.cliente.tag_cadastro_omie_pre,
+                    },
+                    'MRX': {
+                        'transportadora': transportadora.cod_omie_mrx,
+                        'vendedor': vendedor.cod_omie_mrx,
+                        'cod_cliente': order.cliente.tag_cadastro_omie_mrx,
+                    },
+                    'SRV': {
+                        'transportadora': transportadora.cod_omie_srv,
+                        'vendedor': vendedor.cod_omie_srv,
+                        'cod_cliente': order.cliente.tag_cadastro_omie_srv,
+                    },
+                    'FLX': {
+                        'transportadora': transportadora.cod_omie_flx,
+                        'vendedor': vendedor.cod_omie_flx,
+                        'cod_cliente': order.cliente.tag_cadastro_omie_flx,
+                    },
+                }
+                for sigla, codigo in mapa_sigla_para_campo.items():
+                    print(f'sigla: {sigla}')
+                    if sigla == order_itens.first().cnpj_faturamento.sigla:
+                        context['codigo_transportadora'] = codigo['transportadora']
+                        context['codigo_vendedor'] = codigo['vendedor']
+                        context['codigo_cliente'] = codigo['cod_cliente']
+                        context['sigla'] = sigla
+
+                context['item_list'] = item_list
+                context['quantidade_itens'] = quantidade_itens
+                context['order'] = order
+                context['prazo'] = prazo
+                context['order_itens'] = order_itens
+                context['cliente'] = client
+                context['vendedor'] = vendedor
+                context['conta_corrente'] = conta_corrente
+
+                # api_response = get_client_from_omie(order.cliente.cnpj, context['sigla'])
+                # print(f'API Response: {api_response}')
+
+            else:
+                raise ValueError('Pedido sem itens')
+                self.errors = {
+                    'message': 'Pedido sem itens',
+                }
+                context['errors'] = self.errors
+        except:
+            pass
+
+        return context
 
 def add_product_to_order(request, order_id):
     """
@@ -683,6 +772,7 @@ def add_product_to_order(request, order_id):
     """
     def handle_diferent_freights(order_instance, freight_type, freight_tax):
         first_item = OutflowsItems.objects.filter(saida=order_instance).first()
+        print(freight_tax, first_item.taxa_frete_item)
 
         if not first_item :
             return True
@@ -696,7 +786,6 @@ def add_product_to_order(request, order_id):
         # print(freight_tax)
         # print(freight_type)
         # print(first_item.tipo_frete_item.id)
-
 
         # if freight_tax:
         #     if order_instance.taxa_frete:
