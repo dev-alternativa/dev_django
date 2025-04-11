@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Pendências{% endblock %}
+{% block title %}Pendências{% endblock %}
 
 {% block content %}
     <div id='page-wrapper'>
@@ -27,58 +27,74 @@
                 </form> {% endcomment %}
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <legend class="text-center">Foram encontradas as seguintes Pendências:</legend>
+
+        {% if has_pending_issues %}
+            <div class="row">
+                <div class="col-md-12 alert alert-warning  not-fade">
+                    <legend class="text-center">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Foram encontradas as seguintes Pendências:
+                    </legend>
+
+                </div>
             </div>
-        </div>
-        <div class="row">Pendências PEDIDO</div>
-        <div class="row">
-            <table class="table text-center">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Tipo de Pendência</th>
-                        <th scope="col">Descrição</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td scope="row">6</td>
-                        <td scope="row">Erro</td>
-                        <td scope="row">Dados faltantes</td>
-                        <td scope="row">Incorreto</td>
-                        <td scope="row">Voltar</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="row">Pendências Produtos</div>
+            <!-- ERROS DO SISTEMA LOCAL-->
+            {% if local_errors %}
+                <div class="row">Pendências de Sistema</div>
+                <div class="row">
+                    <table class="table text-center">
+                        <thead>
+                            <tr>
+                                {% comment %} <th scope="col">ID</th> {% endcomment %}
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col">Detalhes</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for error in local_errors %}
+                                <tr>
+                                    <td scope="row">{{ error.type|title }}</td>
+                                    <td scope="row">{{ error.message }}</td>
+                                    <td scope="row">{{ error.detail }}</td>
+                                    <td scope="row">Voltar</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            <!-- ERROS DA API -->
+
+        {% endif %}
+        {% if api_errors %}
+
+        <div class="text-center">Pendências API</div>
 
         <div class="row">
             <table class="table text-center">
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Tipo de Pendência</th>
+                        <th scope="col">Tipo</th>
                         <th scope="col">Descrição</th>
-                        <th scope="col">Status</th>
+                        <th scope="col">Detalhes</th>
                         <th scope="col">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td scope="row">6</td>
-                        <td scope="row">Erro</td>
-                        <td scope="row">Dados faltantes</td>
-                        <td scope="row">Incorreto</td>
-                        <td scope="row">Voltar</td>
-                    </tr>
+                    {% for error in api_errors %}
+                        <tr>
+                            <td scope="row">{{ error.type }}</td>
+                            <td scope="row">{{ error.message }}</td>
+                            <td scope="row">{{ error.detail }}</td>
+                            <td scope="row">Voltar</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
+        {% endif %}
 
         <div class="row">
             <div class="col-md-12">
@@ -97,29 +113,30 @@
                 <tbody>
                     <tr>
                         <td><strong>ATRASADO</strong></td>
-                        <td>R$ 500,00</td>
+                        <td>R$ {{ financial_data.ATRASADO|floatformat:2|default:"0,00" }}</td>
                     </tr>
                     <tr>
                         <td><strong>VENCE HOJE</strong></td>
-                        <td>R$ 1.000,00</td>
+                        <td>R$ {{ financial_data.VENCE_HOJE|floatformat:2|default:"0,00" }}</td>
                     </tr>
                     <tr>
                         <td><strong>A VENCER</strong></td>
-                        <td>R$ 2.000,00</td>
+                        <td>R$ {{ financial_data.A_VENCER|floatformat:2|default:"0,00" }}</td>
                     </tr>
                     <tr>
                         <td><strong>TOTAL A RECEBER</strong></td>
-                        <td>R$ 3.000,00</td>
+                        <td>R$ {{ financial_data.TOTAL_A_RECEBER|floatformat:2|default:"0,00" }}</td>
                     </tr>
                     <tr>
                         <td><strong>LIMITE CREDITO</strong></td>
-                        <td>R$ 4.000,00</td>
+                        <td>R$ {{ financial_data.LIMITE_CREDITO|floatformat:2|default:"0,00" }}</td>
                     </tr>
                     <tr>
                         <td><strong>LIMITE DISPONÍVEL</strong></td>
-                        <td>R$ 5.000,00</td>
+                        <td>R$ {{ financial_data.LIMITE_DISPONIVEL|floatformat:2|default:"0,00" }}</td>
                     </tr>
                 </tbody>
+            </table>
         </div>
 
     </div>

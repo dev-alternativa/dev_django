@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Para cada alerta encontrado
   alerts.forEach(alert => {
+    if (alert.classList.contains('not-fade')) {
+      return;
+    }
+
     // Defina um tempo de espera de 3 segundos (3000 milissegundos)
     setTimeout(() => {
       // Adicione a classe 'fade' para iniciar a transição de desvanecimento

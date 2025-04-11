@@ -1,4 +1,6 @@
-from api_omie.views import get_client_from_omie
+import json
+import os
+from api_omie.views import get_client_from_omie, get_financial_data_from_omie
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
 from core.views import FormMessageMixin
 from decimal import Decimal
@@ -295,6 +297,48 @@ def calculate_order_total(items):
     total_nota = total_pedido + total_ipi
 
     return total_pedido, total_ipi, total_nota, item_list
+
+
+
+def process_financial_data(json_data):
+    """
+    Processa os dados financeiros do JSON para calcular os totais por status de título.
+
+    Args:
+        json_data (dict): Um dicionário contendo os dados financeiros.
+
+    Returns:
+        dict: Um dicionário contendo os totais por status de título e o total a receber.
+    """
+    print(f'INICIANDO TRATAMENTO FINANCEIRO')
+    result = {
+        "ATRASADO": 0,
+        "VENCE HOJE": 0,
+        "A VENCER": 0,
+        "TOTAL A RECEBER": 0,
+    }
+    contadores = {
+        "ATRASADO": 0,
+        "VENCE HOJE": 0,
+        "A VENCER": 0,
+        "TOTAL A RECEBER": 0,
+    }
+
+    for item in json_data.get('conta_receber_cadastro', []):
+        status = item.get('status_titulo', 'DESCONHECIDO')
+        valor = item.get('valor_documento', 0)
+
+        if status in result:
+            result[status] += valor
+            contadores[status] += 1
+
+        result["TOTAL A RECEBER"] += valor
+        contadores['TOTAL A RECEBER'] += 1
+
+    # print(f'RESULTADO: {result}')
+    # print(f'RESULTADO: {contadores}')
+
+    return result
 
 
 # ********************************* ENTRADAS *********************************
@@ -671,25 +715,109 @@ class OrderPendingDetail(DetailView):
     template_name = 'includes/_pendencias.html'
     model = Outflows
     context_object_name = 'order_pending'
-    errors = None
+
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['local_errors'] = []
+        context['api_errors'] = []
+        context['has_pending_issues'] = False
+
         try:
             order = self.get_object()
             client = order.cliente
-            order_itens = OutflowsItems.objects.filter(saida=order.pk)
-            if order_itens.exists():
-                transportadora = order_itens.first().saida.transportadora
-                quantidade_itens = len(order_itens)
-                vendedor = order.vendedor
-                prazo = order_itens.first().prazo_item.codigo
-                *_, item_list = calculate_order_total(order_itens)
+            context['cliente'] = client
+            context['order'] = order
 
+            # Verifica itens do pedido
+            order_itens = OutflowsItems.objects.filter(saida=order.pk)
+            if not order_itens.exists():
+                context['local_errors'].append({
+                    'type': 'order',
+                    'message': 'Pedido sem itens cadastrados',
+                    'detail': f'O pedido #{order.pk} não possui itens associados'
+                })
+                context['has_pending_issues'] = True
+                return context
+
+            context['order_itens'] = order_itens
+            quantidade_itens = len(order_itens)
+            context['quantidade_itens'] = quantidade_itens
+
+            # Verifica dados dos itens
+            for item in order_itens:
+                if not item.quantidade:
+                    context['local_errors'].append({
+                        'type': 'item',
+                        'message': f'Item {item.produto.nome_produto} sem quantidade',
+                        'detail': f'O item #{item.id} precisa de uma quantidade válida'
+                    })
+                    context['has_pending_issues'] = True
+
+                if not item.cnpj_faturamento:
+                    context['local_errors'].append({
+                        'type': 'item',
+                        'message': f'Item {item.produto.nome_produto} sem CNPJ de faturamento',
+                        'detail': f'O item #{item.id} precisa de um CNPJ de faturamento válido'
+                    })
+                    context['has_pending_issues'] = True
+
+            if context['has_pending_issues']:
+                return context
+
+            transportadora = order_itens.first().saida.transportadora
+            vendedor = order.vendedor
+
+            try:
+                prazo = order_itens.first().prazo_item.codigo
+                context['prazo'] = prazo
+            except AttributeError:
+                context['local_errors'].append({
+                    'type': 'item',
+                    'message': 'Item sem prazo de pagamento',
+                    'detail': 'O primeito item do pedido não possui Prazo de pagamento definido'
+                })
+                context['has_pending_issues'] = True
+
+            try:
+                *_, item_list = calculate_order_total(order_itens)
+                context['item_list'] = item_list
+            except Exception as e:
+                context['local_errors'].append({
+                    'type': 'cálculo',
+                    'message': 'Erro ao calcular total do pedido',
+                    'detail': str(e)
+                })
+                context['has_pending_issues'] = True
+
+            try:
+                # Verifica conta corrente
                 conta_corrente = ContaCorrente.objects.filter(
                     cnpj=order_itens.first().cnpj_faturamento,
                     padrao=True
                 )
+                context['conta_corrente'] = conta_corrente
+
+                if not conta_corrente.exists():
+                    context['local_errors'].append({
+                        'type': 'financeiro',
+                        'message': 'Conta corrente não encontrada',
+                        'detail': f'Conta corrente não encontrada para o CNPJ {order_itens.first().cnpj_faturamento}'
+                    })
+                    context['has_pending_issues'] = True
+            except Exception as e:
+                context['local_errors'].append({
+                    'type': 'financeiro',
+                    'message': 'Erro ao verificar conta corrente',
+                    'detail': str(e)
+                })
+                context['has_pending_issues'] = True
+
+                # Verifica códigos de integração com a API
+            try:
+                cnpj_faturamento = order_itens.first().cnpj_faturamento
+                sigla = cnpj_faturamento.sigla
 
                 mapa_sigla_para_campo = {
                     'COM': {
@@ -723,35 +851,127 @@ class OrderPendingDetail(DetailView):
                         'cod_cliente': order.cliente.tag_cadastro_omie_flx,
                     },
                 }
-                for sigla, codigo in mapa_sigla_para_campo.items():
-                    print(f'sigla: {sigla}')
-                    if sigla == order_itens.first().cnpj_faturamento.sigla:
-                        context['codigo_transportadora'] = codigo['transportadora']
-                        context['codigo_vendedor'] = codigo['vendedor']
-                        context['codigo_cliente'] = codigo['cod_cliente']
-                        context['sigla'] = sigla
 
-                context['item_list'] = item_list
-                context['quantidade_itens'] = quantidade_itens
-                context['order'] = order
-                context['prazo'] = prazo
-                context['order_itens'] = order_itens
-                context['cliente'] = client
-                context['vendedor'] = vendedor
-                context['conta_corrente'] = conta_corrente
+                if sigla not in mapa_sigla_para_campo:
+                    context['local_errors'].append({
+                        'type': 'integração',
+                        'message': f'App {sigla} não reconhecido',
+                        'detail': f'O App de faturamento não está cadastado {sigla}'
+                    })
+                    context['has_pending_issues'] = True
 
-                # api_response = get_client_from_omie(order.cliente.cnpj, context['sigla'])
-                # print(f'API Response: {api_response}')
+                else:
+                    info_code = mapa_sigla_para_campo[sigla]
+                    context['codigo_transportadora'] = info_code['transportadora']
+                    context['codigo_vendedor'] = info_code['vendedor']
+                    context['codigo_cliente'] = info_code['cod_cliente']
+                    context['sigla'] = sigla
 
-            else:
-                raise ValueError('Pedido sem itens')
-                self.errors = {
-                    'message': 'Pedido sem itens',
-                }
-                context['errors'] = self.errors
-        except:
-            pass
+                    # Verifica se algum código está ausente
+                    empty_fields = []
+                    if not info_code['transportadora']:
+                        empty_fields.append('transportadora')
+                    if not info_code['vendedor']:
+                        empty_fields.append('vendedor')
+                    if not info_code['cod_cliente']:
+                        empty_fields.append('cliente')
 
+                    if empty_fields:
+                        context['local_errors'].append({
+                            'type': 'integração',
+                            'message': 'Códigos de integração ausentes',
+                            'detail': f'Os seguintes códigos estão ausentes: {", ".join(empty_fields)}'
+                        })
+                        context['has_pending_issues'] = True
+
+                    if not context['has_pending_issues']:
+                        try:
+                            # api_response = get_client_from_omie(order.cliente.cnpj, context['sigla'])
+                            # print(f'API Response: {api_response}')
+                            # finance_api_response = get_financial_data_from_omie(order.cliente.cnpj, context['sigla'])
+                            with open('json/response_error.json', 'r', encoding='utf-8') as file:
+                                finance_api_response = json.load(file)
+
+                            if finance_api_response.get('faultstring'):
+                                context['api_errors'].append({
+                                    'type': 'API',
+                                    'message': 'Erro ao buscar dados financeiros na API',
+                                    'detail': finance_api_response.get('faultstring')
+                                })
+                                context['has_pending_issues'] = True
+
+                            with open('json/response_cadastro_cliente.json', 'r', encoding='utf-8') as file:
+                                client_api_response = json.load(file)
+
+                            if client_api_response.get('faultstring'):
+                                context['api_errors'].append({
+                                    'type': 'API',
+                                    'message': 'Erro ao buscar dados do cliente na API',
+                                    'detail': client_api_response.get('faultstring')
+                                })
+                                context['has_pending_issues'] = True
+
+                            # finance_api_response = get_financial_data_from_omie(order.cliente.cnpj, context['sigla'])
+                            # print(f'API Financial Response: {finance_api_response}')
+                            if not finance_api_response:
+                                context['api_errors'].append({
+                                    'type': 'API',
+                                    'message': 'Erro ao buscar dados financeiros na API',
+                                    'detail': f'A API não retornou dados financeiros'
+                                })
+                                context['has_pending_issues'] = True
+                            elif not finance_api_response.get('conta_receber_cadastro'):
+                                context['api_errors'].append({
+                                    'type': 'API',
+                                    'message': 'Cliente sem dados de conta a receber',
+                                    'detail': 'Dados de `Contas a Receber` do cliente não encontrados no OMIE'
+                                })
+                                context['has_pending_issues'] = True
+                            else:
+
+                                credit_limit = client_api_response['clientes_cadastro'][0]['valor_limite_credito']
+
+                                financial_process_data = process_financial_data(finance_api_response)
+                                available_limit = float(credit_limit) - float(financial_process_data['TOTAL A RECEBER'])
+
+                                context['financial_data'] = {
+                                    'ATRASADO': financial_process_data['ATRASADO'],
+                                    'VENCE_HOJE': financial_process_data['VENCE HOJE'],
+                                    'A_VENCER': financial_process_data['A VENCER'],
+                                    'TOTAL_A_RECEBER': financial_process_data['TOTAL A RECEBER'],
+                                    'LIMITE_CREDITO': credit_limit,
+                                    'LIMITE_DISPONIVEL': available_limit,
+                                }
+
+                        except Exception as e:
+                            context['api_errors'].append({
+                                'type': 'API',
+                                'message': 'Erro ao buscar dados na API',
+                                'detail': str(e)
+                            })
+                            context['has_pending_issues'] = True
+            except Exception as e:
+                context['local_errors'].append({
+                    'type': 'sistema',
+                    'message': 'Erro ao processar dados de integração',
+                    'detail': str(e)
+                })
+                context['has_pending_issues'] = True
+
+            context['vendedor'] = vendedor
+            if not context['has_pending_issues']:
+                context['ready_to_send'] = True
+
+
+        except Exception as e:
+            context['local_errors'].append({
+                'type': 'sistema',
+                'message': 'Erro geral ao processar pedido',
+                'detail': str(e)
+            })
+            context['has_pending_issues'] = True
+
+        print(context)
         return context
 
 def add_product_to_order(request, order_id):
