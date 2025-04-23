@@ -568,7 +568,7 @@ def get_omie_credentials(app_type):
 
 
 # **************************** FINANCEIRO ********************************
-def get_financial_data_from_omie(cnpj_cpf, app_type):
+def get_financial_data_from_omie(cnpj_cpf):
     """
     Obtém dados financeiros de um cliente do OMIE com base no CNPJ/CPF.
 
@@ -579,34 +579,79 @@ def get_financial_data_from_omie(cnpj_cpf, app_type):
     Returns:
         dict: Um dicionário contendo os dados financeiros do cliente.
     """
-    credentials = get_omie_credentials(app_type)
-    url = os.getenv('URL_ENDPOINT_ACCOUNTS_RECEIVABLE')
-    request_data = {
-        "call": os.getenv('LIST_ACCOUNTS_RECEIVABLE'),
-        "app_key": credentials['app_key'],
-        "app_secret": credentials['app_secret'],
-        "param": [
-            {
-                "pagina": 1,
-                "registros_por_pagina": 20,
-                "apenas_importado_api": "N",
-                "filtrar_por_cpf_cnpj": clean_cnpj_cpf(cnpj_cpf),
-                "filtrar_apenas_titulos_em_aberto": "S",
-            }
-        ]
-    }
-    try:
-        response_data, response = execute_omie_request(request_data, url)
-        print(response_data)
-        print(response)
+    cnpj_list = ('COM', 'FLX', 'IND', 'MRX', 'PRE', 'SRV')
+    financial_apps_list = []
+    financial_errors_data = []
 
-    except:
-        pass
+    for app_type in cnpj_list:
+
+        credentials = get_omie_credentials(app_type)
+        url = os.getenv('URL_ENDPOINT_ACCOUNTS_RECEIVABLE')
+        request_data = {
+            "call": os.getenv('LIST_ACCOUNTS_RECEIVABLE'),
+            "app_key": credentials['app_key'],
+            "app_secret": credentials['app_secret'],
+            "param": [
+                {
+                    "pagina": 1,
+                    "registros_por_pagina": 20,
+                    "apenas_importado_api": "N",
+                    "filtrar_por_cpf_cnpj": clean_cnpj_cpf(cnpj_cpf),
+                    "filtrar_apenas_titulos_em_aberto": "S",
+                }
+            ]
+        }
+        try:
+            print(f'Iniciando busca de Contas à receber para o APP: {app_type}')
+            response_data, response = execute_omie_request(request_data, url)
+            if response_data.get('faultstring'):
+                print(f'Achou um sem cadastro {app_type}')
+                financial_errors_data.append({
+                    'app_type': app_type,
+                    'has_error': True,
+                    'message': 'Cliente não cadastrado no App {app_type}',
+                    'action': 'Buscar dados financeiros do cliente no OMIE'
+                })
+            if response_data.get('status') == "0":
+                if not len(response_data['conta_receber_cadastro']):
+                    financial_errors_data.append({
+                        'success': False,
+                        'app_type': app_type,
+                        'message': f'Dados financeiros do cliente {cnpj_cpf} não encontrado no OMIE {app_type}!'
+                    })
+            else:
+                financial_apps_list.append(response_data)
+
+        except requests.exceptions.RequestException as e:
+            error_data = {}
+            try:
+                error_data = e.response.json() if hasattr(e, 'response') else {}
+                financial_errors_data.append({
+                    'app_type': app_type,
+                    'has_error': True,
+                    'message': f'Cliente não cadastrado no App {app_type}',
+                })
+            except ValueError:
+                error_data = e.response.text
+                print("Erro HTTP", e.response.text)
+                return {
+                    'success': False,
+                    'error': str(e) if not error_data or not error_data.get('faultstring') else error_data.get("faultstring"),
+                    'message': 'Erro ao buscar dados financeiros do cliente no OMIE'
+                }
+
+    # print(f'Dados: {financial_apps_list}')
+    # print(f'Errors: {financial_errors_data}')
+    return {
+        'success': True,
+        'message': 'Todos os dados coletados',
+        'financial_apps_list': financial_apps_list,
+    }
 
 
 # ****************************** CLIENTE **********************************
 
-def get_client_from_omie(cnpj_cpf, app_type):
+def get_client_from_omie(cnpj_cpf):
     """
     Obtém dados de um cliente do OMIE com base no CNPJ/CPF.
 
@@ -617,55 +662,80 @@ def get_client_from_omie(cnpj_cpf, app_type):
     Returns:
         dict: Um dicionário contendo os dados do cliente.
     """
-    credentials = get_omie_credentials(app_type)
+    cnpj_list = ('COM', 'FLX', 'IND', 'MRX', 'PRE', 'SRV')
+    global_credit_limit = 0.0
+    client_errors_data = []
 
-    url = os.getenv('URL_ENDPOINT_CUSTOMER')
-    request_data = {
-        "call": os.getenv('LIST_CUSTOMER'),
-        "app_key": credentials['app_key'],
-        "app_secret": credentials['app_secret'],
-        "param": [
-            {
-                "pagina": 1,
-                "registros_por_pagina": 50,
-                "apenas_importado_api": "N",
-                "clientesFiltro": {
-                    "cnpj_cpf": clean_cnpj_cpf(cnpj_cpf),
+    for app_type in cnpj_list:
+        # Obtem credencial relativa ao app OMIE
+        credentials = get_omie_credentials(app_type)
+        # Monta a requisição para a API do OMIE
+        url = os.getenv('URL_ENDPOINT_CUSTOMER')
+        request_data = {
+            "call": os.getenv('LIST_CUSTOMER'),
+            "app_key": credentials['app_key'],
+            "app_secret": credentials['app_secret'],
+            "param": [
+                {
+                    "pagina": 1,
+                    "registros_por_pagina": 50,
+                    "apenas_importado_api": "N",
+                    "clientesFiltro": {
+                        "cnpj_cpf": clean_cnpj_cpf(cnpj_cpf),
+                    }
                 }
-            }
-        ]
-    }
-    try:
+            ]
+        }
+        try:
+            print(f'Iniciando consulta de cliente para o APP: {app_type}')
+            response_data, response = execute_omie_request(request_data, url)
 
-        response_data, response = execute_omie_request(request_data, url)
+            if response_data.get('faultstring'):
+                client_errors_data.append({
+                    'app_type': app_type,
+                    'has_error': True,
+                    'message': 'Cliente não cadastrado no App {app_type}',
+                    'action': 'Buscar dados do cliente no OMIE',
+                })
 
-        if response_data.get('status') == "0":
-            if not len(response_data['clientes_cadastro']):
+            if response_data.get('status') == "0":
+                if not len(response_data['clientes_cadastro']):
+                    client_errors_data.append({
+                        'success': False,
+                        'app_type': app_type,
+                        'message': f'Dados do cliente {cnpj_cpf} não encontrado no OMIE {app_type}!'
+                    })
+
+            else:
+                global_credit_limit += float(response_data.get('clientes_cadastro', [{}])[0].get('valor_limite_credito', 0))
+
+
+
+        except requests.exceptions.RequestException as e:
+            error_data = {}
+            try:
+                error_data = e.response.json() if hasattr(e, 'response') else {}
+                # print("mensagem de erro capturada:", error_data.get("faultstring"))
+                client_errors_data.append({
+                    'app_type': app_type,
+                    'has_error': True,
+                    'message': f'Cliente não cadastrado no App {app_type}',
+                })
+            except ValueError:
+                error_data = e.response.text
+                print("Erro HTTP", e.response.text)
                 return {
                     'success': False,
-                    'message': f'Dados do cliente {cnpj_cpf} não encontrado no OMIE!'
+                    'error': str(e) if not error_data or not error_data.get('faultstring') else error_data.get("faultstring"),
+                    'message': 'Erro ao buscar cliente no OMIE'
                 }
 
-        else:
-            return {
-                'success': True,
-                'message': 'Cliente encontrado no OMIE!',
-                'data': response_data['clientes_cadastro'],
-            }
-
-    except requests.exceptions.RequestException as e:
-        error_data = {}
-        try:
-            error_data = e.response.json() if hasattr(e, 'response') else {}
-            print("mensagem de erro capturada:", error_data.get("faultstring"))
-        except ValueError:
-            error_data = e.response.text
-            print("Erro HTTP", e.response.text)
-            return {
-                'success': False,
-                'error': str(e) if not error_data or not error_data.get('faultstring') else error_data.get("faultstring"),
-                'message': 'Erro ao buscar cliente no OMIE'
-            }
+    return {
+        'success': True,
+        'message': 'Cliente encontrado no OMIE!',
+        'data': response_data['clientes_cadastro'],
+        'global_credit_limit': global_credit_limit,
+    }
 
 
 def execute_omie_request(data, url):

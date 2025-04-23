@@ -14,8 +14,16 @@
     <div class="container">
         <div class="row">
             <div class="col">
+                <a href="{% url 'update_order' order.pk %}" class='btn btn-danger btn-lg' id="button-back">
+                    <i class="bi bi-backspace space_from_margin"></i>
+                    Voltar
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
                 <img class="logo_pdf" src="{% static '/img/alternativa_logo_white_bkg.png' %}">
-                <h5 class="order-separation"><strong>Pedido e Separação Nº 8957</strong></h5>
+                <h5 class="order-separation"><strong>Pedido e Separação Nº {{ order.pk }}</strong></h5>
             </div>
             <div class="col">
                 <h5 class="text-end"><strong>ALTERNATIVA PRE IMPRESSAO LTDA</strong></h5>
@@ -30,24 +38,24 @@
         </div>
         <div class="row">
             <h5 class="client-info"><strong>Informações do Cliente</strong></h5>
-            <h6>FLEXUL FLEXOGRAFIA LTDA</h6>
+            <h6>{{ client.nome_fantasia }}</h6>
         </div>
         <div class="row">
             <div class="col">
                 <section class="text-start client-section">
-                    <span class="d-block">CNPJ: 04.984.102/0001-40</span>
-                    <span class="d-block">Inscrição Estadual: 254877060</span>
+                    <span class="d-block">CNPJ: {{ cnpj }}</span>
+                    <span class="d-block">Inscrição Estadual: {{ client.inscricao_estadual }}</span>
                     <span class="d-block">
-                        <strong>Telefone: 47 3274-6600</strong>
+                        <strong>Telefone: {{ client.ddd }} {{ client.telefone }}</strong>
                     </span>
                 </section>
             </div>
             <div class="col">
                 <section class="text-start client-section">
-                    <span class="d-block">AVENIDA IZIDIO CARLOS PEIXER, 2529 - ILHA DA FIGUEIRA</span>
-                    <span class="d-block">Guaramirim - SC - CEP: 89270000</span>
+                    <span class="d-block">{{ client.endereco }}, {{ client.numero }} - {{ client.bairro }}</span>
+                    <span class="d-block">{{ client.cidade}} - {{ client.estado}} - CEP: {{ client.cep }}</span>
                     <span class="d-block">
-                        <strong>Email: katia@flexul.com.br</strong>
+                        <strong>E-mail: {{ client.email }}</strong>
                     </span>
                 </section>
             </div>
@@ -58,31 +66,24 @@
             <table class="table-sm table-bordered tabela ">
                 <thead class="table-head">
                     <tr>
-                        <th>Código</th>
+                        <th>Código Produto</th>
                         <th>Descrição</th>
-                        <th class="text-end">NCM</th>
                         <th class="text-end">Quantidade</th>
                         <th class="text-end">Unitário</th>
                         <th class="text-end">Valor Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>QPC-01</td>
-                        <td>FILME ADES. P/ LAMINACAO 808C - (BRILHO)</td>
-                        <td>3919.90.90</td>
-                        <td class="text-end">318,00 M2</td>
-                        <td class="text-end">1,1200</td>
-                        <td class="text-end">356,16</td>
-                    </tr>
-                    <tr>
-                        <td>QPC-01</td>
-                        <td>FILME ADES. P/ LAMINACAO 808C - (BRILHO)</td>
-                        <td>3919.90.90</td>
-                        <td class="text-end">400,00 M2</td>
-                        <td class="text-end">1,1200</td>
-                        <td class="text-end">448,00</td>
-                    </tr>
+                    {% for item in order_itens %}
+                        <tr>
+                            <td>{{ item.item.pk }}</td>
+                            <td>{{ item.item.produto.nome_produto }}</td>
+                            <td class="text-end">{{ item.item.quantidade }}</td>
+                            <td class="text-end">R$ {{ item.preco_unitario|floatformat:2 }}</td>
+                            <td class="text-end">R$ {{ item.preco_total|floatformat:2 }}</td>
+                        </tr>
+
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -105,24 +106,24 @@
                     </tr>
                     <tr>
                         <td class="total_strong_width"><strong>Total:</strong></td>
-                        <td class="total_value_width">2.010,97</td>
+                        <td class="total_value_width">{{ total_geral|floatformat:2 }}</td>
                     </tr>
 
                 </table>
             </div>
         </div>
 
-        <div class="row ">
+        <div class="row">
             <div class="col">
-                <h5 class=""><strong>Vencimentos </strong>Para 28 dias</h5>
+                <h5 class=""><strong>Vencimentos </strong>{{ order.prazo }}</h5>
                 <table class="table-sm table-bordered tabela">
                     <tr>
                         <td><strong>Parcela:</strong></td>
-                        <td>1</td>
+                        <td>{{ order.prazo.parcelas }}</td>
                     </tr>
                     <tr>
                         <td><strong>Vencimento</strong></td>
-                        <td>24/04/2025</td>
+                        <td>{{ order.dt_previsao_faturamento|date:"SHORT_DATE_FORMAT" }}</td>
                     </tr>
                     <tr>
                         <td><strong>Valor:</strong></td>
@@ -130,15 +131,58 @@
                     </tr>
                 </table>
             </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="text-center"><strong>Consulta Crédito:</strong></h3>
+                    </div>
+                </div>
+                <div class="row col">
+                    <table class="table text-center">
+                        <thead>
+                            <tr>
+                                <th scope="col">Vencimento</th>
+                                <th scope="col">Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>ATRASADO</strong></td>
+                                <td>R$ {{ financial_data.ATRASADO|floatformat:2|default:"0,00" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>VENCE HOJE</strong></td>
+                                <td>R$ {{ financial_data.VENCE_HOJE|floatformat:2|default:"0,00" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>A VENCER</strong></td>
+                                <td>R$ {{ financial_data.A_VENCER|floatformat:2|default:"0,00" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>TOTAL A RECEBER</strong></td>
+                                <td>R$ {{ financial_data.TOTAL_A_RECEBER|floatformat:2|default:"0,00" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LIMITE CREDITO</strong></td>
+                                <td>R$ {{ financial_data.LIMITE_CREDITO|floatformat:2|default:"0,00" }}</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td><strong>LIMITE DISPONÍVEL</strong></td>
+                                <td>R$ {{ financial_data.LIMITE_DISPONIVEL|floatformat:2|default:"0,00" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <div class="row other-info">
             <div class="col mt-4">
                 <h5><strong>Outras Informações</strong></h5>
-                <span class="d-block"><strong>Pedido e Separação - incluido em: </strong>24/04/2025 às 13:29</span>
-                <span class="d-block"><strong>Previsão de Faturamento: </strong>27/-3/2025</span>
-                <span class="d-block"><strong>Vendedor: </strong> GABRIEL BENASSI</span>
-                <span class="d-block"><strong>N do Pedido do Cliente: </strong>14120</span>
+                <span class="d-block"><strong>Pedido e Separação - incluido em: </strong>{{ order.dt_criacao }}</span>
+                <span class="d-block"><strong>Previsão de Faturamento: </strong>27/3/2025</span>
+                <span class="d-block"><strong>Vendedor: </strong>{{ order.vendedor.nome }}</span>
+                <span class="d-block"><strong>N do Pedido do Cliente: </strong>{{ order.pedido_interno_cliente|default_if_none:"" }}</span>
             </div>
         </div>
         <div class="row">
@@ -157,7 +201,7 @@
         </div>
         <div class="row mt-5">
             <h5><strong>Transportador</strong></h5>
-            <table class="table-sm table-bordered transp-info">
+            <table class="table-sm table-bordered transp-info text-center">
                 <thead>
                     <tr>
                         <th>Transportadora</th>
@@ -170,9 +214,9 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>TRANSLIGUE (CAMPINAS)</td>
+                        <td>{{ transportadora.nome }}</td>
                         <td>(19) 3233-2232</td>
-                        <td>Destinatário (FOB)</td>
+                        <td>{{ order.tipo_frete.tipo_frete }}</td>
                         <td></td>
                         <td></td>
                         <td></td>
