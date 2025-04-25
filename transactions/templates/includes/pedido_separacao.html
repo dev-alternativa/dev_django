@@ -152,7 +152,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr
+                                {% if financial_data.ATRASADO > 0 %} class="table-red" {% endif %}
+                            >
                                 <td><strong>ATRASADO</strong></td>
                                 <td>R$ {{ financial_data.ATRASADO|floatformat:2|default:"0,00" }}</td>
                             </tr>
