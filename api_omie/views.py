@@ -594,7 +594,7 @@ def get_financial_data_from_omie(cnpj_cpf):
             "param": [
                 {
                     "pagina": 1,
-                    "registros_por_pagina": 20,
+                    "registros_por_pagina": 138,
                     "apenas_importado_api": "N",
                     "filtrar_por_cpf_cnpj": clean_cnpj_cpf(cnpj_cpf),
                     "filtrar_apenas_titulos_em_aberto": "S",
