@@ -77,8 +77,14 @@
                     {% for item in order_itens %}
                         <tr>
                             <td>{{ item.item.pk }}</td>
-                            <td>{{ item.item.produto.nome_produto }}</td>
-                            <td class="text-end">{{ item.item.quantidade }}</td>
+                            <td>{{ item.item.produto.nome_produto }} - {{ item.item.obs }}</td>
+                            <td class="text-end">
+                                {% if item.item.produto.tipo_categoria.id == 3 or item.item.produto.tipo_categoria.id == 4 %}
+                                    {{ item.m_quadrado_unitario }} M2
+                                {% else %}
+                                    {{ item.item.quantidade }} PC
+                                {% endif %}
+                            </td>
                             <td class="text-end">R$ {{ item.preco_unitario|floatformat:2 }}</td>
                             <td class="text-end">R$ {{ item.preco_total|floatformat:2 }}</td>
                         </tr>
@@ -166,7 +172,9 @@
                                 <td><strong>LIMITE CREDITO</strong></td>
                                 <td>R$ {{ financial_data.LIMITE_CREDITO|floatformat:2|default:"0,00" }}</td>
                             </tr>
-                            <tr class="table-danger">
+                            <tr
+                                {% if financial_data.LIMITE_DISPONIVEL < 0 %} class="table-red" {% endif %}
+                            >
                                 <td><strong>LIMITE DISPONÍVEL</strong></td>
                                 <td>R$ {{ financial_data.LIMITE_DISPONIVEL|floatformat:2|default:"0,00" }}</td>
                             </tr>
@@ -225,7 +233,7 @@
             </table>
         </div>
         <div class="row mt-4">
-            <p class="text-center"><em>Gerado em 24/03/2025 às 13:35:12 por Gabriel Benassi</em></p>
+            <p class="text-center"><em>Gerado em {{ order.dt_criacao }} por {{ order.seller }}</em></p>
         </div>
     </div>
 {% endblock %}

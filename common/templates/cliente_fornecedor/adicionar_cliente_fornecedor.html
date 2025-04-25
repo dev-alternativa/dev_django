@@ -13,6 +13,7 @@
                 <div class="card-header">
                     Adicionar Nova Cliente/Fornecedor
                 </div>
+                <div id="alertsClient"></div>
                 {% comment %} <ul class="messages">
                   {% for message in messages %}
                     <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
@@ -31,7 +32,7 @@
                       {% endif %}
                     </form>
                 </div>
-                {% include "modalAlertBox.html" %}
+
             </div>
           </div>
         </div>

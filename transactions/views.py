@@ -311,7 +311,7 @@ def process_financial_data(data):
     """
     print('Comecando processamento')
     financial_data = data.get('financial_apps_list', [])
-    print(f'Dados financeiros: {financial_data}')
+    # print(f'Dados financeiros: {financial_data}')
     result = {
         "ATRASADO": 0,
         "VENCE HOJE": 0,
@@ -648,7 +648,12 @@ class OrderEditDetailsView(UpdateView):
             (cliente.tag_cadastro_omie_mrx, 'MRX'),
             (cliente.tag_cadastro_omie_flx, 'FLX'),
         ]
-        context['cliente_tags'] = [tag for valor, tag in valid_tags if int(valor)]
+        try:
+            context['cliente_tags'] = [tag for valor, tag in valid_tags if int(valor)]
+        except (ValueError, TypeError) as e:
+            print(f'Erro ao processar tags: {str(e)}')
+            messages.error(self.request, 'Cliente sem Cód OMIE cadastrado!')
+            context['cliente_tags'] = []
 
         return context
 

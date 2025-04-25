@@ -162,7 +162,7 @@ class CustomerSupplierNewView(CreateView):
     model = CustomerSupplier
     form_class = CustomerSupplierForm
     template_name = "cliente_fornecedor/adicionar_cliente_fornecedor.html"
-    success_url = reverse_lazy('cliente_fornecedor')
+    success_url = reverse_lazy('customer_supplier')
 
     def form_invalid(self, form):
         cnpj = form.cleaned_data.get('cnpj', '')

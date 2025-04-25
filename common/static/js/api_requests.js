@@ -17,7 +17,8 @@
 const checkCNPJ = () => {
   let cnpj = $('#id_cnpj').val();
   let cleanedCNPJ = cnpj.replace(/[^\d]/g, '');
-  const url = `/api/cnpj/${cleanedCNPJ}`;
+  const url = `/api/cnpj/${cleanedCNPJ}/`;
+
   let errorDivCNPJ = $('#id_cnpj-error');
   const btnConsultaCNPJ = $('#btn_consulta_cnpj');
 
@@ -61,18 +62,22 @@ const checkCNPJ = () => {
         $('#id_cnpj').removeClass('is-invalid');
         errorDivCNPJ.text('')
         $('#id_cnpj').addClass('is-valid');
-        messageBox("Preenchimento de Dados?", "CNPJ encontrado e validado. Deseja usar os dados consultados para preencher o formulário?")
-          .then((result) => {
-            if (result) {
-              handleJSONCNPJ(dataResponse);
-            }
-          });
+
+        // messageBox("Preenchimento de Dados?", "CNPJ encontrado e validado. Deseja usar os dados consultados para preencher o formulário?")
+        if (dataResponse) {
+          handleJSONCNPJ(dataResponse);
+        } else {
+          alert('Não foram encontrados dados para o CNPJ informado.');
+        }
+
       },
       error: (err) => {
         $('id_cnpj').addClass('is-invalid');
         errorDivCNPJ.addClass('invalid-feedback show');
         btnConsultaCNPJ.html('Consultar CNPJ');
         btnConsultaCNPJ.attr('disabled', false);
+        console.log(err);
+        alert(`Ocorreu um erro {err.status}: ${err.statusText}`);
       }
     });
   }

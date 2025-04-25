@@ -22,7 +22,7 @@
   top: 50%;
   transform: scale(1.5);
   /* transform: translate(-50%, -50%); */
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   padding: 20px;
   border-radius: 5px;
@@ -37,7 +37,7 @@
   margin-top: 1rem;
 }
 
-.btn-plus{
+.btn-plus {
   margin-top: 1.5rem;
 }
 
@@ -47,7 +47,13 @@
   background-color: #f8d7da;
   border-color: #f5c6cb;
 }
+
 /* Alinha textos à direita */
 .text-align-right {
   text-align: right;
+}
+
+.table-red {
+  --bs-table-bg: #dc3545 !important;
+  --bs-table-color: #fff !important;
 }
