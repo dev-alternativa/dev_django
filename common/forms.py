@@ -48,15 +48,15 @@ class CustomerSupplierForm(ModelForm):
         fields = '__all__'
         widgets = {
             'categoria': Select2MultipleWidget(attrs={'data-placeholder': 'Selecione uma categoria'}),
-            'prazo': Select2Widget(
-                attrs={
-                    'data-language': 'pt-br',
-                    'data-placeholder': 'Começe digitando algo...',
-                    'data-minimum-input-length': 3,
-                    'data-width': '100%',
-                    # 'data-height': '1rem',
-                }
-            ),
+            # 'prazo': Select2Widget(
+            #     attrs={
+            #         'data-language': 'pt-br',
+            #         'data-placeholder': 'Começe digitando algo...',
+            #         'data-minimum-input-length': 3,
+            #         'data-width': '100%',
+            #         # 'data-height': '1rem',
+            #     }
+            # ),
             'cliente_transportadora': Select2Widget(
                 attrs={
                     'data-language': 'pt-br',
@@ -118,7 +118,7 @@ class CustomerSupplierForm(ModelForm):
                             PrependedText(
                                 'taxa_frete', 'R$',
                                 css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
-                            Field('prazo', css_class='form-control col-md-6 mb-0 '),
+
                         ),
                     )
                 ),
@@ -168,28 +168,39 @@ class CustomerSupplierForm(ModelForm):
                 Tab(
                     'Dados Avançados',
                     Row(
-                        Column(
-                            Field('categoria', css_class='form-control col-md-6 mb-0'),
-                            PrependedText(
-                                'limite_credito', 'R$',
-                                css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
+                        Row(
+                            Column(
+                                Field('categoria', css_class='form-control col-md-6 mb-0'),
+                                PrependedText(
+                                    'limite_credito', 'R$',
+                                    css_class='form-control col-md-6 mb-0 numericValorOnly mask-money'),
+                            ),
+                            Column(
+                                Switch('ativo', css_class='form-control col-md-6 mb-0'),
+                                Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
+                                Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
+                                Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),
+                                Switch('is_international', css_class='form-control col-md-6 mb-0'),
+                            ),
+                            Column(
+                                Field('tag_cadastro_omie_com', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                                Field('tag_cadastro_omie_ind', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                                Field('tag_cadastro_omie_pre', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                            ),
+                            Column(
+                                Field('tag_cadastro_omie_mrx', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                                Field('tag_cadastro_omie_flx', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                                Field('tag_cadastro_omie_srv', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                            ),
                         ),
-                        Column(
-                            Switch('ativo', css_class='form-control col-md-6 mb-0'),
-                            Switch('contribuinte', css_class='form-control col-md-6 mb-0'),
-                            Switch('tag_cliente', css_class='form-control col-md-6 mb-0'),
-                            Switch('tag_fornecedor', css_class='form-control col-md-6 mb-0'),
-                            Switch('is_international', css_class='form-control col-md-6 mb-0'),
-                        ),
-                        Column(
-                            Field('tag_cadastro_omie_com', css_class='form-control col-md-3 mb-0 numericValorOnly'),
-                            Field('tag_cadastro_omie_ind', css_class='form-control col-md-3 mb-0 numericValorOnly'),
-                            Field('tag_cadastro_omie_pre', css_class='form-control col-md-3 mb-0 numericValorOnly'),
-                        ),
-                        Column(
-                            Field('tag_cadastro_omie_mrx', css_class='form-control col-md-3 mb-0 numericValorOnly'),
-                            Field('tag_cadastro_omie_flx', css_class='form-control col-md-3 mb-0 numericValorOnly'),
-                            Field('tag_cadastro_omie_srv', css_class='form-control col-md-3 mb-0 numericValorOnly'),
+                        Row(
+                            StrictButton(
+                                "Coletar Códigos do OMIE",
+                                css_class="btn btn-dark col-6 float-end",
+                                onclick="getOmieCodes()",
+                                css_id="btn_get_omie_codes"
+                            ),
+                            css_class="justify-content-end"
                         ),
                     ),
                 ),

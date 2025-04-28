@@ -879,7 +879,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
 
                 if not context['has_pending_issues']:
                     try:
-                        client_api_response = get_client_from_omie(order.cliente.cnpj)
+                        client_api_response = get_client_from_omie(order.cliente.cnpj, action='consultar')
                         finance_api_response = get_financial_data_from_omie(order.cliente.cnpj)
                         credit_limit = client_api_response['global_credit_limit']
                         financial_process_data = process_financial_data(finance_api_response)

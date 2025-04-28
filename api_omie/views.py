@@ -651,7 +651,7 @@ def get_financial_data_from_omie(cnpj_cpf):
 
 # ****************************** CLIENTE **********************************
 
-def get_client_from_omie(cnpj_cpf):
+def get_client_from_omie(cnpj_cpf, action):
     """
     Obtém dados de um cliente do OMIE com base no CNPJ/CPF.
 
@@ -665,6 +665,7 @@ def get_client_from_omie(cnpj_cpf):
     cnpj_list = ('COM', 'FLX', 'IND', 'MRX', 'PRE', 'SRV')
     global_credit_limit = 0.0
     client_errors_data = []
+    omie_codes = []
 
     for app_type in cnpj_list:
         # Obtem credencial relativa ao app OMIE
@@ -707,6 +708,15 @@ def get_client_from_omie(cnpj_cpf):
                     })
 
             else:
+                if action == 'coletar_codigo_omie':
+
+                    customer_registry = response_data.get('clientes_cadastro')
+                    cod_omie = customer_registry[0].get('codigo_cliente_omie', None)
+                    print(f'Código OMIE: {cod_omie}')
+                    omie_codes.append({
+                        app_type: cod_omie
+                    })
+
                 global_credit_limit += float(response_data.get('clientes_cadastro', [{}])[0].get('valor_limite_credito', 0))
 
 
@@ -735,6 +745,7 @@ def get_client_from_omie(cnpj_cpf):
         'message': 'Cliente encontrado no OMIE!',
         'data': response_data['clientes_cadastro'],
         'global_credit_limit': global_credit_limit,
+        'omie_codes': omie_codes if omie_codes else None,
     }
 
 
@@ -748,10 +759,45 @@ def execute_omie_request(data, url):
     Returns:
         tuple: Resposta da API e o objeto de resposta HTTP.
     """
-    print('Preparando chamada para o OMIE')
+
     response = requests.post(url, json=data)
     response.raise_for_status()
     response_data = response.json()
-    print('Chamada efetuada, tratando.')
 
     return response_data, response
+
+
+def get_customer_codes(request):
+    """
+    Obtém os códigos de clientes do OMIE com base no CNPJ/CPF.
+
+    Args:
+        request (HttpRequest): A requisição HTTP contendo o CNPJ/CPF.
+
+    Returns:
+        JsonResponse: Resposta JSON com os códigos de clientes ou erro.
+    """
+    cnpj_cpf = request.GET.get('cnpj_cpf')
+
+    if not cnpj_cpf:
+        return JsonResponse({'error': 'CNPJ/CPF não informado'}, status=400)
+
+    try:
+        customer_data = get_client_from_omie(cnpj_cpf, action='coletar_codigo_omie')
+        omie_codes = customer_data.get('omie_codes', [])
+
+
+        if not customer_data['success']:
+            return JsonResponse({'error': customer_data['message']}, status=400)
+
+
+
+        return JsonResponse(
+            {
+                'status': 'success',
+                'message': 'Códigos obtidos com sucesso!',
+                'omie_codes': omie_codes,
+            },status=200)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

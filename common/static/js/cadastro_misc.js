@@ -60,3 +60,54 @@ $(document).ready(() => {
   });
 
 });
+
+const getOmieCodes = () => {
+  const $btn_get_omie_codes = $('#btn_get_omie_codes');
+  // Coleta o valor do CNPJ do campo de entrada
+  const cnpj_cpf = $('#id_cnpj').val();
+
+  if (cnpj_cpf === '') {
+    alert('Informe o CNPJ do Cliente/Fornecedor.');
+    return;
+  }
+  const url = `/api/v1/omie/get_customer_codes/?cnpj_cpf=${encodeURIComponent(cnpj_cpf)}`;
+
+  // Desabilita o botão de consulta até que a requisição termine
+  $btn_get_omie_codes.html("<span class='spinner-border spinner-border-sm' aria-hidden='true'></span> <span role='status'>Por Favor, Aguarde... </span>");
+  $btn_get_omie_codes.attr('disabled', true);
+
+  $.ajax({
+    type: 'GET',
+    url: url,
+    success: function (response) {
+      if (response.status === 'success') {
+        alert('Códigos obtidos com sucesso.');
+
+        omie_codes = response.omie_codes;
+        const omieCodeFields = {
+          COM: '#id_tag_cadastro_omie_com',
+          IND: '#id_tag_cadastro_omie_ind',
+          PRE: '#id_tag_cadastro_omie_pre',
+          MRX: '#id_tag_cadastro_omie_mrx',
+          FLX: '#id_tag_cadastro_omie_flx',
+          SRV: '#id_tag_cadastro_omie_srv'
+        };
+
+        for (const code in omieCodeFields) {
+          const codeObj = omie_codes.find(obj => code in obj);
+          if (codeObj) {
+            $(omieCodeFields[code]).val(codeObj[code]);
+          }
+        }
+        $btn_get_omie_codes.html('Coletar Códigos do OMIE');
+        $btn_get_omie_codes.attr('disabled', false);
+
+      } else {
+        alert('Erro ao obter os códigos do Omie.');
+      }
+    },
+    error: function () {
+      alert('Erro ao obter os códigos do Omie.');
+    }
+  });
+};
