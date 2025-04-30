@@ -81,21 +81,6 @@ InflowsItemsFormSet = inlineformset_factory(
 
 
 class OutflowsForm(forms.ModelForm):
-    dolar_ptax = forms.DecimalField(
-        decimal_places=4,
-        required=False,
-        widget=forms.NumberInput(
-            attrs={
-                'class': 'form-control',
-                'readonly': 'readonly',
-            }
-        )
-    )
-    def clean(self):
-        cleaned_data = super().clean()
-        print("Cleaned data:", cleaned_data)
-        print("Status em cleaned_data:", cleaned_data.get('status'))
-        return cleaned_data
 
     class Meta:
         model = Outflows
@@ -104,12 +89,23 @@ class OutflowsForm(forms.ModelForm):
 
             'cliente': Select2Widget(
                 attrs={
-                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Selecione o cliente',
+                    'class': 'search_select',
                 }
             ),
             'transportadora': Select2Widget(
                 attrs={
-                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Selecione a transportadora',
+                    'class': 'search_select',
+                }
+            ),
+            'prazo': Select2Widget(
+                attrs={
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Selecione o prazo',
+                    'class': 'search_select',
                 }
             ),
             'dados_adicionais_nf': Textarea(attrs={'rows': 3}),
@@ -127,9 +123,26 @@ class OutflowsForm(forms.ModelForm):
             'dt_previsao_faturamento': 'Prev. de Fat.',
         }
 
+    dolar_ptax = forms.DecimalField(
+        decimal_places=4,
+        required=False,
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-control',
+                'readonly': 'readonly',
+            }
+        )
+    )
+    def clean(self):
+        cleaned_data = super().clean()
+        print("Cleaned data:", cleaned_data)
+        print("Status em cleaned_data:", cleaned_data.get('status'))
+        return cleaned_data
+
+
     def __init__(self, *args, **kwargs):
         super(OutflowsForm, self).__init__(*args, **kwargs)
-        self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True)
+        self.fields['cliente'].queryset = CustomerSupplier.objects.filter(tag_cliente=True).order_by('nome_fantasia')
         self.fields['vendedor'].widget.attrs['disabled'] = 'true'
         self.fields['tipo_frete'].empty_label = None
         self.helper = FormHelper()

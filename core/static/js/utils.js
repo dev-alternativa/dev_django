@@ -77,10 +77,13 @@ function goBack() {
 
 }
 
-/* BARRA DE PROGRESSO */
 $(document).ready(function () {
+
+
+  /* BARRA DE PROGRESSO DE UPLOAD */
   $('#upload-form').on('submit', function (event) {
     $('#loading').show();
     $('#overlay').show();
   });
+
 });

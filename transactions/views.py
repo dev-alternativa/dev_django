@@ -321,6 +321,7 @@ def process_financial_data(data):
     contadores = {
         "ATRASADO": 0,
         "VENCE HOJE": 0,
+        "RECEBIDO": 0,
         "A VENCER": 0,
         "TOTAL A RECEBER": 0,
     }
@@ -329,8 +330,14 @@ def process_financial_data(data):
         for item in obj.get('conta_receber_cadastro', []):
             status = item.get('status_titulo', 'DESCONHECIDO')
             valor = item.get('valor_documento', 0)
+            print(status)
 
             if status in result:
+                if status == 'RECEBIDO':
+                    result['ATRASADO'] += valor
+                    # print(f'Achou um RECEBIDO') # 286065,95
+                    continue
+
                 result[status] += valor
                 contadores[status] += 1
 
@@ -338,6 +345,17 @@ def process_financial_data(data):
             contadores['TOTAL A RECEBER'] += 1
 
     return result
+
+def filter_omie_apps(dict_mapp):
+    filtered_apps = {}
+    for key, value in dict_mapp.items():
+        if (
+            'transportadora' in value and value['transportadora'] is not None and
+            'vendedor' in value and value['vendedor'] is not None and
+            'cod_cliente' in value and value['cod_cliente'] is not None
+        ):
+            filtered_apps[key] = value
+    return filtered_apps
 
 
 def return_omie_mapping_codes(carrier, seller, order):
@@ -373,7 +391,9 @@ def return_omie_mapping_codes(carrier, seller, order):
             'cod_cliente': order.cliente.tag_cadastro_omie_flx,
         },
     }
-    return mapa_sigla_para_campo
+    cleaned_apps = filter_omie_apps(mapa_sigla_para_campo)
+
+    return cleaned_apps
 
 # ********************************* ENTRADAS *********************************
 class InflowsListView(ListView):
@@ -649,7 +669,7 @@ class OrderEditDetailsView(UpdateView):
             (cliente.tag_cadastro_omie_flx, 'FLX'),
         ]
         try:
-            context['cliente_tags'] = [tag for valor, tag in valid_tags if int(valor)]
+            context['cliente_tags'] = [tag for valor, tag in valid_tags if valor and str(valor).strip() and int(str(valor).strip())]
         except (ValueError, TypeError) as e:
             print(f'Erro ao processar tags: {str(e)}')
             messages.error(self.request, 'Cliente sem Cód OMIE cadastrado!')
@@ -739,6 +759,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
     context_object_name = 'order_picking'
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         context['local_errors'] = []
         context['api_errors'] = []
@@ -797,6 +818,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
         try:
             *_, item_list = calculate_order_total(order_itens)
             context['item_list'] = item_list
+
         except Exception as e:
             context['local_errors'].append({
                 'type': 'cálculo',
@@ -805,6 +827,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
             })
             context['has_pending_issues'] = True
         calculated_itens = []
+
         for item, calc in zip(order_itens, item_list):
             item_dict = {
                 'item': item,
@@ -845,20 +868,23 @@ class OrderPicking(DetailView, FormataDadosMixin):
             sigla = cnpj_faturamento.sigla
 
             mapa_sigla_para_campo = return_omie_mapping_codes(carrier, seller, order)
-
-            if sigla not in mapa_sigla_para_campo:
+            if not mapa_sigla_para_campo:
                 context['local_errors'].append({
                     'type': '',
-                    'message': f'O App {sigla} não reconhecido',
-                    'detail': f'O App {sigla} não foi reconhecido para o cliente {order.cliente.nome_fantasia}'
+                    'message': f'O Cliente não possui código OMIE de integração com a API',
+                    'detail': f'Cadastre os códigos OMIE para o cliente {order.cliente.nome_fantasia}'
                 })
                 context['has_pending_issues'] = True
             else:
+
+
                 info_code = mapa_sigla_para_campo[sigla]
                 context['codigo_transportadora'] = info_code['transportadora']
                 context['codigo_vendedor'] = info_code['vendedor']
                 context['codigo_cliente'] = info_code['cod_cliente']
                 context['sigla'] = sigla
+
+                print(mapa_sigla_para_campo)
 
                 # Verifica se algum código está ausente
                 empty_fields = []
@@ -876,10 +902,12 @@ class OrderPicking(DetailView, FormataDadosMixin):
                         'detail': f'Os seguintes códigos estão ausentes: {", ".join(empty_fields)}'
                     })
                     context['has_pending_issues'] = True
-
                 if not context['has_pending_issues']:
+                    print('teste')
                     try:
+                        print('TESTE ANTES DE COLETAR DADOS API DO CLIENTE')
                         client_api_response = get_client_from_omie(order.cliente.cnpj, action='consultar')
+                        print(client_api_response)
                         finance_api_response = get_financial_data_from_omie(order.cliente.cnpj)
                         credit_limit = client_api_response['global_credit_limit']
                         financial_process_data = process_financial_data(finance_api_response)
@@ -900,6 +928,16 @@ class OrderPicking(DetailView, FormataDadosMixin):
                             'message': 'Erro ao consultar API',
                             'detail': str(e)
                         })
+                else:
+                    message.error(self.request, context['local_errors'])
+
+            if context['has_pending_issues'] == True:
+                if context['local_errors']:
+                    messages.error(self.request, context['local_errors'])
+                    print(f'ERRO: {context["local_errors"]}')
+                if context['api_errors']:
+                    messages.error(self.request, context['api_errors'])
+                    print(f'ERRO: {context["api_errors"]}')
 
         except Exception as e:
             context['local_errors'].append({
@@ -908,6 +946,8 @@ class OrderPicking(DetailView, FormataDadosMixin):
                 'detail': str(e)
             })
             context['has_pending_issues'] = True
+            messages.error(self.request, context['local_errors'])
+            print(f'ERRO: {context["local_errors"]}')
 
         if not context['has_pending_issues']:
             context['ready_to_send'] = True

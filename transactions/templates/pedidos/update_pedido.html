@@ -204,7 +204,7 @@
         <div class="col-md-12" style="margin-top: 10px;">
           <div class="form-inline buttons">
             <button class="btn btn-success btn-lg"
-              value="OMIE" id="sendOMIEButton"
+              value="OMIE" id="validateOrder"
               onclick="location.href='{% url 'order_picking' order.pk %}'">
               <i class="bi bi-send-arrow-up"></i>
               Validar Pedido
@@ -1120,12 +1120,14 @@ $(document).ready(function() {
     });
   });
 
-  /*
-  $("#sendOMIEButton").click(function(){
+
+  $("#validateOrder").click(function(e){
+
     $('#loading').show();
     $('#overlay').show();
-
-    $.ajax({
+    console.log('Validando pedido...');
+  });
+    /*$.ajax({
       type: 'POST',
       url: "{% url 'create_omie_order' order.pk %}",
       data:{
@@ -1155,11 +1157,15 @@ $(document).ready(function() {
 
 
 </script>
-
+{% include "includes/_overlay.html" %}
 
 {% endblock content %}
 {% block extra_scripts %}
   <script src="{% static 'js/select2.min.js' %}"></script>
   <script src="{% static 'js/mask.js' %}"></script>
+  <script>
+    /** Habilita pesquiza para selectbox */
+    $('.search_select').select2();
+  </script>
 {% endblock %}
 
