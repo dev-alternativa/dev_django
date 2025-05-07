@@ -97,8 +97,8 @@
                                     {{ item.item.quantidade }} PC
                                 {% endif %}
                             </td>
-                            <td class="text-end">R$ {{ item.preco_unitario|floatformat:2 }}</td>
-                            <td class="text-end">R$ {{ item.preco_total|floatformat:2 }}</td>
+                            <td class="text-end">R$ {{ item.preco_unitario_formatado }}</td>
+                            <td class="text-end">R$ {{ item.preco_total_formatado }}</td>
                         </tr>
 
                     {% endfor %}
@@ -112,11 +112,11 @@
                 <table class="table-sm table-bordered tabela">
                     <tr>
                         <td class="total_strong_width"><strong>Subtotal:</strong> </td>
-                        <td class="total_value_width">1.832,32</td>
+                        <td class="total_value_width">R$ {{ sub_total }}</td>
                     </tr>
                     <tr>
                         <td class="total_strong_width"><strong>IPI:</strong></td>
-                        <td class="total_value_width">178,65</td>
+                        <td class="total_value_width">{{ total_ipi }}</td>
                     </tr>
                     <tr>
                         <td class="total_strong_width"><strong>ICMS ST:</strong></td>
@@ -124,7 +124,7 @@
                     </tr>
                     <tr>
                         <td class="total_strong_width"><strong>Total:</strong></td>
-                        <td class="total_value_width">{{ total_geral|floatformat:2 }}</td>
+                        <td class="total_value_width">R$ {{ total_nota }}</td>
                     </tr>
 
                 </table>
@@ -132,6 +132,7 @@
         </div>
 
         <div class="row">
+            <!--
             <div class="col">
                 <h5 class=""><strong>Vencimentos </strong>{{ order.prazo }}</h5>
                 <table class="table-sm table-bordered tabela">
@@ -149,8 +150,9 @@
                     </tr>
                 </table>
             </div>
+            -->
             <div class="col">
-                <div class="row">
+                <div class="row mt-5">
                     <div class="col-md-12">
                         <h3 class="text-center"><strong>Consulta Crédito:</strong></h3>
                     </div>
@@ -168,29 +170,29 @@
                                 {% if financial_data.ATRASADO > 0 %} class="table-red" {% endif %}
                             >
                                 <td><strong>ATRASADO</strong></td>
-                                <td>R$ {{ financial_data.ATRASADO|floatformat:2|default:"0,00" }}</td>
+                                <td>R$ {{ financial_data.ATRASADO }}</td>
                             </tr>
                             <tr>
                                 <td><strong>VENCE HOJE</strong></td>
-                                <td>R$ {{ financial_data.VENCE_HOJE|floatformat:2|default:"0,00" }}</td>
+                                <td>R$ {{ financial_data.VENCE_HOJE }}</td>
                             </tr>
                             <tr>
                                 <td><strong>A VENCER</strong></td>
-                                <td>R$ {{ financial_data.A_VENCER|floatformat:2|default:"0,00" }}</td>
+                                <td>R$ {{ financial_data.A_VENCER }}</td>
                             </tr>
                             <tr>
                                 <td><strong>TOTAL A RECEBER</strong></td>
-                                <td>R$ {{ financial_data.TOTAL_A_RECEBER|floatformat:2|default:"0,00" }}</td>
+                                <td>R$ {{ financial_data.TOTAL_A_RECEBER }}</td>
                             </tr>
                             <tr>
                                 <td><strong>LIMITE CREDITO</strong></td>
-                                <td>R$ {{ financial_data.LIMITE_CREDITO|floatformat:2|default:"0,00" }}</td>
+                                <td>R$ {{ financial_data.LIMITE_CREDITO }}</td>
                             </tr>
                             <tr
                                 {% if financial_data.LIMITE_DISPONIVEL < 0 %} class="table-red" {% endif %}
                             >
                                 <td><strong>LIMITE DISPONÍVEL</strong></td>
-                                <td>R$ {{ financial_data.LIMITE_DISPONIVEL|floatformat:2|default:"0,00" }}</td>
+                                <td>R$ {{ financial_data.LIMITE_DISPONIVEL }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -246,8 +248,16 @@
                 </tbody>
             </table>
         </div>
+        <div class="row mt-2">
+            <div class="col-6">
+                <button class="btn btn-warning">Imprimir Proposta</button>
+            </div>
+            <div class="col-6 text-end">
+                <button class="btn btn-info">Concluir Pedido</button>
+            </div>
+        </div>
         <div class="row mt-4">
-            <p class="text-center"><em>Gerado em {{ order.dt_criacao }} por {{ order.seller }}</em></p>
+            <p class="text-center"><em>Gerado em {{ order.dt_criacao }} por {{ order.vendedor.nome }}</em></p>
         </div>
     </div>
 {% endblock %}

@@ -120,6 +120,7 @@ class DeleteSuccessMessageMixin(SuccessMessageMixin, DeleteView):
             messages.error(self.request, self.delete_error_message)
             return redirect(self.success_url)
 
+
 def clean_cnpj_cpf(cnpj_cpf):
     """
     Remove caracteres especiais de um CNPJ ou CPF.
@@ -127,3 +128,20 @@ def clean_cnpj_cpf(cnpj_cpf):
     :return: CNPJ ou CPF sem caracteres especiais.
     """
     return ''.join(filter(str.isdigit, cnpj_cpf))
+
+
+def format_to_brl_currency(value):
+    """
+    Formata um valor numérico para o formato de moeda brasileira (R$).
+    Args:
+        value (str | int | float) Valor a ser formatado.
+    Returns:
+        str: Valor formatado como string no padrão brasileiro.
+    """
+    try:
+        number = float(value)
+        formated_value = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        # print(f"Valor formatado: {formated_value}")
+        return formated_value
+    except (ValueError, TypeError):
+        return False

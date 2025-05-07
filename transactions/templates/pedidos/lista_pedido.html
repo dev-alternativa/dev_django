@@ -60,6 +60,7 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
+                                            <th>Status</th>
                                             <th>No Pedido OMIE</th>
                                             <th>No OMIE Secundário</th>
                                             <th>Tipo de Saída</th>
@@ -68,7 +69,6 @@
                                             <th>NF Saída</th>
                                             <th>Transportadora</th>
                                             <th>Previsão de Faturamento</th>
-                                            <th>Data Criação</th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -76,6 +76,18 @@
                                         {% for pedido in pedidos %}
                                             <tr>
                                                 <td>{{ pedido.id }}</td>
+                                                {% if pedido.status == "A" %}
+                                                    <td>Aberto</td>
+                                                {% elif pedido.status == "C" %}
+                                                    <td>Concluído</td>
+                                                {% elif pedido.status == "P" %}
+                                                    <td>Com Pendências</td>
+                                                {% elif pedido.status == "ANF" %}
+                                                    <td>Aguardando NF</td>
+                                                {% else %}
+                                                    <td></td>
+                                                {% endif %}
+
                                                 <td>{{ pedido.num_pedido_omie|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.num_pedido_omie_secundario|default_if_none:'-' }}</td>
                                                 <td>{{ pedido.get_tipo_saida_display }}</td>
@@ -83,8 +95,7 @@
                                                 <td>{{ pedido.cliente  }}</td>
                                                 <td>{{ pedido.nf_saida|default_if_none:'' }}</td>
                                                 <td>{{ pedido.transportadora|default_if_none:'-' }}</td>
-                                                <td>{{ pedido.dt_previao_faturamento|date:'d/m/Y' }}</td>
-                                                <td>{{ pedido.dt_criacao|date:'d/m/Y' }}</td>
+                                                <td>{{ pedido.dt_previsao_faturamento|date:'d/m/Y' }}</td>
                                                 <td class="action_size_column">
                                                     <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                                                         <!-- Visualizar detalhes -->

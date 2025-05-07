@@ -114,7 +114,7 @@ class CustomerSupplier(Base):
     inscricao_estadual = models.CharField('Inscrição Estadual', max_length=20, null=True, blank=True)
     limite_credito = models.CharField('Limite de Crédito', max_length=20, null=True, blank=True)
     contribuinte = models.BooleanField('Contribuinte', default=True)
-    tag_cliente = models.BooleanField('Cliente', default=False)
+    tag_cliente = models.BooleanField('Cliente', default=True)
     tag_fornecedor = models.BooleanField('Fornecedor', default=False)
     tag_cadastro_omie_com = models.CharField('OMIE COM', max_length=20, null=True, blank=True)
     tag_cadastro_omie_ind = models.CharField('OMIE IND', max_length=20, null=True, blank=True)

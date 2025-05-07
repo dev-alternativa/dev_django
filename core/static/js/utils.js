@@ -79,7 +79,6 @@ function goBack() {
 
 $(document).ready(function () {
 
-
   /* BARRA DE PROGRESSO DE UPLOAD */
   $('#upload-form').on('submit', function (event) {
     $('#loading').show();

@@ -1,6 +1,6 @@
 from api_omie.views import get_client_from_omie, get_financial_data_from_omie
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
-from core.views import FormMessageMixin, FormataDadosMixin
+from core.views import FormMessageMixin, FormataDadosMixin, format_to_brl_currency
 from datetime import timedelta
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -275,13 +275,14 @@ def calculate_order_total(items):
             ipi = Decimal('0.0')
             print(f'Não foi encontrado alíquota de IPI para o APP {item.cnpj_faturamento.sigla}')
 
-
         item_data = {
             'id': item.id,
             'nome': item.produto.nome_produto,
             'quantidade': quantidade,
             'preco_unitario': preco_unitario,
+            'preco_unitario_formatado': format_to_brl_currency(preco_unitario),
             'preco_total': preco_total,
+            'preco_total_formatado': format_to_brl_currency(preco_total),
             'largura': item.largura,
             'comprimento': item.comprimento,
             'm_quadrado_unitario': m_quadrado_unitario,
@@ -309,7 +310,7 @@ def process_financial_data(data):
     Returns:
         dict: Um dicionário contendo os totais por status de título e o total a receber.
     """
-    print('Comecando processamento')
+
     financial_data = data.get('financial_apps_list', [])
     # print(f'Dados financeiros: {financial_data}')
     result = {
@@ -816,8 +817,10 @@ class OrderPicking(DetailView, FormataDadosMixin):
 
         # Verifica dados dos itens
         try:
-            *_, item_list = calculate_order_total(order_itens)
+            *_, total_ipi, total_nota,item_list = calculate_order_total(order_itens)
+
             context['item_list'] = item_list
+            context['total_nota'] = format_to_brl_currency(total_nota)
 
         except Exception as e:
             context['local_errors'].append({
@@ -832,14 +835,26 @@ class OrderPicking(DetailView, FormataDadosMixin):
             item_dict = {
                 'item': item,
                 'preco_unitario': calc['preco_unitario'],
+                'preco_unitario_formatado': calc['preco_unitario_formatado'],
                 'preco_total': calc['preco_total'],
+                'preco_total_formatado': calc['preco_total_formatado'],
                 'largura': calc['largura'],
                 'comprimento': calc['comprimento'],
                 'm_quadrado_unitario': calc['m_quadrado_unitario'],
                 'm_quadrado_total': calc['m_quadrado_total'],
+                'ipi': calc['ipi'],
             }
             calculated_itens.append(item_dict)
         context['order_itens'] = calculated_itens
+
+        total_ipi = sum(item['ipi'] for item in item_list)
+        print(f'Total IPI: {total_ipi}')
+        context['total_ipi'] = format_to_brl_currency(total_ipi)
+
+        total_pedido = sum(item['preco_total'] for item in item_list)
+        context['sub_total'] = format_to_brl_currency(total_pedido)
+
+
 
         # Verifica conta corrente
         try:
@@ -884,7 +899,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
                 context['codigo_cliente'] = info_code['cod_cliente']
                 context['sigla'] = sigla
 
-                print(mapa_sigla_para_campo)
+                # print(mapa_sigla_para_campo)
 
                 # Verifica se algum código está ausente
                 empty_fields = []
@@ -903,23 +918,22 @@ class OrderPicking(DetailView, FormataDadosMixin):
                     })
                     context['has_pending_issues'] = True
                 if not context['has_pending_issues']:
-                    print('teste')
+
                     try:
-                        print('TESTE ANTES DE COLETAR DADOS API DO CLIENTE')
                         client_api_response = get_client_from_omie(order.cliente.cnpj, action='consultar')
-                        print(client_api_response)
+                        # print(client_api_response)
                         finance_api_response = get_financial_data_from_omie(order.cliente.cnpj)
                         credit_limit = client_api_response['global_credit_limit']
                         financial_process_data = process_financial_data(finance_api_response)
                         available_limit = float(credit_limit) - float(financial_process_data['TOTAL A RECEBER'])
 
                         context['financial_data'] = {
-                            'ATRASADO': financial_process_data['ATRASADO'],
-                            'VENCE_HOJE': financial_process_data['VENCE HOJE'],
-                            'A_VENCER': financial_process_data['A VENCER'],
-                            'TOTAL_A_RECEBER': financial_process_data['TOTAL A RECEBER'],
-                            'LIMITE_CREDITO': credit_limit,
-                            'LIMITE_DISPONIVEL': available_limit,
+                            'ATRASADO': format_to_brl_currency(financial_process_data['ATRASADO']),
+                            'VENCE_HOJE': format_to_brl_currency(financial_process_data['VENCE HOJE']),
+                            'A_VENCER': format_to_brl_currency(financial_process_data['A VENCER']),
+                            'TOTAL_A_RECEBER': format_to_brl_currency(financial_process_data['TOTAL A RECEBER']),
+                            'LIMITE_CREDITO': format_to_brl_currency(credit_limit),
+                            'LIMITE_DISPONIVEL': format_to_brl_currency(available_limit),
                         }
 
                     except Exception as e:
@@ -1476,13 +1490,12 @@ def get_itens_pedido(request, order_id):
         # total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list)
         # total_nota = total_pedido + total_ipi
 
-
     html = render_to_string(
         'includes/_tabela_items.html', {
             'itens_produtos': item_list,
             'total_produtos': total_produtos,
-            'total_nota': total_nota,
-            'total_pedido': total_pedido,
+            'total_nota': format_to_brl_currency(total_nota) if format_to_brl_currency(total_nota) else 0,
+            'total_pedido': format_to_brl_currency(total_pedido) if format_to_brl_currency(total_pedido) else 0,
             'total_ipi': total_ipi,
         }
     )
