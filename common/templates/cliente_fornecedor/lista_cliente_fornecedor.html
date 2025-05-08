@@ -44,7 +44,7 @@
                 {% endfor %}
               </td>
               <td>{{ cliente.inscricao_estadual|default_if_none:"" }}</td>
-              <td>{{ cliente.limite_credito }}</td>
+              <td>R$ {{ cliente.limite_credito_formatado }}</td>
               <td class="action_size_column">
                 <div class="btn-group center_content " role="group" aria-label="Basic mixed styles example">
                   <!-- Visualizar -->

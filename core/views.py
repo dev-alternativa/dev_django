@@ -33,17 +33,43 @@ class FormataDadosMixin:
 
     # formata para real `BRL`
     def format_BRL(self, value):
-        value_str = str(value).replace('.', ',')
-        if value_str == 'None':
-            return 'R$ 0,00'
+        try:
+            if isinstance(value, str) and (',' in value or '.' in value):
+                # Remove caracteres especiais, exceto vírgula e ponto
+                clean_value = value.replace('.', '').replace(',', '.')
+                number = float(clean_value)
+            else:
+                # Converte o valor para float
+                number = float(value)
 
-        if ',' not in value_str:
-            value_str += ',00'
+                # Formata o número com separadores de milhar e vírgula
+            value_str = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-        elif len(value_str.split(',')[1]) == 1:
-            value_str += '0'
+            return value_str
+        except (ValueError, TypeError) as e:
+            print(f'Erro ao formatar valor para BRL [{value}]: {str(e)}')
+            return '0,00'
 
-        return f'R$ {value_str}'
+    def format_USD(self, value):
+        try:
+            if isinstance(value, str) and (',' in value or '.' in value):
+                if ',' in value:
+                    # Converte do formato brasileiro para o americano
+                    clean_value = value.replace('.', '').replace(',', '.')
+                else:
+                    # caso já esteja no formato americano
+                    clean_value = value
+                number = float(clean_value)
+            else:
+                # Converte o valor para float
+                number = float(value)
+
+            # Formata o número no padrão americano 1,234.56
+            value_str = f'{number:,.2f}'
+            return value_str
+        except (ValueError, TypeError) as e:
+            print(f'Erro ao formatar valor em USD [{value}]: {str(e)}')
+            return '0.00'
 
     # Formata o contexto para exibição
     def get_context_data(self, **kwargs):

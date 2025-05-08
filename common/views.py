@@ -7,7 +7,7 @@ from common.forms import CategoryForm, CustomerSupplierForm, SellerForm, PriceFo
 from common.models import Category, CustomerSupplier, Seller, Price
 from products.models import Product
 from django.db.models import Q
-from core.views import FormataDadosMixin, FormMessageMixin, DeleteSuccessMessageMixin
+from core.views import FormataDadosMixin, FormMessageMixin, DeleteSuccessMessageMixin, format_to_brl_currency
 from django.views import View
 from logistic.models import LeadTime
 from api_omie.views import add_seller_to_omie, delete_seller_from_omie
@@ -156,6 +156,15 @@ class CustomerSupplierListView(FormataDadosMixin, ListView):
                 query |= Q(tag_cadastro_omie_srv__icontains=term)
             queryset = queryset.filter(query).distinct()
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        clients = context.get(self.context_object_name)
+        if clients:
+            for client in clients:
+
+                client.limite_credito_formatado = self.format_BRL(client.limite_credito)
+        return context
 
 
 class CustomerSupplierNewView(CreateView):
@@ -354,7 +363,7 @@ class SellerDetailView(DetailView, FormataDadosMixin):
 
 
 # ********************************* PREÇO *********************************
-class PriceListView(ListView):
+class PriceListView(ListView, FormataDadosMixin):
     model = Price
     template_name = 'preco/preco.html'
     context_object_name = 'itens_preco'
@@ -371,6 +380,16 @@ class PriceListView(ListView):
             queryset = queryset.filter(query).distinct()
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        prices = context.get(self.context_object_name)
+
+        if prices:
+            for price in prices:
+
+                price.price_dolar = self.format_USD(price.valor) if price.is_dolar else price.price_brl == self.format_BRL(price.valor)
+                print(price.price_dolar)
+        return context
 
 class PriceCreateView(FormMessageMixin, CreateView):
     model = Price
