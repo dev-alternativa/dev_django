@@ -203,3 +203,40 @@ const handleJSONCNPJ = (jsonData) => {
   $('#id_telefone').val(telefone1);
 
 };
+
+
+const sendToOmie = (orderID) => {
+  const url = `/add_order_to_omie/${orderID}/`;
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrfToken(),
+    },
+
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Erro na requisição');
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Aqui você pode lidar com a resposta da API
+    console.log('Dados enviados com sucesso:', data);
+  })
+  .catch(error => {
+    console.error('Erro ao enviar os dados:', error);
+  });
+}
+
+// Função auxiliar para obter o token CSRF
+function getCsrfToken() {
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    ?.split('=')[1];
+
+  return cookieValue;
+}

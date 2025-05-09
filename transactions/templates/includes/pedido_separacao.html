@@ -116,7 +116,7 @@
                     </tr>
                     <tr>
                         <td class="total_strong_width"><strong>IPI:</strong></td>
-                        <td class="total_value_width">{{ total_ipi }}</td>
+                        <td class="total_value_width">R$ {{ total_ipi }}</td>
                     </tr>
                     <tr>
                         <td class="total_strong_width"><strong>ICMS ST:</strong></td>
@@ -250,14 +250,17 @@
         </div>
         <div class="row mt-2">
             <div class="col-6">
-                <button class="btn btn-warning">Imprimir Proposta</button>
+                <button class="btn btn-warning" id="id_print_sales_proposal">Imprimir Proposta</button>
             </div>
             <div class="col-6 text-end">
-                <button class="btn btn-info">Concluir Pedido</button>
+                <button class="btn btn-info" id="id_conclude_order" onclick="sendToOmie({{ order.id }})">Concluir Pedido</button>
             </div>
         </div>
         <div class="row mt-4">
             <p class="text-center"><em>Gerado em {{ order.dt_criacao }} por {{ order.vendedor.nome }}</em></p>
         </div>
     </div>
+{% endblock %}
+{% block extra_scripts %}
+    <script src="{% static 'js/api_requests.js' %}"></script>
 {% endblock %}

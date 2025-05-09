@@ -330,7 +330,7 @@ function addProduct() {
   // Valores dos campos
   const produto = productID;
   const billingCNPJ = getVal('cnpj_faturamento');
-  const prazo_item = getVal('prazo');
+  const prazo_item = getVal('prazo_item');
   const quantidade = getVal('quantidade');
   const preco = getVal('preco');
   const contaCorrente = getVal('conta_corrente');
@@ -345,6 +345,7 @@ function addProduct() {
   const obs = getVal('obs');
   //const cfop = getVal('cfop');
 
+  console.log(prazo_item);
   // Controla se o formulário é válido
   let isValid = true;
   const validateFormField = (fieldId, value) => {
@@ -547,6 +548,14 @@ function calculateProductValuesByCategory(
 
 $(document).ready(function() {
 
+
+
+  document.getElementById('id_prazo_item').addEventListener('change', function(event) {
+    console.log('Valor selecionado:', this.value);
+    // Verifique se algum código aqui está redefinindo o valor
+  });
+
+
   /**
     Funções iniciadas ao carregar a página
   */
@@ -594,6 +603,7 @@ $(document).ready(function() {
 
   $(".close").on('click', function() {
     handleCloseButtonFocus(document.getElementById('button-back'));
+    resetForm();
   });
 
   // ################### Configuração dos campos do produto ###################
@@ -840,7 +850,7 @@ $(document).ready(function() {
             if(isDolar){
               preco = (data.preco * parseFloat($('#id_dolar_ptax').val())).toFixed(4);
             }
-
+            console.log('Prazo:', data.prazo_item);
             $('#id_preco').val(preco);
             $('#id_conta_corrente').val(data.cc);
             $('#id_cnpj_faturamento').val(data.cnpj_faturamento);

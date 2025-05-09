@@ -447,13 +447,17 @@ def add_order_to_omie(request, order_id):
         all_orders.append(order_dict)
         # print(all_orders)
     api_response = sync_orders_with_omie(all_orders)
-    request.session['api_response'] = api_response
-
-    return redirect('order_summary')
-
+    # request.session['api_response'] = api_response
+    return api_response
+    # return redirect('update_order', order_id=order_id)
 
 def sync_orders_with_omie(all_orders):
-    # return False
+    return JsonResponse(
+        {
+            'success': True,
+            'message': 'Pedidos sincronizados com sucesso!'
+        }
+    )
     """Faz a chamada para o OMIE"""
     for order in all_orders:
 

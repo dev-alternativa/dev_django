@@ -271,6 +271,7 @@ def calculate_order_total(items):
         try:
 
             ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
+
         except IndexError:
             ipi = Decimal('0.0')
             print(f'Não foi encontrado alíquota de IPI para o APP {item.cnpj_faturamento.sigla}')
@@ -294,6 +295,7 @@ def calculate_order_total(items):
 
     total_pedido = sum(item['preco_total'] for item in item_list)
     total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
+    print(f'Total IPI função: {total_ipi}')
     total_nota = total_pedido + total_ipi
 
     return total_pedido, total_ipi, total_nota, item_list
@@ -817,7 +819,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
 
         # Verifica dados dos itens
         try:
-            *_, total_ipi, total_nota,item_list = calculate_order_total(order_itens)
+            *_, total_ipi, total_nota, item_list = calculate_order_total(order_itens)
 
             context['item_list'] = item_list
             context['total_nota'] = format_to_brl_currency(total_nota)
@@ -847,9 +849,9 @@ class OrderPicking(DetailView, FormataDadosMixin):
             calculated_itens.append(item_dict)
         context['order_itens'] = calculated_itens
 
-        total_ipi = sum(item['ipi'] for item in item_list)
-        print(f'Total IPI: {total_ipi}')
+        # total_ipi = sum(item['ipi'] for item in item_list)
         context['total_ipi'] = format_to_brl_currency(total_ipi)
+        print(f'Total IPI: {context['total_ipi'] }')
 
         total_pedido = sum(item['preco_total'] for item in item_list)
         context['sub_total'] = format_to_brl_currency(total_pedido)
@@ -1222,15 +1224,22 @@ def add_product_to_order(request, order_id):
     """
     def handle_diferent_freights(order_instance, freight_type, freight_tax):
         first_item = OutflowsItems.objects.filter(saida=order_instance).first()
-        print(freight_tax, first_item.taxa_frete_item)
+
 
         if not first_item :
             return True
 
-        if freight_tax != first_item.taxa_frete_item:
+        first_item_tax = float(first_item.taxa_frete_item.replace(',', '.')) if first_item.taxa_frete_item else 0.0
+        freight_tax = float(freight_tax.replace(',', '.')) if freight_tax else 0.0
+        # print(first_item_tax)
+        # print(freight_tax)
+
+        if freight_tax != first_item_tax:
+            print('Frete diferentes')
             return False
 
         if freight_type != first_item.tipo_frete_item.id:
+            print('Tipo de frete diferentes')
             return False
         # print(first_item.taxa_frete_item)
         # print(freight_tax)
@@ -1339,7 +1348,7 @@ def add_product_to_order(request, order_id):
 
             if not handle_diferent_freights(order, freight_type.id, freight_tax):
                 return JsonResponse(
-                    {'error': 'Fretes Diferentes'},
+                    {'error': 'Valor ou tipo de frete diferente entre Pedido e o Item'},
                     status=400
                 )
 
@@ -1461,6 +1470,7 @@ def get_itens_pedido(request, order_id):
 
     if items.exists():
         total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
+        # print(f'Total de IPI: {total_ipi}')
         # item_list = []
 
 
@@ -1902,7 +1912,7 @@ def get_filtered_products(request):
                 'prazo_item': preco.prazo.id if preco else '',
                 'vendedor': preco.vendedor.id if preco else '',
                 'tipo_frete_item': tipo_frete if tipo_frete is not None else '',
-                'taxa_frete_item': taxa_frete if taxa_frete is not None else '',
+                'taxa_frete_item': taxa_frete if taxa_frete is not None else 0,
                 'origem_frete': origem_frete,
                 'is_dolar': preco.is_dolar if preco else False,
                 'id_numero_pedido': pedido.pedido_interno_cliente,
