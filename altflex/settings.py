@@ -97,7 +97,7 @@ DATABASES = {
         'NAME': os.getenv('MYSQL_DATABASE', 'mydatabase'),
         'USER': os.getenv('MYSQL_USER', 'pasklan'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD', 'H3l3n@2024'),
-        'HOST': os.getenv('DB_HOST', 'db'),
+        'HOST': os.getenv('DB_HOST', 'host.docker.internal'),
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
