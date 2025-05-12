@@ -77,3 +77,6 @@ BKP*
 *.sql
 *.sqlite3
 *.db
+
+# Variáveis de ambiente
+.env
