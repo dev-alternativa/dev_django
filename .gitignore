@@ -67,6 +67,7 @@ exemplo*
 *.json
 .flake8
 .gitignore
+OLD*
 
 # Código antigo
 cadastro/
