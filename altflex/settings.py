@@ -1,12 +1,16 @@
 from pathlib import Path
-from dotenv import load_dotenv
 import os
 
 
-load_dotenv()  # Carrega variáveis de ambiente do arquivo .env
-ENVIRONMENT_DEV = os.getenv('ENVIRONMENT_DEV') == 'True'
-ENVIRONMENT_HML = os.getenv('ENVIRONMENT_HML') == 'True'
-ENVIRONMENT_PRD = os.getenv('ENVIRONMENT_PRD') == 'True'
+# Carrega variáveis de ambiente do arquivo .env apenas se for amibente local
+if os.environ.get("ENV") != "production":
+    from dotenv import load_dotenv
+    load_dotenv()
+
+# Flags de ambienet
+ENVIRONMENT_DEV = os.getenv('ENVIRONMENT_DEV') == 'False'
+ENVIRONMENT_HML = os.getenv('ENVIRONMENT_HML') == 'False'
+ENVIRONMENT_PRD = os.getenv('ENVIRONMENT_PRD') == 'False'
 CNPJ_API_ENDPOINT = os.getenv('CNPJ_API_ENDPOINT', 'https://publica.cnpj.ws/cnpj/')
 CEP_API_ENDPOINT = os.getenv('CEP_API_ENDPOINT', 'https://brasilapi.com.br/api/cep/v2/')
 
@@ -141,7 +145,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "core/static"),
 ]
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media'
 
