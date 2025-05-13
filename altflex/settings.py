@@ -28,8 +28,7 @@ ALLOWED_HOSTS = [
     '192.168.15.149',
     'altflexo.site',
     'www.altflexo.site',
-    '162.240.229.32:3000',
-    'altflexo.site:3000',
+    '162.240.229.32',
 ]
 
 # Application definition
