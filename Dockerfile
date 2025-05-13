@@ -10,13 +10,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Instala as dependências necessárias para build (compilação de pacotes)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
         gcc \
         default-libmysqlclient-dev \
         libmariadb-dev \
         build-essential \
         pkg-config \
         python3-dev \
-        curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
