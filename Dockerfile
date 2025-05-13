@@ -38,7 +38,7 @@ COPY . .
 RUN python manage.py collectstatic --no-input
 
 # Expor porta para o Gunicorn
-EXPOSE 8080
+EXPOSE 3000
 
 # Executa servidor (Gunicorn) na porta 8080
-CMD ["gunicorn", "altflex.wsgi:application", "--bind", "0.0.0.0:8080"]
+CMD ["gunicorn", "altflex.wsgi:application", "--bind", "0.0.0.0:3000"]
