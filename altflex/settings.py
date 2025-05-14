@@ -100,10 +100,10 @@ WSGI_APPLICATION = 'altflex.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'mydatabase'),
-        'USER': os.getenv('MYSQL_USER', 'pasklan'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'H3l3n@2024'),
-        'HOST': os.getenv('DB_HOST', 'host.docker.internal'),
+        'NAME': os.getenv('MYSQL_DATABASE', 'hml_database'),
+        'USER': os.getenv('MYSQL_USER', 'alt'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'Alt@123hml'),
+        'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',

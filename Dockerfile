@@ -35,7 +35,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Coleta  arquivos estáticos
-RUN python manage.py collectstatic --no-input
+# RUN python manage.py collectstatic --no-input
 
 # Expor porta para o Gunicorn
 EXPOSE 3000

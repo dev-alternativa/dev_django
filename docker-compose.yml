@@ -23,15 +23,15 @@ services:
       sh -c "./wait-for-it.sh db:3306 -- python manage.py makemigrations &&
         python manage.py migrate &&
         python manage.py collectstatic --noinput &&
-        gunicorn --bind 0.0.0.0:8080 altflex.wsgi:application"
+        gunicorn --bind 0.0.0.0:3000 altflex.wsgi:application"
     volumes:
       - .:/app_alternativa
       - static_volume:/app_alternativa/staticfiles
       - media_volume:/app_alternativa/media
     expose:
-      - 8080
+      - 3000
     environment:
-      - PORT=8080
+      - PORT=3000
       - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}
       - DJANGO_SETTINGS_MODULE=altflex.settings
     depends_on:
