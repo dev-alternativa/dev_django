@@ -1,16 +1,18 @@
+from dotenv import load_dotenv
 from pathlib import Path
 import os
 
 
-# Carrega variáveis de ambiente do arquivo .env apenas se for amibente local
-if os.environ.get("ENV") != "production":
-    from dotenv import load_dotenv
-    load_dotenv()
+load_dotenv()
 
-# Flags de ambienet
-ENVIRONMENT_DEV = os.getenv('ENVIRONMENT_DEV') == 'False'
-ENVIRONMENT_HML = os.getenv('ENVIRONMENT_HML') == 'False'
-ENVIRONMENT_PRD = os.getenv('ENVIRONMENT_PRD') == 'False'
+# Flag de ambienet
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV').strip().upper()
+
+ENVIRONMENT_DEV = ENVIRONMENT == 'DEV'
+ENVIRONMENT_HML = ENVIRONMENT == 'HML'
+ENVIRONMENT_PRD = ENVIRONMENT == 'PRD'
+
+
 CNPJ_API_ENDPOINT = os.getenv('CNPJ_API_ENDPOINT', 'https://publica.cnpj.ws/cnpj/')
 CEP_API_ENDPOINT = os.getenv('CEP_API_ENDPOINT', 'https://brasilapi.com.br/api/cep/v2/')
 

@@ -17,13 +17,11 @@ services:
       - .env
 
   web:
-    build: .
+    build:
+      context: .
+    image: django_app_hml:v1
     container_name: django_app
-    command: >
-      sh -c "./wait-for-it.sh db:3306 -- python manage.py makemigrations &&
-        python manage.py migrate &&
-        python manage.py collectstatic --noinput &&
-        gunicorn --bind 0.0.0.0:3000 altflex.wsgi:application"
+    command: ["sh", "./entrypoint.sh"]
     volumes:
       - .:/app_alternativa
       - static_volume:/app_alternativa/staticfiles
