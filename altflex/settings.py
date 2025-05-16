@@ -25,12 +25,17 @@ SECRET_KEY = 'django-insecure-cw-0x)y_b9)a!h)l&0xlx^k!5y_rchz6@a$u*!e*_oz53u6=n!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5000','http://altflexo.site']
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
 ALLOWED_HOSTS = [
-    'localhost',
+    'http://localhost:5000',
     '192.168.15.149',
     'altflexo.site',
     'www.altflexo.site',
     '162.240.229.32',
+    'http://162.240.229.32'
 ]
 
 # Application definition
