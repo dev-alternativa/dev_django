@@ -45,7 +45,7 @@ services:
       - media_volume:/app_alternativa/media
       - ./nginx.conf:/etc/nginx/conf.d/custom.conf:ro
     ports:
-      - "8080:80"
+      - "5000:80"
     depends_on:
       - web
 
