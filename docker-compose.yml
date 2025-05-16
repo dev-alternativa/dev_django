@@ -43,7 +43,7 @@ services:
     volumes:
       - static_volume:/app_alternativa/staticfiles
       - media_volume:/app_alternativa/media
-      - ./app.conf:/etc/nginx/conf.d:ro
+      - ./nginx/conf:/etc/nginx/conf.d:ro
     ports:
       - "5000:80"
     depends_on:
