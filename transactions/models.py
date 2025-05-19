@@ -140,7 +140,7 @@ class OutflowsItems(Base):
         verbose_name = 'Items de Saída de Estoque'
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.saida.pk, self.produto, self.quantidade)
+        return '{} - {} - {}'.format(self.id, self.produto, self.quantidade)
 
 
 class TaxScenario(Base):

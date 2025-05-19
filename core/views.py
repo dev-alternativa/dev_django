@@ -1,9 +1,12 @@
 from django.contrib import messages
-from django.views.generic import TemplateView, DeleteView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import ProtectedError
+from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.views.generic import TemplateView, DeleteView, View
+from weasyprint import HTML
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -14,6 +17,43 @@ class IndexView(LoginRequiredMixin, TemplateView):
         user = self.request.user
         context["first_name"] = user.first_name
         return context
+
+# ********************************* UTILS  ********************************************
+class PDFGeneratorView(View):
+    """
+
+    """
+    template_name = None
+    filename = 'output.pdf'
+
+    def get_context_data(self, **kwargs):
+        """
+        Overwrite this method to provide context data for the template.
+        """
+        return {}
+
+    def render_to_pdf(self, context):
+        """
+        Render the template to PDF.
+        :param context: Contexto a ser passado para o template.
+        :return: PDF gerado.
+        """
+        html_string = render_to_string(self.template_name, context)
+        base_url = self.request.build_absolute_uri('/')
+        pdf_file = HTML(string=html_string, base_url=base_url).write_pdf()
+        return pdf_file
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle requests to generate PDF.
+        """
+        context = self.get_context_data(**kwargs)
+        pdf_file = self.render_to_pdf(context)
+
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{self.filename}"'
+        return response
+
 
 
 # ********************************* CUSTOM MIXINS  ********************************************

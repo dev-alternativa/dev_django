@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Q, Sum
+from django.db.models import QuerySet
 from django.http import HttpResponseNotAllowed
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -14,17 +15,18 @@ from django.template.loader import render_to_string
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy, reverse
-from django.db.models import QuerySet
+
+from core.views import PDFGeneratorView
 from logistic.models import Carrier, LeadTime, Freight
 from products.models import Product
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from transactions.models import TaxScenario
+
 import requests
 
 
 # Utilities
-
 def is_form_empty(form):
     """
     Retorna True se todos os campos de um formulário forem vazios
@@ -333,7 +335,7 @@ def process_financial_data(data):
         for item in obj.get('conta_receber_cadastro', []):
             status = item.get('status_titulo', 'DESCONHECIDO')
             valor = item.get('valor_documento', 0)
-            print(status)
+            # print(status)
 
             if status in result:
                 if status == 'RECEBIDO':
@@ -578,6 +580,20 @@ class OutflowsDetailView(DetailView):
 
 
 # ********************************** PEDIDOS *********************************
+class ExportOrderPDFView(PDFGeneratorView):
+    template_name = 'includes/_pedido_separacao_pdf.html'
+    filename = 'pedido_separacao.pdf'
+
+    def get_context_data(self, **kwargs):
+        order_id = kwargs.get('order_id')
+
+        view = OrderPicking()
+        view.kwargs = {'pk': order_id}
+        view.request = self.request
+        view.object = view.get_object()
+        return view.get_context_data()
+
+
 class OrderListView(ListView):
     model = Outflows
     template_name = 'pedidos/lista_pedido.html'

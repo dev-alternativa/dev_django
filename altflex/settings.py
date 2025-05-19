@@ -8,9 +8,16 @@ load_dotenv()
 # Flag de ambienet
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'DEV').strip().upper()
 
-ENVIRONMENT_DEV = ENVIRONMENT == 'DEV'
-ENVIRONMENT_HML = ENVIRONMENT == 'HML'
-ENVIRONMENT_PRD = ENVIRONMENT == 'PRD'
+ENVIRONMENT_DEV = False
+ENVIRONMENT_HML = False
+ENVIRONMENT_PRD = False
+
+if ENVIRONMENT == 'DEV':
+    ENVIRONMENT_DEV = True
+elif ENVIRONMENT == 'HML':
+    ENVIRONMENT_HML = True
+else:
+    ENVIRONMENT_PRD = True
 
 
 CNPJ_API_ENDPOINT = os.getenv('CNPJ_API_ENDPOINT', 'https://publica.cnpj.ws/cnpj/')
@@ -25,17 +32,19 @@ SECRET_KEY = 'django-insecure-cw-0x)y_b9)a!h)l&0xlx^k!5y_rchz6@a$u*!e*_oz53u6=n!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:5000','http://altflexo.site']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5000',
+    'http://altflexo.site'
+    'http://162.240.229.32:5000',
+    ]
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 
 ALLOWED_HOSTS = [
-    'http://localhost:5000',
+    'localhost',
     '192.168.15.149',
     'altflexo.site',
-    'www.altflexo.site',
     '162.240.229.32',
-    'http://162.240.229.32'
 ]
 
 # Application definition
@@ -107,10 +116,10 @@ WSGI_APPLICATION = 'altflex.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'hml_database'),
-        'USER': os.getenv('MYSQL_USER', 'alt'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'Alt@123hml'),
-        'HOST': os.getenv('DB_HOST', 'db'),
+        'NAME': os.getenv('MYSQL_DATABASE', 'hml_database') if ENVIRONMENT == 'HML' else 'mydatabase',
+        'USER': os.getenv('MYSQL_USER', 'alt') if ENVIRONMENT == 'HML' else 'pasklan',
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'Alt@123hml') if ENVIRONMENT == 'HML' else 'H3l3n@2024',
+        'HOST': os.getenv('DB_HOST', 'db') if ENVIRONMENT == 'HML' else 'localhost',
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',

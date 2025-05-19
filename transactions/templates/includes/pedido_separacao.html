@@ -1,36 +1,35 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block extra_css %}
     <link rel="stylesheet" href="{% static '/css/order_picking_resume.css' %}">
 {% endblock extra_css %}
 
 
-
 {% block title %} Pedido e Separação {% endblock %}
-
 
 {% block content %}
 
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <a href="{% url 'update_order' order.pk %}" class='btn btn-danger btn-lg' id="button-back">
-                    <i class="bi bi-backspace space_from_margin"></i>
-                    Voltar
-                </a>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <a href="{% url 'update_order' order.pk %}" class='btn btn-danger btn-lg' id="button-back">
+                <i class="bi bi-backspace space_from_margin"></i>
+                Voltar
+            </a>
         </div>
+    </div>
 
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
         <div class="row">
             <div class="col">
@@ -250,14 +249,16 @@
         </div>
         <div class="row mt-2">
             <div class="col-6">
-                <button class="btn btn-warning" id="id_print_sales_proposal">Imprimir Proposta</button>
+                <a href="{% url 'export_order_to_pdf' order.id %}" target="_blank" class="btn btn-warning col-6">
+                    Imprimir Proposta
+                </a>
             </div>
             <div class="col-6 text-end">
                 <button class="btn btn-info" id="id_conclude_order" onclick="sendToOmie({{ order.id }})">Concluir Pedido</button>
             </div>
         </div>
         <div class="row mt-4">
-            <p class="text-center"><em>Gerado em {{ order.dt_criacao }} por {{ order.vendedor.nome }}</em></p>
+            <p class="text-center"><em>Gerado em {% now "DATETIME_FORMAT" %} por {{ order.vendedor.nome }}</em></p>
         </div>
     </div>
 {% endblock %}
