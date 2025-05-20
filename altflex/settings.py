@@ -13,12 +13,14 @@ ENVIRONMENT_HML = False
 ENVIRONMENT_PRD = False
 
 if ENVIRONMENT == 'DEV':
+    load_dotenv('.env.dev')
     ENVIRONMENT_DEV = True
 elif ENVIRONMENT == 'HML':
+    load_dotenv('.env.hml')
     ENVIRONMENT_HML = True
 else:
     ENVIRONMENT_PRD = True
-
+    load_dotenv('.env')
 
 CNPJ_API_ENDPOINT = os.getenv('CNPJ_API_ENDPOINT', 'https://publica.cnpj.ws/cnpj/')
 CEP_API_ENDPOINT = os.getenv('CEP_API_ENDPOINT', 'https://brasilapi.com.br/api/cep/v2/')
@@ -116,10 +118,10 @@ WSGI_APPLICATION = 'altflex.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'hml_database') if ENVIRONMENT == 'HML' else 'mydatabase',
-        'USER': os.getenv('MYSQL_USER', 'alt') if ENVIRONMENT == 'HML' else 'pasklan',
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'Alt@123hml') if ENVIRONMENT == 'HML' else 'H3l3n@2024',
-        'HOST': os.getenv('DB_HOST', 'db') if ENVIRONMENT == 'HML' else 'localhost',
+        'NAME': os.getenv('MYSQL_DATABASE', 'mydatabase'),
+        'USER': os.getenv('MYSQL_USER', 'H3l3n@2024'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'Alt@123hml'),
+        'HOST': os.getenv('DB_HOST', 'db'),
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
