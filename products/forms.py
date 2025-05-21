@@ -273,6 +273,7 @@ class ProductForm(ModelForm):
                             Field('nome_produto', css_class='form-control col-md-6 mb-0'),
                             Field('largura', css_class='form-control col-md-6 mb-0 validate-number'),
                             Field('comprimento', css_class='form-control col-md-6 mb-0 validate-number'),
+                            Field('unidade', css_class='form-control col-md-6 mb-0'),
                         ),
                         Column(
                             Field(
@@ -328,3 +329,5 @@ class ProductForm(ModelForm):
                 css_class='form-row text-center'
             )
         )
+
+        self.fields['unidade'].widget.attrs['readonly'] = 'readonly'

@@ -214,6 +214,14 @@ class ProductUpdateView(FormMessageMixin, UpdateView):
     success_url = reverse_lazy('product')
     success_message = 'Produto atualizado com sucesso!'
 
+    def form_valid(self, form):
+        print('ATUALIZADO')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print(f'ERRO: {form.errors}')
+        return super().form_invalid(form)
+
 
 class ProductDeleteView(DeleteSuccessMessageMixin, DeleteView):
     model = Product
