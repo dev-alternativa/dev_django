@@ -821,6 +821,7 @@ $(document).ready(function() {
     paymentTerms = $("#id_condicaoSelect").val();
     isValid = true;
 
+
     validateFormField('productSelect', productID);
     validateFormField('condicaoSelect', paymentTerms);
     if(!isValid) {
@@ -876,6 +877,10 @@ $(document).ready(function() {
 
             configProductFormLabels(data.categoria);
             calcProductFieldsArea(data.m2);
+          }
+          else{
+            console.log('Erro ao carregar produto:', response.error);
+            alert('Erro ao carregar produto');
           }
         },
         error: function(xhr, status, error) {

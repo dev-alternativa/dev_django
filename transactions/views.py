@@ -297,7 +297,7 @@ def calculate_order_total(items):
 
     total_pedido = sum(item['preco_total'] for item in item_list)
     total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
-    print(f'Total IPI função: {total_ipi}')
+    # print(f'Total IPI função: {total_ipi}')
     total_nota = total_pedido + total_ipi
 
     return total_pedido, total_ipi, total_nota, item_list
@@ -1867,92 +1867,78 @@ def get_filtered_products(request):
 
     Returns:
         JsonResponse: Uma resposta JSON contendo os dados do produto ou uma mensagem de erro.
-
-    O método aceita apenas requisições POST. Ele processa os dados do formulário,
-    verifica os IDs do pedido, produto e cliente, e retorna os dados do produto
-    Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
-
-    Campos esperados no POST:
-        - order_id (int): O ID do pedido.
-        - product_id (int): O ID do produto.
-        - client_id (int): O ID do cliente.
     """
-    if request.method == 'POST':
-        try:
-            order_id = request.POST.get('order_id')
-            product_id = request.POST.get('product_id')
-            client_id = request.POST.get('client_id')
-
-            if not order_id or not product_id:
-                return JsonResponse({
-                    "success": False,
-                    "error": "Não foi possível encontrar os dados do pedido ou produto!",
-                }, status=400)
-
-            preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
-            cliente = CustomerSupplier.objects.get(pk=client_id)
-            cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
-            largura = Product.objects.get(pk=product_id).largura
-            comprimento = Product.objects.get(pk=product_id).comprimento
-            m_quadrado = Product.objects.get(pk=product_id).m_quadrado
-            pedido = Outflows.objects.get(pk=order_id)
-            items = OutflowsItems.objects.filter(saida=pedido).count()
-            proximo_pedido_id = pedido.saida_items.count() + 1
-            categoria = Product.objects.get(pk=product_id).tipo_categoria.id
-
-            if preco and preco.taxa_frete:
-                origem_frete = 'tabela_preco'
-            else:
-                origem_frete = 'tabela_cliente'
-
-            taxa_frete = (
-                preco.taxa_frete if preco and preco.taxa_frete else
-                cliente.taxa_frete if cliente and hasattr(cliente, 'taxa_frete') else
-                None
-            )
-
-            tipo_frete = (
-                preco.tipo_frete.id if preco and preco.tipo_frete else
-                cliente.tipo_frete.id if cliente and hasattr(cliente, 'tipo_frete') else
-                None
-            )
-
-            data = {
-                'id': order_id,
-                'nome': Product.objects.get(pk=product_id).nome_produto,
-                'preco': preco.valor if preco else '',
-                'cc': cc.pk if cc else '',
-                'cnpj_faturamento': preco.cnpj_faturamento.id if preco else '',
-                'largura': largura,
-                'comprimento': comprimento,
-                'prazo_item': preco.prazo.id if preco else '',
-                'vendedor': preco.vendedor.id if preco else '',
-                'tipo_frete_item': tipo_frete if tipo_frete is not None else '',
-                'taxa_frete_item': taxa_frete if taxa_frete is not None else 0,
-                'origem_frete': origem_frete,
-                'is_dolar': preco.is_dolar if preco else False,
-                'id_numero_pedido': pedido.pedido_interno_cliente,
-                'item_pedido': items + 1,
-                'proximo_pedido': proximo_pedido_id,
-                'm2': m_quadrado,
-                'categoria': categoria,
-                'sub_categoria': Product.objects.get(pk=product_id).sub_categoria,
-                'unidade': Product.objects.get(pk=product_id).unidade,
-            }
-
-            return JsonResponse({
-                "success": True,
-                "action": "update",
-                "data": data,
-            }, status=200)
-
-        except Exception as e:
-            return JsonResponse({
-                "success": False,
-                "error": str(e),
-            }, status=500)
-    else:
+    if request.method != 'POST':
         return JsonResponse({
             "success": False,
             "error": "Método não permitido!",
         }, status=405)
+
+    try:
+        order_id = request.POST.get('order_id')
+        product_id = request.POST.get('product_id')
+        client_id = request.POST.get('client_id')
+
+        if not order_id or not product_id:
+            return JsonResponse({
+                "success": False,
+                "error": "Não foi possível encontrar os dados do pedido ou produto!",
+            }, status=400)
+
+        product = Product.objects.get(pk=product_id)
+        cliente = CustomerSupplier.objects.get(pk=client_id)
+        preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
+        pedido = Outflows.objects.get(pk=order_id)
+        items_count = OutflowsItems.objects.filter(saida=pedido).count()
+        proximo_pedido_id = pedido.saida_items.count() + 1
+        cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
+
+        origem_frete = 'tabela_preco' if preco and preco.taxa_frete else 'tabela_cliente'
+
+        taxa_frete = getattr(preco, 'taxa_frete', None)
+        if not taxa_frete:
+            taxa_frete = getattr(cliente, 'taxa_frete', 0) or 0
+
+        tipo_frete = 6
+        if preco and getattr(preco, 'tipo_frete', None):
+            tipo_frete = preco.tipo_frete.id
+        elif getattr(cliente, 'tipo_frete', None):
+            tipo_frete = cliente.tipo_frete.id
+
+        print(f'Tipo frete: {tipo_frete}')
+
+        data = {
+            'id': order_id,
+            'nome': product.nome_produto,
+            'preco': preco.valor if preco else '',
+            'cc': cc.pk if cc else '',
+            'cnpj_faturamento': preco.cnpj_faturamento.id if preco else '',
+            'largura': product.largura,
+            'comprimento': product.comprimento,
+            'prazo_item': preco.prazo.id if preco else '',
+            'vendedor': preco.vendedor.id if preco else '',
+            'tipo_frete_item': tipo_frete if tipo_frete is not None else '',
+            'taxa_frete_item': taxa_frete,
+            'origem_frete': origem_frete,
+            'is_dolar': preco.is_dolar if preco else False,
+            'id_numero_pedido': pedido.pedido_interno_cliente,
+            'item_pedido': items_count + 1,
+            'proximo_pedido': proximo_pedido_id,
+            'm2': product.m_quadrado,
+            'categoria': product.tipo_categoria.id,
+            'sub_categoria': product.sub_categoria,
+            'unidade': product.unidade,
+        }
+
+        return JsonResponse({
+            "success": True,
+            "action": "update",
+            "data": data,
+        }, status=200)
+
+    except Exception as e:
+        print(f'Erro ao obter dados do produto {request.POST.get("product_id")}: {e}')
+        return JsonResponse({
+            "success": False,
+            "error": str(e),
+        }, status=500)
