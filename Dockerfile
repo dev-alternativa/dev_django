@@ -30,9 +30,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copia Script para o container
 COPY wait-for-it.sh /app_alternativa
+COPY entrypoint.sh /app_alternativa
 
 # Atribui permissão de execução ao script
-RUN chmod +x /app_alternativa/wait-for-it.sh
+RUN chmod +x /app_alternativa/wait-for-it.sh /app_alternativa/entrypoint.sh
 
 # Instalar dependências do Python
 COPY requirements.txt /app_alternativa
