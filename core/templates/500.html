@@ -1,15 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-body">
-            <h1 class="text-danger mb-4">Erro 500 - Erro de Processamento do Servidor</h1>
-            <p>Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde.</p>
-          </div>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="card text-center shadow-lg border-0 p-4">
+        <div class="card-body">
+            <h1 class="display-1 text-warning fw-bold">500</h1>
+            <h2 class="mb-4">Erro Interno no Servidor</h2>
+            <p class="text-muted mb-4">
+                Algo inesperado aconteceu no servidor. 😥 <br>
+                Nossa equipe já foi notificada ou você pode tentar novamente mais tarde.
+            </p>
+            <a href="{% url 'index' %}" class="btn btn-outline-primary btn-lg">
+                🔄 Voltar para a Página Inicial
+            </a>
         </div>
-      </div>
     </div>
 </div>
 {% endblock %}

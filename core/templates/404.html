@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-body">
-            <h1 class="text-danger mb-4">Erro 404 - Página não encontrada</h1>
-            <p>A página que você está tentando acessar não foi encontrada.</p>
-            <a href="{% url 'index' %}" class="btn btn-primary">Voltar para a Página Inicial</a>
-          </div>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="card text-center shadow-lg border-0 p-4">
+        <div class="card-body">
+            <h1 class="display-1 text-danger fw-bold">404</h1>
+            <h2 class="mb-4">Página não encontrada</h2>
+            <p class="text-muted mb-4">
+                Opa! Parece que a página que você está procurando não existe ou foi movida.
+            </p>
+            <a href="{% url 'index' %}" class="btn btn-outline-primary btn-lg">
+                🔙 Voltar para a Página Inicial
+            </a>
         </div>
-      </div>
     </div>
 </div>
 {% endblock %}

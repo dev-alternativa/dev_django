@@ -74,15 +74,19 @@ class FormataDadosMixin:
     # formata para real `BRL`
     def format_BRL(self, value):
         try:
-            if isinstance(value, str) and (',' in value or '.' in value):
-                # Remove caracteres especiais, exceto vírgula e ponto
-                clean_value = value.replace('.', '').replace(',', '.')
+            if isinstance(value, str):
+                clean_value = value.strip()
+
+                if ',' in clean_value and '.' in clean_value:
+                    # Se ambos os separadores estão presentes, assume que é um valor brasileiro
+                    clean_value = clean_value.replace('.', '').replace(',', '.')
+                elif ',' in clean_value:
+                    # Se apenas a vírgula está presente, assume que é um valor brasileiro
+                    clean_value = clean_value.replace(',', '.')
                 number = float(clean_value)
             else:
-                # Converte o valor para float
                 number = float(value)
 
-                # Formata o número com separadores de milhar e vírgula
             value_str = f"{number:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
             return value_str

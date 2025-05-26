@@ -1,12 +1,14 @@
+import pandas as pd
+import re
+
+from django.contrib import messages
 from django.views.generic import FormView
 from django.urls import reverse_lazy
-from django.contrib import messages
-from imports.forms import UploadLeadTimeForm, UploadCustomerSupplierForm, UploadCarrierForm, UploadProductForm
-import pandas as pd
+
 from common.models import CustomerSupplier, Category
+from imports.forms import UploadLeadTimeForm, UploadCustomerSupplierForm, UploadCarrierForm, UploadProductForm
+from logistic.models import Carrier, LeadTime, Freight
 from products.models import Product
-from logistic.models import Carrier, LeadTime
-import re
 
 
 class ImportLeadTimeView(FormView):
@@ -66,9 +68,18 @@ class ImportLeadTimeView(FormView):
 
 
 class ImportCustomerSupplierView(FormView):
+    pass
     form_class = UploadCustomerSupplierForm
     template_name = 'importar_cliente_fornecedor.html'
     success_url = reverse_lazy('customer_supplier')
+    freight_cache = {}
+    for freight in Freight.objects.all():
+
+        if freight.tipo_frete and ' - ' in freight.tipo_frete:
+            code = freight.tipo_frete.split(' - ')[0]
+            freight_cache[code] = freight
+
+    freight_default = Freight.objects.get(pk=6)
 
     # trata com os caracteres não numericos de CNPJ e telefone, se houver um DDD no campo telefone, separa
     def remover_nao_numericos(self, texto):
@@ -206,17 +217,13 @@ class ImportCustomerSupplierView(FormView):
                         transportadora.nome = row.get('nome', 'Nome a definir')
                         transportadora.save()
 
-                    # print("Verificando prazo...")
-                    # prazo_descricao = row.get('Número de Parcelas', '')
+                    print("Verificando Tipo de Frete...")
+                    freight_value = str(row.get('Modalidade do Frete', ''))
+                    print(f"Tipo de frete: {freight_value}")
+                    tipo_frete = self.freight_cache.get(freight_value, self.freight_default)
 
-                    # if pd.notna(prazo_descricao):
-                    #     prazo_queryset = LeadTime.objects.filter(descricao=prazo_descricao)
-                    #     if prazo_queryset.exists():
-                    #         prazo_obj = prazo_queryset.first()  # Pega o primeiro objeto encontrado
-                    #     else:
-                    #         prazo_obj = None
-                    # else:
-                    #     prazo_obj = None
+                    if freight_value not in self.freight_cache:
+                        messages.warning(self.request, f"Tipo de frete '{freight_value}' não encontrado. Usando valor padrão.")
 
                     print("Salvando dados no banco...")
                     obj, created = CustomerSupplier.objects.update_or_create(
@@ -236,7 +243,7 @@ class ImportCustomerSupplierView(FormView):
                             'cep': row.get('cep', ''),
                             'email': row.get('email', 'Não definido'),
                             'nome_contato': row.get('contato', ''),
-                            'tipo_frete': row.get('Modalidade do Frete', ''),
+                            'tipo_frete': tipo_frete,
                             # Regra: taxa só existe se a modalidade de frete for do tipo 3
                             'taxa_frete': row.get('Frete') if int(row.get('Modalidade do Frete')) == 3 else '0,00',
                             'cliente_transportadora': transportadora,

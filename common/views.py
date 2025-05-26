@@ -387,7 +387,7 @@ class PriceListView(ListView, FormataDadosMixin):
         if prices:
             for price in prices:
 
-                price.price_dolar = self.format_USD(price.valor) if price.is_dolar else price.price_brl == self.format_BRL(price.valor)
+                price.price_dolar = self.format_USD(price.valor) if price.is_dolar else price.valor
                 print(price.price_dolar)
         return context
 

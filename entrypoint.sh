@@ -4,6 +4,7 @@
 
 python manage.py makemigrations
 python manage.py migrate
+python manage.py load_sql
 python manage.py collectstatic --noinput
 
 echo "from django.contrib.auth import get_user_model; \
