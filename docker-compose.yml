@@ -21,7 +21,6 @@ services:
       context: .
     image: django_app_hml:v1
     container_name: django_app
-    command: ["sh", "./entrypoint.sh"]
     volumes:
       - .:/app_alternativa
       - static_volume:/app_alternativa/staticfiles

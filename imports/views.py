@@ -68,18 +68,10 @@ class ImportLeadTimeView(FormView):
 
 
 class ImportCustomerSupplierView(FormView):
-    pass
+
     form_class = UploadCustomerSupplierForm
     template_name = 'importar_cliente_fornecedor.html'
     success_url = reverse_lazy('customer_supplier')
-    freight_cache = {}
-    for freight in Freight.objects.all():
-
-        if freight.tipo_frete and ' - ' in freight.tipo_frete:
-            code = freight.tipo_frete.split(' - ')[0]
-            freight_cache[code] = freight
-
-    freight_default = Freight.objects.get(pk=6)
 
     # trata com os caracteres não numericos de CNPJ e telefone, se houver um DDD no campo telefone, separa
     def remover_nao_numericos(self, texto):
@@ -97,6 +89,15 @@ class ImportCustomerSupplierView(FormView):
 
     # Upload do arquivo do formulário
     def form_valid(self, form):
+        freight_cache = {}
+        for freight in Freight.objects.all():
+
+            if freight.tipo_frete and ' - ' in freight.tipo_frete:
+                code = freight.tipo_frete.split(' - ')[0]
+                freight_cache[code] = freight
+
+        freight_default = Freight.objects.get(pk=6)
+
         file = form.cleaned_data['file']
         nao_incluidos = 0
         incluidos = 0
@@ -220,9 +221,9 @@ class ImportCustomerSupplierView(FormView):
                     print("Verificando Tipo de Frete...")
                     freight_value = str(row.get('Modalidade do Frete', ''))
                     print(f"Tipo de frete: {freight_value}")
-                    tipo_frete = self.freight_cache.get(freight_value, self.freight_default)
+                    tipo_frete = freight_cache.get(freight_value, freight_default)
 
-                    if freight_value not in self.freight_cache:
+                    if freight_value not in freight_cache:
                         messages.warning(self.request, f"Tipo de frete '{freight_value}' não encontrado. Usando valor padrão.")
 
                     print("Salvando dados no banco...")

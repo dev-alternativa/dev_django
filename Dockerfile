@@ -26,28 +26,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libopenjp2-7-dev \
         libglib2.0-0 \
         shared-mime-info \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copia Script para o container
-COPY wait-for-it.sh /app_alternativa
-COPY entrypoint.sh /app_alternativa
-
-# Atribui permissão de execução ao script
-RUN chmod +x /app_alternativa/wait-for-it.sh /app_alternativa/entrypoint.sh
+COPY requirements.txt .
 
 # Instalar dependências do Python
-COPY requirements.txt /app_alternativa
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copiar o código da aplicação
 COPY . .
 
-# Coleta  arquivos estáticos
-# RUN python manage.py collectstatic --no-input
+# Atribui permissão de execução ao script
+RUN chmod +x ./wait-for-it.sh ./entrypoint.sh
 
 # Expor porta para o Gunicorn
 EXPOSE 3000
 
-# Executa servidor (Gunicorn) na porta 8080
-CMD ["gunicorn", "altflex.wsgi:application", "--bind", "0.0.0.0:3000"]
+ENTRYPOINT ["./entrypoint.sh"]
