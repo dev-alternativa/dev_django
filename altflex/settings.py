@@ -36,7 +36,7 @@ DEBUG = False
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5000',
-    'http://altflexo.site'
+    'http://altflexo.site',
     'http://162.240.229.32:5000',
     ]
 CSRF_COOKIE_SECURE = False
