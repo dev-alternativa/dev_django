@@ -74,7 +74,7 @@ cadastro/
 BKP*
 
 # Banco de dados
-*.sql
+.sql
 *.sqlite3
 *.db
 
