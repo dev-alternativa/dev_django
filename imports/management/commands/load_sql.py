@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         sql_dir = os.path.join(settings.BASE_DIR, 'sql')
-        sql_files = sql_files = sorted(glob.glob(os.path.join(sql_dir, '*.sql')))
+        sql_files = sorted(glob.glob(os.path.join(sql_dir, '*.sql')))
 
         if not sql_files:
             self.stdout.write(self.style.WARNING('Nenhum arquivo SQL encontrado.'))
