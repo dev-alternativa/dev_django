@@ -148,7 +148,7 @@
     </div>
 
   </div>
-<!-- 
+<!--
   <script>
     $(document).ready(function (){
       $('#id_cliente').select2();
@@ -160,7 +160,10 @@
 {% endblock content %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/select2.min.js' %}"></script>
-<script src="{% static 'js/new_order.js' %}"></script>
-
+  <script src="{% static 'js/select2.min.js' %}"></script>
+  <script src="{% static 'js/new_order.js' %}"></script>
+  <script>
+    /** Habilita pesquiza para selectbox */
+    $('.search_select').select2();
+  </script>
 {% endblock %}

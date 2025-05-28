@@ -1,6 +1,25 @@
 from dotenv import load_dotenv
 from pathlib import Path
-import os
+import os, sys
+
+
+class DebuggingMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host_header = request.META.get('HTTP_HOST')
+        x_forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST')
+        real_ip = request.META.get('HTTP_X_REAL_IP')
+        forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+
+        print(f"DEBUG: Request Host: {host_header}", file=sys.stderr)
+        print(f"DEBUG: X-Forwarded-Host: {x_forwarded_host}", file=sys.stderr)
+        print(f"DEBUG: X-Real-IP: {real_ip}", file=sys.stderr)
+        print(f"DEBUG: X-Forwarded-For: {forwarded_for}", file=sys.stderr)
+
+        response = self.get_response(request)
+        return response
 
 
 load_dotenv()
@@ -46,7 +65,9 @@ ALLOWED_HOSTS = [
     'localhost',
     '192.168.15.149',
     'altflexo.site',
+    'www.altflexo.site',
     '162.240.229.32',
+    '127.0.0.1',
 ]
 
 # Application definition
@@ -80,6 +101,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'altflex.middleware.DebuggingMiddleware',  # Middleware de depuração
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

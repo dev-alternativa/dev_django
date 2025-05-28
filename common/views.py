@@ -63,7 +63,7 @@ class CategoryListView(ListView):
     context_object_name = 'itens_categoria'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().exclude(id=1)
         search = self.request.GET.get('search')
         if search:
             search_terms = search.split()

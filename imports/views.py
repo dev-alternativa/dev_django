@@ -104,7 +104,7 @@ class ImportCustomerSupplierView(FormView):
         sheet_name = 'Clientes'
         # Lista de possíveis categorias (Colunas booleanas na planilha)
         categorias_colunas = [
-            'QSPAC', 'TESA', 'DIVERSOS', 'LAMINAS',
+            'SUPERLAM', 'TESA', 'DIVERSOS', 'LAMINAS',
             'MÁQUINAS', 'NYLOPRINT', 'NYLOFLEX', 'NOVOS'
         ]
 
@@ -133,7 +133,7 @@ class ImportCustomerSupplierView(FormView):
         df['Modalidade do Frete'] = df['Modalidade do Frete'].fillna('9')
         df['Frete'] = df['Frete'].fillna('0.00')
         df['valor_limite_credito_total'] = df['valor_limite_credito_total'].fillna('0.00')
-        df['QSPAC'] = df['QSPAC'].fillna('0')
+        df['SUPERLAM'] = df['SUPERLAM'].fillna('0')
         df['TESA'] = df['TESA'].fillna('0')
         df['DIVERSOS'] = df['DIVERSOS'].fillna('0')
         df['LAMINAS'] = df['LAMINAS'].fillna('0')

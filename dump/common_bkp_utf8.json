@@ -229,17 +229,6 @@
 },
 {
   "model": "common.category",
-  "pk": 1,
-  "fields": {
-    "dt_criacao": "2024-10-21T19:04:25.689Z",
-    "dt_modificado": "2024-10-21T19:04:25.689Z",
-    "ativo": true,
-    "nome": "QSPAC",
-    "descricao": ""
-  }
-},
-{
-  "model": "common.category",
   "pk": 2,
   "fields": {
     "dt_criacao": "2024-10-21T19:04:30.524Z",
