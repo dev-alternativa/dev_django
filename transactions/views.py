@@ -587,7 +587,7 @@ class ExportOrderPDFView(PDFGeneratorView):
     def get_context_data(self, **kwargs):
         order_id = kwargs.get('order_id')
 
-        view = OrderPicking()
+        view = OrderPickingPDF()
         view.kwargs = {'pk': order_id}
         view.request = self.request
         view.object = view.get_object()
@@ -769,6 +769,100 @@ class OrderSummary(DetailView):
             context['order'] = order
             context['conta_corrente'] = conta_corrente
             context['api_response'] = api_response
+        return context
+
+
+class OrderPickingPDF(DetailView, FormataDadosMixin):
+    model = Outflows
+    template_name = 'includes/pedido_separacao_pdf.html'
+    context_object_name = 'order_picking'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['local_errors'] = []
+        context['api_errors'] = []
+
+        context['order'] = order = self.get_object()
+        context['client'] = order.cliente
+        context['cnpj'] = self.format_cnpj_cpf(order.cliente.cnpj)
+        context['vendedor'] = order.vendedor
+        context['prazo_parcelas'] = order.prazo
+
+        order_itens = OutflowsItems.objects.filter(saida=order.pk)
+        if not order_itens.exists():
+            context['local_errors'].append({
+                'type': 'order',
+                'message': 'Pedido sem itens cadastrados',
+                'detail': f'O pedido #{order.pk} não possui itens associados'
+            })
+            context['has_pending_issues'] = True
+
+        order_itens = order_itens.annotate(
+            item_total=F('preco') * F('quantidade')
+        )
+        total_geral = order_itens.aggregate(
+            total=Sum('item_total')
+        )
+
+        for item in order_itens:
+            if not item.quantidade:
+                context['local_errors'].append({
+                    'type': 'item',
+                    'message': f'Item {item.produto.nome_produto} sem quantidade',
+                    'detail': f'O item #{item.id} precisa de uma quantidade válida'
+                })
+                context['has_pending_issues'] = True
+            if not item.cnpj_faturamento:
+                context['local_errors'].append({
+                    'type': 'item',
+                    'message': f'Item {item.produto.nome_produto} sem CNPJ de faturamento',
+                    'detail': f'O item #{item.id} precisa de um CNPJ de faturamento válido'
+                })
+                context['has_pending_issues'] = True
+
+        context['order_itens'] = order_itens
+        context['total_geral'] = total_geral['total']
+        carrier = order_itens.first().saida.transportadora
+        context['transportadora'] = carrier
+        quantidade_itens = len(order_itens)
+        context['quantidade_itens'] = quantidade_itens
+
+        try:
+            *_, total_ipi, total_nota, item_list = calculate_order_total(order_itens)
+
+            context['item_list'] = item_list
+            context['total_nota'] = format_to_brl_currency(total_nota)
+        except Exception as e:
+            context['local_errors'].append({
+                'type': 'cálculo',
+                'message': 'Erro ao calcular total do pedido',
+                'detail': str(e)
+            })
+            context['has_pending_issues'] = True
+
+        calculated_itens = []
+        for item, calc in zip(order_itens, item_list):
+            item_dict = {
+                'item': item,
+                'preco_unitario': calc['preco_unitario'],
+                'preco_unitario_formatado': calc['preco_unitario_formatado'],
+                'preco_total': calc['preco_total'],
+                'preco_total_formatado': calc['preco_total_formatado'],
+                'largura': calc['largura'],
+                'comprimento': calc['comprimento'],
+                'm_quadrado_unitario': calc['m_quadrado_unitario'],
+                'm_quadrado_total': calc['m_quadrado_total'],
+                'ipi': calc['ipi'],
+            }
+            calculated_itens.append(item_dict)
+
+        context['order_itens'] = calculated_itens
+        context['total_ipi'] = format_to_brl_currency(total_ipi)
+        total_pedido = sum(item['preco_total'] for item in item_list)
+        context['sub_total'] = format_to_brl_currency(total_pedido)
+
+        context['ready_to_send'] = True
+
         return context
 
 

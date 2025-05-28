@@ -15,6 +15,7 @@ _pycache_/
 *.pyo
 *.py[cod]
 *.so
+dump/test_file_encoding.py
 
 # Configurações do Django
 *.log
@@ -64,7 +65,7 @@ docker-compose.override.yml
 
 # Outros arquivos
 exemplo*
-*.json
+json/
 .flake8
 .gitignore
 OLD*
@@ -74,7 +75,7 @@ cadastro/
 BKP*
 
 # Banco de dados
-.sql
+*.sql
 *.sqlite3
 *.db
 

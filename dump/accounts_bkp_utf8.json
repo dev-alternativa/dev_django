@@ -1,0 +1,107 @@
+[
+{
+  "model": "accounts.customusuario",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$j29qL8ReZHCiihnJBzWle3$mj0iv8S518Fhz6OQs5ZjrgxcdU4JoCnAOEDVJdPFqgo=",
+    "last_login": "2025-05-26T12:47:31.935Z",
+    "is_superuser": true,
+    "username": "rpasklan",
+    "first_name": "Renato",
+    "last_name": "Pasklan",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2024-10-21T18:47:13Z",
+    "email": "dev@alternativaflexo.com.br",
+    "contato": "98992381122",
+    "departamento": "GERENCIA",
+    "unidade": "PIRACICABA",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customusuario",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rguTmDUYHXThAMer68TTHF$PcrYONq7vy3cCL0dzDleAxbu/2dIZ/w+Yt/zYabYZoU=",
+    "last_login": "2024-11-18T11:45:52Z",
+    "is_superuser": true,
+    "username": "teste",
+    "first_name": "Teste",
+    "last_name": "Teste",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2024-11-18T11:45:32Z",
+    "email": "teste@teste.com",
+    "contato": "99999999",
+    "departamento": "OUTROS",
+    "unidade": "PIRACICABA",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customusuario",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$POYTmgzI2WjqwgWbI1qKmW$zwAXiW157jMwDy2c0myxTv+L41qS0gmnAg0fvOlQjIw=",
+    "last_login": "2025-01-15T11:33:54Z",
+    "is_superuser": false,
+    "username": "rzenero",
+    "first_name": "Rodrigo",
+    "last_name": "Zenero",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-01-15T11:33:34Z",
+    "email": "rodrigo@alternativaflexo.com.br",
+    "contato": "989999999",
+    "departamento": "GERENCIA",
+    "unidade": "PIRACICABA",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customusuario",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$XyG7yQO8PRWHTGi556yEvO$kJdpHdtg4J6kL3AM949gHtufZj8Ao2rzo8UBkxYJMFQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "spanaia",
+    "first_name": "Sabrina",
+    "last_name": "Panaia",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-01-17T14:42:58.932Z",
+    "email": "financeiro@alternativaflexo.com.br",
+    "contato": "1999999999",
+    "departamento": "FINANCEIRO",
+    "unidade": "PIRACICABA",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customusuario",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$p4kFZE4GEfKRwTxlw1LQva$jw82TgBxlnvzD5cJhTDqKjQ8ViNq7KSr/99968FGiz0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "wsilva",
+    "first_name": "Wilson",
+    "last_name": "Silva",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-01-17T14:44:29.384Z",
+    "email": "wilson@wds.works",
+    "contato": "1999999999",
+    "departamento": "OPERACIONAL",
+    "unidade": "PIRACICABA",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

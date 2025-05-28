@@ -1,0 +1,190 @@
+body {
+    font-family: sans-serif;
+    color: #333;
+}
+
+.container {
+    width: 190mm;
+    margin: auto;
+}
+
+.client-section {
+    font-size: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.alternativa-section {
+    font-size: 0.8rem;
+}
+
+.logo_pdf {
+    width: 6rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.order-separation {
+    margin-bottom: 2rem;
+}
+
+.tabela {
+    font-size: 0.7rem;
+    background-color: #fff4e8;
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+    padding: 0.35rem 0.5;
+    vertical-align: top;
+    border: 1px solid #d1c2b4;
+}
+
+.tabela .table-head th,
+.tabela thead.table-head th {
+    background-color: #ffa435;
+    color: #ffffff;
+    border-color: #e08e2a;
+    border-bottom-width: 2px;
+}
+
+.totais {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.totais .tabela  {
+    width: auto;
+    margin-top: 0;
+    background-color: transparent;
+}
+
+.totais .tabela td {
+    background-color: #ffffff;
+}
+
+.totais .tabela tr:last-child td {
+    font-weight: bold;
+}
+
+.total_strong_width {
+    width: auto;
+    padding-right: 1rem;
+    text-align: right;
+    font-weight: bold;
+}
+
+.total_value_width {
+    text-align: right;
+}
+
+.other-info {
+    font-size: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.footer-info {
+    list-style-type: none;
+    font-size: 0.7rem;
+    padding-left: 0;
+    margin-top: 1rem;
+}
+
+.footer-info li {
+    margin-bottom: 0.4rem;
+}
+
+.footer-info li::before {
+    content: "- ";
+    margin-right: 5px;
+}
+
+.info-bottom {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.transp-info {
+    font-size: 0.5rem;
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.transp-info th
+.transp-info td {
+    padding: 0.35rem 0.5rem;
+    border: 1px solid #cccccc;
+    text-align: center;
+}
+
+.transp-info thead th {
+    background-color: #f8f8f8;
+    border-color: #e0e0e0;
+}
+
+/* === NOVOS UTILITÁRIOS (Substitutos do Bootstrap) === */
+
+.pdf-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    /* Opcional: Para criar um "gutter" (espaço) entre as colunas.
+       Se usar, as colunas (.pdf-col) precisarão de padding. */
+    /* margin-left: -10px; */
+    /* margin-right: -10px; */
+}
+
+.pdf-col {
+    flex-grow: 1; /* Permite que a coluna cresça */
+    flex-basis: 0;  /* Base inicial para cálculo do tamanho */
+    max-width: 100%; /* Não exceder a largura do pai */
+    /* Opcional: Padding para o "gutter" */
+    /* padding-left: 10px; */
+    /* padding-right: 10px; */
+    /* box-sizing: border-box; */ /* Importante se usar padding + width percentual */
+}
+
+/* Para layout de duas colunas (50%/50%) como parece ser seu caso: */
+.pdf-row > .pdf-col {
+    width: 50%; /* Define explicitamente que cada coluna tem 50% */
+    /* Se tiver mais de 2 .pdf-col e quiser que dividam igualmente, remova este width
+       e confie no flex-grow, ou crie classes .pdf-col-6, .pdf-col-4 etc. */
+}
+/* Se uma .pdf-row tiver apenas uma .pdf-col, ela naturalmente ocupará 100% */
+
+
+.pdf-d-block {
+    display: block !important;
+}
+
+.pdf-text-start {
+    text-align: left !important;
+}
+
+.pdf-text-end {
+    text-align: right !important;
+}
+
+.pdf-text-center {
+    text-align: center !important;
+}
+
+/* Para margens e paddings. Você usou mt-4. */
+.pdf-mt-1 { margin-top: 0.25rem !important; }
+.pdf-mt-2 { margin-top: 0.5rem !important; }
+.pdf-mt-3 { margin-top: 1rem !important; }
+.pdf-mt-4 { margin-top: 1.5rem !important; }
+.pdf-mt-5 { margin-top: 3rem !important; }
+
+.pdf-mb-1 { margin-bottom: 0.25rem !important; }
+.pdf-mb-2 { margin-bottom: 0.5rem !important; }
+.pdf-mb-3 { margin-bottom: 1rem !important; }
+.pdf-mb-4 { margin-bottom: 1.5rem !important; }
+.pdf-mb-5 { margin-bottom: 3rem !important; }
