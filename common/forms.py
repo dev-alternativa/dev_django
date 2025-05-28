@@ -1,13 +1,12 @@
 from django import forms
-from django.forms import ModelForm, Form
+from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, HTML, Submit
-from common.models import Category, CustomerSupplier, Seller, Price
+from crispy_forms.layout import Layout, Field, Row, Column, HTML
+from common.models import Category, CustomerSupplier, Seller
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 from crispy_forms.bootstrap import TabHolder, Tab, PrependedText, FieldWithButtons, StrictButton
 from crispy_bootstrap5.bootstrap5 import Switch
-from products.models import Product
-from logistic.models import LeadTime
+
 
 
 class CategoryForm(ModelForm):
@@ -233,124 +232,6 @@ class CustomerSupplierForm(ModelForm):
         self.fields['limite_credito'].widget.attrs.update({'maxlength': 8})
         self.fields['inscricao_estadual'].widget.attrs.update({'inscricao_estadual': 10})
 
-
-class PriceFormCustomer(Form):
-
-    cliente = forms.ModelChoiceField(
-        queryset=CustomerSupplier.objects.filter(tag_cliente=True),
-        label='Cliente',
-        widget=Select2Widget(
-            attrs={
-                'data-placeholder': 'Selecione um cliente',
-                'data-minimum-input-length': 3,
-                'style': 'width: 40%'
-            }
-        )
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(PriceFormCustomer, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            HTML('<h3>Pametrizar preço de cliente</h3>'),
-            Row(
-                Column(
-                    FieldWithButtons(
-                        Field('cliente', css_class='form-control col-md-2 mb-0'),
-                        Submit(
-                            value='Selecionar Cliente',
-                            name='select-cliente',
-                            css_class='btn btn-danger',
-                            id='select-cliente'
-                        ),
-                    ),
-                ),
-            ),
-        )
-
-
-class PriceFormCategory(Form):
-
-    categoria = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
-        label='Categoria',
-        widget=forms.Select(attrs={
-            'class': 'form-control',  # Adiciona a classe CSS para estilização
-
-            'id': 'categoria-select'   # Adiciona um ID para JavaScript ou CSS, se necessário
-        })
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(PriceFormCategory, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.layout = Layout(
-            HTML('<h3>Selecione a Categoria para Parametrizar</h3>'),
-            Row(
-                Column(
-                    FieldWithButtons(
-                        Field('categoria', css_class='form-control col-md-2 mb-0'),
-                        Submit(
-                            value='Selecionar Categoria',
-                            name='select-categoria',
-                            css_class='btn btn-primary',
-                            id='select-categoria'
-                        ),
-                    ),
-                ),
-            ),
-        )
-
-
-class PriceForms(ModelForm):
-
-    prazo = forms.ModelChoiceField(
-        queryset=LeadTime.objects.all(),
-        widget=Select2Widget(
-            attrs={
-                'data-placeholder': 'Selecione prazo',
-                'style': 'width: 100%!important'
-
-            }
-        )
-    )
-
-    class Meta:
-        model = Price
-        exclude = ['dt_criacao', 'dt_modificado', 'cliente']
-
-    def __init__(self, *args, **kwargs):
-
-        categoria_id = kwargs.pop('categoria_id', None)
-        super(PriceForms, self).__init__(*args, **kwargs)
-
-        self.fields['produto'].queryset = Product.objects.filter(tipo_categoria=categoria_id)
-        self.fields['valor'].label = 'Preço Unitário'
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.layout = Layout(
-            Row(
-                Column(
-                    Field('produto', css_class='form-control col-md-4 mb-0'),
-                    Field('vendedor', css_class='form-control col-md-4 mb-0'),
-                    PrependedText(
-                        'taxa_frete', 'R$',
-                        css_class='form-control col-md-4 mb-0 numericValorOnly mask-money'
-                    ),
-                ),
-                Column(
-                    Field('condicao', css_class='form-control col-md-4 mb-0'),
-                    Field('valor', css_class='form-control col-md-4 mb-0'),
-                    Field('tipo_frete', css_class='form-control col-md-4 mb-0')
-                ),
-                Column(
-                    Field('prazo', css_class='form-control col-md-6 mb-0'),
-                    Field('cnpj_faturamento', css_class='form-control col-md-6 mb-0'),
-                    Switch('is_dolar', css_class='form-control col-md-4 mb-0'),
-                    # Submit('btnAddClientPrice', '+', css_class='btn btn-info float-end'),
-                ),
-            ),
-        )
 
 # DiversosFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])
 # LaminasFormSet = forms.modelformset_factory(Price, form=TabsPriceFormset, extra=1, exclude=['ativo', ])

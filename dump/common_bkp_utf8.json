@@ -37190,66 +37190,6 @@
   }
 },
 {
-  "model": "common.price",
-  "pk": 1,
-  "fields": {
-    "dt_criacao": "2025-03-19T12:13:44.833Z",
-    "dt_modificado": "2025-03-19T14:48:10.892Z",
-    "ativo": false,
-    "produto": 24,
-    "cliente": 11,
-    "valor": "10.00",
-    "is_dolar": true,
-    "prazo": 3745,
-    "cnpj_faturamento": 2,
-    "condicao": "Normal",
-    "vendedor": 241,
-    "taxa_frete": "50.00",
-    "tipo_frete": 2,
-    "obs": ""
-  }
-},
-{
-  "model": "common.price",
-  "pk": 2,
-  "fields": {
-    "dt_criacao": "2025-05-23T12:21:19.436Z",
-    "dt_modificado": "2025-05-23T12:21:19.436Z",
-    "ativo": false,
-    "produto": 21,
-    "cliente": 864,
-    "valor": "1000.00",
-    "is_dolar": false,
-    "prazo": 3753,
-    "cnpj_faturamento": 2,
-    "condicao": "Normal",
-    "vendedor": 241,
-    "taxa_frete": null,
-    "tipo_frete": 6,
-    "obs": ""
-  }
-},
-{
-  "model": "common.price",
-  "pk": 3,
-  "fields": {
-    "dt_criacao": "2025-05-23T12:24:04.923Z",
-    "dt_modificado": "2025-05-23T12:24:04.923Z",
-    "ativo": false,
-    "produto": 21,
-    "cliente": 864,
-    "valor": "1000.00",
-    "is_dolar": false,
-    "prazo": 3753,
-    "cnpj_faturamento": 2,
-    "condicao": "Normal",
-    "vendedor": 241,
-    "taxa_frete": null,
-    "tipo_frete": 6,
-    "obs": ""
-  }
-},
-{
   "model": "common.seller",
   "pk": 225,
   "fields": {

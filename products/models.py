@@ -1,5 +1,15 @@
 from django.db import models
 from core.models import Base
+from common.models import CustomerSupplier
+from logistic.models import Freight
+
+
+CONDICAO_PRECO = (
+    ('Normal', 'Normal'),
+    ('Especial1', 'Especial 1'),
+    ('Especial2', 'Especial 2'),
+    ('Especial3', 'Especial 3'),
+)
 
 TIPO_ALTERACAO = (
     ('E', 'Entrada'),
@@ -128,3 +138,26 @@ class Location(Base):
 
     def __str__(self):
         return self.nome
+
+
+
+
+class Price(Base):
+    produto = models.ForeignKey('products.Product', verbose_name='Produto', on_delete=models.CASCADE, related_name='precos')
+    cliente = models.ForeignKey(CustomerSupplier, verbose_name='Cliente', on_delete=models.CASCADE, related_name='precos')
+    valor = models.DecimalField('Valor', max_digits=10, decimal_places=2)
+    is_dolar = models.BooleanField('Dolar', default=False)
+    prazo = models.ForeignKey('logistic.LeadTime', verbose_name='Prazo', on_delete=models.CASCADE, null=True, blank=True, related_name='precos')
+    cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='precos')
+    condicao = models.CharField('Condição de Cálculo', choices=CONDICAO_PRECO, max_length=100, null=True, blank=True)
+    vendedor = models.ForeignKey('common.Seller', verbose_name='Vendedor', on_delete=models.CASCADE, related_name='precos')
+    taxa_frete = models.DecimalField('Taxa Frete', max_digits=10, decimal_places=2, null=True, blank=True)
+    tipo_frete = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='precos')
+    obs = models.TextField('Observações', null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Preço'
+        verbose_name_plural = 'Preços'
+
+    def __str__(self):
+        return str(self.valor)

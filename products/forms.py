@@ -1,11 +1,133 @@
-from django import forms
-from django.forms import ModelForm
+from crispy_bootstrap5.bootstrap5 import Switch
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, Row, Column, HTML, Div
-from crispy_forms.bootstrap import TabHolder, Tab
+from crispy_forms.layout import Layout, Field, Row, Column, HTML, Div, Submit
+from crispy_forms.bootstrap import TabHolder, Tab, FieldWithButtons, PrependedText
+from django import forms
+from django.forms import ModelForm, Form
 from django_select2.forms import Select2Widget
-from products.models import Product, CoordinateSetting, Location
-from common.models import Category
+
+from common.models import Category, CustomerSupplier
+from logistic.models import LeadTime
+from products.models import CoordinateSetting, Location, Price, Product
+
+
+class PriceFormCustomer(Form):
+
+    cliente = forms.ModelChoiceField(
+        queryset=CustomerSupplier.objects.filter(tag_cliente=True),
+        label='Cliente',
+        widget=Select2Widget(
+            attrs={
+                'data-placeholder': 'Selecione um cliente',
+                'data-minimum-input-length': 3,
+                'style': 'width: 40%'
+            }
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(PriceFormCustomer, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            HTML('<h3>Pametrizar preço de cliente</h3>'),
+            Row(
+                Column(
+                    FieldWithButtons(
+                        Field('cliente', css_class='form-control col-md-2 mb-0'),
+                        Submit(
+                            value='Selecionar Cliente',
+                            name='select-cliente',
+                            css_class='btn btn-danger',
+                            id='select-cliente'
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+
+class PriceFormCategory(Form):
+
+    categoria = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        label='Categoria',
+        widget=forms.Select(attrs={
+            'class': 'form-control',  # Adiciona a classe CSS para estilização
+
+            'id': 'categoria-select'   # Adiciona um ID para JavaScript ou CSS, se necessário
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(PriceFormCategory, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            HTML('<h3>Selecione a Categoria para Parametrizar</h3>'),
+            Row(
+                Column(
+                    FieldWithButtons(
+                        Field('categoria', css_class='form-control col-md-2 mb-0'),
+                        Submit(
+                            value='Selecionar Categoria',
+                            name='select-categoria',
+                            css_class='btn btn-primary',
+                            id='select-categoria'
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+
+class PriceForms(ModelForm):
+
+    prazo = forms.ModelChoiceField(
+        queryset=LeadTime.objects.all(),
+        widget=Select2Widget(
+            attrs={
+                'data-placeholder': 'Selecione prazo',
+                'style': 'width: 100%!important'
+
+            }
+        )
+    )
+
+    class Meta:
+        model = Price
+        exclude = ['dt_criacao', 'dt_modificado', 'cliente']
+
+    def __init__(self, *args, **kwargs):
+
+        categoria_id = kwargs.pop('categoria_id', None)
+        super(PriceForms, self).__init__(*args, **kwargs)
+
+        self.fields['produto'].queryset = Product.objects.filter(tipo_categoria=categoria_id)
+        self.fields['valor'].label = 'Preço Unitário'
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('produto', css_class='form-control col-md-4 mb-0'),
+                    Field('vendedor', css_class='form-control col-md-4 mb-0'),
+                    PrependedText(
+                        'taxa_frete', 'R$',
+                        css_class='form-control col-md-4 mb-0 numericValorOnly mask-money'
+                    ),
+                ),
+                Column(
+                    Field('condicao', css_class='form-control col-md-4 mb-0'),
+                    Field('valor', css_class='form-control col-md-4 mb-0'),
+                    Field('tipo_frete', css_class='form-control col-md-4 mb-0')
+                ),
+                Column(
+                    Field('prazo', css_class='form-control col-md-6 mb-0'),
+                    Field('cnpj_faturamento', css_class='form-control col-md-6 mb-0'),
+                    Switch('is_dolar', css_class='form-control col-md-4 mb-0'),
+                    # Submit('btnAddClientPrice', '+', css_class='btn btn-info float-end'),
+                ),
+            ),
+        )
 
 
 class CoordinateForm(ModelForm):

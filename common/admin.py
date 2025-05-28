@@ -1,5 +1,5 @@
 from django.contrib import admin
-from common.models import Category, CustomerSupplier, Seller, Price, CNPJFaturamento, ContaCorrente
+from common.models import Category, CustomerSupplier, Seller, CNPJFaturamento, ContaCorrente
 
 
 @admin.register(Category)
@@ -20,13 +20,6 @@ class SellerAdmin(admin.ModelAdmin):
     list_display = ('nome', 'cod_omie_com', 'cod_omie_ind', 'cod_omie_pre', 'cod_omie_mrx', 'cod_omie_flx', 'cod_omie_srv', 'representante', 'ativo')
     search_fields = ('nome', 'cod_omie_com', 'cod_omie_ind', 'cod_omie_pre', 'cod_omie_mrx', 'cod_omie_flx', 'cod_omie_srv', 'representante', 'email')
     list_filter = ('representante', 'email')
-
-
-@admin.register(Price)
-class PriceAdmin(admin.ModelAdmin):
-    list_display = ('produto', 'cliente', 'valor', 'is_dolar', 'prazo', 'cnpj_faturamento', 'condicao', 'obs')
-    search_fields = ('cliente', 'valor', 'cnpj_faturamento', 'condicao')
-    list_filter = ('is_dolar', 'cnpj_faturamento')
 
 
 @admin.register(CNPJFaturamento)

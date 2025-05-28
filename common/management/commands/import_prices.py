@@ -3,9 +3,9 @@ import re
 import openpyxl
 from decimal import Decimal, ROUND_HALF_UP
 from django.core.management.base import BaseCommand
-from common.models import Price, CustomerSupplier, CNPJFaturamento, Seller
+from common.models import CustomerSupplier, CNPJFaturamento, Seller
 from logistic.models import LeadTime, Freight
-from products.models import Product
+from products.models import Price, Product
 
 
 class Command(BaseCommand):

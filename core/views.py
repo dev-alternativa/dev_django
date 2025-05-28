@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -39,8 +40,14 @@ class PDFGeneratorView(View):
         :return: PDF gerado.
         """
         html_string = render_to_string(self.template_name, context)
-        base_url = self.request.build_absolute_uri('/')
-        pdf_file = HTML(string=html_string, base_url=base_url).write_pdf()
+
+        if settings.DEBUG:
+            effective_base_url = self.request.build_absolute_uri('/')
+        else:
+            effective_base_url = 'http://nginx/'
+
+
+        pdf_file = HTML(string=html_string, base_url=effective_base_url).write_pdf()
         return pdf_file
 
     def get(self, request, *args, **kwargs):

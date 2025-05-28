@@ -1,7 +1,3 @@
-from api_omie.views import get_client_from_omie, get_financial_data_from_omie
-from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente, Price
-from core.views import FormMessageMixin, FormataDadosMixin, format_to_brl_currency
-from datetime import timedelta
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -16,9 +12,11 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy, reverse
 
-from core.views import PDFGeneratorView
+from api_omie.views import get_client_from_omie, get_financial_data_from_omie
+from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente
+from core.views import FormMessageMixin, FormataDadosMixin, format_to_brl_currency, PDFGeneratorView
 from logistic.models import Carrier, LeadTime, Freight
-from products.models import Product
+from products.models import Price, Product
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from transactions.models import TaxScenario

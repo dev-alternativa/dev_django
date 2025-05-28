@@ -1,5 +1,5 @@
 from django.contrib import admin
-from products.models import Product, CoordinateSetting, Location
+from products.models import CoordinateSetting, Location, Price, Product
 
 
 @admin.register(CoordinateSetting)
@@ -12,6 +12,13 @@ class CoodinateSettingAdmin(admin.ModelAdmin):
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ('nome',)
+
+
+@admin.register(Price)
+class PriceAdmin(admin.ModelAdmin):
+    list_display = ('produto', 'cliente', 'valor', 'is_dolar', 'prazo', 'cnpj_faturamento', 'condicao', 'obs')
+    search_fields = ('cliente', 'valor', 'cnpj_faturamento', 'condicao')
+    list_filter = ('is_dolar', 'cnpj_faturamento')
 
 
 @admin.register(Product)
