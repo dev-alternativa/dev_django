@@ -101,7 +101,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'altflex.middleware.DebuggingMiddleware',  # Middleware de depuração
+    'altflex.settings.DebuggingMiddleware',  # Middleware de depuração
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
