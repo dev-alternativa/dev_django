@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ConsultaCNPJAPIView, ConsultaCEPAPIVIew, ConsultaDolarPTAX
+from .services import ConsultaCNPJAPIView, ConsultaCEPAPIVIew, ConsultaDolarPTAX
 
 
 urlpatterns = [

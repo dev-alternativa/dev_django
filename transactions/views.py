@@ -12,6 +12,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from django.urls import reverse_lazy, reverse
 
+from api.services import get_dolar_ptax
 from api_omie.views import get_client_from_omie, get_financial_data_from_omie
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente
 from core.views import FormMessageMixin, FormataDadosMixin, format_to_brl_currency, PDFGeneratorView
@@ -607,24 +608,18 @@ class OrderCreateView(FormMessageMixin, CreateView):
     success_message = 'Novo Pedido Gerado com sucesso!'
     form_class = OutflowsForm
 
-    def get_dolar_ptax(self):
-        api_url = self.request.build_absolute_uri('/api/dolar_hoje/')
-        response = requests.get(api_url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
-
     def get_initial(self):
         initial = super().get_initial()
-        dolar_ptax = self.get_dolar_ptax()
-        if dolar_ptax:
+        dolar = get_dolar_ptax()
+        if dolar:
             try:
-                value = dolar_ptax.get('value')[0]['cotacaoVenda']
+                value = dolar.get('value')[0]['cotacaoVenda']
                 initial['dolar_ptax'] = value
             except(IndexError, KeyError, TypeError) as e:
                 print(f'Erro ao recuperar valor do dolar: {e}')
                 initial['dolar_ptax'] = None
+        else:
+            initial['dolar_ptax'] = None
         return initial
 
     def get_context_data(self, **kwargs):
