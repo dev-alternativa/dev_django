@@ -1,25 +1,6 @@
 from dotenv import load_dotenv
 from pathlib import Path
-import os, sys
-
-
-class DebuggingMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        host_header = request.META.get('HTTP_HOST')
-        x_forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST')
-        real_ip = request.META.get('HTTP_X_REAL_IP')
-        forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-
-        print(f"DEBUG: Request Host: {host_header}", file=sys.stderr)
-        print(f"DEBUG: X-Forwarded-Host: {x_forwarded_host}", file=sys.stderr)
-        print(f"DEBUG: X-Real-IP: {real_ip}", file=sys.stderr)
-        print(f"DEBUG: X-Forwarded-For: {forwarded_for}", file=sys.stderr)
-
-        response = self.get_response(request)
-        return response
+import os
 
 
 load_dotenv()
@@ -101,7 +82,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'altflex.settings.DebuggingMiddleware',  # Middleware de depuração
+    # 'altflex.settings.DebuggingMiddleware',  # Middleware de depuração
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -133,10 +114,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'altflex.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -151,10 +128,6 @@ DATABASES = {
         },
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -171,10 +144,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
 LANGUAGE_CODE = 'pt-BR'
 
 TIME_ZONE = 'America/Sao_Paulo'
@@ -184,10 +153,6 @@ USE_I18N = True
 USE_TZ = True
 
 USE_L10N = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
