@@ -15,12 +15,14 @@ services:
       - mysql_data:/var/lib/mysql
     env_file:
       - .env.hml
+    restart: unless-stopped
 
   web:
     build:
       context: .
     image: django_app_hml:v1
     container_name: django_app
+    restart: always
     volumes:
       - .:/app_alternativa
       - static_volume:/app_alternativa/staticfiles
@@ -39,6 +41,7 @@ services:
   nginx:
     image: nginx:1.25-alpine
     container_name: nginx_server
+    restart: always
     volumes:
       - static_volume:/app_alternativa/staticfiles
       - media_volume:/app_alternativa/media
