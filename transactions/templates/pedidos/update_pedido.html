@@ -843,6 +843,19 @@ $(document).ready(function() {
             isDolar = data.is_dolar;
             let preco = data.preco;
             let taxa_frete_item = data.taxa_frete_item
+            let $selectApp = $('#id_cnpj_faturamento');
+
+            $selectApp.empty();
+            $selectApp.append('<option value="">---------</option>');
+
+            $.each(data.cnpj_faturamento_options, function(index, item) {
+              $selectApp.append(
+                $('<option>', {
+                  value: item.id,
+                  text: item.sigla
+                })
+              );
+            });
 
             // Atualiza o valores do modal de adição de produto
             /** Caso o preço seja cadastrado como dolar, já verificar e multiplica corretamente,
@@ -854,7 +867,7 @@ $(document).ready(function() {
             console.log('Prazo:', data.prazo_item);
             $('#id_preco').val(preco);
             $('#id_conta_corrente').val(data.cc);
-            $('#id_cnpj_faturamento').val(data.cnpj_faturamento);
+            //$('#id_cnpj_faturamento').val(data.cnpj_faturamento);
             $('#id_prazo_item').val(data.prazo_item);
 
 

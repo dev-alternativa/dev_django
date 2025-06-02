@@ -17,6 +17,7 @@ from api_omie.views import get_client_from_omie, get_financial_data_from_omie
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente
 from core.views import FormMessageMixin, FormataDadosMixin, format_to_brl_currency, PDFGeneratorView
 from logistic.models import Carrier, LeadTime, Freight
+from itertools import chain
 from products.models import Price, Product
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
@@ -668,7 +669,7 @@ class OrderEditDetailsView(UpdateView):
             }
         )
         context['item_form'] = item_form
-        context['categories'] = Category.objects.all()
+        context['categories'] = Category.objects.filter(ativo=1)
         # context['price'] = preco
 
         # verifica qual tag de cadastro está ativa para o cliente
@@ -1980,6 +1981,23 @@ def get_filtered_products(request):
         proximo_pedido_id = pedido.saida_items.count() + 1
         cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
 
+        # Seleciona apenas as tags com CNPJ que o cliente possui no OMIE
+        tags = [
+            (cliente.tag_cadastro_omie_com, 'COM'),
+            (cliente.tag_cadastro_omie_ind, 'IND'),
+            (cliente.tag_cadastro_omie_pre, 'PRE'),
+            (cliente.tag_cadastro_omie_flx, 'FLX'),
+            (cliente.tag_cadastro_omie_mrx, 'MRX'),
+            (cliente.tag_cadastro_omie_srv, 'SRV'),
+        ]
+        try:
+            client_tags = [tag for valor, tag in tags if valor and str(valor).strip() and int(str(valor).strip())]
+
+        except (ValueError, TypeError):
+            print(f'Erro ao converter tags do cliente {cliente.id}: {tags}')
+
+        valid_client_cnpj = list(CNPJFaturamento.objects.filter(sigla__in=client_tags).values('id', 'sigla'))
+
         origem_frete = 'tabela_preco' if preco and preco.taxa_frete else 'tabela_cliente'
 
         taxa_frete = getattr(preco, 'taxa_frete', None)
@@ -1992,14 +2010,14 @@ def get_filtered_products(request):
         elif getattr(cliente, 'tipo_frete', None):
             tipo_frete = cliente.tipo_frete.id
 
-        print(f'Tipo frete: {tipo_frete}')
+        # print(f'Tipo frete: {tipo_frete}')
 
         data = {
             'id': order_id,
             'nome': product.nome_produto,
             'preco': preco.valor if preco else '',
             'cc': cc.pk if cc else '',
-            'cnpj_faturamento': preco.cnpj_faturamento.id if preco else '',
+            'cnpj_faturamento_options': valid_client_cnpj,
             'largura': product.largura,
             'comprimento': product.comprimento,
             'prazo_item': preco.prazo.id if preco else '',
