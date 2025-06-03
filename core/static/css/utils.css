@@ -57,3 +57,9 @@
   --bs-table-bg: #dc3545 !important;
   --bs-table-color: #fff !important;
 }
+
+.escurecer {
+    filter: brightness(50%);
+    pointer-events: none;
+}
+

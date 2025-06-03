@@ -1228,6 +1228,52 @@ $(document).ready(function() {
   <script>
     /** Habilita pesquiza para selectbox */
     $('.search_select').select2();
+    /**
+    Resolve problema de z-index entre o modal, o Select2
+    e o input do select
+    */
+    $('#id_prazo_item').select2({
+        dropdownParent: $('#itemsModal')
+    });
+    {% comment %} $('.modal').css('z-index', '1051'); {% endcomment %}
+    $('.select2-container').css('z-index', '1052');
+
+    $('#itemsModal').on('shown.bs.modal', function () {
+        $(this).removeAttr('tabindex');
+    });
+    $('#categoryOrderModal').on('shown.bs.modal', function () {
+        $(this).removeAttr('tabindex');
+    });
+    $('#productOrderModal').on('shown.bs.modal', function () {
+        $(this).removeAttr('tabindex');
+    });
+
+    $('#itemsModal').on('show.bs.modal', function () {
+      $('.select2-container').not($(this).find('.select2-container')).addClass('escurecer');
+    });
+
+    $('#categoryOrderModal').on('show.bs.modal', function () {
+      $('.select2-container').not($(this).find('.select2-container')).addClass('escurecer');
+    });
+
+    $('#productOrderModal').on('show.bs.modal', function () {
+      $('.select2-container').not($(this).find('.select2-container')).addClass('escurecer');
+    });
+
+    $('#itemsModal').on('hidden.bs.modal', function () {
+        $('.select2-container').removeClass('escurecer');
+    });
+
+    $('#categoryOrderModal').on('hidden.bs.modal', function () {
+        $('.select2-container').removeClass('escurecer');
+    });
+
+    $('#productOrderModal').on('hidden.bs.modal', function () {
+        $('.select2-container').removeClass('escurecer');
+    });
+
+
+
   </script>
 {% endblock %}
 

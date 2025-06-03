@@ -1,3 +1,4 @@
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block extra_css %}
@@ -119,3 +120,10 @@
         </div>
     </div>
 </div>
+{% comment %} {% block extra_scripts %}
+    <script src="{% static 'js/select2.min.js' %}"></script>
+    <script>
+
+
+    </script>
+{% endblock %} {% endcomment %}

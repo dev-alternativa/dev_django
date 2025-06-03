@@ -4,7 +4,7 @@ from crispy_forms.helper import FormHelper
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
 from django_select2.forms import Select2Widget
 from common.models import Category, CustomerSupplier
-
+from products.models import Product
 
 class InflowsForm(forms.ModelForm):
 
@@ -189,10 +189,19 @@ class OrderItemsForm(forms.ModelForm):
         model = OutflowsItems
         exclude = ['dt_criacao', 'dt_modificado', 'ativo']
         widgets = {
-            'produto': Select2Widget(
+            'id_productSelect': Select2Widget(
                 attrs={
-                    'data-placeholder': 'Diferencia maiúsculas de minúsculas',
-                    'data-minimum-input-length': 3,
+                    'id': 'id_productSelect',
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Digite no mínimo 3 caracteres',
+                    'class': 'search_select',
+                }
+            ),
+            'prazo_item': Select2Widget(
+                attrs={
+                    'data-language': 'pt-br',
+                    'data-placeholder': 'Digite no mínimo 3 caracteres',
+                    'class': 'search_select',
                 }
             ),
             'dados_adicionais_item': forms.Textarea(attrs={'rows': 3}),
@@ -207,4 +216,5 @@ class OrderItemsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['tipo_frete_item'].empty_label = None
+        self.fields['produto'].queryset = Product.objects.filter(ativo=True)
 
