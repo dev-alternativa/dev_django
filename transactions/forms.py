@@ -9,7 +9,7 @@ from common.models import Category, CustomerSupplier
 class InflowsForm(forms.ModelForm):
 
     categoria = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
+        queryset=Category.objects.filter(ativo=True),
         widget=Select2Widget(
             attrs={
                 'data-placeholder': 'Selecione a categoria',

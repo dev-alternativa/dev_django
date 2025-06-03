@@ -549,6 +549,40 @@ function calculateProductValuesByCategory(
 $(document).ready(function() {
 
 
+  $('#id_cnpj_faturamento').on('change', function() {
+    let selectedAPP = $(this).val();
+    let sigla= $(this).find('option:selected').text();
+    //console.log('CNPJ Faturamento selecionado:', selectedAPP, sigla);
+
+    if (selectedAPP){
+      $.ajax({
+        url:  '/select_current_account/',
+        type: 'POST',
+        data: {
+          'account_id': selectedAPP,
+          'sigla': sigla,
+          'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+        },
+        success: function(response){
+          if (response.success){
+            console.log('Conta Corrente atualizada:', response.data);
+            $('#id_conta_corrente').val(response.data.id).trigger('change');
+          }else{
+            console.error('Erro ao atualizar conta corrente:', response.error);
+            alert('Erro ao atualizar conta corrente');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Erro na requisição:', error);
+          alert('Erro ao atualizar conta corrente');
+        }
+
+      });
+    }
+
+
+  });
+
 
   document.getElementById('id_prazo_item').addEventListener('change', function(event) {
     console.log('Valor selecionado:', this.value);

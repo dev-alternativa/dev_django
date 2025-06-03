@@ -2047,3 +2047,57 @@ def get_filtered_products(request):
             "success": False,
             "error": str(e),
         }, status=500)
+
+def select_current_account(request):
+    """
+    Seleciona a conta corrente atual para o pedido.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+
+    Returns:
+        JsonResponse: Uma resposta JSON com a conta corrente selecionada ou uma mensagem de erro.
+    """
+    if request.method != 'POST':
+        return JsonResponse({
+            "success": False,
+            "error": "Método não permitido!",
+        }, status=405)
+
+    try:
+        account_id = request.POST.get('account_id')
+        sigla = request.POST.get('sigla')
+
+        print(f'Selecionando conta corrente para o app {sigla} com ID {account_id}')
+
+        if not account_id:
+            return JsonResponse({
+                "success": False,
+                "error": "ID da conta corrente não fornecido.",
+            }, status=400)
+
+        account = ContaCorrente.objects.filter(padrao=True, cnpj=account_id).first()
+        # print(f'Conta corrente selecionada: {account} para o app {sigla}')
+        if not account:
+            return JsonResponse({
+                "success": False,
+                "error": "Conta corrente não encontrada.",
+            }, status=404)
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Conta Corrente {sigla} selecionada com sucesso!",
+            "data": {
+                "id": account.id,
+                "descricao": account.descricao,
+
+            }
+        }, status=200)
+
+
+    except Exception as e:
+        print(f'Erro ao selecionar conta corrente: {e}')
+        return JsonResponse({
+            "success": False,
+            "error": str(e),
+        }, status=500)
