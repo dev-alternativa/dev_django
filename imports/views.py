@@ -105,7 +105,7 @@ class ImportCustomerSupplierView(FormView):
         # Lista de possíveis categorias (Colunas booleanas na planilha)
         categorias_colunas = [
             'SUPERLAM', 'TESA', 'DIVERSOS', 'LAMINAS',
-            'MÁQUINAS', 'NYLOPRINT', 'NYLOFLEX', 'NOVOS'
+            'MÁQUINAS', 'NYLOPRINT', 'NYLOFLEX', 'NOVOS', 'GRAVACAO'
         ]
 
         # Tenta carregar arquivo Excel
@@ -130,9 +130,9 @@ class ImportCustomerSupplierView(FormView):
         # Limpeza do DataFrame
         # Substitui `NaN` de alguns campos para valores padrõs
         print("Iniciando limpeza do Dataframe, preenchendo com valores padrões possíveis colunas vazias...")
-        df['Modalidade do Frete'] = df['Modalidade do Frete'].fillna('9')
-        df['Frete'] = df['Frete'].fillna('0.00')
-        df['valor_limite_credito_total'] = df['valor_limite_credito_total'].fillna('0.00')
+        df['tipo_frete'] = df['tipo_frete'].fillna('9')
+        df['taxa_frete'] = df['taxa_frete'].fillna('0.00')
+        df['limite_credito'] = df['limite_credito'].fillna('0.00')
         df['SUPERLAM'] = df['SUPERLAM'].fillna('0')
         df['TESA'] = df['TESA'].fillna('0')
         df['DIVERSOS'] = df['DIVERSOS'].fillna('0')
@@ -142,25 +142,25 @@ class ImportCustomerSupplierView(FormView):
         df['NYLOFLEX'] = df['NYLOFLEX'].fillna('0')
         df['NOVOS'] = df['NOVOS'].fillna('0')
         df['cep'] = df['cep'].fillna('0')
-        df['Número de Parcelas'] = df['Número de Parcelas'].fillna('A Vista')
-        df['codigo_cliente_omie_COM'] = df['codigo_cliente_omie_COM'].fillna('0')
-        df['codigo_cliente_omie_IND'] = df['codigo_cliente_omie_IND'].fillna('0')
-        df['codigo_cliente_omie_PRE'] = df['codigo_cliente_omie_PRE'].fillna('0')
-        df['codigo_cliente_omie_MRX'] = df['codigo_cliente_omie_MRX'].fillna('0')
-        df['codigo_cliente_omie_FLX'] = df['codigo_cliente_omie_FLX'].fillna('0')
-        df['codigo_cliente_omie_SRV'] = df['codigo_cliente_omie_SRV'].fillna('0')
+        # df['Número de Parcelas'] = df['Número de Parcelas'].fillna('A Vista')
+        df['tag_cadastro_omie_COM'] = df['tag_cadastro_omie_COM'].fillna('0')
+        df['tag_cadastro_omie_IND'] = df['tag_cadastro_omie_IND'].fillna('0')
+        df['tag_cadastro_omie_PRE'] = df['tag_cadastro_omie_PRE'].fillna('0')
+        df['tag_cadastro_omie_MRX'] = df['tag_cadastro_omie_MRX'].fillna('0')
+        df['tag_cadastro_omie_FLX'] = df['tag_cadastro_omie_FLX'].fillna('0')
+        df['tag_cadastro_omie_SRV'] = df['tag_cadastro_omie_SRV'].fillna('0')
 
         print("Convertendo colunas para formato correto antes de salvar no banco..")
         # remove parte decimal de CEP e converte pra string
         df['cep'] = df['cep'].astype(int).astype(str)
-        df['Modalidade do Frete'] = df['Modalidade do Frete'].astype(int).astype(str)
-        df['Frete'] = df['Frete'].astype(float).astype(str)
-        df['codigo_cliente_omie_COM'] = df['codigo_cliente_omie_COM'].astype(int).astype(str)
-        df['codigo_cliente_omie_IND'] = df['codigo_cliente_omie_IND'].astype(int).astype(str)
-        df['codigo_cliente_omie_PRE'] = df['codigo_cliente_omie_PRE'].astype(int).astype(str)
-        df['codigo_cliente_omie_MRX'] = df['codigo_cliente_omie_MRX'].astype(int).astype(str)
-        df['codigo_cliente_omie_FLX'] = df['codigo_cliente_omie_FLX'].astype(int).astype(str)
-        df['codigo_cliente_omie_SRV'] = df['codigo_cliente_omie_SRV'].astype(int).astype(str)
+        df['tipo_frete'] = df['tipo_frete'].astype(int).astype(str)
+        df['taxa_frete'] = df['taxa_frete'].astype(float).astype(str)
+        df['tag_cadastro_omie_COM'] = df['tag_cadastro_omie_COM'].astype(int).astype(str)
+        df['tag_cadastro_omie_IND'] = df['tag_cadastro_omie_IND'].astype(int).astype(str)
+        df['tag_cadastro_omie_PRE'] = df['tag_cadastro_omie_PRE'].astype(int).astype(str)
+        df['tag_cadastro_omie_MRX'] = df['tag_cadastro_omie_MRX'].astype(int).astype(str)
+        df['tag_cadastro_omie_FLX'] = df['tag_cadastro_omie_FLX'].astype(int).astype(str)
+        df['tag_cadastro_omie_SRV'] = df['tag_cadastro_omie_SRV'].astype(int).astype(str)
 
         # Substitui 'NaN' por 'N/A'
         print("Preenchendo o resto das colunas com N/A...")
@@ -169,24 +169,24 @@ class ImportCustomerSupplierView(FormView):
         # return False
         # Verifica o mínimo de colunas preenchidas para processar
         colunas_esperadas = [
-            'cnpj_cpf',
+            'cnpj',
             'nome_fantasia',
             'razao_social',
             'inscricao_estadual',
             'cidade',
             'email',
             'endereco',
-            'endereco_numero',
+            'numero',
             'bairro',
             'estado',
             'cep',
-            'Modalidade do Frete',
+            'tipo_frete',
             'contribuinte',
-            'telefone1_numero',
-            'Cliente',
-            'Fornecedor',
+            'telefone',
+            'tag_cliente',
+            'tag_fornecedor',
             'Transportadora (CNPJ/CPF)',
-            'Número de Parcelas',
+            # 'Número de Parcelas',
         ]
 
         colunas_ausentes = [column for column in colunas_esperadas if column not in df.columns]
@@ -219,7 +219,7 @@ class ImportCustomerSupplierView(FormView):
                         transportadora.save()
 
                     print("Verificando Tipo de Frete...")
-                    freight_value = str(row.get('Modalidade do Frete', ''))
+                    freight_value = str(row.get('tipo_frete', ''))
                     print(f"Tipo de frete: {freight_value}")
                     tipo_frete = freight_cache.get(freight_value, freight_default)
 
@@ -228,7 +228,7 @@ class ImportCustomerSupplierView(FormView):
 
                     print("Salvando dados no banco...")
                     obj, created = CustomerSupplier.objects.update_or_create(
-                        cnpj=self.remover_nao_numericos(row.get('cnpj_cpf', '')),
+                        cnpj=self.remover_nao_numericos(row.get('cnpj', '')),
                         defaults={
                             'nome_fantasia': row.get('nome_fantasia', ''),
                             'razao_social': row.get('razao_social', ''),
@@ -238,27 +238,27 @@ class ImportCustomerSupplierView(FormView):
                             'endereco': row.get('endereco', ''),
                             'bairro': row.get('bairro', ''),
                             'complemento': row.get('complemento', ''),
-                            'numero': row.get('endereco_numero', ''),
-                            'telefone': row.get('telefone1_numero'),
+                            'numero': row.get('numero', ''),
+                            'telefone': row.get('telefone'),
                             'ddd': row.get('telefone1_ddd', ''),
                             'cep': row.get('cep', ''),
                             'email': row.get('email', 'Não definido'),
                             'nome_contato': row.get('contato', ''),
                             'tipo_frete': tipo_frete,
                             # Regra: taxa só existe se a modalidade de frete for do tipo 3
-                            'taxa_frete': row.get('Frete') if int(row.get('Modalidade do Frete')) == 3 else '0,00',
+                            'taxa_frete': row.get('taxa_frete') if int(row.get('tipo_frete')) == 3 else '0,00',
                             'cliente_transportadora': transportadora,
                             'inscricao_estadual': self.remover_nao_numericos(row.get('inscricao_estadual', '')),
-                            'limite_credito': row.get('valor_limite_credito_total', '0'),
+                            'limite_credito': row.get('limite_credito', '0'),
                             'contribuinte': 1 if row.get('contribuinte') == 'S' else 0,
-                            'tag_cliente': 1 if int(row.get('Cliente')) == 1 else 0,
-                            'tag_fornecedor': 1 if int(row.get('Fornecedor')) == 1 else 0,
-                            'tag_cadastro_omie_com': row.get('codigo_cliente_omie_COM', '0'),
-                            'tag_cadastro_omie_ind': row.get('codigo_cliente_omie_IND', '0'),
-                            'tag_cadastro_omie_pre': row.get('codigo_cliente_omie_PRE', '0'),
-                            'tag_cadastro_omie_mrx': row.get('codigo_cliente_omie_MRX', '0'),
-                            'tag_cadastro_omie_flx': row.get('codigo_cliente_omie_FLX', '0'),
-                            'tag_cadastro_omie_srv': row.get('codigo_cliente_omie_SRV', '0'),
+                            'tag_cliente': 1 if int(row.get('tag_cliente')) == 1 else 0,
+                            'tag_fornecedor': 1 if int(row.get('tag_fornecedor')) == 1 else 0,
+                            'tag_cadastro_omie_com': row.get('tag_cadastro_omie_COM', '0'),
+                            'tag_cadastro_omie_ind': row.get('tag_cadastro_omie_ind', '0'),
+                            'tag_cadastro_omie_pre': row.get('tag_cadastro_omie_pre', '0'),
+                            'tag_cadastro_omie_mrx': row.get('tag_cadastro_omie_mrx', '0'),
+                            'tag_cadastro_omie_flx': row.get('tag_cadastro_omie_flx', '0'),
+                            'tag_cadastro_omie_srv': row.get('tag_cadastro_omie_srv', '0'),
                         }
                     )
 
