@@ -1,6 +1,7 @@
 body {
     font-family: sans-serif;
     color: #333;
+    font-size: small;
 }
 
 .container {
@@ -9,18 +10,18 @@ body {
 }
 
 .client-section {
-    font-size: 0.8rem;
-    margin-bottom: 1.5rem;
+    font-size: 0.6rem;
+    margin-bottom: 0.5rem;
 }
 
 .alternativa-section {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
 }
 
 .logo_pdf {
-    width: 6rem;
+    width: 4rem;
     display: block;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .order-separation {
@@ -31,8 +32,8 @@ body {
     font-size: 0.7rem;
     background-color: #fff4e8;
     width: 100%;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
     border-collapse: collapse;
 }
 
@@ -40,14 +41,14 @@ body {
 .tabela td {
     padding: 0.35rem 0.5;
     vertical-align: top;
-    border: 1px solid #d1c2b4;
+    border: 1px solid #ffffff;
 }
 
 .tabela .table-head th,
 .tabela thead.table-head th {
     background-color: #ffa435;
     color: #ffffff;
-    border-color: #e08e2a;
+    border-color: #ffffff;
     border-bottom-width: 2px;
 }
 
@@ -61,11 +62,10 @@ body {
 .totais .tabela  {
     width: auto;
     margin-top: 0;
-    background-color: transparent;
 }
 
 .totais .tabela td {
-    background-color: #ffffff;
+    background-color: #fff4e8;
 }
 
 .totais .tabela tr:last-child td {
@@ -84,15 +84,15 @@ body {
 }
 
 .other-info {
-    font-size: 0.8rem;
-    margin-top: 1.5rem;
+    font-size: 0.6rem;
+    margin-top: 0.4rem;
 }
 
 .footer-info {
     list-style-type: none;
     font-size: 0.7rem;
     padding-left: 0;
-    margin-top: 1rem;
+    margin-top: 0.4rem;
 }
 
 .footer-info li {
@@ -105,28 +105,28 @@ body {
 }
 
 .info-bottom {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     font-weight: bold;
 }
 
 .transp-info {
     font-size: 0.5rem;
     width: 100%;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
     border-collapse: collapse;
 }
 
 .transp-info th
 .transp-info td {
     padding: 0.35rem 0.5rem;
-    border: 1px solid #cccccc;
+    border: 1px solid #ffffff;
     text-align: center;
 }
 
 .transp-info thead th {
     background-color: #f8f8f8;
-    border-color: #e0e0e0;
+    border-color: #ffffff;
 }
 
 /* === NOVOS UTILITÁRIOS (Substitutos do Bootstrap) === */

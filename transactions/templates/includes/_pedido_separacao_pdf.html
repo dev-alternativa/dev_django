@@ -21,9 +21,13 @@
     </div>
 </div>
 
-<div class="pdf-row">
-    <h5><strong>Informações do Cliente</strong></h5>
-    <h6>{{ client.nome_fantasia }}</h6>
+<div>
+    <p>
+        <h3 class="pdf-text-center"><strong>Informações do Cliente </strong></h3>
+    </p>
+    <p>
+        <h6>{{ client.nome_fantasia }}</h6>
+    </p>
 </div>
 
 <div class="pdf-row">
@@ -35,10 +39,10 @@
         </section>
     </div>
     <div class="pdf-col">
-        <section class="pdf-text-start client-section">
+        <section class="pdf-text-end client-section">
             <span class="pdf-d-block">{{ client.endereco }}, {{ client.numero }} - {{ client.bairro }}</span>
             <span class="pdf-d-block">{{ client.cidade}} - {{ client.estado}} - CEP: {{ client.cep }}</span>
-            <span class="pdf-d-block"><strong>E-mail: {{ client.email }}</strong></span>
+            {% comment %} <span class="pdf-d-block"><strong>E-mail: {{ client.email }}</strong></span> {% endcomment %}
         </section>
     </div>
 </div>
@@ -80,27 +84,48 @@
         <table class="tabela">
             <tr>
                 <td><strong>Subtotal:</strong></td>
-                <td>R$ {{ sub_total }}</td>
+                <td class="pdf-text-end">R$ {{ sub_total }}</td>
             </tr>
             <tr>
                 <td><strong>IPI:</strong></td>
-                <td>R$ {{ total_ipi }}</td>
+                <td class="pdf-text-end">R$ {{ total_ipi }}</td>
             </tr>
             <tr>
                 <td><strong>ICMS ST:</strong></td>
-                <td>0,00</td>
+                <td class="pdf-text-end">0,00</td>
             </tr>
             <tr>
                 <td><strong>Total:</strong></td>
-                <td>R$ {{ total_nota }}</td>
+                <td class="pdf-text-end">R$ {{ total_nota }}</td>
             </tr>
         </table>
     </div>
 </div>
 
+<div class="pdf-row">
+    <div class="pdf-col">
+        <h5 class=""><strong>Vencimentos </strong>{{ order.prazo }}</h5>
+        <table class="tabela">
+            <tr>
+                <td><strong>Parcela:</strong></td>
+                <td>{{ order.prazo.parcelas }}</td>
+            </tr>
+            <tr>
+                <td><strong>Vencimento</strong></td>
+                <td>{{ order.dt_previsao_faturamento|date:"SHORT_DATE_FORMAT" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Valor:</strong></td>
+                <td>2.010,97</td>
+            </tr>
+        </table>
+    </div>
+    <div class="pdf-col">
+    </div>
+</div>
 
 <div class="pdf-row other-info">
-    <div class="pdf-col pdf-mt-4">
+    <div class="pdf-col pdf-mt-2">
         <h5><strong>Outras Informações</strong></h5>
         <span class="pdf-d-block"><strong>Pedido e Separação - incluído em:</strong> {{ order.dt_criacao }}</span>
         <span class="pdf-d-block"><strong>Previsão de Faturamento:</strong> 27/3/2025</span>
@@ -109,7 +134,7 @@
     </div>
 </div>
 
-<div class="pdf-row pdf-mt-4">
+<div class="pdf-row pdf-mt-2">
     <h5><strong>Transportador</strong></h5>
     <table class="transp-info">
         <thead>
@@ -135,7 +160,7 @@
     </table>
 </div>
 
-<div class="pdf-row pdf-mt-4">
+<div class="pdf-row pdf-mt-1">
     <p class="info-bottom"><strong>INFORMAÇÕES IMPORTANTES:</strong></p>
     <ul class="footer-info">
         <li>Prazo de atendimento: 72 horas</li>
@@ -144,6 +169,6 @@
     </ul>
 </div>
 
-<div class="pdf-row pdf-mt-4">
+<div class="pdf-row pdf-mt-1">
     <p class="pdf-text-center"><em>Gerado em {% now "DATETIME_FORMAT" %} por {{ order.vendedor.nome }}</em></p>
 </div>
