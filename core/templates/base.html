@@ -15,14 +15,17 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<!-- Favicon -->
+    <!-- Favicon -->
     <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
 
-<!-- Custom CSS  -->
+    <!-- Custom CSS  -->
     <link href="{% static '/css/utils.css' %}" rel="stylesheet">
     <link href="{% static '/css/sidebars.css' %}" rel="stylesheet">
     <link href="{% static '/css/elementos_cadastro.css' %}" rel="stylesheet">
+
     {% block extra_css %}{% endblock %}
+
+    {% block extra_script %}{% endblock %}
 
     <style>
         {% if ENVIRONMENT_DEV %}
@@ -85,7 +88,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <!-- jQuery Mask Plugin -->
-    <script src="{% static '/js/jquery.mask.min.js' %}"></script>
+    {% comment %} <script src="{% static '/js/jquery.mask.min.js' %}"></script> {% endcomment %}
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>

@@ -345,7 +345,7 @@ function addProduct() {
   const obs = getVal('obs');
   //const cfop = getVal('cfop');
 
-  console.log(prazo_item);
+
   // Controla se o formulário é válido
   let isValid = true;
   const validateFormField = (fieldId, value) => {
@@ -565,7 +565,7 @@ $(document).ready(function() {
         },
         success: function(response){
           if (response.success){
-            console.log('Conta Corrente atualizada:', response.data);
+            //console.log('Conta Corrente atualizada:', response.data);
             $('#id_conta_corrente').val(response.data.id).trigger('change');
           }else{
             console.error('Erro ao atualizar conta corrente:', response.error);
@@ -879,6 +879,8 @@ $(document).ready(function() {
             let taxa_frete_item = data.taxa_frete_item
             let $selectApp = $('#id_cnpj_faturamento');
 
+            taxa_frete_item = Number(taxa_frete_item).toFixed(2).replace('.', ',') ? taxa_frete_item != undefined : '0'
+
             $selectApp.empty();
             $selectApp.append('<option value="">---------</option>');
 
@@ -915,7 +917,7 @@ $(document).ready(function() {
             $("#hidden_dolar_id").val(isDolar);
             $('#id_item_pedido').val(data.item_pedido);
             $('#id_vendedor_item').val(data.vendedor);
-            $('#id_taxa_frete_item').val(Number(taxa_frete_item).toFixed(2).replace('.', ','));
+            $('#id_taxa_frete_item').val();
             $('#id_tipo_frete_item').val(data.tipo_frete_item);
             $('#id_m2').val(data.m2);
             $('#hidden_m2_id').val(data.m2);
