@@ -3672,7 +3672,7 @@
     "dt_criacao": "2024-10-21T19:07:57.204Z",
     "dt_modificado": "2024-10-21T19:07:57.204Z",
     "ativo": true,
-    "nome": "SABI√Å",
+    "nome": "SABI¡",
     "cnpj": "59512962000253",
     "cod_omie_com": "0",
     "cod_omie_ind": "2057049545",
@@ -8251,14 +8251,14 @@
   "model": "logistic.freight",
   "pk": 5,
   "fields": {
-    "tipo_frete": "4 - Por conta do Destinat√°rio"
+    "tipo_frete": "4 - Por conta do Destinat·rio"
   }
 },
 {
   "model": "logistic.freight",
   "pk": 6,
   "fields": {
-    "tipo_frete": "9 - Sem Ocorr√™ncia de Transporte"
+    "tipo_frete": "9 - Sem OcorrÍncia de Transporte"
   }
 }
 ]

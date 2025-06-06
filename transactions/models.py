@@ -129,7 +129,7 @@ class OutflowsItems(Base):
     taxa_frete_item = models.CharField('Tx Frete', max_length=50, blank=True, null=True)
     tipo_frete_item = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='frete_item', default=6)
     cnpj_faturamento = models.ForeignKey('common.CNPJFaturamento', on_delete=models.CASCADE, related_name='saida_items')
-    prazo_item = models.ForeignKey('logistic.LeadTime', on_delete=models.CASCADE, null=True, blank=True, related_name='saida_items')
+    prazo_item = models.ForeignKey('logistic.LeadTime', on_delete=models.SET_NULL, null=True, blank=True, related_name='saida_items')
     conta_corrente = models.ForeignKey('common.ContaCorrente', on_delete=models.CASCADE, related_name='saida_items')
     obs = models.TextField(max_length=500, blank=True, null=True)
     vendedor_item = models.ForeignKey('common.Seller', on_delete=models.CASCADE, verbose_name='Vendedor', null=True, blank=True, related_name='saida_items')
