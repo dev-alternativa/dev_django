@@ -193,14 +193,14 @@ class OrderItemsForm(forms.ModelForm):
                 attrs={
                     'id': 'id_productSelect',
                     'data-language': 'pt-br',
-                    'data-placeholder': 'Digite no mínimo 3 caracteres',
+                    'data-placeholder': 'Digite o Produto',
                     'class': 'search_select',
                 }
             ),
             'prazo_item': Select2Widget(
                 attrs={
                     'data-language': 'pt-br',
-                    'data-placeholder': 'Digite no mínimo 3 caracteres',
+                    'data-placeholder': 'Digite o Prazo',
                     'class': 'search_select',
                 }
             ),

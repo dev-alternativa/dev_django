@@ -10,7 +10,7 @@ const requestDolarPTAX = (event) => {
         url: '/api/dolar_hoje/',
         method: 'GET',
         success: (data) => {
-            const dolar = data.value[0].cotacaoVenda.toFixed(2);
+            const dolar = data.value[0].cotacaoVenda;
             $('#id_dolar_ptax').val(dolar);
         },
         error: (err) => {

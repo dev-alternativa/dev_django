@@ -489,9 +489,9 @@ function calculateProductValuesByCategory(
   quantidade = parseInt(quantidade);
   categoryID = parseInt(categoryID);
 
-  if(isDolar){
+  if(isDolar == true){
     dolarPtax = parseFloat($('#id_dolar_ptax').val());
-
+    console.log("Entrou onde n devia")
   }
 
   const formatProductDescription = (quantidade, unidade, parte1, parte2 = '') => {
@@ -505,7 +505,7 @@ function calculateProductValuesByCategory(
   const area_m2 = largura && comprimento ? (largura * comprimento ) / 1000 * quantidade: 0;
 
   // Categorias que usam rolos
-  // SuperLAM, Novos e Gravação
+  // SuperLAM, Novos
   const categoriaRolo = [3, 4];
   if(categoriaRolo.includes(categoryID)){
     return {
@@ -1225,7 +1225,9 @@ $(document).ready(function() {
 
 {% endblock content %}
 {% block extra_scripts %}
+
   <script src="{% static 'js/select2.min.js' %}"></script>
+  <script src="{% static '/js/jquery.mask.min.js' %}"></script>
   <script src="{% static 'js/mask.js' %}"></script>
   <script>
     /** Habilita pesquiza para selectbox */
