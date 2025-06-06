@@ -4,8 +4,8 @@
 
 {% block extra_script %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.min.js"></script>
-  <script src="{% static '/js/jquery.mask.min.js' %}"></script>
-  <script src="{% static '/js/mask.js' %}"></script>
+  {% comment %} <script src="{% static '/js/jquery.mask.min.js' %}"></script> {% endcomment %}
+  {% comment %} <script src="{% static '/js/mask.js' %}"></script> {% endcomment %}
 
   <script type="text/javascript">
     $(document).ready(function(){

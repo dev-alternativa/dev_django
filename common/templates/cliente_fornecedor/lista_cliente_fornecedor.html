@@ -40,7 +40,7 @@
                 {% if cliente.ddd %}
                   ({{ cliente.ddd }})
                 {% endif %}
-                &nbsp{{ cliente.telefone|default_if_none:"" }}
+                {{ cliente.telefone|default_if_none:"" }}
               </td>
               <td>
                 <!-- Exibição de Categorias corretamente -->

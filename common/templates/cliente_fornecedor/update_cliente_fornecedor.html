@@ -2,6 +2,18 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block extra_script %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $("#id_cnpj").mask("99.999.999/9999-99");
+    });
+  </script>
+
+{% endblock %}
+
+
 {% block title %}Atualizar Cliente/Fornecedor{% endblock %}
 {% block content %}
 <div id="page-wrapper">
