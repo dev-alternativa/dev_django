@@ -95,7 +95,7 @@ class Outflows(Base):
     cliente = models.ForeignKey('common.CustomerSupplier', on_delete=models.CASCADE, related_name='saidas')
     nf_saida = models.CharField('NF Saída', null=True, blank=True, max_length=44)
     transportadora = models.ForeignKey('logistic.Carrier', on_delete=models.CASCADE, related_name='saidas', null=True, blank=True)
-    dolar_ptax = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    dolar_ptax = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
     dados_adicionais_nf = models.TextField('Dados Adicionais NF', max_length=500, blank=True, null=True)
     cod_cenario_fiscal = models.ForeignKey('transactions.TaxScenario', on_delete=models.CASCADE, null=True, blank=True, related_name='saidas', default=1)
     tipo_frete = models.ForeignKey(Freight, on_delete=models.SET_NULL, null=True, blank=True, related_name='frete', default=6)

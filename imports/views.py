@@ -21,7 +21,7 @@ class ImportLeadTimeView(FormView):
         file = form.cleaned_data['file']
         nao_incluidos = 0
         incluidos = 0
-        sheet_name = 'Planilha1'
+        sheet_name = 'Planilha2'
         # Tenta carregar arquivo Excel
         try:
             df = pd.read_excel(file, sheet_name, engine='openpyxl')
@@ -240,7 +240,7 @@ class ImportCustomerSupplierView(FormView):
                             'complemento': row.get('complemento', ''),
                             'numero': row.get('numero', ''),
                             'telefone': row.get('telefone'),
-                            'ddd': row.get('telefone1_ddd', ''),
+                            'ddd': row.get('ddd', ''),
                             'cep': row.get('cep', ''),
                             'email': row.get('email', 'Não definido'),
                             'nome_contato': row.get('contato', ''),
@@ -254,11 +254,11 @@ class ImportCustomerSupplierView(FormView):
                             'tag_cliente': 1 if int(row.get('tag_cliente')) == 1 else 0,
                             'tag_fornecedor': 1 if int(row.get('tag_fornecedor')) == 1 else 0,
                             'tag_cadastro_omie_com': row.get('tag_cadastro_omie_COM', '0'),
-                            'tag_cadastro_omie_ind': row.get('tag_cadastro_omie_ind', '0'),
-                            'tag_cadastro_omie_pre': row.get('tag_cadastro_omie_pre', '0'),
-                            'tag_cadastro_omie_mrx': row.get('tag_cadastro_omie_mrx', '0'),
-                            'tag_cadastro_omie_flx': row.get('tag_cadastro_omie_flx', '0'),
-                            'tag_cadastro_omie_srv': row.get('tag_cadastro_omie_srv', '0'),
+                            'tag_cadastro_omie_ind': row.get('tag_cadastro_omie_IND', '0'),
+                            'tag_cadastro_omie_pre': row.get('tag_cadastro_omie_PRE', '0'),
+                            'tag_cadastro_omie_mrx': row.get('tag_cadastro_omie_MRX', '0'),
+                            'tag_cadastro_omie_flx': row.get('tag_cadastro_omie_FLX', '0'),
+                            'tag_cadastro_omie_srv': row.get('tag_cadastro_omie_SRV', '0'),
                         }
                     )
 
