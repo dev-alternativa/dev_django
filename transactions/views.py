@@ -1327,11 +1327,19 @@ def add_product_to_order(request, order_id):
     processamento, uma resposta JSON com o erro é retornada.
     """
     def handle_diferent_freights(order_instance, freight_type, freight_tax):
-        first_item = OutflowsItems.objects.filter(saida=order_instance).first()
 
 
-        if not first_item :
+        itens = OutflowsItems.objects.filter(saida=order_instance)
+
+        if not itens.exists():
             return True
+
+        first_item = itens.first()
+
+        if itens.count() == 1:
+            order_instance.taxa_frete = freight_tax
+            order_instance.save()
+            print('Aviso: Primeiro item sobrescreveu taxa de frete do Pedido')
 
         first_item_tax = float(first_item.taxa_frete_item.replace(',', '.')) if first_item.taxa_frete_item else 0.0
         freight_tax = float(freight_tax.replace(',', '.')) if freight_tax else 0.0
@@ -1948,7 +1956,7 @@ def update_product_from_order(request, item_id):
 
 def get_filtered_products(request):
     """
-    Recupera os dados de um produto.
+    Recupera os dados de um produto ao clicar em Adicionar Item.
 
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
