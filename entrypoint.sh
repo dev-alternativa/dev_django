@@ -18,13 +18,12 @@ if not User.objects.filter(username='admin').exists():
 
 # Importa os dados dos fixtures na ordem correta
 # echo "Importando fixtures..."
-python manage.py loaddata dump/customers_utf8.json .json
-python manage.py loaddata dump/leadtime_utf8.json
-# python manage.py loaddata dump/logistic_bkp_utf8.json
-# python manage.py loaddata dump/common_bkp_utf8.json
-# python manage.py loaddata dump/products_bkp_utf8.json
-# python manage.py loaddata dump/transactions_bkp_utf8.json
-# echo "Fixtures importadas com sucesso."
+python manage.py loaddata dump/accounts_bkp_utf8.json
+python manage.py loaddata dump/logistic_bkp_utf8.json
+python manage.py loaddata dump/common_bkp_utf8.json
+python manage.py loaddata dump/products_bkp_utf8.json
+python manage.py loaddata dump/transactions_bkp_utf8.json
+echo "Fixtures importadas com sucesso."
 
 # Inicia o servidor Gunicorn
 exec gunicorn --bind 0.0.0.0:3000 altflex.wsgi:application
