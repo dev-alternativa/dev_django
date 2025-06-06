@@ -18,8 +18,8 @@ if not User.objects.filter(username='admin').exists():
 
 # Importa os dados dos fixtures na ordem correta
 # echo "Importando fixtures..."
-# python manage.py loaddata dump/auth_bkp_utf8.json
-# python manage.py loaddata dump/accounts_bkp_utf8.json
+python manage.py loaddata dump/customers.json
+python manage.py loaddata dump/leadtime.json
 # python manage.py loaddata dump/logistic_bkp_utf8.json
 # python manage.py loaddata dump/common_bkp_utf8.json
 # python manage.py loaddata dump/products_bkp_utf8.json
