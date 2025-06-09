@@ -2012,13 +2012,13 @@ def get_filtered_products(request):
         origem_frete = 'tabela_preco' if preco and preco.taxa_frete else 'tabela_cliente'
 
         taxa_frete = getattr(preco, 'taxa_frete', None)
+
         if not taxa_frete:
             taxa_frete = getattr(cliente, 'taxa_frete', 0) or 0
 
         tipo_frete = 6
         if preco and getattr(preco, 'tipo_frete', None):
             tipo_frete = preco.tipo_frete.id
-            print(f'Tipo frete: {tipo_frete}')
         elif getattr(cliente, 'tipo_frete', None):
             tipo_frete = cliente.tipo_frete.id
 
@@ -2041,7 +2041,7 @@ def get_filtered_products(request):
             'id_numero_pedido': pedido.pedido_interno_cliente,
             'item_pedido': items_count + 1,
             'proximo_pedido': proximo_pedido_id,
-            'm2': product.m_quadrado,
+            # 'm2': product.m_quadrado,
             'categoria': product.tipo_categoria.id,
             'sub_categoria': product.sub_categoria,
             'unidade': product.unidade,
