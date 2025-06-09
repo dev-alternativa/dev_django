@@ -1956,7 +1956,7 @@ def update_product_from_order(request, item_id):
 
 def get_filtered_products(request):
     """
-    Recupera os dados de um produto ao clicar em Adicionar Item.
+    Recupera os dados de um produto ao clicar em Adicionar Item.Formulário 'Adicionar Produto'
 
     Args:
         request (HttpRequest): O objeto de requisição HTTP.
@@ -1988,7 +1988,10 @@ def get_filtered_products(request):
         items_count = OutflowsItems.objects.filter(saida=pedido).count()
         proximo_pedido_id = pedido.saida_items.count() + 1
         cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
+        app_omie = CNPJFaturamento.objects.get(pk=preco.cnpj_faturamento.id) if preco and preco.cnpj_faturamento else ''
 
+
+        print(f'APP_OMIE {app_omie}')
         # Seleciona apenas as tags com CNPJ que o cliente possui no OMIE
         tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
@@ -2015,10 +2018,10 @@ def get_filtered_products(request):
         tipo_frete = 6
         if preco and getattr(preco, 'tipo_frete', None):
             tipo_frete = preco.tipo_frete.id
+            print(f'Tipo frete: {tipo_frete}')
         elif getattr(cliente, 'tipo_frete', None):
             tipo_frete = cliente.tipo_frete.id
 
-        # print(f'Tipo frete: {tipo_frete}')
 
         data = {
             'id': order_id,
@@ -2026,6 +2029,7 @@ def get_filtered_products(request):
             'preco': preco.valor if preco else '',
             'cc': cc.pk if cc else '',
             'cnpj_faturamento_options': valid_client_cnpj,
+            'selected_cnpj_faturamento': app_omie.id if app_omie else '',
             'largura': product.largura,
             'comprimento': product.comprimento,
             'prazo_item': preco.prazo.id if preco else '',

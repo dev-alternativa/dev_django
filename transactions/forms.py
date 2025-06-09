@@ -202,6 +202,7 @@ class OrderItemsForm(forms.ModelForm):
                     'data-language': 'pt-br',
                     'data-placeholder': 'Digite o Prazo',
                     'class': 'search_select',
+                    'style': 'width: 200px;',
                 }
             ),
             'dados_adicionais_item': forms.Textarea(attrs={'rows': 3}),

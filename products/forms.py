@@ -49,7 +49,7 @@ class PriceFormCustomer(Form):
 class PriceFormCategory(Form):
 
     categoria = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
+        queryset=Category.objects.filter(ativo=1),
         label='Categoria',
         widget=forms.Select(attrs={
             'class': 'form-control',  # Adiciona a classe CSS para estilização

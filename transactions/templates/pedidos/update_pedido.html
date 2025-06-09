@@ -893,6 +893,10 @@ $(document).ready(function() {
               );
             });
 
+            if (data.selected_cnpj_faturamento){
+              $selectApp.val(data.selected_cnpj_faturamento);
+            }
+
             // Atualiza o valores do modal de adição de produto
             /** Caso o preço seja cadastrado como dolar, já verificar e multiplica corretamente,
             adicionando as labels corretamente
