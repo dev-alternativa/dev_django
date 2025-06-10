@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -612,6 +613,10 @@ class OrderCreateView(FormMessageMixin, CreateView):
     def get_initial(self):
         initial = super().get_initial()
         dolar = get_dolar_ptax()
+        today = datetime.now().date()
+        format_today = today.strftime('%Y-%m-%d')
+        print(f'Data atual formatada: {format_today}')
+        initial['dt_previsao_faturamento'] = format_today
         if dolar:
             try:
                 value = dolar.get('value')[0]['cotacaoVenda']
@@ -1326,44 +1331,27 @@ def add_product_to_order(request, order_id):
     e cria uma nova instância de OutflowsItems. Se houver algum erro durante o
     processamento, uma resposta JSON com o erro é retornada.
     """
-    def handle_diferent_freights(order_instance, freight_type, freight_tax):
+    def handle_diferent_freights(order_instance, freight_type_id, freight_tax, prazo_item):
 
-
+        freight_type = Freight.objects.get(pk=freight_type_id)
         itens = OutflowsItems.objects.filter(saida=order_instance)
 
-        if not itens.exists():
+        # Se é 1º item do pedido, sobrescreve a taxa de frete do pedido
+        if itens.count() == 0:
+
+            order_instance.taxa_frete = freight_tax
+            order_instance.tipo_frete = freight_type
+            order_instance.prazo = prazo_item
+            order_instance.save()
+            print('Aviso: Primeiro item sobrescreveu taxa de frete, tipo de frete e Prazo do Pedido')
             return True
 
         first_item = itens.first()
 
-        if itens.count() == 1:
-            order_instance.taxa_frete = freight_tax
-            order_instance.save()
-            print('Aviso: Primeiro item sobrescreveu taxa de frete do Pedido')
-
-        first_item_tax = float(first_item.taxa_frete_item.replace(',', '.')) if first_item.taxa_frete_item else 0.0
-        freight_tax = float(freight_tax.replace(',', '.')) if freight_tax else 0.0
-        # print(first_item_tax)
-        # print(freight_tax)
-
-        if freight_tax != first_item_tax:
-            print('Frete diferentes')
-            return False
-
-        if freight_type != first_item.tipo_frete_item.id:
-            print('Tipo de frete diferentes')
-            return False
-        # print(first_item.taxa_frete_item)
-        # print(freight_tax)
-        # print(freight_type)
-        # print(first_item.tipo_frete_item.id)
-
-        # if freight_tax:
-        #     if order_instance.taxa_frete:
-        #         if float(order_instance.taxa_frete) > float(freight_tax):
-        #             freight_tax = order_instance.taxa_frete
-        #         else:
-        #             freight_tax = freight_tax
+        for item in itens:
+            item.taxa_frete_item = first_item.taxa_frete_item
+            item.tipo_frete_item = first_item.tipo_frete_item
+            item.prazo_item = first_item.prazo_item
 
         return True
 
@@ -1454,13 +1442,14 @@ def add_product_to_order(request, order_id):
             cnpj_list_in_database = [item.cnpj_faturamento.sigla for item in items_list]
             cnpj_list = CNPJFaturamento.objects.values_list('sigla', flat=True)
             cnpj_list_in_database.append(cnpj_faturamento.sigla)
+            prazo_item = LeadTime.objects.get(pk=data['prazo_item'])
 
             freight_tax = data['taxa_frete_item']
 
 
-            if not handle_diferent_freights(order, freight_type.id, freight_tax):
+            if not handle_diferent_freights(order, freight_type.id, freight_tax, prazo_item):
                 return JsonResponse(
-                    {'error': 'Valor ou tipo de frete diferente entre Pedido e o Item'},
+                    {'error': 'Frete Invalido'},
                     status=400
                 )
 
@@ -1990,8 +1979,6 @@ def get_filtered_products(request):
         cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
         app_omie = CNPJFaturamento.objects.get(pk=preco.cnpj_faturamento.id) if preco and preco.cnpj_faturamento else ''
 
-
-        print(f'APP_OMIE {app_omie}')
         # Seleciona apenas as tags com CNPJ que o cliente possui no OMIE
         tags = [
             (cliente.tag_cadastro_omie_com, 'COM'),
