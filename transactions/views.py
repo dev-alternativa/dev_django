@@ -1963,6 +1963,7 @@ def get_filtered_products(request):
         order_id = request.POST.get('order_id')
         product_id = request.POST.get('product_id')
         client_id = request.POST.get('client_id')
+        payment_term = request.POST.get('payment_terms_id')
 
         if not order_id or not product_id:
             return JsonResponse({
@@ -1973,6 +1974,8 @@ def get_filtered_products(request):
         product = Product.objects.get(pk=product_id)
         cliente = CustomerSupplier.objects.get(pk=client_id)
         preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
+
+
         pedido = Outflows.objects.get(pk=order_id)
         items_count = OutflowsItems.objects.filter(saida=pedido).count()
         proximo_pedido_id = pedido.saida_items.count() + 1
@@ -2032,7 +2035,21 @@ def get_filtered_products(request):
             'categoria': product.tipo_categoria.id,
             'sub_categoria': product.sub_categoria,
             'unidade': product.unidade,
+            'cliente_id': client_id,
         }
+
+        if not preco:
+            formatted_message = (
+                f"O produto <strong>{ product.nome_produto }</strong> (Condição: {payment_term}) "
+                f"não possui preço definido para o cliente <strong>{ cliente.nome_fantasia }</strong>, "
+                f"deseja cadastrar agora? Caso NÃO, será usado o preço do CLIENTE PADRÃO.",
+            )
+            return JsonResponse({
+                "success": False,
+                "show_modal": True,
+                "message": formatted_message,
+                "data": data,
+            }, status=200)
 
         return JsonResponse({
             "success": True,

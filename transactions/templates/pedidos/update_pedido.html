@@ -181,6 +181,8 @@
 <!-- Modal de adição de produtos -->
 {% include "includes/_modal_item_pedido.html" %}
 
+<!-- Modal de mensagem de erros -->
+{% include "includes/_modalAlertBox.html" %}
 
     <!-- Botão de salvar -->
 
@@ -241,7 +243,11 @@
 /* ######################################################## SCRIPTS ########################################################### */
 
 // Variáveis globais
-let categoryID, productID, paymentTerms, isValid;
+let categoryID = null;
+let productID = null;
+let paymentTerms = null;
+let isValid = null;
+let lastProductResponse = null;
 
 function selectOptionByText(selectId, optionText){
   /**
@@ -469,6 +475,14 @@ function updateProduct() {
   }
 }
 
+
+  {% comment %} function handlePriceModals(data){
+
+
+
+  } {% endcomment %}
+
+
 function calculateProductValuesByCategory(
     categoryID, productValues, productName, initialArea
   ){
@@ -547,7 +561,7 @@ function calculateProductValuesByCategory(
 }
 
 $(document).ready(function() {
-
+  let lastProductResponse = null;
 
   $('#id_cnpj_faturamento').on('change', function() {
     let selectedAPP = $(this).val();
@@ -642,43 +656,7 @@ $(document).ready(function() {
 
   // ################### Configuração dos campos do produto ###################
 
-  const configProductFormLabels = (categoryID) => {
-    /**
-      Configura os campos do formulário de adição de produtos
-      @param {int} categoryID - ID da categoria do produto
-    */
-    const categoriesByPiece = [2, 5, 6, 7, 8, 9];
-    const categoriaMMporM = [2, 3, 4, 8];
 
-    const rollDescription = [3, 4];
-    const plateDescription = [6, 7];
-
-    const enabledFields = [3, 4, 9, 10]
-    const isMMporM = categoriaMMporM.includes(categoryID);
-    const isRoll = rollDescription.includes(categoryID);
-    const isPiece = categoriesByPiece.includes(categoryID);
-    const isEnabled = enabledFields.includes(categoryID);
-
-    // Oculta campo m2 se categoria for lâminas
-    const $parentId_m2 = $("#id_m2").parent();
-    if(categoryID === 8){
-      $parentId_m2.addClass("d-none");
-    }else{
-      $parentId_m2.removeClass("d-none");
-    }
-
-    // Desativa edição do campo Item #
-    $("#id_item_pedido").prop('disabled', true);
-
-    // Configura se label é `Comp. (m)` ou `Comp. (mm)`
-    $("#div_id_comprimento label").text(isMMporM ? 'Comp. (m)' : 'Comp. (mm)');
-    // Configura se label é `Preço / m² (R$)` ou `Preço pç (R$)`
-    $("#div_id_preco label").text(isPiece ? 'Preço pç (R$)' : 'Preço / m² (R$)');
-    // Configura se input text é habilitado
-    $('#id_comprimento').prop('disabled', !isEnabled);
-    $('#id_largura').prop('disabled', !isEnabled);
-
-  }
 
   // ################### Adiciona um item ao pedido ###################
   $('#add-item').on('click', function(){
@@ -703,79 +681,6 @@ $(document).ready(function() {
     }else{
     }*/
   });
-
-  function calcProductFieldsArea(m2){
-    /**
-      Calcula metragem no modal de adição de produtos dependendo da categoria
-    */
-    categoryID = $("#hidden_categoria_id").val();
-
-    const $quantidade = $('#id_quantidade');
-    const $largura = $('#id_largura');
-    const $comprimento = $('#id_comprimento');
-    const $preco = $('#id_preco');
-    const $m2_total = $('#id_m2');
-    const initialArea = m2 && m2 != 0 ? parseFloat(m2) : 1;
-    const $total = $('#id_total_preco');
-    const $cnpjFaturamento = $('#id_cnpj_faturamento');
-
-    /*
-    [$largura, $comprimento, $preco].forEach(field => {
-      const value = field.val();
-      if(value && !isNaN(parseFloat(value))){
-        field.val(parseFloat(value).toFixed(2));
-      }
-    });
-    */
-    const $inputs = [
-      $quantidade,
-      $largura,
-      $comprimento,
-      $preco,
-      $cnpjFaturamento
-    ];
-    const requiredCategories = [3, 4];
-    let $requiredInputs = [$quantidade, $preco];
-
-    if(requiredCategories.includes(parseInt(categoryID))){
-      $requiredInputs.push($largura, $comprimento);
-    }
-
-    productName = $('#nome_produto').text();
-
-    // Obtém os valores dos campos obrigatórios
-    const requiredValues = $requiredInputs.map(i => {
-      const value = parseFloat(i.val());
-      return !isNaN(value) && value > 0 ? value : null;
-    });
-
-    // Verifica se todos os calores são diferentes de 0
-    const allValid = requiredValues.every(value => value !== null);
-
-    if(!allValid){
-      return;
-    }
-
-    // Obtém todos os valores (inclusive os opcionais, como metragem)
-    const valores = $inputs.map(i => parseFloat(i.val()) || 0);
-    // Executa o calculo
-    const result = calculateProductValuesByCategory(
-      parseInt(categoryID),
-      valores,
-      productName,
-      initialArea,
-    );
-
-    // Quando lâmina, comprimento sempre é igual à quantidade
-    $comprimento.val(categoryID == 8 ? $quantidade.val(): $comprimento.val());
-
-    // Atualiza campos do form
-    $("#id_dados_adicionais_item").val(result.dados_descritivo);
-    $("#id_obs").val(result.dados_descritivo);
-    $total.val(result.total_valor);
-    $m2_total.val(result.area_total);
-
-  }
 
   // Remove os dados de um formulário ao clicar no botão `X` do modal
   $('.btn-close').on('click', function(){
@@ -854,12 +759,12 @@ $(document).ready(function() {
     paymentTerms = $("#id_condicaoSelect").val();
     isValid = true;
 
-
     validateFormField('productSelect', productID);
     validateFormField('condicaoSelect', paymentTerms);
     if(!isValid) {
       e.preventDefault();
     }else{
+
       const url = "{% url 'get_filtered_products' %}";
       $.ajax({
         type: 'POST',
@@ -868,68 +773,22 @@ $(document).ready(function() {
           order_id: {{ order.pk }},
           client_id: {{ order.cliente.id}},
           product_id: productID,
+          payment_terms_id: paymentTerms,
           'csrfmiddlewaretoken': '{{ csrf_token }}'
         },
         success: function(response) {
           if(response.success){
-            data = response.data;
-            isDolar = data.is_dolar;
-            let preco = data.preco;
-            let taxa_frete_item = data.taxa_frete_item
-            let $selectApp = $('#id_cnpj_faturamento');
-            taxa_frete_item = (taxa_frete_item !== undefined && taxa_frete_item !== null) ? Number(taxa_frete_item)
-              .toFixed(2)
-              .replace('.', ',') : '0,00';
+            $('#productOrderModal').modal('hide');
+            handlePriceModals(response.data);
 
-            $selectApp.empty();
-            $selectApp.append('<option value="">---------</option>');
+          }else if (response.show_modal){
+            lastProductResponse = response.data;
 
-            $.each(data.cnpj_faturamento_options, function(index, item) {
-              $selectApp.append(
-                $('<option>', {
-                  value: item.id,
-                  text: item.sigla
-                })
-              );
-            });
+            $('#productOrderModal').modal('hide');
+            $('#messageBoxBody').html(response.message);
+            $('#messageBoxModal').modal('show');
 
-            if (data.selected_cnpj_faturamento){
-              $selectApp.val(data.selected_cnpj_faturamento);
-            }
-
-            // Atualiza o valores do modal de adição de produto
-            /** Caso o preço seja cadastrado como dolar, já verificar e multiplica corretamente,
-            adicionando as labels corretamente
-            */
-            if(isDolar){
-              preco = (data.preco * parseFloat($('#id_dolar_ptax').val())).toFixed(4);
-            }
-            $('#id_preco').val(preco);
-            $('#id_conta_corrente').val(data.cc);
-            $('#id_prazo_item').val(data.prazo_item).trigger('change');
-
-
-            if(data.origem_frete == 'tabela_preco'){
-              $('#info_preco').html('*Taxa do Produto');
-            }else{
-              $('#info_preco').html('*Taxa original do Cliente');
-
-            }
-            $("#id_quantidade").val(1);
-            $("#hidden_dolar_id").val(isDolar);
-            $('#id_item_pedido').val(data.item_pedido);
-            $('#id_vendedor_item').val(data.vendedor);
-            $('#id_taxa_frete_item').val(taxa_frete_item);
-            $('#id_tipo_frete_item').val(data.tipo_frete_item);
-            $('#id_m2').val(data.m2);
-            $('#hidden_m2_id').val(data.m2);
-            $('#hidden_categoria_id').val(data.categoria);
-            $("#nome_produto").text(`${productName} (${data.unidade})`);
-
-            configProductFormLabels(data.categoria);
-            calcProductFieldsArea(data.m2);
-          }
-          else{
+          }else{
             console.log('Erro ao carregar produto:', response.error);
             alert('Erro ao carregar produto');
           }
@@ -939,18 +798,6 @@ $(document).ready(function() {
         }
       });
 
-      $('#productOrderModal').modal('hide');
-
-      $("#div_id_preco label").append(`/ <b>Condição: ${paymentTerms}</b>`);
-
-      // Verifica se largura/comprimento/Metragem devem ser exibidos
-      resetForm();
-
-      $("#div_id_preco label").html('Preço pç (R$)');
-      $('#hidden_m2_id').val(0);
-      $('hidden_categoria_id').val(0);
-      $('#itemsModalLabel').contents().first().replaceWith(`Adicionar Produto - `);
-      $('#itemsModal').modal('show');
 
     }
   });
@@ -1219,6 +1066,22 @@ $(document).ready(function() {
       $('#overlay').hide();
     });
   });*/
+
+  /** AO CLICAR EM `NÃO` NO MODAL DE PARA ADICIONAR UM PRECO */
+  $('#btnModalNo').click(function() {
+    if (lastProductResponse) {
+      handlePriceModals(lastProductResponse);
+    }
+  });
+  $('#btnModalYes').click(function() {
+    console.log('CLICOU NO BOTAO SIM')
+    const redirectPriceUrl = `/preco/adicionar/${lastProductResponse.cliente_id}/${lastProductResponse.categoria}/`;
+    console.log(redirectPriceUrl);
+    window.location.href = redirectPriceUrl;
+  });
+
+
+
 });
 
 
@@ -1227,9 +1090,9 @@ $(document).ready(function() {
 
 {% endblock content %}
 {% block extra_scripts %}
-
+  <script src="{% static 'js/handle_modals.js' %}"></script>
   <script src="{% static 'js/select2.min.js' %}"></script>
-  <script src="{% static '/js/jquery.mask.min.js' %}"></script>
+  <script src="{% static 'js/jquery.mask.min.js' %}"></script>
   <script src="{% static 'js/mask.js' %}"></script>
   <script>
     /** Habilita pesquiza para selectbox */
@@ -1243,38 +1106,6 @@ $(document).ready(function() {
     });
     {% comment %} $('.modal').css('z-index', '1051'); {% endcomment %}
     $('.select2-container').css('z-index', '1052');
-
-    $('#itemsModal').on('shown.bs.modal', function () {
-        $(this).removeAttr('tabindex');
-    });
-    $('#categoryOrderModal').on('shown.bs.modal', function () {
-        $(this).removeAttr('tabindex');
-    });
-    $('#productOrderModal').on('shown.bs.modal', function () {
-        $(this).removeAttr('tabindex');
-    });
-
-    $('#itemsModal').on('show.bs.modal', function () {
-      $('.select2-container').not($(this).find('.select2-container')).addClass('escurecer');
-    });
-
-    $('#categoryOrderModal').on('show.bs.modal', function () {
-      $('.select2-container').not($(this).find('.select2-container')).addClass('escurecer');
-    });
-
-    $('#productOrderModal').on('show.bs.modal', function () {
-      $('.select2-container').not($(this).find('.select2-container')).addClass('escurecer');
-    });
-
-    $('#itemsModal').on('hidden.bs.modal', function () {
-        $('.select2-container').removeClass('escurecer');
-    });
-
-    $('#productOrderModal').on('hidden.bs.modal', function () {
-        $('.select2-container').removeClass('escurecer');
-    });
-
-
 
   </script>
 {% endblock %}

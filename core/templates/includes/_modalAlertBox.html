@@ -1,0 +1,26 @@
+<!-- Button trigger modal -->
+{% comment %} <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Launch static backdrop modal
+</button> {% endcomment %}
+{% block modals %}
+
+<!-- Modal -->
+<div class="modal fade" id="messageBoxModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="messageBoxLabel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 fw-bold text-danger" id="messageBoxLabel">{{ title|default:"Aviso" }}</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="messageBoxBody"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnModalNo" class="btn btn-danger" data-bs-dismiss="modal">NÃO</button>
+        <button type="button" id="btnModalYes" class="btn btn-success">SIM</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock modals %}
