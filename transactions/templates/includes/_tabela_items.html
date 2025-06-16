@@ -2,7 +2,7 @@
 <table class="table text-center">
     <thead>
         <tr>
-            <th>ID Item</th>
+            <th>ID Produto</th>
             <th>Produto</th>
             <th>Quantidade</th>
             <th>Larg. (mm)</th>
@@ -19,7 +19,7 @@
     <tbody id="tbody-items">
         {% for item in itens_produtos %}
         <tr>
-            <td>{{ item.id }}</td>
+            <td>{{ item.produto_id }}</td>
             <td>{{ item.nome }}</td>
             <td>{{ item.quantidade }}</td>
             <td>{{ item.largura|floatformat:0 }}</td>

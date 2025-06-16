@@ -281,6 +281,7 @@ def calculate_order_total(items):
 
         item_data = {
             'id': item.id,
+            'produto_id': item.produto.id,
             'nome': item.produto.nome_produto,
             'quantidade': quantidade,
             'preco_unitario': preco_unitario,
@@ -365,6 +366,8 @@ def filter_omie_apps(dict_mapp):
 
 
 def return_omie_mapping_codes(carrier, seller, order):
+
+
     mapa_sigla_para_campo = {
         'COM': {
             'transportadora': carrier.cod_omie_com,
@@ -876,7 +879,6 @@ class OrderPicking(DetailView, FormataDadosMixin):
         context['local_errors'] = []
         context['api_errors'] = []
         context['has_pending_issues'] = False
-
         context['order'] = order = self.get_object()
         context['client'] = order.cliente
         cnpj = self.format_cnpj_cpf(order.cliente.cnpj)
@@ -887,7 +889,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
         context['prazo_parcelas'] = prazo_parcelas
 
         # Verifica se existem produtos no pedido
-        order_itens = OutflowsItems.objects.filter(saida=order.pk)
+        order_itens = OutflowsItems.objects.filter(saida=order.pk, produto__isnull=False)
         if not order_itens.exists():
             context['local_errors'].append({
                 'type': 'order',
@@ -903,7 +905,9 @@ class OrderPicking(DetailView, FormataDadosMixin):
             total=Sum('item_total')
         )
 
+
         for item in order_itens:
+
             if not item.quantidade:
                 context['local_errors'].append({
                     'type': 'item',
@@ -925,6 +929,7 @@ class OrderPicking(DetailView, FormataDadosMixin):
         context['transportadora'] = carrier
         quantidade_itens = len(order_itens)
         context['quantidade_itens'] = quantidade_itens
+
 
         # Verifica dados dos itens
         try:
@@ -960,7 +965,6 @@ class OrderPicking(DetailView, FormataDadosMixin):
 
         # total_ipi = sum(item['ipi'] for item in item_list)
         context['total_ipi'] = format_to_brl_currency(total_ipi)
-        print(f'Total IPI: {context['total_ipi'] }')
 
         total_pedido = sum(item['preco_total'] for item in item_list)
         context['sub_total'] = format_to_brl_currency(total_pedido)
@@ -993,7 +997,12 @@ class OrderPicking(DetailView, FormataDadosMixin):
             cnpj_faturamento = order_itens.first().cnpj_faturamento
             sigla = cnpj_faturamento.sigla
 
+            print("DEBUG seller:", seller)
+            print("DEBUG seller.cod_omie_com:", getattr(seller, 'cod_omie_com', 'não encontrado'))
+
+
             mapa_sigla_para_campo = return_omie_mapping_codes(carrier, seller, order)
+            print(mapa_sigla_para_campo)
             if not mapa_sigla_para_campo:
                 context['local_errors'].append({
                     'type': '',
@@ -1963,7 +1972,7 @@ def get_filtered_products(request):
         order_id = request.POST.get('order_id')
         product_id = request.POST.get('product_id')
         client_id = request.POST.get('client_id')
-        payment_term = request.POST.get('payment_terms_id')
+        payment_term = request.POST.get('payment_terms')
 
         if not order_id or not product_id:
             return JsonResponse({
@@ -1973,14 +1982,29 @@ def get_filtered_products(request):
 
         product = Product.objects.get(pk=product_id)
         cliente = CustomerSupplier.objects.get(pk=client_id)
-        preco = Price.objects.filter(cliente=client_id, produto=product_id).first()
-
+        preco = Price.objects.filter(cliente=client_id, produto=product_id, condicao=payment_term).first()
 
         pedido = Outflows.objects.get(pk=order_id)
         items_count = OutflowsItems.objects.filter(saida=pedido).count()
         proximo_pedido_id = pedido.saida_items.count() + 1
         cc = ContaCorrente.objects.get(padrao=True, cnpj=preco.cnpj_faturamento) if preco else ''
         app_omie = CNPJFaturamento.objects.get(pk=preco.cnpj_faturamento.id) if preco and preco.cnpj_faturamento else ''
+        if preco:
+            seller = preco.vendedor
+            seller_tags = [
+                (seller.cod_omie_com, 'COM'),
+                (seller.cod_omie_ind, 'IND'),
+                (seller.cod_omie_pre, 'PRE'),
+                (seller.cod_omie_flx, 'FLX'),
+                (seller.cod_omie_mrx, 'MRX'),
+                (seller.cod_omie_srv, 'SRV'),
+            ]
+            valid_seller_codes = [app for value, app in seller_tags if value and str(value).strip() and int(str(value).strip())]
+            if not valid_seller_codes:
+                return JsonResponse({
+                        "success": False,
+                        "message": "Aviso: O vendedor selecionado não possui códigos válidos no OMIE.",
+                    }, status=200)
 
         # Seleciona apenas as tags com CNPJ que o cliente possui no OMIE
         tags = [
@@ -1993,13 +2017,10 @@ def get_filtered_products(request):
         ]
         try:
             client_tags = [tag for valor, tag in tags if valor and str(valor).strip() and int(str(valor).strip())]
-
         except (ValueError, TypeError):
             print(f'Erro ao converter tags do cliente {cliente.id}: {tags}')
 
         valid_client_cnpj = list(CNPJFaturamento.objects.filter(sigla__in=client_tags).values('id', 'sigla'))
-
-        origem_frete = 'tabela_preco' if preco and preco.taxa_frete else 'tabela_cliente'
 
         taxa_frete = getattr(preco, 'taxa_frete', None)
 
@@ -2009,9 +2030,10 @@ def get_filtered_products(request):
         tipo_frete = 6
         if preco and getattr(preco, 'tipo_frete', None):
             tipo_frete = preco.tipo_frete.id
+            origem_frete = 'tabela_preco'
         elif getattr(cliente, 'tipo_frete', None):
             tipo_frete = cliente.tipo_frete.id
-
+            origem_frete = 'cliente'
 
         data = {
             'id': order_id,
