@@ -76,6 +76,83 @@ function goBack() {
 
 }
 
+function calculateProductValuesByCategory(
+    categoryID, productValues, productName, initialArea
+  ){
+  /**
+   * Calcula área e valor do produto, caso exista dolar, também multiplica
+   * @param {int} categoryID - Categoria do produto
+   * @param {object} productValues - Objeto com os valores do produto
+   * @param {string} productName - Nome do produto
+   * @return {object} area_metragem, total_valor e dados_descritivo
+   */
+  const isDolar = $('#hidden_dolar_id').val();
+
+  let dolarPtax = 1;
+  let [quantidade, largura, comprimento, preco, cnpjFaturamento] = productValues;
+  largura = !largura ? 0 : largura;
+  comprimento = !comprimento ? 0 : comprimento;
+
+  quantidade = parseInt(quantidade);
+  categoryID = parseInt(categoryID);
+
+  if(isDolar == true){
+    dolarPtax = parseFloat($('#id_dolar_ptax').val());
+    console.log("Entrou onde n devia")
+  }
+
+  const formatProductDescription = (quantidade, unidade, parte1, parte2 = '') => {
+    const qtd = quantidade < 10 ? `0${quantidade}` : `${quantidade}`;
+    if (!parte2){
+      return `${qtd} ${unidade} ${parte1}`;
+    }
+    return `${qtd} ${unidade} ${parte1} x ${parte2}`;
+  };
+
+  const area_m2 = largura && comprimento ? (largura * comprimento ) / 1000 * quantidade: 0;
+
+  // Categorias que usam rolos
+  // SuperLAM, Novos
+  const categoriaRolo = [3, 4];
+  if(categoriaRolo.includes(categoryID)){
+    return {
+      area_total: (area_m2).toFixed(2),
+      total_valor: (preco * area_m2 * dolarPtax).toFixed(4),
+      dados_descritivo: formatProductDescription(
+        quantidade,
+        'rolo(s)',
+        largura,
+        comprimento
+      )
+    };
+  }
+  // Categorias que usam chapas
+  // Nyloprint, Nyloflex, Tesa, Máquinas, Lâminas, Diversos
+  const categoriaChapa = [6, 7];
+
+  if(categoriaChapa.includes(categoryID)){
+    return {
+      area_total: (quantidade * initialArea).toFixed(2),
+      total_valor: (quantidade * preco).toFixed(2),
+      dados_descritivo: formatProductDescription(
+        quantidade,
+        'chapa(s)',
+        productName.replace(/\s*\(\w+\)$/, ""),
+        'Revenda'
+      )
+    };
+  }
+  // Qualquer outra categoria
+  const area_default = largura * comprimento / 1000;
+
+    return {
+      area_total: (area_default * quantidade).toFixed(2),
+      total_valor: (quantidade * preco).toFixed(4),
+      dados_descritivo: ''
+  };
+
+}
+
 const configProductFormLabels = (categoryID) => {
     /**
       Configura os campos do formulário de adição de produtos
@@ -114,11 +191,10 @@ const configProductFormLabels = (categoryID) => {
 
   }
 
-function calcProductFieldsArea(m2){
+function calcProductFieldsArea(m2, categoryID){
     /**
       Calcula metragem no modal de adição de produtos dependendo da categoria
     */
-    categoryID = $("#hidden_categoria_id").val();
 
     const $quantidade = $('#id_quantidade');
     const $largura = $('#id_largura');
@@ -168,6 +244,7 @@ function calcProductFieldsArea(m2){
 
     // Obtém todos os valores (inclusive os opcionais, como metragem)
     const valores = $inputs.map(i => parseFloat(i.val()) || 0);
+
     // Executa o calculo
     const result = calculateProductValuesByCategory(
       parseInt(categoryID),
@@ -175,7 +252,7 @@ function calcProductFieldsArea(m2){
       productName,
       initialArea,
     );
-
+    console.log(result.dados_descritivo);
     // Quando lâmina, comprimento sempre é igual à quantidade
     $comprimento.val(categoryID == 8 ? $quantidade.val(): $comprimento.val());
 

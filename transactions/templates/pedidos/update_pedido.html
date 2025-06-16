@@ -354,11 +354,13 @@ function addProduct() {
 
   // Controla se o formulário é válido
   let isValid = true;
+  /*
   const validateFormField = (fieldId, value) => {
     const element = $(`#id_${fieldId}`);
     element.toggleClass('is-invalid', !value);
     if (!value) isValid = false;
   };
+  */
 
   validateFormField('produto', produto);
   validateFormField('cnpj_faturamento', billingCNPJ);
@@ -475,93 +477,9 @@ function updateProduct() {
   }
 }
 
-
-  {% comment %} function handlePriceModals(data){
-
-
-
-  } {% endcomment %}
-
-
-function calculateProductValuesByCategory(
-    categoryID, productValues, productName, initialArea
-  ){
-  /**
-   * Calcula área e valor do produto, caso exista dolar, também multiplica
-   * @param {int} categoryID - Categoria do produto
-   * @param {object} productValues - Objeto com os valores do produto
-   * @param {string} productName - Nome do produto
-   * @return {object} area_metragem, total_valor e dados_descritivo
-   */
-  const isDolar = $('#hidden_dolar_id').val();
-
-  let dolarPtax = 1;
-  let [quantidade, largura, comprimento, preco, cnpjFaturamento] = productValues;
-  largura = !largura ? 0 : largura;
-  comprimento = !comprimento ? 0 : comprimento;
-
-  quantidade = parseInt(quantidade);
-  categoryID = parseInt(categoryID);
-
-  if(isDolar == true){
-    dolarPtax = parseFloat($('#id_dolar_ptax').val());
-    console.log("Entrou onde n devia")
-  }
-
-  const formatProductDescription = (quantidade, unidade, parte1, parte2 = '') => {
-    const qtd = quantidade < 10 ? `0${quantidade}` : `${quantidade}`;
-    if (!parte2){
-      return `${qtd} ${unidade} ${parte1}`;
-    }
-    return `${qtd} ${unidade} ${parte1} x ${parte2}`;
-  };
-
-  const area_m2 = largura && comprimento ? (largura * comprimento ) / 1000 * quantidade: 0;
-
-  // Categorias que usam rolos
-  // SuperLAM, Novos
-  const categoriaRolo = [3, 4];
-  if(categoriaRolo.includes(categoryID)){
-    return {
-      area_total: (area_m2).toFixed(2),
-      total_valor: (preco * area_m2 * dolarPtax).toFixed(4),
-      dados_descritivo: formatProductDescription(
-        quantidade,
-        'rolo(s)',
-        largura,
-        comprimento
-      )
-    };
-  }
-  // Categorias que usam chapas
-  // Nyloprint, Nyloflex, Tesa, Máquinas, Lâminas, Diversos
-  const categoriaChapa = [6, 7];
-
-  if(categoriaChapa.includes(categoryID)){
-    return {
-      area_total: (quantidade * initialArea).toFixed(2),
-      total_valor: (quantidade * preco).toFixed(2),
-      dados_descritivo: formatProductDescription(
-        quantidade,
-        'chapa(s)',
-        productName.replace(/\s*\(\w+\)$/, ""),
-        'Revenda'
-      )
-    };
-  }
-  // Qualquer outra categoria
-  const area_default = largura * comprimento / 1000;
-
-    return {
-      area_total: (area_default * quantidade).toFixed(2),
-      total_valor: (quantidade * preco).toFixed(4),
-      dados_descritivo: ''
-  };
-
-}
-
 $(document).ready(function() {
   let lastProductResponse = null;
+
 
   $('#id_cnpj_faturamento').on('change', function() {
     let selectedAPP = $(this).val();
@@ -627,7 +545,8 @@ $(document).ready(function() {
   // Captura o valor do campo oculto de área e chama a função de cálculo
   const calculateFields = () => {
     const m2 = $('#hidden_m2_id').val();
-    calcProductFieldsArea(m2);
+    const categoryID = $('#hidden_categoria_id').val();
+    calcProductFieldsArea(m2, categoryID);
   }
 
   // Chama os eventos de cálculo de metragem e valor total
@@ -694,10 +613,10 @@ $(document).ready(function() {
   $('#selectCategoryOrder').click(function(e) {
     e.preventDefault();
     categoryID = $("#id_categoriaSelect").val();
+    $("#hidden_categoria_id").val(categoryID);
     isValid = true;
 
     validateFormField('categoriaSelect', categoryID);
-    $('#hidden_categoria_id').val(categoryID);
 
     if(isValid) {
       $.ajax({
@@ -773,14 +692,13 @@ $(document).ready(function() {
           order_id: {{ order.pk }},
           client_id: {{ order.cliente.id}},
           product_id: productID,
-          payment_terms_id: paymentTerms,
+          payment_terms: paymentTerms,
           'csrfmiddlewaretoken': '{{ csrf_token }}'
         },
         success: function(response) {
           if(response.success){
             $('#productOrderModal').modal('hide');
             handlePriceModals(response.data);
-
           }else if (response.show_modal){
             lastProductResponse = response.data;
 
