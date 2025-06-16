@@ -95,6 +95,14 @@ class PriceForms(ModelForm):
     class Meta:
         model = Price
         exclude = ['dt_criacao', 'dt_modificado', 'cliente']
+        widgets = {
+            'produto': Select2Widget(
+                attrs={
+                    'data-placeholder': 'Começe digitando algo...',
+                    'data-width': '100%',
+                }
+            ),
+        }
 
     def __init__(self, *args, **kwargs):
 

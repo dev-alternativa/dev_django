@@ -10,7 +10,6 @@ function handlePriceModals(data) {
     taxa_frete_item = (taxa_frete_item !== undefined && taxa_frete_item !== null) ? Number(taxa_frete_item)
         .toFixed(2)
         .replace('.', ',') : 0;
-    console.log('FRETE DEPOIS', taxa_frete_item);
 
     $selectApp.empty();
     $selectApp.append('<option value="">---------</option>');
@@ -64,8 +63,7 @@ function handlePriceModals(data) {
     $("#div_id_preco label").append(`/ <b>Condição: ${paymentTerms}</b>`);
 
     $("#div_id_preco label").html('Preço pç (R$)');
-    $('#hidden_m2_id').val(0);
-    $('#hidden_categoria_id').val(0);
+
     $('#itemsModalLabel').contents().first().replaceWith(`Adicionar Produto - `);
 
 }
