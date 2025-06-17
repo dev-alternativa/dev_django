@@ -226,6 +226,8 @@ def calculate_order_total(items):
         order = Outflows.objects.filter(id=single_item.saida.id).distinct()
         items_to_process = [single_item]
 
+
+
     is_donate = True if order[0].cod_cenario_fiscal.id == 3 else False
 
     for item in items_to_process:
@@ -297,7 +299,7 @@ def calculate_order_total(items):
         }
         item_list.append(item_data)
 
-    total_pedido = sum(item['preco_total'] for item in item_list)
+    total_pedido = sum(item['preco_total'] for item in item_list) + Decimal(items[0].taxa_frete_item.replace(',', '.'))
     total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
     # print(f'Total IPI função: {total_ipi}')
     total_nota = total_pedido + total_ipi
@@ -618,7 +620,7 @@ class OrderCreateView(FormMessageMixin, CreateView):
         dolar = get_dolar_ptax()
         today = datetime.now().date()
         format_today = today.strftime('%Y-%m-%d')
-        print(f'Data atual formatada: {format_today}')
+        # print(f'Data atual formatada: {format_today}')
         initial['dt_previsao_faturamento'] = format_today
         if dolar:
             try:
@@ -1864,17 +1866,6 @@ def update_product_from_order(request, item_id):
     verifica e atualiza os campos do item da ordem de saída com os dados fornecidos.
     Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
 
-    Campos esperados no POST:
-        - quantidade (int): Quantidade do produto.
-        - preco (float): Preço do produto.
-        - item_pedido (str): Item do pedido.
-        - numero_pedido (str): Número do pedido.
-        - dados_adicionais_item (str): Dados adicionais do item.
-        - obs (str): Observações.
-        - prazo_item (int): ID do prazo.
-        - cnpj_faturamento (int): ID do CNPJ de faturamento.
-        - conta_corrente (int): ID da conta corrente.
-        - vendedor_item (int): ID do vendedor.
     """
     if request.method == 'POST':
         try:
@@ -1891,7 +1882,42 @@ def update_product_from_order(request, item_id):
             comprimento = request.POST.get('comprimento')
             taxa_frete_item = request.POST.get('taxa_frete_item')
 
+            prazo_item_id = request.POST.get('prazo_item')
+            cnpj_faturamento_id = request.POST.get('cnpj_faturamento')
+            conta_corrente_id = request.POST.get('conta_corrente')
+            vendedor_item_id = request.POST.get('vendedor_item')
+            tipo_frete_item_id = request.POST.get('tipo_frete_item')
+
             item.taxa_frete_item = taxa_frete_item if taxa_frete_item else '0,00'
+            print(f'Taxa de Frete: {item.taxa_frete_item}')
+
+            all_itens = OutflowsItems.objects.filter(saida=item.saida)
+
+            if prazo_item_id:
+                prazo_item = get_object_or_404(LeadTime, pk=prazo_item_id)
+                item.prazo_item = prazo_item
+            if cnpj_faturamento_id:
+                cnpj_faturamento = get_object_or_404(CNPJFaturamento, pk=cnpj_faturamento_id)
+                item.cnpj_faturamento = cnpj_faturamento
+            if conta_corrente_id:
+                conta_corrente = get_object_or_404(ContaCorrente, pk=conta_corrente_id)
+                item.conta_corrente = conta_corrente
+            if vendedor_item_id:
+                vendedor_item = get_object_or_404(Seller, pk=vendedor_item_id)
+                item.vendedor_item = vendedor_item
+            if tipo_frete_item_id:
+                tipo_frete_item = get_object_or_404(Freight, pk=tipo_frete_item_id)
+                item.tipo_frete_item = tipo_frete_item
+
+
+            if item == all_itens.first():
+                order = Outflows.objects.get(pk=item.saida.id)
+                order.taxa_frete = item.taxa_frete_item
+                order.tipo_frete = tipo_frete_item
+                order.prazo = prazo_item
+                order.vendedor = vendedor_item
+                order.save()
+                print(f'Salvou')
 
             if item.produto.tipo_categoria_id == 7:
                 largura = item.produto.largura
@@ -1913,23 +1939,7 @@ def update_product_from_order(request, item_id):
             if obs:
                 item.obs = obs
 
-            # Foreign Keys
-            prazo_item = request.POST.get('prazo_item')
-            cnpj_faturamento_id = request.POST.get('cnpj_faturamento')
-            conta_corrente_id = request.POST.get('conta_corrente')
-            vendedor_item_id = request.POST.get('vendedor_item')
-            tipo_frete_item_id = request.POST.get('tipo_frete_item')
 
-            if prazo_item:
-                item.prazo_item = get_object_or_404(LeadTime, pk=prazo_item)
-            if cnpj_faturamento_id:
-                item.cnpj_faturamento = get_object_or_404(CNPJFaturamento, pk=cnpj_faturamento_id)
-            if conta_corrente_id:
-                item.conta_corrente = get_object_or_404(ContaCorrente, pk=conta_corrente_id)
-            if vendedor_item_id:
-                item.vendedor_item = get_object_or_404(Seller, pk=vendedor_item_id)
-            if tipo_frete_item_id:
-                item.tipo_frete_item = get_object_or_404(Freight, pk=tipo_frete_item_id)
 
             item.save()
 

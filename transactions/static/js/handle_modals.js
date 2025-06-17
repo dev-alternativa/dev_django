@@ -2,7 +2,6 @@
 function handlePriceModals(data) {
 
     $('#itemsModal').modal('show');
-    console.log('Frete antes', data.taxa_frete_item);
     isDolar = data.is_dolar;
     let preco = data.preco;
     let taxa_frete_item = parseFloat(data.taxa_frete_item)
