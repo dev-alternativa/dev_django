@@ -1,5 +1,5 @@
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db import transaction
@@ -226,16 +226,16 @@ def calculate_order_total(items):
         order = Outflows.objects.filter(id=single_item.saida.id).distinct()
         items_to_process = [single_item]
 
-
-
     is_donate = True if order[0].cod_cenario_fiscal.id == 3 else False
 
     for item in items_to_process:
 
         # Se for categoria Superlam
         if item.produto.tipo_categoria_id == 3:
-            m_quadrado_unitario = item.produto.m_quadrado
+            m_quadrado_unitario = Decimal(item.largura) * Decimal(item.comprimento) / Decimal(1000)
             m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+            # m_quadrado_total = 0
+
             preco_unitario = item.preco
             preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
             quantidade = item.quantidade
@@ -299,13 +299,18 @@ def calculate_order_total(items):
         }
         item_list.append(item_data)
 
-    total_pedido = sum(item['preco_total'] for item in item_list) + Decimal(items[0].taxa_frete_item.replace(',', '.'))
+    frete_str = str(items[0].taxa_frete_item or '0').replace(',', '.')
+    try:
+        frete_decimal = Decimal(frete_str)
+    except InvalidOperation:
+        frete_decimal = Decimal('0')
+
+    total_pedido = sum(item['preco_total'] for item in item_list) + frete_decimal
     total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
     # print(f'Total IPI função: {total_ipi}')
     total_nota = total_pedido + total_ipi
 
     return total_pedido, total_ipi, total_nota, item_list
-
 
 
 def process_financial_data(data):
@@ -1416,21 +1421,22 @@ def add_product_to_order(request, order_id):
                     data[key] = 0 if field_types[key] in [int, float] else ""
 
         # Verifica campos obrigatórios
-        if (not data["produto"] or not
-                data["quantidade"] or not
-                data["preco"] or not
-                data["item_pedido"] or not
-                data["cnpj_faturamento"] or not
-                data["prazo_item"]):
+        field_labels = {
+            'produto': 'Produto',
+            'quantidade': 'Quantidade',
+            'preco': 'Preço',
+            'cnpj_faturamento': 'CNPJ de Faturamento',
+            'prazo_item': 'Prazo Item'
+        }
+
+        required_fields = field_labels.keys()
+        missing_fields = [field_labels[field] for field in required_fields if not data.get(field)]
+
+        if missing_fields:
             return JsonResponse(
                 {
                     'error': 'Dados Obrigatórios Incompletos',
-                    'produto': data["produto"],
-                    'quantidade': data["quantidade"],
-                    'preco': data["preco"],
-                    'item_pedido': data["item_pedido"],
-                    'cnpj_faturamento': data["cnpj_faturamento"],
-                    'prazo_item': data["prazo_item"]
+                    'missing_fields': missing_fields
                 }, status=400
             )
 
@@ -1639,20 +1645,6 @@ def edit_order(request, order_id):
     verifica e atualiza os campos da ordem de saída com os dados fornecidos.
     Se houver algum erro durante o processamento, uma resposta JSON com o erro é retornada.
 
-    Campos esperados no POST:
-        - cliente (int): ID do cliente.
-        - num_pedido_omie (str): Número do pedido Omie.
-        - dolar_ptax (float): Valor do dólar PTAX.
-        - desconto (float): Valor do desconto.
-        - nf_saida (str): Nota fiscal de saída.
-        - transportadora (int): ID da transportadora.
-        - pedido_interno_cliente (int): Número do pedido interno do cliente.
-        - dt_previsao_faturamento (str): Data de previsão de faturamento.
-        - tipo_frete (str): Tipo de frete.
-        - dados_adicionais_nf (str): Dados adicionais da nota fiscal.
-        - cod_cenario_fiscal (int): ID do cenário fiscal.
-        - vendedor (int): ID do vendedor.
-        - item_pedido (str): Item do pedido.
     """
     if request.method == 'POST':
 
@@ -1688,6 +1680,11 @@ def edit_order(request, order_id):
                 prazo_id = dados_modificados.get('prazo')
                 prazo = get_object_or_404(LeadTime, id=prazo_id)
                 order.prazo = prazo
+            else:
+                return JsonResponse(
+                    {'error': 'Prazo não informado!'},
+                    status=400
+                )
             if 'taxa_frete' in dados_modificados:
                 order.taxa_frete = dados_modificados.get('taxa_frete')
             if 'dados_adicionais_nf' in dados_modificados:
@@ -1702,9 +1699,9 @@ def edit_order(request, order_id):
                 order.vendedor = vendedor
             if 'item_pedido' in dados_modificados:
                 order.item_pedido = dados_modificados.get('item_pedido')
-
             if 'status' in dados_modificados:
                 order.status = dados_modificados.get('status')
+
 
             order.save()
             return JsonResponse({'message': 'Pedido atualizado com sucesso!'}, status=200)
@@ -1831,7 +1828,7 @@ def get_item_data(request, item_id):
                 "taxa_frete_item": item.taxa_frete_item,
                 "tipo_frete_item": tipo_frete_item,
             }
-            # print(data)
+            print(data['area_total'])
 
             return JsonResponse({
                 "success": True,

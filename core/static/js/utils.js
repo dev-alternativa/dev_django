@@ -196,6 +196,14 @@ function calcProductFieldsArea(m2, categoryID){
       Calcula metragem no modal de adição de produtos dependendo da categoria
     */
 
+    function parseInputFloat(value) {
+      if (!value) return 0;
+      value = value.replace(',', '.');
+      const number = parseFloat(value);
+      return isNaN(number) ? 0 : number;
+    }
+
+
     const $quantidade = $('#id_quantidade');
     const $largura = $('#id_largura');
     const $comprimento = $('#id_comprimento');
@@ -231,9 +239,10 @@ function calcProductFieldsArea(m2, categoryID){
 
     // Obtém os valores dos campos obrigatórios
     const requiredValues = $requiredInputs.map(i => {
-      const value = parseFloat(i.val());
-      return !isNaN(value) && value > 0 ? value : null;
+      const value = parseInputFloat(i.val());
+      return value > 0 ? value : null;
     });
+
 
     // Verifica se todos os calores são diferentes de 0
     const allValid = requiredValues.every(value => value !== null);
@@ -243,7 +252,7 @@ function calcProductFieldsArea(m2, categoryID){
     }
 
     // Obtém todos os valores (inclusive os opcionais, como metragem)
-    const valores = $inputs.map(i => parseFloat(i.val()) || 0);
+    const valores = $inputs.map(i => parseInputFloat(i.val()));
 
     // Executa o calculo
     const result = calculateProductValuesByCategory(
@@ -261,6 +270,8 @@ function calcProductFieldsArea(m2, categoryID){
     $("#id_obs").val(result.dados_descritivo);
     $total.val(result.total_valor);
     $m2_total.val(result.area_total);
+
+    formatCurrencyInput('id_preco');
 
   }
 
@@ -290,3 +301,25 @@ $('.modal').on('shown.bs.modal', function () {
 $('.modal').on('hidden.bs.modal', function () {
   $('.select2-container').removeClass('escurecer');
 });
+
+
+// Formatador de moeda básico
+function formatCurrencyInput(selector) {
+  $(selector).on('blur', function() {
+    let value = $(this).val();
+
+    if (value) {
+      // Troca vírgula por ponto para validar
+      let numericValue = parseFloat(value.replace(',', '.'));
+
+      if (!isNaN(numericValue)) {
+        // Formata de volta para o padrão brasileiro
+        $(this).val(numericValue.toFixed(2).replace('.', ','));
+      } else {
+        // Opcional: limpar o campo ou exibir erro
+        $(this).val('');
+      }
+    }
+  });
+}
+

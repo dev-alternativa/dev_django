@@ -413,10 +413,11 @@ function addProduct() {
           },
           error: function(response) {
             // Erro
-            let erro = response.responseJSON.error;
+            const erro = response.responseJSON.error;
+            const message = response.responseJSON.missing_fields;
             let alertElement = `
               <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                ${erro}
+                ${erro}: ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>`;
 
@@ -526,20 +527,8 @@ $(document).ready(function() {
     Funções iniciadas ao carregar a página
   */
 
-  // Formata os campos de largura, comprimento e preço com 2 casa decimais
-  $('#id_largura, #id_comprimento, #id_preco').on('blur', function() {
-    const value = $(this).val();
-    if (value && !isNaN(parseFloat(value))) {
-        $(this).val(parseFloat(value).toFixed(2));
-    }
-  });
-  // Formata campo Taxa Frete do item
-  $('#id_taxa_frete_item').on('blur', function() {
-    const value = $(this).val();
-    if (value && !isNaN(parseFloat(value))){
-      $(this).val(Number(value).toFixed(2).replace('.', ','));
-    }
-  });
+  // Formata Taxa Frete do item, largura, comprimento e preço com 2 casa decimais
+  formatCurrencyInput('#id_taxa_frete_item');
 
 
   // Captura o valor do campo oculto de área e chama a função de cálculo
@@ -810,9 +799,18 @@ $(document).ready(function() {
 
         },
         error: function(xhr, status, error) {
-            // Exibe mensagem de erro caso a requisição falhe
-            console.log(`Erro: ${status}: ${error}`);
-            alert("Ocorreu um erro ao salvar o pedido.");
+          // Erro
+          let erro = response.responseJSON.error;
+          let alertElement = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              ${erro}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+
+          $('#alertsModal').append(alertElement);
+          // Exibe mensagem de erro caso a requisição falhe
+          console.log(`Erro: ${status}: ${error}`);
+          alert("Ocorreu um erro ao salvar o pedido.");
         }
       });
 
