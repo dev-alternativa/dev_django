@@ -118,7 +118,7 @@ class OutflowsItems(Base):
     saida = models.ForeignKey(Outflows, on_delete=models.CASCADE, related_name='saida_items')
     cod_item_omie = models.PositiveBigIntegerField(null=True, blank=True)
     produto = models.ForeignKey('products.Product', on_delete=models.CASCADE, related_name='saida_items')
-    quantidade = models.PositiveIntegerField(verbose_name='Qtde')
+    quantidade = models.DecimalField(verbose_name='Qtde', max_digits=10, decimal_places=4)
     preco = models.DecimalField(verbose_name='Preço Uni. (R$)', max_digits=10, decimal_places=4, blank=True, null=True)
     dados_adicionais_item = models.TextField('Dados Adicionais', max_length=500, blank=True, null=True)
     numero_pedido = models.CharField(verbose_name='Ordem de Compra (item)', max_length=50, blank=True, null=True)
