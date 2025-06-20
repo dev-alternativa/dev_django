@@ -444,6 +444,22 @@ class ProductForm(ModelForm):
                         ),
                     ),
                 ),
+                Tab(
+                    'Alíquotas',
+                    Row(
+                        Column(
+                            Field('aliq_ipi_com', css_class='form-control campo-estreito mx-auto'),
+                            Field('aliq_ipi_ind', css_class='form-control campo-estreito mx-auto'),
+                            Field('aliq_ipi_flx', css_class='form-control campo-estreito mx-auto'),
+                            css_class='text-center'
+                        ),
+                        Column(
+                            Field('aliq_ipi_mrx', css_class='form-control campo-estreito mx-auto'),
+                            Field('aliq_ipi_pre', css_class='form-control campo-estreito mx-auto'),
+                            css_class='text-center'
+                        ),
+                    ),
+                ),
 
             ),
             Row(

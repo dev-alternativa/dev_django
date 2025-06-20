@@ -140,8 +140,6 @@ class Location(Base):
         return self.nome
 
 
-
-
 class Price(Base):
     produto = models.ForeignKey('products.Product', verbose_name='Produto', on_delete=models.CASCADE, related_name='precos')
     cliente = models.ForeignKey(CustomerSupplier, verbose_name='Cliente', on_delete=models.CASCADE, related_name='precos')

@@ -63,3 +63,8 @@
     pointer-events: none;
 }
 
+.campo-estreito {
+  max-width: 8rem;
+  display: block;
+  margin-bottom: 1rem;
+}

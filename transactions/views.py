@@ -1804,6 +1804,9 @@ def get_item_data(request, item_id):
             tipo_frete_item = item.tipo_frete_item.tipo_frete if item.tipo_frete_item else 0
 
             total_pedido, *_, item_list = calculate_order_total([item])
+            total_pedido = f"{total_pedido:.4f}"
+            area_total = f"{item_list[0]['m_quadrado_total']:.4f}"
+            area_unitario = f"{item_list[0]['m_quadrado_unitario']:.4f}"
 
             data = {
                 "quantidade": item.quantidade,
@@ -1821,8 +1824,8 @@ def get_item_data(request, item_id):
                 "nome_produto": item.produto.nome_produto,
                 "vendedor": item.vendedor_item.nome,
                 "categoria": categoria,
-                "area_total": item_list[0]['m_quadrado_total'],
-                "area_unitario": item_list[0]['m_quadrado_unitario'],
+                "area_total": area_total,
+                "area_unitario": area_unitario,
                 "total_pedido": total_pedido,
                 "unidade": item.produto.unidade,
                 "taxa_frete_item": item.taxa_frete_item,

@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, ListView, DeleteView, DetailView
@@ -315,25 +315,32 @@ class SellerDeleteView(DeleteSuccessMessageMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        chaves_omie = ['com', 'ind', 'pre', 'srv', 'mrx', 'flx']
+        delete_from_omie = self.request.POST.get('delete-omie') == 'on'
+        print(delete_from_omie)
+        if delete_from_omie:
+            chaves_omie = ['com', 'ind', 'pre', 'srv', 'mrx', 'flx']
 
-        def remove_integration(cod_omie, chave):
-            if cod_omie:
-                response = delete_seller_from_omie(cod_omie, chave)
-                if not response['success']:
-                    return f'Erro ao remover do OMIE {chave.upper()}: {response["error"]}'
-            return None
+            def remove_integration(cod_omie, chave):
+                if cod_omie:
+                    response = delete_seller_from_omie(cod_omie, chave)
+                    print('APAGANDO DO OMIE')
+                    if not response['success']:
+                        return f'Erro ao remover do OMIE {chave.upper()}: {response["error"]}'
+                return None
 
-        error_messages = [
-            remove_integration(getattr(self.object, f'cod_omie_{chave}', None), chave.upper())
-            for chave in chaves_omie
-            if getattr(self.object, f'cod_omie_{chave}', None)
-        ]
+            error_messages = [
+                remove_integration(getattr(self.object, f'cod_omie_{chave}', None), chave.upper())
+                for chave in chaves_omie
+                if getattr(self.object, f'cod_omie_{chave}', None)
+            ]
 
-        if any(error_messages):
-            messages.warning(self.request, ' | '.join(filter(None, error_messages)))
+            if any(error_messages):
+                messages.warning(self.request, ' | '.join(filter(None, error_messages)))
+                return HttpResponseRedirect(self.success_url)
+            else:
+                messages.success(self.request, 'Vendedor removido com sucesso do sistema e do OMIE!')
         else:
-            messages.success(self.request, self.success_message)
+            messages.success(self.request, 'Vendedor removido localmente!')
 
         return super().delete(request, *args, **kwargs)
 

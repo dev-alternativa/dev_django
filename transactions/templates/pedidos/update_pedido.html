@@ -688,6 +688,7 @@ $(document).ready(function() {
           if(response.success){
             $('#productOrderModal').modal('hide');
             handlePriceModals(response.data);
+
           }else if (response.show_modal){
             lastProductResponse = response.data;
 
@@ -780,7 +781,7 @@ $(document).ready(function() {
         success: function(response) {
             // Exibe mensagem de sucesso ou faz algo com a resposta do servidor
             let message = "Campos alterados com sucesso."
-            console.log(response);
+            // console.log(response);
 
             let alertElement = `
               <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -954,7 +955,7 @@ $(document).ready(function() {
 
     $('#loading').show();
     $('#overlay').show();
-    console.log('Validando pedido...');
+    // console.log('Validando pedido...');
   });
     /*$.ajax({
       type: 'POST',
