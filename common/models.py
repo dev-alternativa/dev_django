@@ -66,7 +66,7 @@ class ContaCorrente(models.Model):
 
 class CNPJFaturamento(models.Model):
     sigla = models.CharField('Tipo CNPJ', max_length=5)
-    codigo = models.CharField('Código CNPJ', max_length=20)
+    cnpj = models.CharField('Código CNPJ', max_length=20)
 
     def __str__(self):
         return self.sigla

@@ -24,7 +24,7 @@ class SellerAdmin(admin.ModelAdmin):
 
 @admin.register(CNPJFaturamento)
 class CNPJFaturamentoAdmin(admin.ModelAdmin):
-    list_display = ('sigla', 'codigo')
+    list_display = ('sigla', 'cnpj')
 
 
 @admin.register(ContaCorrente)
