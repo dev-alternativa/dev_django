@@ -73,6 +73,31 @@ def get_filtered_products_category(request):
 
     return JsonResponse(products_list, safe=False)
 
+def get_shippment_tax(request, client_id):
+    """
+    Recupera a taxa de frete para um cliente específico.
+
+    Esta função busca a taxa de frete associada ao cliente fornecido.
+    Se o cliente não tiver uma taxa de frete definida, retorna uma resposta JSON com valor 0.
+
+    Args:
+        request (HttpRequest): O objeto de requisição HTTP.
+        client_id (int): O ID do cliente para o qual a taxa de frete deve ser recuperada.
+
+    Returns:
+        JsonResponse: Uma resposta JSON contendo a taxa de frete do cliente.
+    """
+    try:
+        client = CustomerSupplier.objects.get(id=client_id)
+        freight = client.taxa_frete
+        print(freight)
+        if freight:
+            return JsonResponse({'taxa_frete': freight})
+        else:
+            return JsonResponse({'taxa_frete': 0})
+    except CustomerSupplier.DoesNotExist:
+        return JsonResponse({'error': 'Cliente não encontrado'}, status=404)
+
 
 # def get_products_by_category(request):
     """
@@ -625,7 +650,7 @@ class OrderCreateView(FormMessageMixin, CreateView):
         dolar = get_dolar_ptax()
         today = datetime.now().date()
         format_today = today.strftime('%Y-%m-%d')
-        # print(f'Data atual formatada: {format_today}')
+
         initial['dt_previsao_faturamento'] = format_today
         if dolar:
             try:
