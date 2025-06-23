@@ -351,7 +351,7 @@ class CustomerPriceSelectView(FormMessageMixin, FormView):
         except CustomerSupplier.DoesNotExist:
             return self.form_invalid(form)
 
-        # Aqui você pode redirecionar ou processar o cliente selecionado
+
         return redirect(reverse('select_category', kwargs={'pk': customer.id}))
 
 

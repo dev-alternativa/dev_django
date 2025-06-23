@@ -85,7 +85,7 @@ class Category(Base):
 
 
 class CustomerSupplier(Base):
-    nome_fantasia = models.CharField('Nome do Cliente/Fornecedor', max_length=100)
+    nome_fantasia = models.CharField('Nome do Cliente/Fornecedor', max_length=100, unique=True)
     razao_social = models.CharField('Razão Social', max_length=100)
     cnpj = models.CharField('CNPJ do Cliente/Fornecedor', max_length=30, unique=True, null=True, blank=True)
     cidade = models.CharField('Cidade', max_length=100)
