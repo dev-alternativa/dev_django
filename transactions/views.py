@@ -1188,7 +1188,7 @@ class OrderPendingDetail(DetailView):
                 context['local_errors'].append({
                     'type': 'item',
                     'message': 'Item sem prazo de pagamento',
-                    'detail': 'O primeito item do pedido não possui Prazo de pagamento definido'
+                    'detail': 'O primeiro item do pedido não possui Prazo de pagamento definido'
                 })
                 context['has_pending_issues'] = True
 
@@ -1451,7 +1451,8 @@ def add_product_to_order(request, order_id):
             'quantidade': 'Quantidade',
             'preco': 'Preço',
             'cnpj_faturamento': 'CNPJ de Faturamento',
-            'prazo_item': 'Prazo Item'
+            'prazo_item': 'Prazo Item',
+            'vendedor': 'Vendedor',
         }
 
         required_fields = field_labels.keys()
