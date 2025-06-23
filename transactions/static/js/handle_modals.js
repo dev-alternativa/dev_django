@@ -63,7 +63,7 @@ function handlePriceModals(data) {
 
     $("#div_id_preco label").html('Preço pç (R$)');
 
-    $('#itemsModalLabel').contents().first().replaceWith(`Adicionar Produto - `);
+    $('#itemsModalLabel').contents().first().replaceWith(`Adicionar Produto `);
 
 }
     // $('#itemsModal').modal('show');
