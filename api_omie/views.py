@@ -78,6 +78,7 @@ def fetch_and_save_sellers(app_omie):
                     'email': seller_data['email'],
                     'ativo': False if seller_data['inativo'] == 'S' else True,
                 }
+                print(seller_dict)
                 if app_omie == 'IND':
                     seller_dict['cod_omie_ind'] = seller_data['codigo']
                 elif app_omie == 'COM':
@@ -134,28 +135,31 @@ def fetch_and_save_sellers(app_omie):
 
 class FetchSellersView(APIView):
     def post(self, request):
-        app_omie = request.data.get('app_omie')
-        if not app_omie:
-            return Response({'error': 'app_omie não informado'}, status=400)
+        apps_omie = CNPJFaturamento.objects.values_list('sigla', flat=True)
+        # apps_omie = None
+        print("Requisiçao chegou")
+        if not apps_omie:
+            return JsonResponse({'error': 'APP OMIE não informado ou não cadastrado!'}, status=400)
 
         try:
+            for app in apps_omie:
+                print(f'Buscando vendedores para o app: {app}')
 
-            result = fetch_and_save_sellers(app_omie)
+                result = fetch_and_save_sellers(app)
 
-            if result['success']:
-                print(f"{result['total_created']} vendedores criados e {result['total_update']} atualizados")
+                if result['success']:
+                    print(f"{result['total_created']} vendedores criados e {result['total_update']} atualizados")
+                else:
+                    print(f'Erro: {result["error"]}')
+                    return Response({
+                        'error': result['error']
+                    }, status=500)
 
-                return Response({
-                    'message': 'Vendedores processados com sucesso!',
-                    'total_created': result['total_created'],
-                    'total_update': result['total_update']
-                }, status=200)
-            else:
-                print(f'Erro: {result["error"]}')
-                return Response({
-                    'error': result['error']
-                }, status=500)
-
+            return Response({
+                        'message': 'Vendedores processados com sucesso!',
+                        'total_created': result['total_created'],
+                        'total_update': result['total_update']
+                    }, status=200)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
 
