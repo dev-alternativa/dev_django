@@ -22,7 +22,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
 # ********************************* UTILS  ********************************************
 class PDFGeneratorView(View):
     """
-
+    Base class for generating PDFs from HTML templates
+    It must be extended to provide the template and context required.
     """
     template_name = None
     filename = 'output.pdf'
@@ -36,8 +37,8 @@ class PDFGeneratorView(View):
     def render_to_pdf(self, context):
         """
         Render the template to PDF.
-        :param context: Contexto a ser passado para o template.
-        :return: PDF gerado.
+        :param context: Context to be passed to the template.
+        :return: PDF file.
         """
         html_string = render_to_string(self.template_name, context)
 

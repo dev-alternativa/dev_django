@@ -217,78 +217,204 @@ def verify_cnpj_order(cnpj_list, cnpj_list_in_database):
 #         'total_valor': total_valor,
 #     }
 
+# def calculate_order_total(items):
+#     """
+#     Calcula os totais de um pedido: preço total, IPI e valor final da nota fiscal.
+
+#     Esta função calcula o preço total, o IPI e o valor final da nota fiscal para um conjunto de itens de pedido.
+#     Os cálculos são feitos com base na categoria do produto e nas quantidades fornecidas.
+
+#     Args:
+#         items (QuerySet): QuerySet de OutflowsItems com os itens do pedido.
+
+#     Returns:
+#         tuple: Uma tupla contendo os valores calculados (total_pedido, total_ipi, total_nota, item_list).
+
+#     A função percorre cada item no QuerySet, calcula a metragem quadrada e o preço total com base na categoria do produto,
+#     e acumula esses valores para calcular os totais do pedido, IPI e nota fiscal.
+
+#     """
+#     item_list = []
+
+#     if isinstance(items, QuerySet):
+#         order = Outflows.objects.filter(id__in=items.values_list('saida', flat=True,)).distinct()
+#         items_to_process = items
+#     elif isinstance(items, list):
+#         if items:
+#             single_item = items[0]  # Pegar o primeiro item da lista
+#             order = Outflows.objects.filter(id=single_item.saida.id).distinct()
+#             items_to_process = items
+#         else:
+#             return Decimal('0.0'), Decimal('0.0'), Decimal('0.0'), []
+#     else:
+#         single_item = items
+#         order = Outflows.objects.filter(id=single_item.saida.id).distinct()
+#         items_to_process = [single_item]
+
+#     is_donate = True if order[0].cod_cenario_fiscal.id == 3 else False
+
+#     for item in items_to_process:
+
+#         # Se for categoria Superlam
+#         if item.produto.tipo_categoria_id == 3:
+#             m_quadrado_unitario = Decimal(item.largura) * Decimal(item.comprimento) / Decimal(1000)
+#             m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+#             # m_quadrado_total = 0
+
+#             preco_unitario = item.preco
+#             preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
+#             quantidade = item.quantidade
+#         # Se form categoria Nyloflex
+#         elif item.produto.tipo_categoria_id == 7:
+
+#             if item.cnpj_faturamento.sigla == 'COM':
+#                 quantidade = item.quantidade
+#                 m_quadrado_unitario = item.produto.m_quadrado or None
+#                 m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+#                 preco_unitario = item.preco
+#                 preco_total = preco_unitario * item.quantidade
+#                 quantidade = item.quantidade
+#             else:
+#                 m_quadrado_unitario = item.produto.m_quadrado or None
+#                 m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
+#                 preco_unitario = Decimal(item.preco) / Decimal(item.produto.m_quadrado)
+#                 preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
+#                 quantidade = item.quantidade
+#         # Qualquer outra categoria
+#         else:
+#             m_quadrado_unitario = float(item.produto.m_quadrado) or None
+#             m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade) or None
+#             preco_unitario = item.preco
+#             preco_total =  Decimal(preco_unitario) * item.quantidade
+#             quantidade = item.quantidade
+
+
+#         # verifica qual tag de cadastro está ativa para o cliente
+#         aliq_siglas = [
+#             (item.produto.aliq_ipi_com, 'COM'),
+#             (item.produto.aliq_ipi_ind, 'IND'),
+#             (item.produto.aliq_ipi_pre, 'PRE'),
+#             (item.produto.aliq_ipi_flx, 'FLX'),
+#             (item.produto.aliq_ipi_mrx, 'MRX'),
+#         ]
+
+#         # Caso não encontre nenhum IPI, assume valor padrão de `0.0`
+#         try:
+
+#             ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
+
+#         except IndexError:
+#             ipi = Decimal('0.0')
+#             print(f'Não foi encontrado alíquota de IPI para o APP {item.cnpj_faturamento.sigla}')
+
+#         item_data = {
+#             'id': item.id,
+#             'produto_id': item.produto.id,
+#             'nome': item.produto.nome_produto,
+#             'quantidade': quantidade,
+#             'preco_unitario': preco_unitario,
+#             'preco_unitario_formatado': format_to_brl_currency(preco_unitario),
+#             'preco_total': preco_total,
+#             'preco_total_formatado': format_to_brl_currency(preco_total),
+#             'largura': item.largura or None,
+#             'comprimento': item.comprimento or None,
+#             'm_quadrado_unitario': m_quadrado_unitario or None,
+#             'm_quadrado_total': m_quadrado_total or None,
+#             'cnpj_faturamento': item.cnpj_faturamento,
+#             'ipi': ipi,
+#         }
+#         # print(item_data)
+#         item_list.append(item_data)
+
+#     frete_str = str(items[0].taxa_frete_item or '0').replace(',', '.')
+#     try:
+#         frete_decimal = Decimal(frete_str)
+#     except InvalidOperation:
+#         frete_decimal = Decimal('0')
+
+#     total_pedido = sum(item['preco_total'] for item in item_list) + frete_decimal
+#     total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
+#     # print(f'Total IPI função: {total_ipi}')
+#     total_nota = total_pedido + total_ipi
+
+#     return total_pedido, total_ipi, total_nota, item_list
+def safe_decimal(value, default=Decimal('0.0')):
+    """Cast a value to Decimal, returning a default value on failure."""
+    try:
+        if value is None:
+            return default
+        return Decimal(str(value))
+    except (InvalidOperation, ValueError, TypeError):
+        return default
+
+def blank_if_zero_or_none(value, decimal_places=2):
+
+    try:
+        val = Decimal(str(value).replace(',', '.'))
+        if val == 0:
+            return ''
+        return f'{val:.{decimal_places}}'.replace('.', ',')
+    except (InvalidOperation, ValueError, TypeError):
+        return ''
+
+
 def calculate_order_total(items):
-    """
-    Calcula os totais de um pedido: preço total, IPI e valor final da nota fiscal.
-
-    Esta função calcula o preço total, o IPI e o valor final da nota fiscal para um conjunto de itens de pedido.
-    Os cálculos são feitos com base na categoria do produto e nas quantidades fornecidas.
-
-    Args:
-        items (QuerySet): QuerySet de OutflowsItems com os itens do pedido.
-
-    Returns:
-        tuple: Uma tupla contendo os valores calculados (total_pedido, total_ipi, total_nota, item_list).
-
-    A função percorre cada item no QuerySet, calcula a metragem quadrada e o preço total com base na categoria do produto,
-    e acumula esses valores para calcular os totais do pedido, IPI e nota fiscal.
-
-    """
+    """Calculate totals for an order including price, IPI, and final invoice value."""
     item_list = []
 
     if isinstance(items, QuerySet):
-        order = Outflows.objects.filter(id__in=items.values_list('saida', flat=True,)).distinct()
+        order = Outflows.objects.filter(id__in=items.values_list('saida', flat=True)).distinct()
         items_to_process = items
     elif isinstance(items, list):
         if items:
-            single_item = items[0]  # Pegar o primeiro item da lista
-            order = Outflows.objects.filter(id=single_item.saida.id).distinct()
+            order = Outflows.objects.filter(id=items[0].saida.id).distinct()
             items_to_process = items
         else:
             return Decimal('0.0'), Decimal('0.0'), Decimal('0.0'), []
     else:
-        single_item = items
-        order = Outflows.objects.filter(id=single_item.saida.id).distinct()
-        items_to_process = [single_item]
+        order = Outflows.objects.filter(id=items.saida.id).distinct()
+        items_to_process = [items]
 
-    is_donate = True if order[0].cod_cenario_fiscal.id == 3 else False
+    is_donate = order.exists() and order.first().cod_cenario_fiscal.id == 3
 
     for item in items_to_process:
+        quantidade = safe_decimal(item.quantidade, default= Decimal('0.0'))
+        preco_unitario = safe_decimal(item.preco, default=Decimal('0.0'))
+        m_quadrado_unitario = None
+        m_quadrado_total = None
+        preco_total = Decimal('0.0')
 
-        # Se for categoria Superlam
-        if item.produto.tipo_categoria_id == 3:
-            m_quadrado_unitario = Decimal(item.largura) * Decimal(item.comprimento) / Decimal(1000)
-            m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
-            # m_quadrado_total = 0
+        categoria = item.produto.tipo_categoria_id
 
-            preco_unitario = item.preco
-            preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
-            quantidade = item.quantidade
-        # Se form categoria Nyloflex
-        elif item.produto.tipo_categoria_id == 7:
+        # Superlam
+        if categoria == 3:
+            largura = safe_decimal(item.largura)
+            comprimento = safe_decimal(item.comprimento)
+            if largura and comprimento:
+                m_quadrado_unitario = (largura * comprimento) / Decimal('1000')
+                m_quadrado_total = m_quadrado_unitario * quantidade
+                preco_total = preco_unitario * m_quadrado_total
+
+        # Nyloflex
+        elif categoria == 7:
+            m_quadrado_unitario = safe_decimal(item.produto.m_quadrado)
+            m_quadrado_total = m_quadrado_unitario * quantidade
 
             if item.cnpj_faturamento.sigla == 'COM':
-                quantidade = item.quantidade
-                m_quadrado_unitario = item.produto.m_quadrado
-                m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
-                preco_unitario = item.preco
-                preco_total = preco_unitario * item.quantidade
-                quantidade = item.quantidade
+                preco_total = preco_unitario * quantidade
             else:
-                m_quadrado_unitario = item.produto.m_quadrado
-                m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
-                preco_unitario = Decimal(item.preco) / Decimal(item.produto.m_quadrado)
-                preco_total =  Decimal(preco_unitario) * Decimal(m_quadrado_total)
-                quantidade = item.quantidade
-        # Qualquer outra categoria
-        else:
-            m_quadrado_unitario = item.produto.m_quadrado
-            m_quadrado_total =  Decimal(m_quadrado_unitario) * Decimal(item.quantidade)
-            preco_unitario = item.preco
-            preco_total =  Decimal(preco_unitario) * item.quantidade
-            quantidade = item.quantidade
+                if m_quadrado_unitario > 0:
+                    preco_unitario = preco_unitario / m_quadrado_unitario
+                    preco_total = preco_unitario * m_quadrado_total
+                else:
+                    preco_total = preco_unitario * quantidade
 
-        # verifica qual tag de cadastro está ativa para o cliente
+        # Outras categorias
+        else:
+            m_quadrado_unitario = safe_decimal(item.produto.m_quadrado)
+            m_quadrado_total = m_quadrado_unitario * quantidade
+            preco_total = preco_unitario * quantidade
+
         aliq_siglas = [
             (item.produto.aliq_ipi_com, 'COM'),
             (item.produto.aliq_ipi_ind, 'IND'),
@@ -297,14 +423,13 @@ def calculate_order_total(items):
             (item.produto.aliq_ipi_mrx, 'MRX'),
         ]
 
-        # Caso não encontre nenhum IPI, assume valor padrão de `0.0`
-        try:
-
-            ipi = [aliq for aliq, sigla in aliq_siglas if item.cnpj_faturamento.sigla == sigla][0]
-
-        except IndexError:
-            ipi = Decimal('0.0')
-            print(f'Não foi encontrado alíquota de IPI para o APP {item.cnpj_faturamento.sigla}')
+        ipi = Decimal('0.0')
+        for aliq, sigla in aliq_siglas:
+            if item.cnpj_faturamento.sigla == sigla:
+                ipi = safe_decimal(aliq, default=Decimal('0.0'))
+                break
+            else:
+                print(f'Não foi encontrado alíquota de IPI para o APP {item.cnpj_faturamento.sigla}')
 
         item_data = {
             'id': item.id,
@@ -315,27 +440,35 @@ def calculate_order_total(items):
             'preco_unitario_formatado': format_to_brl_currency(preco_unitario),
             'preco_total': preco_total,
             'preco_total_formatado': format_to_brl_currency(preco_total),
-            'largura': item.largura,
-            'comprimento': item.comprimento,
+            'largura': item.largura or '',
+            'comprimento': item.comprimento or '',
             'm_quadrado_unitario': m_quadrado_unitario,
+            'm_quadrado_unitario_formatado': blank_if_zero_or_none(m_quadrado_unitario, 2),
             'm_quadrado_total': m_quadrado_total,
+            'm_quadrado_total_formatado': blank_if_zero_or_none(m_quadrado_total, 2),
             'cnpj_faturamento': item.cnpj_faturamento,
             'ipi': ipi,
         }
+
         item_list.append(item_data)
 
-    frete_str = str(items[0].taxa_frete_item or '0').replace(',', '.')
-    try:
-        frete_decimal = Decimal(frete_str)
-    except InvalidOperation:
-        frete_decimal = Decimal('0')
+    frete_value = getattr(items[0], 'taxa_frete_item', None)
+    frete_decimal = safe_decimal(str(frete_value).replace(',', '.') if frete_value else '0')
 
-    total_pedido = sum(item['preco_total'] for item in item_list) + frete_decimal
-    total_ipi = sum(item['ipi'] * item['preco_total'] / 100 for item in item_list) if not is_donate else 0
-    # print(f'Total IPI função: {total_ipi}')
+    total_pedido = sum(safe_decimal(item['preco_total']) for item in item_list) + frete_decimal
+
+    total_ipi = Decimal('0.0')
+    if not is_donate:
+        for item in item_list:
+            try:
+                total_ipi += safe_decimal(item['ipi']) * safe_decimal(item['preco_total']) / Decimal('100')
+            except InvalidOperation:
+                continue
+
     total_nota = total_pedido + total_ipi
 
-    return total_pedido, total_ipi, total_nota, item_list
+    return total_pedido, blank_if_zero_or_none(total_ipi, 2), total_nota, item_list
+
 
 
 def process_financial_data(data):

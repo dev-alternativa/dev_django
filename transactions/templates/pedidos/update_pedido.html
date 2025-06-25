@@ -415,9 +415,10 @@ function addProduct() {
             // Erro
             const erro = response.responseJSON.error;
             const message = response.responseJSON.missing_fields;
+            console.log(message);
             let alertElement = `
               <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                ${erro}: ${message}
+                ${erro}: ${message.join(', ')}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>`;
 

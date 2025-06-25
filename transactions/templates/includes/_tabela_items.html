@@ -22,10 +22,10 @@
             <td>{{ item.produto_id }}</td>
             <td>{{ item.nome }}</td>
             <td>{{ item.quantidade }}</td>
-            <td>{{ item.largura|floatformat:0 }}</td>
+            <td>{{ item.largura|floatformat:0|default_if_none:'' }}</td>
             <td>{{ item.comprimento|floatformat:0 }}</td>
-            <td>{{ item.m_quadrado_unitario|floatformat:2 }}</td>
-            <td>{{ item.m_quadrado_total|floatformat:2 }}</td>
+            <td>{{ item.m_quadrado_unitario_formatado }}</td>
+            <td>{{ item.m_quadrado_total_formatado }}</td>
             <td>R${{ item.preco_unitario_formatado }}</td>
             <td>R${{ item.preco_total_formatado }}</td>
             <td>{{ item.cnpj_faturamento }}</td>
@@ -55,7 +55,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <legend>Total de Produtos: <strong>{{ total_produtos|default_if_none:"0" }}</strong></legend>
+                <legend>Total de Produtos: <strong>{{ total_produtos }}</strong></legend>
             </div>
             <div class="col-md-6">
                 <legend>Total do Pedido: <strong>R$ {{ total_pedido }}</strong></legend>
@@ -63,7 +63,11 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <legend>Total de IPI sobre os produtos: <strong>R$ {{ total_ipi|floatformat:2 }}</strong></legend>
+                <legend>Total de IPI sobre os produtos:
+                    {% if total_ipi %}
+                        <strong>R$ {{ total_ipi }}</strong>
+                    {% endif %}
+                </legend>
             </div>
             <div class="col-md-6">
                 <legend>Total da Nota: <strong>R$ {{ total_nota }}</strong></legend>
