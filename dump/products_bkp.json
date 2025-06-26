@@ -4406,8 +4406,8 @@
   "pk": 119,
   "fields": {
     "dt_criacao": "2025-02-19T12:20:38.387Z",
-    "dt_modificado": "2025-02-26T13:07:26.543Z",
-    "ativo": true,
+    "dt_modificado": "2025-06-20T12:39:16.549Z",
+    "ativo": false,
     "tipo_categoria": 4,
     "sub_categoria": "BM - 15mic",
     "nome_produto": "FILME BOPP P/LAMINACAO - FOSCO (15mic)",
@@ -4417,7 +4417,7 @@
     "qtd_por_caixa": "0",
     "peso_unitario": "0.023",
     "peso_caixa": "0",
-    "situacao": "0",
+    "situacao": null,
     "cod_omie_com": "0",
     "cod_oculto_omie_com": "0",
     "cod_omie_ind": "BM-15",
@@ -6922,8 +6922,8 @@
   "pk": 187,
   "fields": {
     "dt_criacao": "2025-02-19T12:20:39.265Z",
-    "dt_modificado": "2025-02-26T13:07:27.408Z",
-    "ativo": true,
+    "dt_modificado": "2025-06-18T19:08:53.171Z",
+    "ativo": false,
     "tipo_categoria": 9,
     "sub_categoria": "ACQUASOLVE",
     "nome_produto": "PLACA PRINCIPAL - PAINEL ACQUASOLVE",
@@ -6933,7 +6933,7 @@
     "qtd_por_caixa": "0",
     "peso_unitario": "0.216",
     "peso_caixa": "0",
-    "situacao": "0",
+    "situacao": null,
     "cod_omie_com": "0",
     "cod_oculto_omie_com": "0",
     "cod_omie_ind": "1243",
@@ -8720,6 +8720,26 @@
     "dt_modificado": "2024-10-21T19:06:57.709Z",
     "ativo": true,
     "nome": "VALINHOS"
+  }
+},
+{
+  "model": "products.price",
+  "pk": 2,
+  "fields": {
+    "dt_criacao": "2025-06-09T13:25:13.616Z",
+    "dt_modificado": "2025-06-09T18:12:34.512Z",
+    "ativo": false,
+    "produto": 21,
+    "cliente": 472,
+    "valor": "100.00",
+    "is_dolar": false,
+    "prazo": 11,
+    "cnpj_faturamento": 2,
+    "condicao": "Normal",
+    "vendedor": 231,
+    "taxa_frete": "65.00",
+    "tipo_frete": 6,
+    "obs": ""
   }
 }
 ]

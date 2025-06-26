@@ -23,6 +23,7 @@ python manage.py loaddata dump/logistic_bkp_utf8.json
 python manage.py loaddata dump/common_bkp_utf8.json
 python manage.py loaddata dump/products_bkp_utf8.json
 python manage.py loaddata dump/transactions_bkp_utf8.json
+
 echo "Fixtures importadas com sucesso."
 
 # Inicia o servidor Gunicorn
