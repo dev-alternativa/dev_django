@@ -5,9 +5,9 @@ set -e
 ./wait-for-it.sh db:3306 --timeout=60 --strict -- echo "Database is up"
 
 # Realiza migrations e coleta os estáticos
-echo('Aplicando migrações...')
+echo "Aplicando migrações..."
 python manage.py migrate
-echo('Coletando arquivos estáticos...')
+echo "Coletando arquivos estáticos..."
 python manage.py collectstatic --noinput --clear
 
 # Cria o superusuário se não existir
