@@ -184,7 +184,7 @@
   "pk": 1,
   "fields": {
     "sigla": "COM",
-    "codigo": "11111111111"
+    "cnpj": "11510299000140"
   }
 },
 {
@@ -192,7 +192,7 @@
   "pk": 2,
   "fields": {
     "sigla": "IND",
-    "codigo": "22222222222"
+    "cnpj": "18270945000199"
   }
 },
 {
@@ -200,7 +200,7 @@
   "pk": 3,
   "fields": {
     "sigla": "FLX",
-    "codigo": "33333333333"
+    "cnpj": "99999999999999"
   }
 },
 {
@@ -208,7 +208,7 @@
   "pk": 4,
   "fields": {
     "sigla": "MRX",
-    "codigo": "444444444"
+    "cnpj": "30323170000178"
   }
 },
 {
@@ -216,7 +216,7 @@
   "pk": 5,
   "fields": {
     "sigla": "PRE",
-    "codigo": "555555555"
+    "cnpj": "14952125000126"
   }
 },
 {
@@ -224,7 +224,7 @@
   "pk": 6,
   "fields": {
     "sigla": "SRV",
-    "codigo": "6666666666"
+    "cnpj": "29495655000160"
   }
 },
 {
@@ -472,8 +472,8 @@
   "fields": {
     "dt_criacao": "2024-12-04T20:11:48.324Z",
     "dt_modificado": "2025-06-06T12:18:16.223Z",
-    "ativo": true,
-    "nome_fantasia": "FORMATTO DESIGN",
+    "ativo": false,
+    "nome_fantasia": "FORMATTO DESIGN (ANTIGO)",
     "razao_social": "FORMATTO DESIGN E CLICHERIA LTDA - EPP",
     "cnpj": "72897648000113",
     "cidade": "SAO PAULO",
@@ -21555,8 +21555,8 @@
   "fields": {
     "dt_criacao": "2024-12-04T20:11:59.358Z",
     "dt_modificado": "2025-01-16T17:02:33.657Z",
-    "ativo": true,
-    "nome_fantasia": "WILFLEX",
+    "ativo": false,
+    "nome_fantasia": "WILFLEX (ANTIGO)",
     "razao_social": "CLICHERIA WILFLEX LTDA - ME",
     "cnpj": "13036486000160",
     "cidade": "CACADOR",
@@ -37111,7 +37111,7 @@
     "dt_criacao": "2025-04-23T18:06:51.530Z",
     "dt_modificado": "2025-06-06T12:18:17.976Z",
     "ativo": true,
-    "nome_fantasia": "FRUTMEL",
+    "nome_fantasia": "BRINDES FRUTMEL",
     "razao_social": "BRINDES FRUTMEL LTDA - ME",
     "cnpj": "14313387000140",
     "cidade": "SANTA ADELIA",
@@ -37962,7 +37962,7 @@
     "dt_criacao": "2025-06-04T17:41:57.125Z",
     "dt_modificado": "2025-06-06T12:19:08.884Z",
     "ativo": true,
-    "nome_fantasia": "INDEMETAL",
+    "nome_fantasia": "INDEMETAL(ETIQUETAS)",
     "razao_social": "INDEMETAL INDUSTRIA DE ETIQUETAS LTDA.",
     "cnpj": "48985899000175",
     "cidade": "ITU",
@@ -40315,7 +40315,7 @@
     "dt_criacao": "2025-06-04T17:42:00.139Z",
     "dt_modificado": "2025-06-06T12:19:15.176Z",
     "ativo": true,
-    "nome_fantasia": "MARKA ROTULOS",
+    "nome_fantasia": "MARKA ROTULOS (MASTERPRINT)",
     "razao_social": "MASTERPRINT EMBALAGENS LTDA",
     "cnpj": "58532935000107",
     "cidade": "BOM DESPACHO",
@@ -40475,7 +40475,7 @@
     "dt_criacao": "2025-06-04T17:42:00.249Z",
     "dt_modificado": "2025-06-06T12:19:15.596Z",
     "ativo": true,
-    "nome_fantasia": "ATIVAFLEX",
+    "nome_fantasia": "ATIVAFLEX (AT FLEX)",
     "razao_social": "AT FLEX INDUSTRIA, COMERCIO E PRESTACAO DE SERVICOS LTDA",
     "cnpj": "31953704000102",
     "cidade": "SUMARE",
@@ -45395,7 +45395,7 @@
     "dt_criacao": "2025-06-04T17:42:04.111Z",
     "dt_modificado": "2025-06-06T12:19:28.178Z",
     "ativo": true,
-    "nome_fantasia": "YDEA PRINT",
+    "nome_fantasia": "YDEA PRINT (CPF)",
     "razao_social": "CAISSER CARLOS DE SANT ANA",
     "cnpj": "22371446807",
     "cidade": "SAO JOSE DO RIO PRETO",
@@ -46189,6 +46189,132 @@
   }
 },
 {
+  "model": "common.customersupplier",
+  "pk": 1089,
+  "fields": {
+    "dt_criacao": "2025-06-25T17:05:24.623Z",
+    "dt_modificado": "2025-06-25T17:05:24.623Z",
+    "ativo": true,
+    "nome_fantasia": "ALTERNATIVA COMERCIO",
+    "razao_social": "ALTERNATIVA COMERCIO E FABRICACAO DE PRODUTOS PARA AREA GRAFICA, AGRICOLA E DE EMBALAGENS LTDA",
+    "cnpj": "11510299000140",
+    "cidade": "Piracicaba",
+    "estado": "SP",
+    "endereco": "TANG WING SUN",
+    "bairro": "SERTAOZINHO",
+    "complemento": null,
+    "numero": "151",
+    "telefone": "34210065",
+    "ddd": "19",
+    "cep": "13426425",
+    "email": "financeiro@alternativaflexo.com.br",
+    "nome_contato": null,
+    "tipo_frete": 6,
+    "taxa_frete": null,
+    "cliente_transportadora": null,
+    "inscricao_estadual": "535475436112",
+    "limite_credito": null,
+    "contribuinte": true,
+    "tag_cliente": true,
+    "tag_fornecedor": false,
+    "tag_cadastro_omie_com": "271429308",
+    "tag_cadastro_omie_ind": "271416811",
+    "tag_cadastro_omie_pre": "3170932373",
+    "tag_cadastro_omie_mrx": "2140227634",
+    "tag_cadastro_omie_flx": "743467967",
+    "tag_cadastro_omie_srv": null,
+    "obs": "",
+    "is_international": false,
+    "categoria": [
+      10
+    ]
+  }
+},
+{
+  "model": "common.customersupplier",
+  "pk": 1090,
+  "fields": {
+    "dt_criacao": "2025-06-25T17:23:18.452Z",
+    "dt_modificado": "2025-06-25T17:25:39.552Z",
+    "ativo": true,
+    "nome_fantasia": "ALTERNATIVA MRX PRODUTOS",
+    "razao_social": "MRX PRODUTOS PARA IMPRESSAO E ACABAMENTO GRAFICO LTDA.",
+    "cnpj": "29495655000160",
+    "cidade": "Manaus",
+    "estado": "AM",
+    "endereco": "TINGO",
+    "bairro": "TARUMA-ACU",
+    "complemento": null,
+    "numero": "150",
+    "telefone": "33714772",
+    "ddd": "19",
+    "cep": "69023650",
+    "email": "fiscal@alternativaflexo.com.br",
+    "nome_contato": null,
+    "tipo_frete": 6,
+    "taxa_frete": null,
+    "cliente_transportadora": null,
+    "inscricao_estadual": null,
+    "limite_credito": null,
+    "contribuinte": true,
+    "tag_cliente": true,
+    "tag_fornecedor": false,
+    "tag_cadastro_omie_com": "415382613",
+    "tag_cadastro_omie_ind": "2034184089",
+    "tag_cadastro_omie_pre": "2545347119",
+    "tag_cadastro_omie_mrx": "2140225836",
+    "tag_cadastro_omie_flx": null,
+    "tag_cadastro_omie_srv": null,
+    "obs": "",
+    "is_international": false,
+    "categoria": [
+      3
+    ]
+  }
+},
+{
+  "model": "common.customersupplier",
+  "pk": 1091,
+  "fields": {
+    "dt_criacao": "2025-06-25T17:28:03.027Z",
+    "dt_modificado": "2025-06-25T17:28:03.027Z",
+    "ativo": true,
+    "nome_fantasia": "ALTERNATIVA SERVICOS",
+    "razao_social": "FLEXO SERVICOS E PRODUTOS GRAFICOS LTDA",
+    "cnpj": "14952125000126",
+    "cidade": "Piracicaba",
+    "estado": "SP",
+    "endereco": "BARAO DE PIRACICAMIRIM",
+    "bairro": "SAO DIMAS",
+    "complemento": null,
+    "numero": "991",
+    "telefone": "34210065",
+    "ddd": "19",
+    "cep": "13416005",
+    "email": "contato@globocontabilidade.com",
+    "nome_contato": null,
+    "tipo_frete": 6,
+    "taxa_frete": null,
+    "cliente_transportadora": null,
+    "inscricao_estadual": "535284524110",
+    "limite_credito": null,
+    "contribuinte": true,
+    "tag_cliente": true,
+    "tag_fornecedor": false,
+    "tag_cadastro_omie_com": null,
+    "tag_cadastro_omie_ind": "4905874348",
+    "tag_cadastro_omie_pre": "1711493900",
+    "tag_cadastro_omie_mrx": null,
+    "tag_cadastro_omie_flx": null,
+    "tag_cadastro_omie_srv": "357831851",
+    "obs": "",
+    "is_international": false,
+    "categoria": [
+      10
+    ]
+  }
+},
+{
   "model": "common.seller",
   "pk": 225,
   "fields": {
@@ -46294,9 +46420,9 @@
     "cod_omie_com": 3707101832,
     "cod_omie_ind": 2038659762,
     "cod_omie_pre": 2549307607,
-    "cod_omie_mrx": 0,
+    "cod_omie_mrx": 2140226862,
     "cod_omie_flx": 1641908092,
-    "cod_omie_srv": 0,
+    "cod_omie_srv": 5074691290,
     "representante": false,
     "email": "",
     "incluir_omie": false
@@ -46336,7 +46462,7 @@
     "cod_omie_flx": 0,
     "cod_omie_srv": 0,
     "representante": false,
-    "email": "ricardo.alternativaflexo@hotmail.com",
+    "email": "ricardo@alternativaflexo.com.br",
     "incluir_omie": false
   }
 },
@@ -46463,7 +46589,7 @@
     "ativo": true,
     "nome": "GIULIANO",
     "cod_omie_com": 4913489296,
-    "cod_omie_ind": 0,
+    "cod_omie_ind": 5421497297,
     "cod_omie_pre": 0,
     "cod_omie_mrx": 0,
     "cod_omie_flx": 0,
@@ -46478,7 +46604,7 @@
   "pk": 241,
   "fields": {
     "dt_criacao": "2024-10-25T12:14:33.833Z",
-    "dt_modificado": "2024-10-25T12:14:33.833Z",
+    "dt_modificado": "2025-06-23T12:13:18.995Z",
     "ativo": true,
     "nome": "GABRIEL BENASSI",
     "cod_omie_com": 4915681978,
@@ -46573,15 +46699,110 @@
   "pk": 275,
   "fields": {
     "dt_criacao": "2024-11-01T13:28:27.153Z",
-    "dt_modificado": "2024-11-01T13:28:30.126Z",
+    "dt_modificado": "2025-06-23T11:59:19.435Z",
     "ativo": true,
     "nome": "TESTE",
-    "cod_omie_com": 4947348618,
-    "cod_omie_ind": 5306871712,
-    "cod_omie_pre": 3596189322,
-    "cod_omie_mrx": 6054007857,
-    "cod_omie_flx": 2558700780,
-    "cod_omie_srv": 4947348624,
+    "cod_omie_com": null,
+    "cod_omie_ind": null,
+    "cod_omie_pre": null,
+    "cod_omie_mrx": null,
+    "cod_omie_flx": null,
+    "cod_omie_srv": null,
+    "representante": false,
+    "email": null,
+    "incluir_omie": true
+  }
+},
+{
+  "model": "common.seller",
+  "pk": 276,
+  "fields": {
+    "dt_criacao": "2025-06-13T12:22:06.049Z",
+    "dt_modificado": "2025-06-13T12:24:07.890Z",
+    "ativo": true,
+    "nome": "VITOR",
+    "cod_omie_com": 292005494,
+    "cod_omie_ind": 296680160,
+    "cod_omie_pre": 3714981305,
+    "cod_omie_mrx": 2140225852,
+    "cod_omie_flx": 2783339438,
+    "cod_omie_srv": 5048526458,
+    "representante": false,
+    "email": "",
+    "incluir_omie": true
+  }
+},
+{
+  "model": "common.seller",
+  "pk": 277,
+  "fields": {
+    "dt_criacao": "2025-06-18T19:25:56.819Z",
+    "dt_modificado": "2025-06-18T19:25:56.819Z",
+    "ativo": true,
+    "nome": "GUILHERME REIS",
+    "cod_omie_com": 271393893,
+    "cod_omie_ind": 271453383,
+    "cod_omie_pre": 1713377212,
+    "cod_omie_mrx": null,
+    "cod_omie_flx": 753490992,
+    "cod_omie_srv": 5074691195,
+    "representante": false,
+    "email": "",
+    "incluir_omie": true
+  }
+},
+{
+  "model": "common.seller",
+  "pk": 278,
+  "fields": {
+    "dt_criacao": "2025-06-18T19:25:56.819Z",
+    "dt_modificado": "2025-06-18T19:25:56.819Z",
+    "ativo": true,
+    "nome": "RODRIGO ZENERO",
+    "cod_omie_com": 271429410,
+    "cod_omie_ind": 272040700,
+    "cod_omie_pre": 3741923683,
+    "cod_omie_mrx": null,
+    "cod_omie_flx": 753258482,
+    "cod_omie_srv": 4915699660,
+    "representante": false,
+    "email": "",
+    "incluir_omie": true
+  }
+},
+{
+  "model": "common.seller",
+  "pk": 279,
+  "fields": {
+    "dt_criacao": "2025-06-18T19:25:56.819Z",
+    "dt_modificado": "2025-06-18T19:25:56.819Z",
+    "ativo": true,
+    "nome": "HENRIQUE REIS",
+    "cod_omie_com": 297558785,
+    "cod_omie_ind": 299295490,
+    "cod_omie_pre": 1715749070,
+    "cod_omie_mrx": null,
+    "cod_omie_flx": 753243434,
+    "cod_omie_srv": 5074691159,
+    "representante": false,
+    "email": "",
+    "incluir_omie": true
+  }
+},
+{
+  "model": "common.seller",
+  "pk": 280,
+  "fields": {
+    "dt_criacao": "2025-06-18T19:25:56.819Z",
+    "dt_modificado": "2025-06-18T19:25:56.819Z",
+    "ativo": true,
+    "nome": "VICTOR ARGANDONA",
+    "cod_omie_com": 5074683879,
+    "cod_omie_ind": 5470656446,
+    "cod_omie_pre": 3741912016,
+    "cod_omie_mrx": 6164321361,
+    "cod_omie_flx": 2824042403,
+    "cod_omie_srv": 5074690738,
     "representante": false,
     "email": "",
     "incluir_omie": true
