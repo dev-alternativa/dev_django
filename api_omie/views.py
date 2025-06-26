@@ -1,5 +1,6 @@
 import os
 import re
+from core.views import clean_cnpj_cpf
 from collections import defaultdict
 from common.models import CNPJFaturamento
 from common.models import Seller
@@ -11,7 +12,6 @@ from rest_framework.response import Response
 from transactions.models import OutflowsItems, Outflows
 import requests
 
-from core.views import clean_cnpj_cpf
 
 load_dotenv()
 
@@ -574,6 +574,13 @@ def get_omie_credentials(app_type):
         'app_secret': os.getenv(f'{app_type}_OMIE_API_SECRET')
     }
 
+def clean_cnpj_cpf(cnpj_cpf):
+    """
+    Remove caracteres especiais de um CNPJ ou CPF.
+    :param cnpj_cpf: CNPJ ou CPF a ser limpo.
+    :return: CNPJ ou CPF sem caracteres especiais.
+    """
+    return ''.join(filter(str.isdigit, cnpj_cpf))
 
 # **************************** FINANCEIRO ********************************
 def get_financial_data_from_omie(cnpj_cpf):

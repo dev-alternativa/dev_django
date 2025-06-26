@@ -2,11 +2,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import ProtectedError
+from django.db.models import ProtectedError, F, Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.views.generic import TemplateView, DeleteView, View
+
+from transactions.models import OutflowsItems
 from weasyprint import HTML
 
 
@@ -20,6 +22,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return context
 
 # ********************************* UTILS  ********************************************
+
 class OmieMappingError(Exception):
     """Custom exception for Omie mapping errors."""
     def __init__(self, entity_name, detail):

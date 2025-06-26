@@ -15,11 +15,11 @@ from django.urls import reverse_lazy, reverse
 
 from api.services import get_dolar_ptax
 from api_omie.views import get_client_from_omie, get_financial_data_from_omie
-from core.views import OmieMappingError
+from transactions.utils import OmieMappingError
 from common.models import Seller, CustomerSupplier, Category, CNPJFaturamento, ContaCorrente
 from core.views import FormMessageMixin, FormataDadosMixin, format_to_brl_currency, PDFGeneratorView
 from logistic.models import Carrier, LeadTime, Freight
-from itertools import chain
+
 from products.models import Price, Product
 from transactions.forms import InflowsForm, InflowsItemsFormSet, OutflowsForm, OutflowsItemsFormSet, OrderItemsForm
 from transactions.models import Inflows, InflowsItems, Outflows, OutflowsItems
@@ -955,76 +955,87 @@ class OrderSummary(DetailView):
         return context
 
 
-class OrderPickingPDF(DetailView, FormataDadosMixin):
-    model = Outflows
-    template_name = 'includes/pedido_separacao_pdf.html'
-    context_object_name = 'order_picking'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['local_errors'] = []
-        context['api_errors'] = []
+class OrderPickingContextBuilder(FormataDadosMixin):
+    def __init__(self, order):
+        self.order = order
+        self.context = {
+            'local_errors': [],
+            'api_errors': [],
+            'has_pending issues': False
+        }
 
-        context['order'] = order = self.get_object()
-        context['client'] = order.cliente
-        context['cnpj'] = self.format_cnpj_cpf(order.cliente.cnpj)
-        context['vendedor'] = order.vendedor
-        context['prazo_parcelas'] = order.prazo
+    def build(self):
+        self._add_order_data()
+        self._check_order_items()
+        self._calculate_totals()
+        self._annotate_calculated_items()
+        self._check_integrations()
+        self._check_account()
+        self._get_credit_info()
+        self._finalize()
+        print("Contexto final gerado pelo builder:")
+        print(self.context)
 
-        order_itens = OutflowsItems.objects.filter(saida=order.pk)
-        if not order_itens.exists():
-            context['local_errors'].append({
+        return self.context
+
+    def _add_order_data(self):
+        self.context['order'] = self.order
+        self.context['client'] = self.order.cliente
+        self.context['cnpj'] = self.format_cnpj_cpf(self.order.cliente.cnpj)
+        self.context['vendedor'] = self.order.vendedor
+        self.context['prazo_parcelas'] = self.order.prazo
+
+    def _check_order_items(self):
+        self.qs_itens = OutflowsItems.objects.filter(saida=self.order.pk, produto__isnull=False)
+        self.qs_itens = self.qs_itens.annotate(item_total=F('preco') * F('quantidade'))
+
+        if not self.qs_itens.exists():
+            self.context['local_errors'].append({
                 'type': 'order',
                 'message': 'Pedido sem itens cadastrados',
-                'detail': f'O pedido #{order.pk} não possui itens associados'
+                'detail': f'O pedido #{self.order.pk} não possui itens associados'
             })
-            context['has_pending_issues'] = True
+            self.context['has_pending_issues'] = True
 
-        order_itens = order_itens.annotate(
-            item_total=F('preco') * F('quantidade')
-        )
-        total_geral = order_itens.aggregate(
-            total=Sum('item_total')
-        )
-
-        for item in order_itens:
+        for item in self.qs_itens:
             if not item.quantidade:
-                context['local_errors'].append({
+                self.context['local_errors'].append({
                     'type': 'item',
                     'message': f'Item {item.produto.nome_produto} sem quantidade',
                     'detail': f'O item #{item.id} precisa de uma quantidade válida'
                 })
-                context['has_pending_issues'] = True
+                self.context['has_pending_issues'] = True
             if not item.cnpj_faturamento:
-                context['local_errors'].append({
+                self.context['local_errors'].append({
                     'type': 'item',
                     'message': f'Item {item.produto.nome_produto} sem CNPJ de faturamento',
                     'detail': f'O item #{item.id} precisa de um CNPJ de faturamento válido'
                 })
-                context['has_pending_issues'] = True
+                self.context['has_pending_issues'] = True
 
-        context['order_itens'] = order_itens
-        context['total_geral'] = total_geral['total']
-        carrier = order_itens.first().saida.transportadora
-        context['transportadora'] = carrier
-        quantidade_itens = len(order_itens)
-        context['quantidade_itens'] = quantidade_itens
+        self.context['quantidade_itens'] = self.qs_itens.count()
+        self.context['transportadora'] = self.qs_itens.first().saida.transportadora
+        self.context['total_geral'] = self.qs_itens.aggregate(total=Sum('item_total'))['total']
 
+    def _calculate_totals(self):
         try:
-            *_, total_ipi, total_nota, item_list = calculate_order_total(order_itens)
-
-            context['item_list'] = item_list
-            context['total_nota'] = format_to_brl_currency(total_nota)
+            *_, self.total_ipi, self.total_nota, self.item_list = calculate_order_total(self.qs_itens)
+            self.context['item_list'] = self.item_list
+            self.context['total_nota'] = format_to_brl_currency(self.total_nota)
         except Exception as e:
-            context['local_errors'].append({
+            self.context['local_errors'].append({
                 'type': 'cálculo',
                 'message': 'Erro ao calcular total do pedido',
                 'detail': str(e)
             })
-            context['has_pending_issues'] = True
+            self.context['has_pending_issues'] = True
+            self.item_list = []
 
+    def _annotate_calculated_items(self):
         calculated_itens = []
-        for item, calc in zip(order_itens, item_list):
+
+        for item, calc in zip(self.qs_itens, self.item_list):
             item_dict = {
                 'item': item,
                 'preco_unitario': calc['preco_unitario'],
@@ -1039,14 +1050,219 @@ class OrderPickingPDF(DetailView, FormataDadosMixin):
             }
             calculated_itens.append(item_dict)
 
-        context['order_itens'] = calculated_itens
-        context['total_ipi'] = format_to_brl_currency(total_ipi)
-        total_pedido = sum(item['preco_total'] for item in item_list)
-        context['sub_total'] = format_to_brl_currency(total_pedido)
+        self.context['order_itens'] = calculated_itens
+        self.context['total_ipi'] = format_to_brl_currency(self.total_ipi)
+        total_pedido = sum(item['preco_total'] for item in self.item_list)
+        self.context['sub_total'] = format_to_brl_currency(total_pedido)
 
-        context['ready_to_send'] = True
+    def _check_integrations(self):
+        try:
+            cnpj_faturamento = self.qs_itens.first().cnpj_faturamento
+            sigla = cnpj_faturamento.sigla
+            alternativa_data = CustomerSupplier.objects.get(cnpj=cnpj_faturamento.cnpj)
+            alternativa_data.cnpj = self.format_cnpj_cpf(alternativa_data.cnpj)
 
+            self.context['alternativa_data'] = alternativa_data
+            seller = self.order.vendedor
+            carrier = getattr(self.qs_itens.first().saida, 'transportadora', None)
+
+            try:
+                mapa_sigla_para_campo = return_omie_mapping_codes(carrier, seller, self.order)
+
+            except OmieMappingError as e:
+                self.context['local_errors'].append({
+                    'type': 'integração',
+                    'message': str(e),
+                    'detail': f'Erro ao mapear códigos Omie: {str(e)}'
+                })
+                self.context['has_pending_issues'] = True
+                return
+
+            info_code = mapa_sigla_para_campo.get(sigla, {})
+
+            self.context.update({
+                'codigo_transportadora': info_code.get('transportadora'),
+                'codigo_vendedor': info_code.get('vendedor'),
+                'codigo_cliente': info_code.get('cod_cliente'),
+                'sigla': sigla,
+            })
+
+            empty_fields = []
+            if not info_code.get('vendedor'):
+                empty_fields.append('vendedor')
+            if not info_code.get('cod_cliente'):
+                empty_fields.append('cliente')
+            if carrier and not info_code.get('transportadora'):
+                empty_fields.append('transportadora')
+
+            if empty_fields:
+                self.context['local_errors'].append({
+                    'type': 'integração',
+                    'message': 'Códigos de integração ausentes',
+                    'detail': f'Os seguintes códigos estão ausentes: {", ".join(empty_fields)}'
+                })
+                self.context['has_pending_issues'] = True
+
+        except Exception as e:
+            self.context['local_errors'].append({
+                'type': 'sistema',
+                'message': 'Erro ao processar dados de integração',
+                'detail': str(e)
+            })
+            self.context['has_pending_issues'] = True
+            messages.error(self.request, self.context['local_errors'])
+            print(f'ERRO: {self.context["local_errors"]}')
+
+    def _get_credit_info(self):
+        try:
+            client_api_response = get_client_from_omie(self.order.cliente.cnpj, action='consultar') or None
+            finance_api_response = get_financial_data_from_omie(self.order.cliente.cnpj)
+            credit_limit = client_api_response['global_credit_limit']
+            financial_process_data = process_financial_data(finance_api_response)
+            available_limit = float(credit_limit) - float(financial_process_data['TOTAL A RECEBER'])
+
+            self.context['financial_data'] = {
+                'ATRASADO': format_to_brl_currency(financial_process_data['ATRASADO']),
+                'VENCE_HOJE': format_to_brl_currency(financial_process_data['VENCE HOJE']),
+                'A_VENCER': format_to_brl_currency(financial_process_data['A VENCER']),
+                'TOTAL_A_RECEBER': format_to_brl_currency(financial_process_data['TOTAL A RECEBER']),
+                'LIMITE_CREDITO': format_to_brl_currency(credit_limit),
+                'LIMITE_DISPONIVEL': format_to_brl_currency(available_limit),
+            }
+        except Exception as e:
+            self.context['api_errors'].append({
+                'type': 'API',
+                'message': 'Erro ao consultar API',
+                'detail': str(e)
+            })
+        return
+
+    def _check_account(self):
+        try:
+            cnpj = self.qs_itens.first().cnpj_faturamento
+            conta_corrente = ContaCorrente.objects.filter(cnpj=cnpj, padrao=True)
+            self.context['conta_corrente'] = conta_corrente
+
+            if not conta_corrente.exists():
+                raise ValueError(f'Conta corrente não encontrada para o CNPJ {cnpj}')
+
+        except Exception as e:
+            self.context['local_errors'].append({
+                'type': 'financeiro',
+                'message': 'Conta corrente não encontrada' if isinstance(e, ValueError) else 'Erro ao verificar conta corrente',
+                'detail': str(e)
+            })
+            self.context['has_pending_issues'] = True
+
+        return
+
+    def _finalize(self):
+        self.context['ready_to_send'] = True
+
+class OrderPickingPDF(DetailView, OrderPickingContextBuilder):
+    model = Outflows
+    template_name = 'includes/pedido_separacao_pdf.html'
+    context_object_name = 'order_picking'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.get_object()
+        builder = OrderPickingContextBuilder(order)
+        context.update(builder.build())
         return context
+
+# class OrderPickingPDF(DetailView, OrderPickingContextBuilder):
+#     model = Outflows
+#     template_name = 'includes/pedido_separacao_pdf.html'
+#     context_object_name = 'order_picking'
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['local_errors'] = []
+#         context['api_errors'] = []
+
+#         context['order'] = order = self.get_object()
+#         context['client'] = order.cliente
+#         context['cnpj'] = self.format_cnpj_cpf(order.cliente.cnpj)
+#         context['vendedor'] = order.vendedor
+#         context['prazo_parcelas'] = order.prazo
+
+#         order_itens = OutflowsItems.objects.filter(saida=order.pk)
+#         if not order_itens.exists():
+#             context['local_errors'].append({
+#                 'type': 'order',
+#                 'message': 'Pedido sem itens cadastrados',
+#                 'detail': f'O pedido #{order.pk} não possui itens associados'
+#             })
+#             context['has_pending_issues'] = True
+
+#         order_itens = order_itens.annotate(
+#             item_total=F('preco') * F('quantidade')
+#         )
+#         total_geral = order_itens.aggregate(
+#             total=Sum('item_total')
+#         )
+
+#         for item in order_itens:
+#             if not item.quantidade:
+#                 context['local_errors'].append({
+#                     'type': 'item',
+#                     'message': f'Item {item.produto.nome_produto} sem quantidade',
+#                     'detail': f'O item #{item.id} precisa de uma quantidade válida'
+#                 })
+#                 context['has_pending_issues'] = True
+#             if not item.cnpj_faturamento:
+#                 context['local_errors'].append({
+#                     'type': 'item',
+#                     'message': f'Item {item.produto.nome_produto} sem CNPJ de faturamento',
+#                     'detail': f'O item #{item.id} precisa de um CNPJ de faturamento válido'
+#                 })
+#                 context['has_pending_issues'] = True
+
+#         context['order_itens'] = order_itens
+#         context['total_geral'] = total_geral['total']
+#         carrier = order_itens.first().saida.transportadora
+#         context['transportadora'] = carrier
+#         quantidade_itens = len(order_itens)
+#         context['quantidade_itens'] = quantidade_itens
+
+#         try:
+#             *_, total_ipi, total_nota, item_list = calculate_order_total(order_itens)
+
+#             context['item_list'] = item_list
+#             context['total_nota'] = format_to_brl_currency(total_nota)
+#         except Exception as e:
+#             context['local_errors'].append({
+#                 'type': 'cálculo',
+#                 'message': 'Erro ao calcular total do pedido',
+#                 'detail': str(e)
+#             })
+#             context['has_pending_issues'] = True
+
+#         calculated_itens = []
+#         for item, calc in zip(order_itens, item_list):
+#             item_dict = {
+#                 'item': item,
+#                 'preco_unitario': calc['preco_unitario'],
+#                 'preco_unitario_formatado': calc['preco_unitario_formatado'],
+#                 'preco_total': calc['preco_total'],
+#                 'preco_total_formatado': calc['preco_total_formatado'],
+#                 'largura': calc['largura'],
+#                 'comprimento': calc['comprimento'],
+#                 'm_quadrado_unitario': calc['m_quadrado_unitario'],
+#                 'm_quadrado_total': calc['m_quadrado_total'],
+#                 'ipi': calc['ipi'],
+#             }
+#             calculated_itens.append(item_dict)
+
+#         context['order_itens'] = calculated_itens
+#         context['total_ipi'] = format_to_brl_currency(total_ipi)
+#         total_pedido = sum(item['preco_total'] for item in item_list)
+#         context['sub_total'] = format_to_brl_currency(total_pedido)
+
+#         context['ready_to_send'] = True
+
+#         return context
 
 
 # class OrderPicking(DetailView, FormataDadosMixin):
@@ -1269,24 +1485,19 @@ class OrderPickingPDF(DetailView, FormataDadosMixin):
 
 #         return context
 
-class OrderPicking(DetailView, FormataDadosMixin):
+
+
+
+class OrderPicking(DetailView, OrderPickingContextBuilder):
     model = Outflows
     template_name = 'includes/pedido_separacao.html'
     context_object_name = 'order_picking'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(self._build_base_context())
-
-        order = context['order']
-        order_itens = self._get_order_itens(order, context)
-        context.update(self._calculate_totals(order_itens, context))
-        context.update(self._check_account(order_itens, context))
-        context.update(self._check_integrations(order_itens, order, context))
-        context.update(self._get_credit_info(order, context))
-
-        if not context['has_pending_issues']:
-            context['ready_to_send'] = True
+        order = self.get_object()
+        builder = OrderPickingContextBuilder(order)
+        context.update(builder.build())
 
         return context
 
@@ -1303,179 +1514,9 @@ class OrderPicking(DetailView, FormataDadosMixin):
             'has_pending_issues': False,
         }
 
-    def _get_order_itens(self, order, context):
-        itens = OutflowsItems.objects.filter(saida=order.pk, produto__isnull=False)
 
-        if not itens.exists():
-            context['local_errors'].append({
-                'type': 'pedido',
-                'message': 'Pedido sem itens cadastrados',
-                'detail': f'O pedido #{order.pk} não possui itens associados'
-            })
-            context['has_pending_issues'] = True
 
-        itens = itens.annotate(item_total=F('preco') * F('quantidade'))
 
-        for item in itens:
-            if not item.quantidade:
-                context['local_errors'].append({
-                    'type': 'item',
-                    'message': f'Item {item.produto.nome_produto} sem quantidade',
-                    'detail': f'O item #{item.id} precisa de uma quantidade válida'
-                })
-                context['has_pending_issues'] = True
-            if not item.cnpj_faturamento:
-                context['local_errors'].append({
-                    'type': 'item',
-                    'message': f'Item {item.produto.nome_produto} sem CNPJ de faturamento',
-                    'detail': f'O item #{item.id} precisa de um CNPJ de faturamento válido'
-                })
-                context['has_pending_issues'] = True
-
-            context['transportadora'] = itens.first().saida.transportadora
-            context['quantidade_itens'] = len(itens)
-            return itens
-
-    def _calculate_totals(self, itens, context):
-        result = {}
-        try:
-            *_, total_ipi, total_nota, item_list = calculate_order_total(itens)
-            result['item_list'] = item_list
-            result['total_nota'] = format_to_brl_currency(total_nota)
-
-            calculated_itens = []
-            for item, calc in zip(itens, item_list):
-                calculated_itens.append({
-                    'item': item,
-                    **{k: calc[k] for k in [
-                        'preco_unitario', 'preco_unitario_formatado',
-                        'preco_total', 'preco_total_formatado',
-                        'largura', 'comprimento',
-                        'm_quadrado_unitario', 'm_quadrado_total', 'ipi'
-                    ]}
-                })
-            result['order_itens'] = calculated_itens
-            result['total_ipi'] = format_to_brl_currency(total_ipi)
-            total_pedido = sum(item['preco_total'] for item in item_list)
-            result['sub_total'] = format_to_brl_currency(total_pedido)
-            result['total_geral'] = item.aggregate(total=Sum('item_total'))['total']
-
-        except Exception as e:
-            context['local_errors'].append({
-                'type': 'cálculo',
-                'message': 'Erro ao calcular total do pedido',
-                'detail': str(e)
-            })
-            context['has_pending_issues'] = True
-        return result
-
-    def _check_account(self, itens, context):
-        result = {}
-        try:
-            cnpj = itens.first().cnpj_faturamento
-            conta_corrente = ContaCorrente.objects.filter(cnpj=cnpj, padrao=True)
-            result['conta_corrente'] = conta_corrente
-
-            if not conta_corrente.exists():
-                raise ValueError(f'Conta corrente não encontrada para o CNPJ {cnpj}')
-
-        except Exception as e:
-            context['local_errors'].append({
-                'type': 'financeiro',
-                'message': 'Conta corrente não encontrada' if isinstance(e, ValueError) else 'Erro ao verificar conta corrente',
-                'detail': str(e)
-            })
-            context['has_pending_issues'] = True
-
-        return result
-
-    def _check_integrations(self, itens, order, context):
-        result = {}
-        try:
-            cnpj_faturamento = itens.first().cnpj_faturamento
-            sigla = cnpj_faturamento.sigla
-            alternativa_data = CustomerSupplier.objects.get(cnpj=cnpj_faturamento.cnpj)
-            alternativa_data.cnpj = self.format_cnpj_cpf(alternativa_data.cnpj)
-
-            result['alternativa_data'] = alternativa_data
-            seller = order.vendedor
-            carrier = getattr(itens.first().saida, 'transportadora', None)
-
-            try:
-                mapa_sigla_para_campo = return_omie_mapping_codes(carrier, seller, order)
-
-            except OmieMappingError as e:
-                context['local_errors'].append({
-                    'type': 'integração',
-                    'message': str(e),
-                    'detail': f'Erro ao mapear códigos Omie: {str(e)}'
-                })
-                context['has_pending_issues'] = True
-                return result
-
-            info_code = mapa_sigla_para_campo.get(sigla, {})
-
-            result.update({
-                'codigo_transportadora': info_code.get('transportadora'),
-                'codigo_vendedor': info_code.get('vendedor'),
-                'codigo_cliente': info_code.get('cod_cliente'),
-                'sigla': sigla,
-            })
-
-            empty_fields = []
-            if not info_code.get('vendedor'):
-                empty_fields.append('vendedor')
-            if not info_code.get('cod_cliente'):
-                empty_fields.append('cliente')
-            if carrier and not info_code.get('transportadora'):
-                empty_fields.append('transportadora')
-
-            if empty_fields:
-                context['local_errors'].append({
-                    'type': 'integração',
-                    'message': 'Códigos de integração ausentes',
-                    'detail': f'Os seguintes códigos estão ausentes: {", ".join(empty_fields)}'
-                })
-                context['has_pending_issues'] = True
-
-        except Exception as e:
-            context['local_errors'].append({
-                'type': 'sistema',
-                'message': 'Erro ao processar dados de integração',
-                'detail': str(e)
-            })
-            context['has_pending_issues'] = True
-            messages.error(self.request, context['local_errors'])
-            print(f'ERRO: {context["local_errors"]}')
-        print("has_pending_issues?", context['has_pending_issues'])
-
-        return result
-
-    def _get_credit_info(self, order, context):
-
-        result = {}
-        try:
-            client_api_response = get_client_from_omie(order.cliente.cnpj, action='consultar') or None
-            finance_api_response = get_financial_data_from_omie(order.cliente.cnpj)
-            credit_limit = client_api_response['global_credit_limit']
-            financial_process_data = process_financial_data(finance_api_response)
-            available_limit = float(credit_limit) - float(financial_process_data['TOTAL A RECEBER'])
-
-            result['financial_data'] = {
-                'ATRASADO': format_to_brl_currency(financial_process_data['ATRASADO']),
-                'VENCE_HOJE': format_to_brl_currency(financial_process_data['VENCE HOJE']),
-                'A_VENCER': format_to_brl_currency(financial_process_data['A VENCER']),
-                'TOTAL_A_RECEBER': format_to_brl_currency(financial_process_data['TOTAL A RECEBER']),
-                'LIMITE_CREDITO': format_to_brl_currency(credit_limit),
-                'LIMITE_DISPONIVEL': format_to_brl_currency(available_limit),
-            }
-        except Exception as e:
-            context['api_errors'].append({
-                'type': 'API',
-                'message': 'Erro ao consultar API',
-                'detail': str(e)
-            })
-        return result
 
 class OrderPendingDetail(DetailView):
     template_name = 'includes/_pendencias.html'
