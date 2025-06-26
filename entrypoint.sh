@@ -5,6 +5,9 @@ set -e
 ./wait-for-it.sh db:3306 --timeout=60 --strict -- echo "Database is up"
 
 # Realiza migrations e coleta os estáticos
+
+echo "Criando migrações..."
+python manage.py makemigrations
 echo "Aplicando migrações..."
 python manage.py migrate
 echo "Coletando arquivos estáticos..."
@@ -23,7 +26,7 @@ python manage.py loaddata dump/accounts_bkp_utf8.json
 python manage.py loaddata dump/logistic_bkp_utf8.json
 python manage.py loaddata dump/common_bkp_utf8.json
 python manage.py loaddata dump/products_bkp_utf8.json
-python manage.py loaddata dump/transactions_bkp_utf8.json
+python manage.py loaddata dump/transactions_bkp_ulstf8.json
 
 echo "Fixtures importadas com sucesso."
 
