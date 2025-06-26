@@ -20,6 +20,14 @@ class IndexView(LoginRequiredMixin, TemplateView):
         return context
 
 # ********************************* UTILS  ********************************************
+class OmieMappingError(Exception):
+    """Custom exception for Omie mapping errors."""
+    def __init__(self, entity_name, detail):
+        self.entity_name = entity_name
+        self.detail = detail
+        super().__init__(f'{entity_name}: {detail}')
+
+
 class PDFGeneratorView(View):
     """
     Base class for generating PDFs from HTML templates
@@ -70,7 +78,10 @@ class FormataDadosMixin:
 
     # Formata o CNPJ ou CPF que serão apresentados nas listagens
     def format_cnpj_cpf(self, cnpj):
+        if not isinstance(cnpj, str):
+            raise ValueError("Esperado CNPJ ou CPF como string")
         if cnpj:
+            cnpj = str(cnpj)
             if len(cnpj) == 14:
                 return f'{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:14]}'
 

@@ -37,13 +37,13 @@
                 <h5 class="order-separation"><strong>Pedido e Separação Nº {{ order.pk }}</strong></h5>
             </div>
             <div class="col">
-                <h5 class="text-end"><strong>ALTERNATIVA PRE IMPRESSAO LTDA</strong></h5>
+                <h5 class="text-end"><strong>{{ alternativa_data.nome_fantasia }}</strong></h5>
                 <section class="text-end alternativa-section">
-                    <span class="d-block">CNPJ: 30.323.170/0001-78</span>
-                    <span class="d-block">Inscrição Estadual: 708148927119</span>
-                    <span class="d-block">Endereço: R JOAQUIM DA SILVA MOREIRA, 116, JARDIM PINHEIROS</span>
-                    <span class="d-block">Valinhos - SP - CEP: 13274-310</span>
-                    <span class="d-block">Telefone: (19) 3244-5006</span>
+                    <span class="d-block">CNPJ: {{ alternativa_data.cnpj }}</span>
+                    <span class="d-block">Inscrição Estadual: {{ alternativa_data.inscricao_estadual }}</span>
+                    <span class="d-block">Endereço: {{ alternativa_data.endereco }}, {{ alternativa_data.numero }}, {{ alternativa_data.bairro }}</span>
+                    <span class="d-block">{{ alternativa_data.cidade }} - {{ alternativa_data.estado }} - CEP: {{ alternativa_data.cep }}</span>
+                    <span class="d-block">Telefone: ({{ alternativa_data.ddd }}) {{ alternativa_data.telefone }}</span>
                 </section>
             </div>
         </div>
@@ -203,7 +203,7 @@
             <div class="col mt-4">
                 <h5><strong>Outras Informações</strong></h5>
                 <span class="d-block"><strong>Pedido e Separação - incluido em: </strong>{{ order.dt_criacao }}</span>
-                <span class="d-block"><strong>Previsão de Faturamento: </strong>27/3/2025</span>
+                <span class="d-block"><strong>Previsão de Faturamento: </strong>{{ order.dt_previsao_faturamento }}</span>
                 <span class="d-block"><strong>Vendedor: </strong>{{ order.vendedor.nome }}</span>
                 <span class="d-block"><strong>N do Pedido do Cliente: </strong>{{ order.pedido_interno_cliente|default_if_none:"" }}</span>
             </div>

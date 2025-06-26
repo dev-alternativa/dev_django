@@ -180,13 +180,16 @@ const handleJSONCNPJ = (jsonData) => {
   const cidade = (jsonData.estabelecimento.cidade.nome) ? jsonData.estabelecimento.cidade.nome : "";
   const inscricoes_estaduais = (jsonData.estabelecimento.inscricoes_estaduais) ? jsonData.estabelecimento.inscricoes_estaduais : "";
 
+  console.log(inscricoes_estaduais);
   // Elimina inscrições não ativas e coleta apenas a primeira encontrada
   let inscricaoAtiva = "";
   if (inscricoes_estaduais.length > 0) {
     let inscricoesAtivas = inscricoes_estaduais.filter(inscricao => inscricao.ativo)
-    inscricaoAtiva = inscricoesAtivas[0].inscricao_estadual;
-  }
+      if (!inscricoesAtivas.length){
+        let erroMessage = 'Atenção API informou não existirem inscrições ativas, favor validar no SINTEGRA';
+      }
 
+  }
   // Popula campos do formulário com os valores consultados
   $('#id_nome_fantasia').val(nome_fantasia);
   $('#id_razao_social').val(razao_social);

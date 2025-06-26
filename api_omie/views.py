@@ -674,7 +674,6 @@ def get_client_from_omie(cnpj_cpf, action):
     global_credit_limit = 0.0
     client_errors_data = []
     omie_codes = []
-    print('TESTE')
 
     for app_type in cnpj_list:
         # Obtem credencial relativa ao app OMIE
