@@ -2070,10 +2070,10 @@ def edit_order(request, order_id):
 
     """
     if request.method == 'POST':
-
         try:
             order = get_object_or_404(Outflows, pk=order_id)
             dados_modificados = request.POST
+
 
             if 'cliente' in dados_modificados:
                 cliente_id = dados_modificados.get('cliente')
@@ -2099,15 +2099,12 @@ def edit_order(request, order_id):
                 tipo_frete_id = dados_modificados.get('tipo_frete')
                 tipo_frete = get_object_or_404(Freight, id=tipo_frete_id)
                 order.tipo_frete = tipo_frete
-            if  'prazo' in dados_modificados:
+            if 'prazo' in dados_modificados:
+                print('TESTE EDICAO')
                 prazo_id = dados_modificados.get('prazo')
                 prazo = get_object_or_404(LeadTime, id=prazo_id)
                 order.prazo = prazo
-            else:
-                return JsonResponse(
-                    {'error': 'Prazo não informado!'},
-                    status=400
-                )
+
             if 'taxa_frete' in dados_modificados:
                 order.taxa_frete = dados_modificados.get('taxa_frete')
             if 'dados_adicionais_nf' in dados_modificados:
