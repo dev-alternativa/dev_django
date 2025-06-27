@@ -574,13 +574,13 @@ def get_omie_credentials(app_type):
         'app_secret': os.getenv(f'{app_type}_OMIE_API_SECRET')
     }
 
-def clean_cnpj_cpf(cnpj_cpf):
+# def clean_cnpj_cpf(cnpj_cpf):
     """
     Remove caracteres especiais de um CNPJ ou CPF.
     :param cnpj_cpf: CNPJ ou CPF a ser limpo.
     :return: CNPJ ou CPF sem caracteres especiais.
     """
-    return ''.join(filter(str.isdigit, cnpj_cpf))
+    # return ''.join(filter(str.isdigit, cnpj_cpf))
 
 # **************************** FINANCEIRO ********************************
 def get_financial_data_from_omie(cnpj_cpf):

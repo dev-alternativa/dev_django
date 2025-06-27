@@ -267,6 +267,8 @@ class PriceListView(ListView, FormataDadosMixin):
     template_name = 'preco/preco.html'
     context_object_name = 'itens_preco'
     success_url = reverse_lazy('add_price')
+    paginate_by = 30
+    ordering = 'produto'
 
     def get_queryset(self):
         queryset = super().get_queryset()

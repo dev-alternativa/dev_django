@@ -5,10 +5,11 @@ from django.contrib import messages
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 
-from common.models import CustomerSupplier, Category
-from imports.forms import UploadLeadTimeForm, UploadCustomerSupplierForm, UploadCarrierForm, UploadProductForm
+from core.views import clean_cnpj_cpf
+from common.models import CustomerSupplier, Category, CNPJFaturamento, Seller
+from imports.forms import UploadLeadTimeForm, UploadCustomerSupplierForm, UploadCarrierForm, UploadProductForm, UploadPriceForm
 from logistic.models import Carrier, LeadTime, Freight
-from products.models import Product
+from products.models import Product, Price
 
 
 class ImportLeadTimeView(FormView):
@@ -456,6 +457,105 @@ class ImportProductView(FormView):
 
         messages.success(self.request, 'Arquivo importado e processado com sucesso!')
         return super().form_valid(form)
+
+
+class ImportPriceView(FormView):
+    form_class = UploadPriceForm
+    template_name = 'importar_preco.html'
+    success_url = reverse_lazy('price')
+
+    def form_valid(self, form):
+        file = form.cleaned_data['file']
+        sheet_name = 'Tab_Import'
+
+        # Handle file load
+        try:
+            df = pd.read_excel(file, sheet_name, engine='openpyxl')
+        except Exception as e:
+            messages.error(self.request, f'Erro ao ler o arquivo Excel: {e}')
+            return self.form_invalid(form)
+
+        # Handle empty sheet
+        if df.empty:
+            messages.error(self.request, 'A planilha está vazia...')
+            return super().form_invalid(form)
+
+        # Handle required columns
+        required_columns = [
+            'VALOR', 'CONDICAO', 'CNPJ CLIENTE',
+            'CLIENTE NOME FANTASIA', 'PRODUTO',
+            'PRAZO', 'CNPJ_FATURAMENTO', 'VENDEDOR',
+            'DOLAR', 'Tipo de frete', 'VALOR FRETE',
+        ]
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            messages.error(self.request, f'As seguintes colunas estão faltando: {', '.join(missing_columns)}')
+            return self.form_invalid(form)
+
+        # Cast to string values in coluns / fill empty with `0`
+        df = df.fillna('0').astype(str)
+        criados = 0
+
+        for index, row in df.iterrows():
+            try:
+                valor = row['VALOR']
+                condicao = row['CONDICAO'].replace(' ', '')
+                cnpj_cliente = clean_cnpj_cpf(row['CNPJ CLIENTE'])
+                nome_fantasia = row['CLIENTE NOME FANTASIA']
+                produto_nome = row['PRODUTO']
+                prazo_desc = row['PRAZO']
+                app_omie = row['CNPJ_FATURAMENTO'].upper()
+                vendedor_nome = row['VENDEDOR']
+                is_dolar = bool(row['DOLAR'])
+                tipo_frete_nome = row['Tipo de frete']
+                valor_frete = row['VALOR FRETE']
+
+                produto = Product.objects.filter(nome_produto=produto_nome).first()
+                cliente = CustomerSupplier.objects.filter(cnpj=cnpj_cliente).first()
+                prazo = LeadTime.objects.filter(descricao=prazo_desc).first()
+                cnpj_faturamento = CNPJFaturamento.objects.filter(sigla=app_omie).first()
+                vendedor = Seller.objects.filter(nome=vendedor_nome).first()
+                tipo_frete = Freight.objects.filter(tipo_frete=tipo_frete_nome).first()
+
+                chave_lookup = {
+                    'produto': produto,
+                    'cliente': cliente,
+                    'cnpj_faturamento': cnpj_faturamento,
+                    'vendedor': vendedor,
+                    'tipo_frete': tipo_frete,
+                    'prazo': prazo,
+                    'condicao': condicao,
+                }
+                preco_existente = Price.objects.filter(**chave_lookup).first()
+                if preco_existente:
+                    preco_existente.valor = valor
+                    preco_existente.taxa_frete = valor_frete
+                    preco_existente.is_dolar = is_dolar
+                    preco_existente.obs = ''
+                    preco_existente.save()
+                else:
+                    if all(chave_lookup.values()):
+                        Price.objects.create(
+                            **chave_lookup,
+                            valor=valor,
+                            taxa_frete=valor_frete,
+                            is_dolar=is_dolar,
+                            obs=''
+                        )
+                        criados += 1
+                    # else:
+                    #     messages.warning(
+                    #         self.request,
+                    #         f'[Linha {index + 1}] Registro ignorado: campos obrigatórios ausentes.'
+                    #     )
+
+            except Exception as e:
+                messages.error(self.request, f'ERRO ao processar a linha: {index + 1}: {e}')
+                print(f'Erro ao processar a linha {index + 1}: {e}')
+
+        messages.success(self.request, f'Importação concluída com sucesso. {criados} registro(s) criados')
+        return super().form_valid(form)
+
 
 
 # class ImportarEstoqueView(FormView):

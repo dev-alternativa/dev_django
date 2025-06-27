@@ -8,6 +8,10 @@
             <i class="bi bi-plus-lg"></i>
             Adicionar Novo Preço
         </a>
+        <a href="{% url 'import_price' %}" class="btn btn-outline-success">
+            <i class="bi-box-arrow-in-left"></i>
+            Importar de Planilha Excel
+        </a>
     </div>
     <div class="space_from_margin">
         {% include "preco/lista_preco.html" %}
