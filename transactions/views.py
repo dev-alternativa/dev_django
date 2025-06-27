@@ -465,8 +465,9 @@ def calculate_order_total(items):
                 total_ipi += safe_decimal(item['ipi']) * safe_decimal(item['preco_total']) / Decimal('100')
             except InvalidOperation:
                 continue
-
+    formatador = FormataDadosMixin()
     total_nota = total_pedido + total_ipi
+    total_ipi = formatador.format_BRL(total_ipi)
 
     return total_pedido, total_ipi, total_nota, item_list
 
@@ -1058,6 +1059,7 @@ class OrderPickingContextBuilder(FormataDadosMixin):
     def _check_integrations(self):
         try:
             cnpj_faturamento = self.qs_itens.first().cnpj_faturamento
+
             sigla = cnpj_faturamento.sigla
             alternativa_data = CustomerSupplier.objects.get(cnpj=cnpj_faturamento.cnpj)
             alternativa_data.cnpj = self.format_cnpj_cpf(alternativa_data.cnpj)
@@ -1846,7 +1848,7 @@ def add_product_to_order(request, order_id):
             'preco': 'Preço',
             'cnpj_faturamento': 'CNPJ de Faturamento',
             'prazo_item': 'Prazo Item',
-            'vendedor': 'Vendedor',
+            'vendedor_item': 'Vendedor',
         }
 
         required_fields = field_labels.keys()
@@ -2008,6 +2010,7 @@ def get_itens_pedido(request, order_id):
 
     if items.exists():
         total_pedido, total_ipi, total_nota, item_list = calculate_order_total(items)
+
         # print(f'Total de IPI: {total_ipi}')
         # item_list = []
 
